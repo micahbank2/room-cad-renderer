@@ -76,23 +76,23 @@ Jessica can see her future room with her actual furniture before spending money.
 | EDIT-03 | — | Validated (existing) |
 | EDIT-04 | — | Validated (existing) |
 | EDIT-05 | — | Validated (existing) |
-| EDIT-06 | TBD | Active |
-| EDIT-07 | TBD | Active |
-| EDIT-08 | TBD | Active |
-| EDIT-09 | TBD | Active |
+| EDIT-06 | Phase 1 | Active |
+| EDIT-07 | Phase 1 | Active |
+| EDIT-08 | Phase 1 | Active |
+| EDIT-09 | Phase 1 | Active |
 | LIB-01 | — | Validated (existing) |
 | LIB-02 | — | Validated (existing) |
-| LIB-03 | TBD | Active |
-| LIB-04 | TBD | Active |
-| LIB-05 | TBD | Active |
+| LIB-03 | Phase 2 | Active |
+| LIB-04 | Phase 2 | Active |
+| LIB-05 | Phase 2 | Active |
 | VIZ-01 | — | Validated (existing) |
 | VIZ-02 | — | Validated (existing) |
 | VIZ-03 | — | Validated (existing) |
-| VIZ-04 | TBD | Active |
-| VIZ-05 | TBD | Active |
-| VIZ-06 | TBD | Active |
+| VIZ-04 | Phase 3 | Active |
+| VIZ-05 | Phase 4 | Active |
+| VIZ-06 | Phase 3 | Active |
 | SAVE-01 | — | Validated (existing) |
-| SAVE-02 | TBD | Active |
-| SAVE-03 | TBD | Active |
-| ROOM-01 | TBD | Active |
-| ROOM-02 | TBD | Active |
+| SAVE-02 | Phase 1 | Active |
+| SAVE-03 | Phase 3 | Active |
+| ROOM-01 | Phase 5 | Active |
+| ROOM-02 | Phase 5 | Active |
