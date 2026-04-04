@@ -30,7 +30,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A placed product shows rotation handles she can drag to spin it in place
   4. She can double-click a wall dimension label and type a new value to resize the wall
   5. After making any change, the project saves automatically within a few seconds — no explicit Save click required
-**Plans**: TBD
+**Plans**: 6 plans
+  - [ ] 00-PLAN.md — Test infrastructure (Vitest + jsdom + stub test files)
+  - [ ] 01-PLAN.md — EDIT-09 product image rendering (cache + fabricSync fix)
+  - [ ] 02-PLAN.md — EDIT-07 drag-drop placement (HTML5 DnD + auto-select)
+  - [ ] 03-PLAN.md — EDIT-08 rotation handle (Figma-style + 15° snap + Shift free-rotate)
+  - [ ] 04-PLAN.md — EDIT-06 dimension editing (dblclick overlay input + corner propagation)
+  - [ ] 05-PLAN.md — SAVE-02 auto-save (2s debounce + projectStore + SaveIndicator)
 **UI hint**: yes
 
 ### Phase 2: Product Library
@@ -41,7 +47,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. A product Jessica uploads in Project A appears in the library when she opens Project B
   2. She can add a product with only an image and name — dimension fields are optional and skippable
   3. She can type part of a product name into a search field and see only matching results
-**Plans**: TBD
+**Plans**: 6 plans
+  - [ ] 00-PLAN.md — Test infrastructure (Vitest + jsdom + stub test files)
+  - [ ] 01-PLAN.md — EDIT-09 product image rendering (cache + fabricSync fix)
+  - [ ] 02-PLAN.md — EDIT-07 drag-drop placement (HTML5 DnD + auto-select)
+  - [ ] 03-PLAN.md — EDIT-08 rotation handle (Figma-style + 15° snap + Shift free-rotate)
+  - [ ] 04-PLAN.md — EDIT-06 dimension editing (dblclick overlay input + corner propagation)
+  - [ ] 05-PLAN.md — SAVE-02 auto-save (2s debounce + projectStore + SaveIndicator)
 
 ### Phase 3: 3D Product Rendering
 **Goal**: Products appear in the 3D view with their actual uploaded images as textures, the scene looks visually rich with proper materials and soft shadows, and she can capture the view as a PNG
@@ -51,7 +63,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. A couch product with an uploaded image shows that image mapped onto its 3D box in the Three.js viewport
   2. The 3D scene has a visible floor surface, soft ambient shadows, and materials that feel closer to a real render than placeholder geometry
   3. Jessica can click Export and save the current 3D view as a PNG image file
-**Plans**: TBD
+**Plans**: 6 plans
+  - [ ] 00-PLAN.md — Test infrastructure (Vitest + jsdom + stub test files)
+  - [ ] 01-PLAN.md — EDIT-09 product image rendering (cache + fabricSync fix)
+  - [ ] 02-PLAN.md — EDIT-07 drag-drop placement (HTML5 DnD + auto-select)
+  - [ ] 03-PLAN.md — EDIT-08 rotation handle (Figma-style + 15° snap + Shift free-rotate)
+  - [ ] 04-PLAN.md — EDIT-06 dimension editing (dblclick overlay input + corner propagation)
+  - [ ] 05-PLAN.md — SAVE-02 auto-save (2s debounce + projectStore + SaveIndicator)
 **UI hint**: yes
 
 ### Phase 4: 3D Walkthrough
@@ -62,7 +80,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. A "Walk" or "Eye Level" button switches the 3D viewport from orbit camera to a first-person perspective at roughly standing height
   2. She can use arrow keys or WASD to move through the room and look around
   3. Switching back to orbit view restores the previous orbit camera position
-**Plans**: TBD
+**Plans**: 6 plans
+  - [ ] 00-PLAN.md — Test infrastructure (Vitest + jsdom + stub test files)
+  - [ ] 01-PLAN.md — EDIT-09 product image rendering (cache + fabricSync fix)
+  - [ ] 02-PLAN.md — EDIT-07 drag-drop placement (HTML5 DnD + auto-select)
+  - [ ] 03-PLAN.md — EDIT-08 rotation handle (Figma-style + 15° snap + Shift free-rotate)
+  - [ ] 04-PLAN.md — EDIT-06 dimension editing (dblclick overlay input + corner propagation)
+  - [ ] 05-PLAN.md — SAVE-02 auto-save (2s debounce + projectStore + SaveIndicator)
 **UI hint**: yes
 
 ### Phase 5: Multi-Room
@@ -73,7 +97,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. Jessica can add a second room to an existing project and switch between rooms in the same canvas view
   2. Room templates (living room, bedroom, kitchen) provide a pre-drawn room shape with typical dimensions she can accept or modify
   3. Products placed in one room do not appear in other rooms
-**Plans**: TBD
+**Plans**: 6 plans
+  - [ ] 00-PLAN.md — Test infrastructure (Vitest + jsdom + stub test files)
+  - [ ] 01-PLAN.md — EDIT-09 product image rendering (cache + fabricSync fix)
+  - [ ] 02-PLAN.md — EDIT-07 drag-drop placement (HTML5 DnD + auto-select)
+  - [ ] 03-PLAN.md — EDIT-08 rotation handle (Figma-style + 15° snap + Shift free-rotate)
+  - [ ] 04-PLAN.md — EDIT-06 dimension editing (dblclick overlay input + corner propagation)
+  - [ ] 05-PLAN.md — SAVE-02 auto-save (2s debounce + projectStore + SaveIndicator)
 **UI hint**: yes
 
 ## Progress
