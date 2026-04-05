@@ -88,9 +88,28 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - ✓ Opening slide along host wall — v1.1 (EDIT-18, Phase 10)
 - ✓ Live dim tag during all drags — v1.1 (EDIT-19, Phase 10)
 
-### Active
+### Active (v1.2 New Element Types)
 
-No active requirements. Run `/gsd:new-milestone` to start v1.2.
+**Ceilings:**
+- [ ] Draw ceiling polygons with editable height + material (CEIL-01/02/03/04)
+
+**Floor materials:**
+- [ ] Preset catalog + custom texture upload + scale/rotation controls (FLOOR-01/02/03)
+
+**Wall surfaces:**
+- [ ] Per-wall wallpaper (SURFACE-01)
+- [ ] Wall art items at x/y positions per wall (SURFACE-02/03/04)
+
+**Architectural trim:**
+- [ ] Per-wall wainscoting toggle with editable height (TRIM-01)
+- [ ] Per-wall crown molding toggle (TRIM-02)
+- [ ] 3D rendering of both trim types (TRIM-03)
+
+**Custom element builder:**
+- [ ] Create custom items (name, shape, dims, material) (CUSTOM-01)
+- [ ] Place, move, rotate, resize on canvas (CUSTOM-02/03)
+- [ ] Render in 3D (CUSTOM-04)
+- [ ] Per-project catalog for re-placement (CUSTOM-05)
 
 ### Planned (v1.2 New Element Types)
 - Ceilings
@@ -135,17 +154,16 @@ No active requirements. Run `/gsd:new-milestone` to start v1.2.
 
 ## Next Milestone Goals
 
-v1.1 UX Fixes & Polish — make the app usable without workarounds. See ROADMAP.md for full phase breakdown.
+v1.2 New Element Types — expand beyond walls + products to cover the architectural and decorative elements that make a room feel real.
 
-Key fixes driving v1.1:
-- 2D canvas zoom/pan is missing (critical — makes larger rooms unworkable)
-- Click-placement offset bug (door lands next to wall, not on cursor)
-- Tools stay sticky after placing (should auto-revert to Select)
-- No live measurements while drawing
-- Home page flow needs refocusing on 2 CTAs
-- Broken nav tabs (LAYERS/ASSETS/MEASURE/HISTORY) either wired up or removed
+Key decisions locked in during scoping:
+- **Ceilings**: per-ceiling polygon with custom shape (flexible, supports future vaulted bits)
+- **Floors**: preset material catalog + custom texture upload
+- **Wall surfaces**: per-wall wallpaper + wall art placed with x/y/size
+- **Trim**: per-wall toggles for wainscoting + crown molding (matches real construction)
+- **Custom elements**: full 3D rendering with box/plane shapes
 
-After v1.1: v1.2 adds ceilings/floors/surfaces/custom elements, v1.3 adds the color & paint system with Farrow & Ball catalog and lime wash.
+After v1.2: v1.3 adds the color & paint system with Farrow & Ball catalog and lime wash.
 
 ## Tech Stack (Current)
 

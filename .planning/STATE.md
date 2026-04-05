@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: UX Fixes & Polish
-status: shipped
-stopped_at: v1.1 shipped — milestone archived, tagged v1.1
-last_updated: "2026-04-05T16:30:00.000Z"
+milestone: v1.2
+milestone_name: New Element Types
+status: planning
+stopped_at: Requirements + roadmap drafted, awaiting Phase 11 planning
+last_updated: "2026-04-05T17:00:00.000Z"
 last_activity: 2026-04-05
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+  total_phases: 4
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-05)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Planning next milestone (v1.2) — run `/gsd:new-milestone`
+**Current focus:** v1.2 New Element Types — Phase 11 (Ceilings) ready to plan
 
 ## Current Position
 
-Milestone: v1.1 UX Fixes & Polish — SHIPPED 2026-04-05
-Phases: 6 of 6 complete (6, 7, 7.1, 8, 9, 10)
-PRs merged: 7 (#1–#7)
-Status: Archived, tagged v1.1
+Milestone: v1.2 New Element Types — PLANNING
+Phases planned: 4 (11, 12, 13, 14)
+Requirements: 19 active
+Status: REQUIREMENTS.md + ROADMAP.md drafted. Next: `/gsd:plan-phase 11`
 
-Progress: [██████████] 100%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
