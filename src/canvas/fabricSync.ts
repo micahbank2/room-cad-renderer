@@ -149,40 +149,218 @@ export function renderWalls(
     }
   }
 
-  // For each shared endpoint with exactly two walls meeting, compute the
-  // outer-edge intersection and render a triangular cap that fills the gap
-  // between the two walls' end caps.
+  // Corner caps at shared endpoints. 2-wall junctions get the precise outer-
+  // edge intersection (clean L/T mitre). 3+ wall junctions (WALL-01) get a
+  // convex-hull cap covering all wall-end corners. Dead ends (WALL-02) get
+  // a subtle square end cap extending halfT in the wall's outward direction.
+  const epsPt = 1e-6;
+  const wallList = Object.values(walls);
   for (const entry of endpointUsage.values()) {
-    if (entry.count !== 2) continue; // only handle simple 2-wall junctions
-
-    const incident = Object.values(walls).filter((w) => {
-      const eps = 1e-6;
-      return (
-        (Math.abs(w.start.x - entry.point.x) < eps && Math.abs(w.start.y - entry.point.y) < eps) ||
-        (Math.abs(w.end.x - entry.point.x) < eps && Math.abs(w.end.y - entry.point.y) < eps)
-      );
-    });
-    if (incident.length !== 2) continue;
-
-    const cap = computeCornerCap(incident[0], incident[1], entry.point);
-    if (!cap) continue;
-
-    const capPx = cap.map((p) => ({
-      x: origin.x + p.x * scale,
-      y: origin.y + p.y * scale,
-    }));
-
-    fc.add(
-      new fabric.Polygon(capPx, {
-        fill: WALL_FILL,
-        stroke: null as unknown as string,
-        strokeWidth: 0,
-        selectable: false,
-        evented: false,
-        data: { type: "wall-corner-cap" },
-      })
+    const incident = wallList.filter(
+      (w) =>
+        (Math.abs(w.start.x - entry.point.x) < epsPt &&
+          Math.abs(w.start.y - entry.point.y) < epsPt) ||
+        (Math.abs(w.end.x - entry.point.x) < epsPt &&
+          Math.abs(w.end.y - entry.point.y) < epsPt),
     );
+
+    if (incident.length === 1) {
+      // WALL-02: dead-end cap — rectangle extending halfT beyond endpoint
+      const w = incident[0];
+      const isStart =
+        Math.abs(w.start.x - entry.point.x) < epsPt &&
+        Math.abs(w.start.y - entry.point.y) < epsPt;
+      const cap = computeDeadEndCap(w, isStart);
+      if (cap) addCapPolygon(fc, cap, scale, origin);
+      continue;
+    }
+
+    if (incident.length === 2) {
+      const cap = computeCornerCap(incident[0], incident[1], entry.point);
+      if (cap) addCapPolygon(fc, cap, scale, origin);
+      continue;
+    }
+
+    // WALL-01: 3+ walls meeting — fill convex hull of all wall-end corners
+    const hullPoints: { x: number; y: number }[] = [entry.point];
+    for (const w of incident) {
+      const a = wallAngle(w.start, w.end);
+      const perpAngle = a + Math.PI / 2;
+      const halfT = w.thickness / 2;
+      const pdx = Math.cos(perpAngle) * halfT;
+      const pdy = Math.sin(perpAngle) * halfT;
+      hullPoints.push({ x: entry.point.x - pdx, y: entry.point.y - pdy });
+      hullPoints.push({ x: entry.point.x + pdx, y: entry.point.y + pdy });
+    }
+    const hull = convexHull(hullPoints);
+    if (hull.length >= 3) addCapPolygon(fc, hull, scale, origin);
   }
+
+  // WALL-03: mid-segment wall crossings — fill overlap at each intersection
+  // where two walls cross without sharing an endpoint.
+  for (let i = 0; i < wallList.length; i++) {
+    for (let j = i + 1; j < wallList.length; j++) {
+      const cross = midSegmentCrossing(wallList[i], wallList[j]);
+      if (!cross) continue;
+      const cap = computeCrossingCap(wallList[i], wallList[j], cross);
+      if (cap) addCapPolygon(fc, cap, scale, origin);
+    }
+  }
+}
+
+function addCapPolygon(
+  fc: fabric.Canvas,
+  cap: { x: number; y: number }[],
+  scale: number,
+  origin: { x: number; y: number },
+) {
+  const px = cap.map((p) => ({
+    x: origin.x + p.x * scale,
+    y: origin.y + p.y * scale,
+  }));
+  fc.add(
+    new fabric.Polygon(px, {
+      fill: WALL_FILL,
+      stroke: null as unknown as string,
+      strokeWidth: 0,
+      selectable: false,
+      evented: false,
+      data: { type: "wall-corner-cap" },
+    }),
+  );
+}
+
+/** Andrew's monotone chain convex hull in CCW order. */
+function convexHull(
+  points: { x: number; y: number }[],
+): { x: number; y: number }[] {
+  if (points.length < 3) return points.slice();
+  const pts = points
+    .slice()
+    .sort((a, b) => a.x - b.x || a.y - b.y);
+  const cross = (
+    o: { x: number; y: number },
+    a: { x: number; y: number },
+    b: { x: number; y: number },
+  ) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+  const lower: typeof pts = [];
+  for (const p of pts) {
+    while (
+      lower.length >= 2 &&
+      cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0
+    ) lower.pop();
+    lower.push(p);
+  }
+  const upper: typeof pts = [];
+  for (let i = pts.length - 1; i >= 0; i--) {
+    const p = pts[i];
+    while (
+      upper.length >= 2 &&
+      cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0
+    ) upper.pop();
+    upper.push(p);
+  }
+  lower.pop();
+  upper.pop();
+  return lower.concat(upper);
+}
+
+/** Compute a dead-end square cap that extends the wall by halfT beyond its
+ *  endpoint in the wall's outward direction. Returns 4 polygon corners. */
+function computeDeadEndCap(
+  wall: WallSegment,
+  isStart: boolean,
+): { x: number; y: number }[] | null {
+  const C = isStart ? wall.start : wall.end;
+  const other = isStart ? wall.end : wall.start;
+  const dx = C.x - other.x;
+  const dy = C.y - other.y;
+  const len = Math.hypot(dx, dy);
+  if (len < 1e-6) return null;
+  const ux = dx / len;
+  const uy = dy / len;
+  const halfT = wall.thickness / 2;
+  // Cap extends halfT in the outward direction (ux, uy) from C
+  const extEnd = { x: C.x + ux * halfT, y: C.y + uy * halfT };
+  // Perpendicular
+  const px = -uy;
+  const py = ux;
+  return [
+    { x: C.x + px * halfT, y: C.y + py * halfT },
+    { x: extEnd.x + px * halfT, y: extEnd.y + py * halfT },
+    { x: extEnd.x - px * halfT, y: extEnd.y - py * halfT },
+    { x: C.x - px * halfT, y: C.y - py * halfT },
+  ];
+}
+
+/** Detect whether two walls cross each other in the interior of both segments
+ *  (not at endpoints). Returns the intersection point or null. */
+function midSegmentCrossing(
+  a: WallSegment,
+  b: WallSegment,
+): { x: number; y: number } | null {
+  const r = { x: a.end.x - a.start.x, y: a.end.y - a.start.y };
+  const s = { x: b.end.x - b.start.x, y: b.end.y - b.start.y };
+  const denom = r.x * s.y - r.y * s.x;
+  if (Math.abs(denom) < 1e-9) return null; // parallel
+  const qp = { x: b.start.x - a.start.x, y: b.start.y - a.start.y };
+  const t = (qp.x * s.y - qp.y * s.x) / denom;
+  const u = (qp.x * r.y - qp.y * r.x) / denom;
+  // Must be STRICTLY interior (not at endpoints) — 0.02 margin to avoid
+  // false positives where walls share a corner
+  if (t <= 0.02 || t >= 0.98 || u <= 0.02 || u >= 0.98) return null;
+  return { x: a.start.x + t * r.x, y: a.start.y + t * r.y };
+}
+
+/** Compute a cap polygon covering the overlap of two crossing walls. */
+function computeCrossingCap(
+  a: WallSegment,
+  b: WallSegment,
+  C: { x: number; y: number },
+): { x: number; y: number }[] | null {
+  const angA = wallAngle(a.start, a.end);
+  const angB = wallAngle(b.start, b.end);
+  const halfTA = a.thickness / 2;
+  const halfTB = b.thickness / 2;
+  // Perpendiculars (unit)
+  const paX = Math.cos(angA + Math.PI / 2);
+  const paY = Math.sin(angA + Math.PI / 2);
+  const pbX = Math.cos(angB + Math.PI / 2);
+  const pbY = Math.sin(angB + Math.PI / 2);
+  // 4 corners where the two strips' edges intersect
+  // A strip: lines {C +/- pA*halfTA + t*dA}
+  // B strip: lines {C +/- pB*halfTB + s*dB}
+  const dAx = Math.cos(angA);
+  const dAy = Math.sin(angA);
+  const dBx = Math.cos(angB);
+  const dBy = Math.sin(angB);
+  const intersect = (
+    p1x: number, p1y: number, d1x: number, d1y: number,
+    p2x: number, p2y: number, d2x: number, d2y: number,
+  ): { x: number; y: number } | null => {
+    const denom = d1x * d2y - d1y * d2x;
+    if (Math.abs(denom) < 1e-9) return null;
+    const t = ((p2x - p1x) * d2y - (p2y - p1y) * d2x) / denom;
+    return { x: p1x + t * d1x, y: p1y + t * d1y };
+  };
+  const c1 = intersect(
+    C.x + paX * halfTA, C.y + paY * halfTA, dAx, dAy,
+    C.x + pbX * halfTB, C.y + pbY * halfTB, dBx, dBy,
+  );
+  const c2 = intersect(
+    C.x + paX * halfTA, C.y + paY * halfTA, dAx, dAy,
+    C.x - pbX * halfTB, C.y - pbY * halfTB, dBx, dBy,
+  );
+  const c3 = intersect(
+    C.x - paX * halfTA, C.y - paY * halfTA, dAx, dAy,
+    C.x - pbX * halfTB, C.y - pbY * halfTB, dBx, dBy,
+  );
+  const c4 = intersect(
+    C.x - paX * halfTA, C.y - paY * halfTA, dAx, dAy,
+    C.x + pbX * halfTB, C.y + pbY * halfTB, dBx, dBy,
+  );
+  if (!c1 || !c2 || !c3 || !c4) return null;
+  return convexHull([c1, c2, c3, c4]);
 }
 
 /** Compute the corner-cap polygon that fills the gap between two walls
