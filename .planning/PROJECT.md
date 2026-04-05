@@ -12,9 +12,18 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
-**v1.0 shipped 2026-04-05.** All 14 active v1 requirements validated end-to-end. The core loop works: global product library → dimensionally accurate 2D floor plans → textured 3D rendering → eye-level walkthrough → PNG export → auto-saved + restored on reload.
+**v1.1 shipped 2026-04-05.** 21 UX fixes across 6 phases. The app is
+usable without workarounds — zoom + pan, click accuracy, tool auto-
+revert, live dimensions, wall rotation, product resize, corner-perfect
+wall rendering, edit handles for every placed element, prominent save
+status, focused welcome screen, upload-a-floor-plan tracing.
 
-See `.planning/MILESTONES.md` for shipped work. Multi-room projects (ROOM-01/02) and walk mode (VIZ-05) both work across room switches after Phase 5.1 closed the audit gaps.
+**v1.0 shipped 2026-04-05.** 14 requirements. The core loop works:
+global product library → dimensionally accurate 2D floor plans →
+textured 3D rendering → eye-level walkthrough → PNG export → auto-
+saved + restored on reload.
+
+See `.planning/MILESTONES.md` for all shipped work.
 
 ## Target User
 
@@ -27,7 +36,7 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - Jessica wants HER products in HER rooms at the right scale
 - "Feel the space" matters as much as "does it fit"
 - Desktop-first (laptop/monitor). iPad is future wishlist, not v1.
-- Codebase is ~4,900 LOC TypeScript across React 18 + Fabric.js + Three.js + Zustand
+- Codebase is ~8,600 LOC TypeScript across React 18 + Fabric.js + Three.js + Zustand
 
 ## Requirements
 
@@ -57,32 +66,31 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - ✓ Project save/load via IndexedDB — existing
 - ✓ Obsidian CAD design system + Welcome screen — existing
 
-### Active (v1.1 UX Fixes & Polish)
+**v1.1 Milestone (2026-04-05) — 21 shipped requirements:**
 
-**2D canvas navigation:**
-- [ ] Zoom + pan + fit-to-view on 2D canvas
-**Placement & interaction fixes:**
-- [ ] Door/window clicks land at cursor (accuracy fix)
-- [ ] Auto-revert to Select after placing element
-- [ ] Rotate already-placed walls/doors/windows
-- [ ] Live dimension display while drawing walls
-- [ ] Size tag while resizing products (Google-Slides style)
-**Home page + save + tabs:**
-- [ ] Welcome screen: 2 CTAs (Create vs Upload)
-- [ ] FLOOR_PLAN top-level tab
-- [ ] Template browser works (Living Room, Bedroom, Kitchen)
-- [ ] Auto-save status prominently visible
-- [ ] Remove/wire broken sidebar tabs
-**Wall rendering polish:**
-- [ ] X-junctions (3+ walls at one point) render clean
-- [ ] Dead-end wall caps (cleaner than perpendicular butt)
-- [ ] Walls crossing mid-segment render with correct overlap
-**Google-Slides-style edit handles:**
-- [ ] Wall endpoint drag handles (extend/shorten walls)
-- [ ] Wall thickness handle
-- [ ] Door/window width resize handles
-- [ ] Door/window reposition along host wall
-- [ ] Live dimension tag during any drag
+- ✓ 2D canvas zoom + pan + fit-to-view — v1.1 (NAV-01/02/03, Phase 6)
+- ✓ Door/window live placement preview — v1.1 (EDIT-10, Phase 7)
+- ✓ Tool auto-revert to Select — v1.1 (EDIT-11, Phase 7)
+- ✓ Wall rotation handle — v1.1 (EDIT-12, Phase 7.1)
+- ✓ Live wall-length label while drawing — v1.1 (EDIT-13, Phase 7)
+- ✓ Product resize with live W × D tag — v1.1 (EDIT-14, Phase 7.1)
+- ✓ Prominent toolbar save status — v1.1 (SAVE-04, Phase 8)
+- ✓ 2-CTA welcome screen — v1.1 (HOME-01, Phase 8)
+- ✓ FLOOR_PLAN top-level tab — v1.1 (HOME-02, Phase 8)
+- ✓ Template picker + upload floor plan — v1.1 (HOME-03, Phase 8)
+- ✓ Broken welcome tabs removed — v1.1 (UI-01, Phase 8)
+- ✓ X-junction wall caps — v1.1 (WALL-01, Phase 9)
+- ✓ Dead-end wall caps — v1.1 (WALL-02, Phase 9)
+- ✓ Mid-segment crossing caps — v1.1 (WALL-03, Phase 9)
+- ✓ Wall endpoint drag handles — v1.1 (EDIT-15, Phase 10)
+- ✓ Wall thickness handle — v1.1 (EDIT-16, Phase 10)
+- ✓ Opening width resize handles — v1.1 (EDIT-17, Phase 10)
+- ✓ Opening slide along host wall — v1.1 (EDIT-18, Phase 10)
+- ✓ Live dim tag during all drags — v1.1 (EDIT-19, Phase 10)
+
+### Active
+
+No active requirements. Run `/gsd:new-milestone` to start v1.2.
 
 ### Planned (v1.2 New Element Types)
 - Ceilings

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: UX Fixes & Polish
-status: planning
-stopped_at: Requirements + roadmap drafted, awaiting phase planning
-last_updated: "2026-04-05T16:00:00.000Z"
+status: shipped
+stopped_at: v1.1 shipped — milestone archived, tagged v1.1
+last_updated: "2026-04-05T16:30:00.000Z"
 last_activity: 2026-04-05
 progress:
-  total_phases: 3
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 6
+  completed_phases: 6
+  total_plans: 6
+  completed_plans: 6
+  percent: 100
 ---
 
 # Project State
@@ -21,17 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-05)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** v1.1 UX Fixes & Polish — Phase 6 (2D Canvas Navigation) ready to plan
+**Current focus:** Planning next milestone (v1.2) — run `/gsd:new-milestone`
 
 ## Current Position
 
-Milestone: v1.1 UX Fixes & Polish — PLANNING
-Branch: feature/v1.1-ux-fixes-and-content
-Phases planned: 3 (6, 7, 8)
-Requirements: 13 active
-Status: REQUIREMENTS.md + ROADMAP.md drafted. Next: `/gsd:plan-phase 6`
+Milestone: v1.1 UX Fixes & Polish — SHIPPED 2026-04-05
+Phases: 6 of 6 complete (6, 7, 7.1, 8, 9, 10)
+PRs merged: 7 (#1–#7)
+Status: Archived, tagged v1.1
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
