@@ -12,6 +12,8 @@ import type {
   FloorMaterial,
   Wallpaper,
   WallArt,
+  CustomElement,
+  PlacedCustomElement,
 } from "@/types/cad";
 import { uid, resizeWall } from "@/lib/geometry";
 import { ROOM_TEMPLATES, type RoomTemplateId } from "@/data/roomTemplates";
@@ -55,6 +57,13 @@ interface CADState {
   addWallArt: (wallId: string, art: Omit<WallArt, "id">) => string;
   updateWallArt: (wallId: string, artId: string, changes: Partial<WallArt>) => void;
   removeWallArt: (wallId: string, artId: string) => void;
+  // Custom elements (v1.2 Phase 14)
+  addCustomElement: (el: Omit<CustomElement, "id">) => string;
+  updateCustomElement: (id: string, changes: Partial<CustomElement>) => void;
+  removeCustomElement: (id: string) => void;
+  placeCustomElement: (customElementId: string, position: Point) => string;
+  moveCustomElement: (id: string, position: Point) => void;
+  removePlacedCustomElement: (id: string) => void;
   removeProduct: (id: string) => void;
   removeSelected: (ids: string[]) => void;
   undo: () => void;
@@ -69,10 +78,14 @@ interface CADState {
 }
 
 function snapshot(state: CADState): CADSnapshot {
+  const root = state as any;
   return {
     version: 2,
     rooms: JSON.parse(JSON.stringify(state.rooms)),
     activeRoomId: state.activeRoomId,
+    ...(root.customElements
+      ? { customElements: JSON.parse(JSON.stringify(root.customElements)) }
+      : {}),
   };
 }
 
@@ -468,6 +481,87 @@ export const useCADStore = create<CADState>()((set) => ({
       })
     ),
 
+  addCustomElement: (el) => {
+    const id = `cust_${uid()}`;
+    set(
+      produce((s: CADState) => {
+        pushHistory(s);
+        // customElements lives at snapshot level (per-project), but our state
+        // is flat — we keep it in a parallel top-level field
+        const root = s as any;
+        if (!root.customElements) root.customElements = {};
+        root.customElements[id] = { id, ...el };
+      })
+    );
+    return id;
+  },
+
+  updateCustomElement: (id, changes) =>
+    set(
+      produce((s: CADState) => {
+        const root = s as any;
+        if (!root.customElements?.[id]) return;
+        pushHistory(s);
+        Object.assign(root.customElements[id], changes);
+      })
+    ),
+
+  removeCustomElement: (id) =>
+    set(
+      produce((s: CADState) => {
+        const root = s as any;
+        if (!root.customElements?.[id]) return;
+        pushHistory(s);
+        delete root.customElements[id];
+        // Also remove any placements referencing this custom element across all rooms
+        for (const room of Object.values(s.rooms)) {
+          if (!room.placedCustomElements) continue;
+          for (const [pid, p] of Object.entries(room.placedCustomElements)) {
+            if (p.customElementId === id) delete room.placedCustomElements[pid];
+          }
+        }
+      })
+    ),
+
+  placeCustomElement: (customElementId, position) => {
+    const id = `pcust_${uid()}`;
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        pushHistory(s);
+        if (!doc.placedCustomElements) doc.placedCustomElements = {};
+        doc.placedCustomElements[id] = {
+          id,
+          customElementId,
+          position,
+          rotation: 0,
+        };
+      })
+    );
+    return id;
+  },
+
+  moveCustomElement: (id, position) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.placedCustomElements?.[id]) return;
+        pushHistory(s);
+        doc.placedCustomElements[id].position = position;
+      })
+    ),
+
+  removePlacedCustomElement: (id) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.placedCustomElements?.[id]) return;
+        pushHistory(s);
+        delete doc.placedCustomElements[id];
+      })
+    ),
+
   removeProduct: (id) =>
     set(
       produce((s: CADState) => {
@@ -500,6 +594,7 @@ export const useCADStore = create<CADState>()((set) => ({
         const prev = s.past.pop()!;
         s.rooms = prev.rooms;
         s.activeRoomId = prev.activeRoomId;
+        (s as any).customElements = (prev as any).customElements ?? {};
       })
     ),
 
@@ -511,6 +606,7 @@ export const useCADStore = create<CADState>()((set) => ({
         const next = s.future.pop()!;
         s.rooms = next.rooms;
         s.activeRoomId = next.activeRoomId;
+        (s as any).customElements = (next as any).customElements ?? {};
       })
     ),
 
@@ -520,6 +616,7 @@ export const useCADStore = create<CADState>()((set) => ({
         const snap = migrateSnapshot(raw);
         s.rooms = snap.rooms;
         s.activeRoomId = snap.activeRoomId;
+        (s as any).customElements = (snap as any).customElements ?? {};
         s.past = [];
         s.future = [];
       })
@@ -591,6 +688,18 @@ export const useActivePlacedProducts = () =>
 const EMPTY_CEILINGS: Record<string, Ceiling> = Object.freeze({});
 export const useActiveCeilings = () =>
   useCADStore((s) => (s.activeRoomId ? s.rooms[s.activeRoomId]?.ceilings ?? EMPTY_CEILINGS : EMPTY_CEILINGS));
+
+const EMPTY_CUSTOMS: Record<string, CustomElement> = Object.freeze({});
+export const useCustomElements = () =>
+  useCADStore((s) => (s as any).customElements ?? EMPTY_CUSTOMS);
+
+const EMPTY_PLACED_CUSTOMS: Record<string, PlacedCustomElement> = Object.freeze({});
+export const useActivePlacedCustomElements = () =>
+  useCADStore((s) =>
+    s.activeRoomId
+      ? s.rooms[s.activeRoomId]?.placedCustomElements ?? EMPTY_PLACED_CUSTOMS
+      : EMPTY_PLACED_CUSTOMS,
+  );
 
 // Non-hook for imperative paths (tools)
 export function getActiveRoomDoc(): RoomDoc | undefined {

@@ -7,12 +7,14 @@ import {
   useActiveWalls,
   useActivePlacedProducts,
   useActiveCeilings,
+  useActivePlacedCustomElements,
+  useCustomElements,
   getActiveRoomDoc,
 } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { drawGrid } from "./grid";
 import { drawRoomDimensions } from "./dimensions";
-import { renderWalls, renderProducts, renderCeilings } from "./fabricSync";
+import { renderWalls, renderProducts, renderCeilings, renderCustomElements } from "./fabricSync";
 import { activateWallTool, deactivateWallTool } from "./tools/wallTool";
 import { activateSelectTool, deactivateSelectTool, setSelectToolProductLibrary } from "./tools/selectTool";
 import { activateProductTool, deactivateProductTool } from "./tools/productTool";
@@ -73,6 +75,8 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const activeDoc = useActiveRoomDoc();
   const floorPlanImage = activeDoc?.floorPlanImage;
   const ceilings = useActiveCeilings();
+  const placedCustoms = useActivePlacedCustomElements();
+  const customCatalog = useCustomElements();
   const activeTool = useUIStore((s) => s.activeTool);
   const selectedIds = useUIStore((s) => s.selectedIds);
   const showGrid = useUIStore((s) => s.showGrid);
@@ -142,12 +146,15 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // 5. Ceilings (translucent overlays)
     renderCeilings(fc, ceilings, scale, origin, selectedIds);
 
+    // 6. Custom elements
+    renderCustomElements(fc, placedCustoms, customCatalog, scale, origin, selectedIds);
+
     fc.renderAll();
 
     // Re-activate current tool with new scale/origin
     deactivateAllTools(fc);
     activateCurrentTool(fc, activeTool, scale, origin);
-  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings]);
+  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog]);
 
   // Init canvas
   useEffect(() => {

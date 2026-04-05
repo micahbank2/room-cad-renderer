@@ -4,6 +4,7 @@ import { useUIStore } from "@/stores/uiStore";
 import RoomSettings from "./RoomSettings";
 import SidebarProductPicker from "./SidebarProductPicker";
 import FloorMaterialPicker from "./FloorMaterialPicker";
+import CustomElementsPanel from "./CustomElementsPanel";
 
 interface Props {
   productLibrary: Product[];
@@ -91,6 +92,9 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
             <option value={1}>1_FOOT</option>
           </select>
         </div>
+
+        {/* Custom Elements (Phase 14) */}
+        <CustomElementsPanel />
 
         {/* Product picker (LIB-05) */}
         <div>
