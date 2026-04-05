@@ -161,39 +161,61 @@ export default function WallMesh({ wall, isSelected }: Props) {
         />
       </mesh>
 
-      {/* Wainscoting band — procedural board-and-batten pattern */}
+      {/* Wainscoting — 3D extruded panels with chair rail cap */}
       {wainscotHeight > 0 && (() => {
-        const tex = getWainscotingTexture(wall.wainscoting!.color);
-        // Repeat based on wainscot height — panel width equals height for square panels
+        const color = wall.wainscoting!.color;
+        const tex = getWainscotingTexture(color);
         const panelWidth = Math.max(1, wainscotHeight * 0.7);
         tex.repeat.set(length / panelWidth, 1);
         tex.needsUpdate = true;
+        const baseDepth = 0.08; // ~1" panel protrusion
+        const railDepth = 0.15; // ~1.8" chair rail (sticks out further)
+        const railHeight = 0.17; // ~2" chair rail height
         return (
-          <mesh
-            position={[0, -halfH + wainscotHeight / 2, thickness / 2 + bandOffset]}
-          >
-            <planeGeometry args={[length, wainscotHeight]} />
-            <meshStandardMaterial
-              map={tex}
-              roughness={0.75}
-              metalness={0}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
+          <group>
+            {/* Main wainscoting panel — extruded box protruding from wall */}
+            <mesh
+              position={[0, -halfH + wainscotHeight / 2, thickness / 2 + baseDepth / 2]}
+              castShadow
+              receiveShadow
+            >
+              <boxGeometry args={[length, wainscotHeight, baseDepth]} />
+              <meshStandardMaterial
+                map={tex}
+                color={color}
+                roughness={0.7}
+                metalness={0}
+              />
+            </mesh>
+            {/* Chair rail cap at the top — sticks out further, classic wainscoting profile */}
+            <mesh
+              position={[0, -halfH + wainscotHeight - railHeight / 2, thickness / 2 + railDepth / 2]}
+              castShadow
+              receiveShadow
+            >
+              <boxGeometry args={[length, railHeight, railDepth]} />
+              <meshStandardMaterial
+                color={color}
+                roughness={0.6}
+                metalness={0}
+              />
+            </mesh>
+          </group>
         );
       })()}
 
-      {/* Crown molding band — plane on interior wall face, top-aligned */}
+      {/* Crown molding — 3D extruded band at ceiling line */}
       {crownHeight > 0 && (
         <mesh
-          position={[0, halfH - crownHeight / 2, thickness / 2 + bandOffset]}
+          position={[0, halfH - crownHeight / 2, thickness / 2 + 0.08]}
+          castShadow
+          receiveShadow
         >
-          <planeGeometry args={[length, crownHeight]} />
+          <boxGeometry args={[length, crownHeight, 0.15]} />
           <meshStandardMaterial
             color={wall.crownMolding!.color}
-            roughness={0.7}
+            roughness={0.6}
             metalness={0}
-            side={THREE.DoubleSide}
           />
         </mesh>
       )}
