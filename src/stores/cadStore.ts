@@ -37,6 +37,7 @@ interface CADState {
   rotateWallNoHistory: (id: string, angleDeltaDeg: number) => void;
   resizeProduct: (id: string, scale: number) => void;
   resizeProductNoHistory: (id: string, scale: number) => void;
+  setFloorPlanImage: (dataUrl: string | undefined) => void;
   removeProduct: (id: string) => void;
   removeSelected: (ids: string[]) => void;
   undo: () => void;
@@ -279,6 +280,17 @@ export const useCADStore = create<CADState>()((set) => ({
         if (!doc) return;
         if (!doc.placedProducts[id]) return;
         doc.placedProducts[id].sizeScale = Math.max(0.1, Math.min(10, scale));
+      })
+    ),
+
+  setFloorPlanImage: (dataUrl) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        pushHistory(s);
+        if (dataUrl) doc.floorPlanImage = dataUrl;
+        else delete doc.floorPlanImage;
       })
     ),
 

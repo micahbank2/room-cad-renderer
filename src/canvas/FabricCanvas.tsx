@@ -3,6 +3,7 @@ import * as fabric from "fabric";
 import {
   useCADStore,
   useActiveRoom,
+  useActiveRoomDoc,
   useActiveWalls,
   useActivePlacedProducts,
   getActiveRoomDoc,
@@ -23,6 +24,9 @@ import type { Product } from "@/types/product";
 interface Props {
   productLibrary: Product[];
 }
+
+// Simple module-level cache for floor plan background images
+const bgImageCache = new Map<string, HTMLImageElement>();
 
 function getBaseFitScale(roomW: number, roomH: number, canvasW: number, canvasH: number) {
   const pad = 50;
@@ -64,6 +68,8 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const room = useActiveRoom() ?? { width: 20, length: 16, wallHeight: 8 };
   const walls = useActiveWalls();
   const placedProducts = useActivePlacedProducts();
+  const activeDoc = useActiveRoomDoc();
+  const floorPlanImage = activeDoc?.floorPlanImage;
   const activeTool = useUIStore((s) => s.activeTool);
   const selectedIds = useUIStore((s) => s.selectedIds);
   const showGrid = useUIStore((s) => s.showGrid);
@@ -96,6 +102,28 @@ export default function FabricCanvas({ productLibrary }: Props) {
       room.width, room.length, cW, cH, userZoom, panOffset
     );
 
+    // 0. Floor plan background image (if any) — rendered to fit the room
+    if (floorPlanImage) {
+      const img = bgImageCache.get(floorPlanImage);
+      if (img && img.complete) {
+        const fImg = new fabric.FabricImage(img, {
+          left: origin.x,
+          top: origin.y,
+          scaleX: (room.width * scale) / img.naturalWidth,
+          scaleY: (room.length * scale) / img.naturalHeight,
+          opacity: 0.45,
+          selectable: false,
+          evented: false,
+        });
+        fc.add(fImg);
+      } else if (!img) {
+        const el = new Image();
+        el.onload = () => fc.renderAll();
+        el.src = floorPlanImage;
+        bgImageCache.set(floorPlanImage, el);
+      }
+    }
+
     // 1. Grid
     drawGrid(fc, room.width, room.length, scale, origin, showGrid);
 
@@ -113,7 +141,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // Re-activate current tool with new scale/origin
     deactivateAllTools(fc);
     activateCurrentTool(fc, activeTool, scale, origin);
-  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset]);
+  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage]);
 
   // Init canvas
   useEffect(() => {

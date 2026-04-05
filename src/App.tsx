@@ -20,6 +20,7 @@ import { useOnboardingStore } from "@/stores/onboardingStore";
 import WelcomeScreen from "@/components/WelcomeScreen";
 import RoomTabs from "@/components/RoomTabs";
 import AddRoomDialog from "@/components/AddRoomDialog";
+import TemplatePickerDialog from "@/components/TemplatePickerDialog";
 import FabricCanvas from "@/canvas/FabricCanvas";
 
 const ThreeViewport = lazy(() => import("@/three/ThreeViewport"));
@@ -30,6 +31,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState<ViewMode>("2d");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAddRoomDialog, setShowAddRoomDialog] = useState(false);
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const setTool = useUIStore((s) => s.setTool);
   const activeWalls = useActiveWalls();
@@ -142,7 +144,12 @@ export default function App() {
 
   return (
     <div className="h-full flex flex-col bg-obsidian-base">
-      <Toolbar viewMode={viewMode} onViewChange={setViewMode} onHome={() => setHasStarted(false)} />
+      <Toolbar
+        viewMode={viewMode}
+        onViewChange={setViewMode}
+        onHome={() => setHasStarted(false)}
+        onFloorPlanClick={() => setShowTemplatePicker(true)}
+      />
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left sidebar — only on canvas views */}
@@ -233,6 +240,11 @@ export default function App() {
       </div>
 
       <AddRoomDialog open={showAddRoomDialog} onClose={() => setShowAddRoomDialog(false)} />
+      <TemplatePickerDialog
+        open={showTemplatePicker}
+        onClose={() => setShowTemplatePicker(false)}
+        showUploadOptions
+      />
 
       <StatusBar />
 
