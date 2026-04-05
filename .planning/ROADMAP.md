@@ -91,13 +91,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. Jessica can add a second room to an existing project and switch between rooms in the same canvas view
   2. Room templates (living room, bedroom, kitchen) provide a pre-drawn room shape with typical dimensions she can accept or modify
   3. Products placed in one room do not appear in other rooms
-**Plans**: 6 plans
-  - [ ] 00-PLAN.md — Test infrastructure (Vitest + jsdom + stub test files)
-  - [x] 01-PLAN.md — EDIT-09 product image rendering (cache + fabricSync fix)
-  - [ ] 02-PLAN.md — EDIT-07 drag-drop placement (HTML5 DnD + auto-select)
-  - [ ] 03-PLAN.md — EDIT-08 rotation handle (Figma-style + 15° snap + Shift free-rotate)
-  - [ ] 04-PLAN.md — EDIT-06 dimension editing (dblclick overlay input + corner propagation)
-  - [ ] 05-PLAN.md — SAVE-02 auto-save (2s debounce + projectStore + SaveIndicator)
+**Plans**: 4 plans
+  - [x] 05-00-PLAN.md — Wave 0 test stubs (cadStore.multiRoom + snapshotMigration + roomTemplates)
+  - [ ] 05-01-PLAN.md — Data model foundation (RoomDoc + CADSnapshot v2 + migrateSnapshot + roomTemplates)
+  - [ ] 05-02-PLAN.md — cadStore restructure (rooms + activeRoomId + room-management actions + selectors)
+  - [ ] 05-03-PLAN.md — Consumer updates + RoomTabs + AddRoomDialog + Ctrl/Cmd+Tab wiring
 **UI hint**: yes
 
 ## Progress
@@ -111,4 +109,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Product Library | 0/TBD | Not started | - |
 | 3. 3D Product Rendering | 0/TBD | Not started | - |
 | 4. 3D Walkthrough | 0/TBD | Not started | - |
-| 5. Multi-Room | 0/TBD | Not started | - |
+| 5. Multi-Room | 1/4 | In progress | - |
