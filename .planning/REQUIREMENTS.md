@@ -24,9 +24,9 @@ Jessica can see her future room with her actual furniture before spending money.
 
 - [x] **LIB-01**: User can upload product image with name, category, and dimensions
 - [x] **LIB-02**: User can browse and filter products by category
-- [ ] **LIB-03**: Product library is global — persists across all room projects
-- [ ] **LIB-04**: Product dimensions are optional (image-only upload allowed)
-- [ ] **LIB-05**: User can search products by name
+- [x] **LIB-03**: Product library is global — persists across all room projects
+- [x] **LIB-04**: Product dimensions are optional (image-only upload allowed)
+- [x] **LIB-05**: User can search products by name
 
 ### 3D Visualization
 

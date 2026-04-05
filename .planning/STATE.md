@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-00-PLAN.md
-last_updated: "2026-04-05T02:43:35.367Z"
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-04-05T03:00:33.731Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 11
-  completed_plans: 7
+  completed_plans: 8
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 ## Current Position
 
 Phase: 02 (product-library) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-04-05
 
@@ -59,6 +59,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-2d-canvas-polish P03 | 3min | 4 tasks | 5 files |
 | Phase 01-2d-canvas-polish P05 | 3m | 4 tasks | 6 files |
 | Phase 02-product-library P00 | 1m | 2 tasks | 5 files |
+| Phase 02-product-library P01 | 10m | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,9 @@ Recent decisions affecting current work:
 - [Phase 01-2d-canvas-polish]: SAVE-02: 2s setTimeout debounce in useAutoSave; reference-equality skips past/future-only writes
 - [Phase 01-2d-canvas-polish]: SAVE-02: projectStore lifts activeId/activeName/saveStatus out of ProjectManager local state
 - [Phase 02-product-library]: Wave 0 stubs use it.todo + vitest-only imports to stay orthogonal to downstream waves
+- [Phase 02-product-library]: Pitfall 3 mitigation: productStore subscribe-persist is gated on state.loaded=true — initial empty state cannot overwrite IndexedDB
+- [Phase 02-product-library]: Legacy dim migration lives in productStore.load() (coerce non-number W/D/H to null on read) — self-heals mixed-shape IndexedDB data
+- [Phase 02-product-library]: searchProducts + effectiveDimensions centralized in types/product.ts so renderers + pickers reuse one filter/fallback contract
 
 ### Pending Todos
 
@@ -94,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T02:43:35.364Z
-Stopped at: Completed 02-00-PLAN.md
+Last session: 2026-04-05T03:00:27.607Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None
