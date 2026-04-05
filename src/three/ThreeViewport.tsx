@@ -28,9 +28,19 @@ function Scene({ productLibrary }: Props) {
   const floorTexture = getFloorTexture(room.width, room.length);
 
   // D-09: preserve orbit camera position+target across mode switches
-  const orbitPosRef = useRef<[number, number, number] | null>(null);
+  const orbitPosRef = useRef<[number, number, number]>([halfW + 15, 12, halfL + 15]);
   const orbitTargetRef = useRef<[number, number, number]>([halfW, room.wallHeight / 3, halfL]);
   const orbitControlsRef = useRef<any>(null);
+
+  // 05.1 fix: restore saved camera position when returning to orbit mode
+  useEffect(() => {
+    if (cameraMode !== "orbit") return;
+    const ctrl = orbitControlsRef.current;
+    if (!ctrl?.object) return;
+    const [x, y, z] = orbitPosRef.current;
+    ctrl.object.position.set(x, y, z);
+    ctrl.update();
+  }, [cameraMode]);
 
   return (
     <>
