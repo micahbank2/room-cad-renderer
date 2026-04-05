@@ -10,6 +10,7 @@ const tools: { id: ToolType; label: string; icon: string }[] = [
   { id: "wall", label: "WALL", icon: "horizontal_rule" },
   { id: "door", label: "DOOR", icon: "door_front" },
   { id: "window", label: "WINDOW", icon: "window" },
+  { id: "ceiling", label: "CEILING", icon: "roofing" },
 ];
 
 interface Props {
@@ -160,6 +161,7 @@ const TOOL_SHORTCUTS: Record<ToolType, string> = {
   wall: "W",
   door: "D",
   window: "N",
+  ceiling: "C",
   product: "",
 };
 

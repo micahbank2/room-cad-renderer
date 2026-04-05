@@ -6,17 +6,19 @@ import {
   useActiveRoomDoc,
   useActiveWalls,
   useActivePlacedProducts,
+  useActiveCeilings,
   getActiveRoomDoc,
 } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { drawGrid } from "./grid";
 import { drawRoomDimensions } from "./dimensions";
-import { renderWalls, renderProducts } from "./fabricSync";
+import { renderWalls, renderProducts, renderCeilings } from "./fabricSync";
 import { activateWallTool, deactivateWallTool } from "./tools/wallTool";
 import { activateSelectTool, deactivateSelectTool, setSelectToolProductLibrary } from "./tools/selectTool";
 import { activateProductTool, deactivateProductTool } from "./tools/productTool";
 import { activateDoorTool, deactivateDoorTool } from "./tools/doorTool";
 import { activateWindowTool, deactivateWindowTool } from "./tools/windowTool";
+import { activateCeilingTool, deactivateCeilingTool } from "./tools/ceilingTool";
 import { attachDragDropHandlers } from "./dragDrop";
 import { computeLabelPx, hitTestDimLabel, validateInput } from "./dimensionEditor";
 import type { Product } from "@/types/product";
@@ -70,6 +72,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const placedProducts = useActivePlacedProducts();
   const activeDoc = useActiveRoomDoc();
   const floorPlanImage = activeDoc?.floorPlanImage;
+  const ceilings = useActiveCeilings();
   const activeTool = useUIStore((s) => s.activeTool);
   const selectedIds = useUIStore((s) => s.selectedIds);
   const showGrid = useUIStore((s) => s.showGrid);
@@ -136,12 +139,15 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // 4. Products
     renderProducts(fc, placedProducts, productLibrary, scale, origin, selectedIds);
 
+    // 5. Ceilings (translucent overlays)
+    renderCeilings(fc, ceilings, scale, origin, selectedIds);
+
     fc.renderAll();
 
     // Re-activate current tool with new scale/origin
     deactivateAllTools(fc);
     activateCurrentTool(fc, activeTool, scale, origin);
-  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage]);
+  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings]);
 
   // Init canvas
   useEffect(() => {
@@ -401,6 +407,7 @@ function deactivateAllTools(fc: fabric.Canvas) {
   deactivateProductTool(fc);
   deactivateDoorTool(fc);
   deactivateWindowTool(fc);
+  deactivateCeilingTool(fc);
 }
 
 function activateCurrentTool(
@@ -424,6 +431,9 @@ function activateCurrentTool(
       break;
     case "window":
       activateWindowTool(fc, scale, origin);
+      break;
+    case "ceiling":
+      activateCeilingTool(fc, scale, origin);
       break;
   }
 }
