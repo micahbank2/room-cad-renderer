@@ -48,6 +48,18 @@ export interface Ceiling {
   material: string;
 }
 
+export interface FloorMaterial {
+  kind: "preset" | "custom";
+  /** Present when kind === "preset". From FLOOR_PRESET_IDS. */
+  presetId?: string;
+  /** Present when kind === "custom". Data URL. */
+  imageUrl?: string;
+  /** Texture tile repeat distance in feet (e.g. 2 = pattern repeats every 2ft). */
+  scaleFt: number;
+  /** Texture rotation in degrees. */
+  rotationDeg: number;
+}
+
 export interface RoomDoc {
   id: string;
   name: string;
@@ -59,6 +71,8 @@ export interface RoomDoc {
   floorPlanImage?: string;
   /** Ceilings drawn as independent polygon surfaces overhead. */
   ceilings?: Record<string, Ceiling>;
+  /** Floor material (preset or custom upload). Per-room. */
+  floorMaterial?: FloorMaterial;
 }
 
 export interface CADSnapshot {

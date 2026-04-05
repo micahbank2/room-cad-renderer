@@ -9,6 +9,7 @@ import type {
   Opening,
   RoomDoc,
   Ceiling,
+  FloorMaterial,
 } from "@/types/cad";
 import { uid, resizeWall } from "@/lib/geometry";
 import { ROOM_TEMPLATES, type RoomTemplateId } from "@/data/roomTemplates";
@@ -45,6 +46,7 @@ interface CADState {
   addCeiling: (points: Point[], height: number, material?: string) => string;
   updateCeiling: (id: string, changes: Partial<Ceiling>) => void;
   removeCeiling: (id: string) => void;
+  setFloorMaterial: (material: FloorMaterial | undefined) => void;
   removeProduct: (id: string) => void;
   removeSelected: (ids: string[]) => void;
   undo: () => void;
@@ -369,6 +371,17 @@ export const useCADStore = create<CADState>()((set) => ({
         if (!doc || !doc.ceilings || !doc.ceilings[id]) return;
         pushHistory(s);
         delete doc.ceilings[id];
+      })
+    ),
+
+  setFloorMaterial: (material) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        pushHistory(s);
+        if (material) doc.floorMaterial = material;
+        else delete doc.floorMaterial;
       })
     ),
 
