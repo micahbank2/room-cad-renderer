@@ -77,6 +77,12 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - [ ] X-junctions (3+ walls at one point) render clean
 - [ ] Dead-end wall caps (cleaner than perpendicular butt)
 - [ ] Walls crossing mid-segment render with correct overlap
+**Google-Slides-style edit handles:**
+- [ ] Wall endpoint drag handles (extend/shorten walls)
+- [ ] Wall thickness handle
+- [ ] Door/window width resize handles
+- [ ] Door/window reposition along host wall
+- [ ] Live dimension tag during any drag
 
 ### Planned (v1.2 New Element Types)
 - Ceilings

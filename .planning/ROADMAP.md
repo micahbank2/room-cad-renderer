@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 Room Visualization MVP** — Phases 1–5.1 (shipped 2026-04-05) — see [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
-- 🚧 **v1.1 UX Fixes & Polish** — Phases 6–9 (in progress — Phase 6 shipped)
+- 🚧 **v1.1 UX Fixes & Polish** — Phases 6–10 (in progress — Phases 6, 7, 7.1 shipped)
 - 📋 **v1.2 New Element Types** — Phases 9–11 (planned)
 - 📋 **v1.3 Color & Paint System** — Phases 12–14 (planned)
 
@@ -34,6 +34,18 @@
   5. While resizing a product, a size tag (like Google Slides) shows the current dimensions
 **UI hint:** yes
 
+### Phase 10: Google-Slides-Style Edit Handles
+**Goal:** After placing a wall, door, or window, you can click to select it and drag handles to adjust its size, thickness, or position — just like resizing an image box in Google Slides
+**Depends on:** Phase 7.1 (handle-rendering + drag pattern established for products)
+**Requirements:** EDIT-15, EDIT-16, EDIT-17, EDIT-18, EDIT-19
+**Success Criteria:**
+  1. Clicking a placed wall shows endpoint drag handles — dragging an endpoint extends or shortens the wall (other end stays fixed)
+  2. Clicking a placed wall also shows a thickness handle (drag perpendicular to wall to change thickness)
+  3. Clicking a placed door or window shows corner handles — dragging resizes the opening's width
+  4. Clicking a placed door or window lets you drag it along its host wall (repositions within the wall, clamped so it can't overhang)
+  5. A live dimension tag appears during any drag, matching the product resize tag pattern from Phase 7.1
+**UI hint:** yes
+
 ### Phase 9: Wall Rendering Polish
 **Goal:** Wall joints look clean in every configuration — X-junctions, dead ends, and mid-wall crossings all render correctly
 **Depends on:** Phase 6 (corner caps already handle 2-wall junctions)
@@ -61,9 +73,11 @@
 | Phase | Milestone | Plans Complete | Status |
 |-------|-----------|----------------|--------|
 | 6. 2D Canvas Navigation | v1.1 | 1/1 | Complete (merged 2026-04-05) |
-| 7. Placement & Interaction Fixes | v1.1 | 0/TBD | Not started |
+| 7. Placement & Interaction Fixes | v1.1 | 1/1 | Complete (3/5 reqs, merged 2026-04-05) |
+| 7.1. Rotate + Resize | v1.1 | 1/1 | Complete (merged 2026-04-05) |
 | 8. Home Page + Save + Tabs | v1.1 | 0/TBD | Not started |
-| 9. Wall Rendering Polish | v1.1 | 0/TBD | Not started (endpoint snap + 2-wall caps done ad-hoc in Phase 6 PR) |
+| 9. Wall Rendering Polish | v1.1 | 0/TBD | Not started |
+| 10. Edit Handles for Walls/Doors/Windows | v1.1 | 0/TBD | Not started |
 
 ---
 

@@ -44,6 +44,14 @@ Jessica can see her future room with her actual furniture before spending money.
 - [ ] **WALL-02**: Dead-end walls (no neighbors) get cleaner end caps than the current perpendicular butt
 - [ ] **WALL-03**: Walls that cross through each other mid-segment (not sharing endpoints) render with correct visual overlap
 
+### Google-Slides-Style Edit Handles for Walls, Doors, Windows
+
+- [ ] **EDIT-15**: Selected walls show drag handles at both endpoints (drag to extend/shorten the wall interactively)
+- [ ] **EDIT-16**: Selected walls show a thickness handle to drag-adjust the wall's thickness
+- [ ] **EDIT-17**: Selected doors/windows show corner handles for width adjustment (drag to resize the opening)
+- [ ] **EDIT-18**: Selected doors/windows can be repositioned by dragging along their host wall (slide opening left/right within the wall)
+- [ ] **EDIT-19**: Live dimension/size tag appears during any of the above drags, matching the product resize tag from 7.1
+
 ---
 
 ## v1 Requirements (Validated — shipped)
@@ -106,3 +114,8 @@ See `.planning/milestones/v1.0-REQUIREMENTS.md` — all 14 v1.0 requirements com
 | WALL-01 | Phase 9 | Active |
 | WALL-02 | Phase 9 | Active |
 | WALL-03 | Phase 9 | Active |
+| EDIT-15 | Phase 10 | Active |
+| EDIT-16 | Phase 10 | Active |
+| EDIT-17 | Phase 10 | Active |
+| EDIT-18 | Phase 10 | Active |
+| EDIT-19 | Phase 10 | Active |
