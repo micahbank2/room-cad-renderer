@@ -81,7 +81,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Switching back to orbit view restores the previous orbit camera position
 **Plans**: 3 plans
   - [x] 04-00-PLAN.md — Wave 0 test stubs (walkCollision + uiStore cameraMode)
-  - [ ] 04-01-PLAN.md — uiStore cameraMode + walkCollision.canMoveTo pure module + passing tests
+  - [x] 04-01-PLAN.md — uiStore cameraMode + walkCollision.canMoveTo pure module + passing tests
   - [ ] 04-02-PLAN.md — WalkCameraController + ThreeViewport wiring + Toolbar/StatusBar/App UI
 **UI hint**: yes
 
