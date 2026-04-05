@@ -18,7 +18,7 @@ Jessica can see her future room with her actual furniture before spending money.
 - [ ] **EDIT-06**: User can edit wall dimensions by double-clicking the dimension label
 - [ ] **EDIT-07**: User can drag products from library onto the canvas
 - [ ] **EDIT-08**: User can rotate placed products via drag handles in 2D
-- [ ] **EDIT-09**: Product images render visibly on the 2D canvas (async image loading fix)
+- [x] **EDIT-09**: Product images render visibly on the 2D canvas (async image loading fix)
 
 ### Product Library
 

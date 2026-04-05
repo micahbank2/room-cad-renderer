@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. After making any change, the project saves automatically within a few seconds — no explicit Save click required
 **Plans**: 6 plans
   - [ ] 00-PLAN.md — Test infrastructure (Vitest + jsdom + stub test files)
-  - [ ] 01-PLAN.md — EDIT-09 product image rendering (cache + fabricSync fix)
+  - [x] 01-PLAN.md — EDIT-09 product image rendering (cache + fabricSync fix)
   - [ ] 02-PLAN.md — EDIT-07 drag-drop placement (HTML5 DnD + auto-select)
   - [ ] 03-PLAN.md — EDIT-08 rotation handle (Figma-style + 15° snap + Shift free-rotate)
   - [ ] 04-PLAN.md — EDIT-06 dimension editing (dblclick overlay input + corner propagation)
