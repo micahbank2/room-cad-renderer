@@ -1,123 +1,34 @@
 # Roadmap: Room CAD Renderer
 
-## Overview
+## Milestones
 
-The foundation is built — room drawing, 3D view, product library, and save/load all exist. This roadmap completes the remaining 14 active requirements across five phases that follow Jessica's core workflow: interact with the 2D canvas confidently, manage a product library that works across all projects, see products rendered in 3D with real visual quality, feel the room from eye level, and eventually plan multiple rooms in one project.
+- ✅ **v1.0 Room Visualization MVP** — Phases 1–5.1 (shipped 2026-04-05) — see [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
 
 ## Phases
 
-**Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+<details>
+<summary>✅ v1.0 Room Visualization MVP (Phases 1–5.1) — SHIPPED 2026-04-05</summary>
 
-Decimal phases appear between their surrounding integers in numeric order.
+- [x] Phase 1: 2D Canvas Polish (6/6 plans) — completed 2026-04-05
+- [x] Phase 2: Product Library (5/5 plans) — completed 2026-04-05
+- [x] Phase 3: 3D Product Rendering (4/4 plans) — completed 2026-04-05
+- [x] Phase 4: 3D Walkthrough (3/3 plans) — completed 2026-04-05
+- [x] Phase 5: Multi-Room (4/4 plans) — completed 2026-04-05
+- [x] Phase 5.1: v1.0 Integration Gaps — INSERTED (1/1 plan) — completed 2026-04-05
 
-- [ ] **Phase 1: 2D Canvas Polish** - Fix product image rendering, drag-drop placement, rotation handles, dimension editing, and auto-save
-- [ ] **Phase 2: Product Library** - Global library across projects, optional dimensions, and product search
-- [ ] **Phase 3: 3D Product Rendering** - Textured products in 3D, smooth materials and shadows, and PNG export
-- [ ] **Phase 4: 3D Walkthrough** - Eye-level camera to feel the room from inside
-- [ ] **Phase 5: Multi-Room** - Multiple rooms per project and room templates
+</details>
 
-## Phase Details
+### 📋 v1.1 (Planned)
 
-### Phase 1: 2D Canvas Polish
-**Goal**: The 2D canvas is fully interactive — product images are visible, products can be dragged and rotated, wall dimensions are editable, and work auto-saves
-**Depends on**: Nothing (first phase — builds on existing foundation)
-**Requirements**: EDIT-06, EDIT-07, EDIT-08, EDIT-09, SAVE-02
-**Success Criteria** (what must be TRUE):
-  1. A product with an uploaded image shows its image (not just a dashed border) when placed on the 2D canvas
-  2. Jessica can drag a product from the library panel and drop it onto the canvas at the desired location
-  3. A placed product shows rotation handles she can drag to spin it in place
-  4. She can double-click a wall dimension label and type a new value to resize the wall
-  5. After making any change, the project saves automatically within a few seconds — no explicit Save click required
-**Plans**: 4 plans
-  - [x] 05-00-PLAN.md — Wave 0 test stubs (cadStore.multiRoom + snapshotMigration + roomTemplates)
-  - [x] 05-01-PLAN.md — Data model foundation (RoomDoc + CADSnapshot v2 + migrateSnapshot + roomTemplates)
-  - [x] 05-02-PLAN.md — cadStore restructure (rooms + activeRoomId + room-management actions + selectors)
-  - [x] 05-03-PLAN.md — Consumer updates + RoomTabs + AddRoomDialog + Ctrl/Cmd+Tab wiring
-**UI hint**: yes
-
-### Phase 2: Product Library
-**Goal**: The product library works as a permanent personal catalog — products added once are available in every project, dimensions are optional, and products are searchable
-**Depends on**: Phase 1
-**Requirements**: LIB-03, LIB-04, LIB-05
-**Success Criteria** (what must be TRUE):
-  1. A product Jessica uploads in Project A appears in the library when she opens Project B
-  2. She can add a product with only an image and name — dimension fields are optional and skippable
-  3. She can type part of a product name into a search field and see only matching results
-**Plans**: 5 plans
-  - [x] 02-00-PLAN.md — Test stubs (Wave 0 scaffolding for productStore/helpers/search/modal/picker)
-  - [x] 02-01-PLAN.md — productStore + nullable Product dims + helpers (LIB-03/04 core)
-  - [x] 02-02-PLAN.md — Skip dimensions UI + SIZE:UNSET + PropertiesPanel editable dims (LIB-04)
-  - [x] 02-03-PLAN.md — App/Sidebar store consolidation + SidebarProductPicker (LIB-03/05)
-  - [x] 02-04-PLAN.md — Orphan/null-dim rendering in fabricSync + ProductMesh + selectTool (LIB-03/04)
-
-### Phase 3: 3D Product Rendering
-**Goal**: Products appear in the 3D view with their actual uploaded images as textures, the scene looks visually rich with proper materials and soft shadows, and she can capture the view as a PNG
-**Depends on**: Phase 2
-**Requirements**: VIZ-04, VIZ-06, SAVE-03
-**Success Criteria** (what must be TRUE):
-  1. A couch product with an uploaded image shows that image mapped onto its 3D box in the Three.js viewport
-  2. The 3D scene has a visible floor surface, soft ambient shadows, and materials that feel closer to a real render than placeholder geometry
-  3. Jessica can click Export and save the current 3D view as a PNG image file
-**Plans**: 6 plans
-  - [ ] 00-PLAN.md — Test infrastructure (Vitest + jsdom + stub test files)
-  - [x] 01-PLAN.md — EDIT-09 product image rendering (cache + fabricSync fix)
-  - [ ] 02-PLAN.md — EDIT-07 drag-drop placement (HTML5 DnD + auto-select)
-  - [ ] 03-PLAN.md — EDIT-08 rotation handle (Figma-style + 15° snap + Shift free-rotate)
-  - [ ] 04-PLAN.md — EDIT-06 dimension editing (dblclick overlay input + corner propagation)
-  - [ ] 05-PLAN.md — SAVE-02 auto-save (2s debounce + projectStore + SaveIndicator)
-**UI hint**: yes
-
-### Phase 4: 3D Walkthrough
-**Goal**: Jessica can switch to an eye-level camera and navigate through the room as if standing inside it — the core "feel the space" moment
-**Depends on**: Phase 3
-**Requirements**: VIZ-05
-**Success Criteria** (what must be TRUE):
-  1. A "Walk" or "Eye Level" button switches the 3D viewport from orbit camera to a first-person perspective at roughly standing height
-  2. She can use arrow keys or WASD to move through the room and look around
-  3. Switching back to orbit view restores the previous orbit camera position
-**Plans**: 3 plans
-  - [x] 04-00-PLAN.md — Wave 0 test stubs (walkCollision + uiStore cameraMode)
-  - [x] 04-01-PLAN.md — uiStore cameraMode + walkCollision.canMoveTo pure module + passing tests
-  - [x] 04-02-PLAN.md — WalkCameraController + ThreeViewport wiring + Toolbar/StatusBar/App UI
-**UI hint**: yes
-
-### Phase 5: Multi-Room
-**Goal**: A single project can contain multiple connected rooms, and Jessica can start from a preset template instead of drawing from scratch
-**Depends on**: Phase 4
-**Requirements**: ROOM-01, ROOM-02
-**Success Criteria** (what must be TRUE):
-  1. Jessica can add a second room to an existing project and switch between rooms in the same canvas view
-  2. Room templates (living room, bedroom, kitchen) provide a pre-drawn room shape with typical dimensions she can accept or modify
-  3. Products placed in one room do not appear in other rooms
-**Plans**: 4 plans
-  - [x] 05-00-PLAN.md — Wave 0 test stubs (cadStore.multiRoom + snapshotMigration + roomTemplates)
-  - [x] 05-01-PLAN.md — Data model foundation (RoomDoc + CADSnapshot v2 + migrateSnapshot + roomTemplates)
-  - [x] 05-02-PLAN.md — cadStore restructure (rooms + activeRoomId + room-management actions + selectors)
-  - [ ] 05-03-PLAN.md — Consumer updates + RoomTabs + AddRoomDialog + Ctrl/Cmd+Tab wiring
-**UI hint**: yes
-
-### Phase 5.1: v1.0 Integration Gaps (INSERTED)
-**Goal**: Close the three integration gaps identified in v1.0 milestone audit — startup project hydration (SAVE-02), walk-camera respawn on room switch (VIZ-05×ROOM-01), and orbit camera position restore (VIZ-05)
-**Depends on**: Phase 5
-**Requirements**: SAVE-02, VIZ-05
-**Success Criteria** (what must be TRUE):
-  1. Reloading the browser restores Jessica's last-saved project (rooms, walls, placed products, active room)
-  2. Switching rooms while in walk mode re-spawns the camera at the new room's center at eye level
-  3. Switching walk→orbit restores both the previous camera position AND target (currently only target is restored)
-**Plans**: TBD
-**UI hint**: no
+Run `/gsd:new-milestone` to define next milestone scope.
 
 ## Progress
 
-**Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
-
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. 2D Canvas Polish | 0/TBD | Not started | - |
-| 2. Product Library | 0/TBD | Not started | - |
-| 3. 3D Product Rendering | 0/TBD | Not started | - |
-| 4. 3D Walkthrough | 0/TBD | Not started | - |
-| 5. Multi-Room | 1/4 | In progress | - |
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1. 2D Canvas Polish | v1.0 | 6/6 | Complete | 2026-04-05 |
+| 2. Product Library | v1.0 | 5/5 | Complete | 2026-04-05 |
+| 3. 3D Product Rendering | v1.0 | 4/4 | Complete | 2026-04-05 |
+| 4. 3D Walkthrough | v1.0 | 3/3 | Complete | 2026-04-05 |
+| 5. Multi-Room | v1.0 | 4/4 | Complete | 2026-04-05 |
+| 5.1. Integration Gaps (INSERTED) | v1.0 | 1/1 | Complete | 2026-04-05 |

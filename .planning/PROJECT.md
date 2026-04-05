@@ -2,13 +2,19 @@
 
 ## What This Is
 
-A personal interior design tool built for Jessica (Micah's wife) to plan and visualize their future home. She uploads products she actually loves — from Pinterest, specific stores, real items she's considering — places them in dimensionally accurate room layouts, and sees the space in 3D before buying anything.
+A personal interior design tool built for Jessica (Micah's wife) to plan and visualize their future home. She uploads products she actually loves — from Pinterest, specific stores, real items she's considering — places them in dimensionally accurate multi-room layouts, and walks through the space in 3D at eye level before buying anything.
 
 This is a single-user personal tool. Not a SaaS, not a professional CAD app, not a collaboration platform.
 
 ## Core Value
 
-**Jessica can see her future room with her actual furniture before spending money.** The magic moment: she uploads a photo of a couch she found, places it in a room with real dimensions, rotates to 3D, and feels whether it works.
+**Jessica can see her future room with her actual furniture before spending money.** The magic moment: she uploads a photo of a couch she found, places it in a room with real dimensions, switches to walk mode, and feels whether it works.
+
+## Current State
+
+**v1.0 shipped 2026-04-05.** All 14 active v1 requirements validated end-to-end. The core loop works: global product library → dimensionally accurate 2D floor plans → textured 3D rendering → eye-level walkthrough → PNG export → auto-saved + restored on reload.
+
+See `.planning/MILESTONES.md` for shipped work. Multi-room projects (ROOM-01/02) and walk mode (VIZ-05) both work across room switches after Phase 5.1 closed the audit gaps.
 
 ## Target User
 
@@ -21,73 +27,89 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - Jessica wants HER products in HER rooms at the right scale
 - "Feel the space" matters as much as "does it fit"
 - Desktop-first (laptop/monitor). iPad is future wishlist, not v1.
+- Codebase is ~4,900 LOC TypeScript across React 18 + Fabric.js + Three.js + Zustand
 
 ## Requirements
 
 ### Validated
 
-- ✓ 2D room drawing with real dimensions — existing
-- ✓ Wall drawing tool with snap-to-grid — existing
-- ✓ Door and window placement on walls — existing
-- ✓ Product library with image upload, name, category, dimensions — existing
-- ✓ Product placement on 2D canvas — existing
-- ✓ 3D viewport with wall extrusion and lighting — existing
-- ✓ Split view (2D + 3D side by side) — existing
-- ✓ Undo/redo with history — existing
-- ✓ Project save/load (IndexedDB) — existing
-- ✓ Obsidian CAD design system applied — existing
-- ✓ Welcome screen with blank room creation — existing
-- ✓ Product images render in 2D canvas (async FabricImage cache) — Validated in Phase 01: 2d-canvas-polish (EDIT-09)
-- ✓ Drag-and-drop from product library to canvas — Validated in Phase 01: 2d-canvas-polish (EDIT-07)
-- ✓ Product rotation in 2D via handles — Validated in Phase 01: 2d-canvas-polish (EDIT-08)
-- ✓ Editable dimension labels — Validated in Phase 01: 2d-canvas-polish (EDIT-06)
-- ✓ Auto-save with debounce + status indicator — Validated in Phase 01: 2d-canvas-polish (SAVE-02)
+**v1.0 Milestone (2026-04-05):**
+
+- ✓ Product images render in 2D canvas (async FabricImage cache) — v1.0 (EDIT-09, Phase 1)
+- ✓ Drag-and-drop from product library to canvas — v1.0 (EDIT-07, Phase 1)
+- ✓ Product rotation in 2D via handles — v1.0 (EDIT-08, Phase 1)
+- ✓ Editable wall dimension labels — v1.0 (EDIT-06, Phase 1)
+- ✓ Auto-save with debounce + startup hydration — v1.0 (SAVE-02, Phase 1 + 5.1)
+- ✓ Global product library persists across all projects — v1.0 (LIB-03, Phase 2)
+- ✓ Product dimensions are optional — v1.0 (LIB-04, Phase 2)
+- ✓ Product name search — v1.0 (LIB-05, Phase 2)
+- ✓ 3D product rendering with uploaded textures — v1.0 (VIZ-04, Phase 3)
+- ✓ Smooth 3D experience (PBR, soft shadows, procedural floor, Environment) — v1.0 (VIZ-06, Phase 3)
+- ✓ Export 3D view as PNG — v1.0 (SAVE-03, Phase 3)
+- ✓ Eye-level camera walkthrough with collision — v1.0 (VIZ-05, Phase 4 + 5.1)
+- ✓ Multiple rooms per project with Ctrl/Cmd+Tab switching — v1.0 (ROOM-01, Phase 5)
+- ✓ Room templates (living room, bedroom, kitchen, blank) — v1.0 (ROOM-02, Phase 5)
+
+**Pre-v1 foundation (existing):**
+
+- ✓ 2D room drawing + walls + doors/windows + undo/redo — existing
+- ✓ Split view (2D + 3D) + orbit camera + wall extrusion — existing
+- ✓ Project save/load via IndexedDB — existing
+- ✓ Obsidian CAD design system + Welcome screen — existing
 
 ### Active
 
-- [ ] Global product library persists across all projects (currently per-project IndexedDB)
-- [ ] Multi-room / whole-house floor plan support (connected rooms)
-- [ ] Product dimensions are optional (image-only upload, approximate placement)
-- [ ] 3D product rendering with uploaded textures (aesthetic vibe, not just placeholder boxes)
-- [ ] Eye-level camera walkthrough in 3D (feel the room from inside)
-- [ ] Room templates (living room, bedroom, kitchen presets)
-- [ ] Smooth 3D experience (proper materials, shadows, ambient occlusion)
-
-## Current State
-
-Phase 01 (2D Canvas Polish) complete — canvas is now fully interactive with async image rendering, drag-drop placement, rotation handles, editable dimensions, and debounced auto-save.
+No active requirements — v1.0 shipped. Next milestone requirements to be defined via `/gsd:new-milestone`.
 
 ### Out of Scope
 
 - Multi-user / collaboration — single user only
 - Export to contractors / CAD file formats — not needed
-- Pricing integration / shopping lists — not for v1
-- Mobile / iPad support — desktop only for now
+- Pricing integration / shopping lists — not for this product
+- Mobile / iPad support — desktop only for now, iPad on v2 wishlist
 - Professional drafting features (layers, annotations, blueprints)
 - Backend / server / auth — stays local-first (IndexedDB)
-- GLTF/OBJ 3D model upload — too complex for Jessica, stick with images
+- GLTF/OBJ 3D model upload — too complex for Jessica's workflow, stick with images
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Local-first, no backend | Single user, personal tool. IndexedDB is sufficient. | Active |
-| Global product library | Jessica uploads products once and uses them across all room projects. | Active |
-| Image-only products (no required 3D models) | Jessica saves screenshots from Pinterest/stores. 3D models are too technical. | Active |
-| Optional dimensions | Some products she just wants to see in the space — vibes over precision for some items. | Active |
-| Desktop-only | She'll use a laptop. iPad can come later. | Active |
-| React 18 (not 19) | R3F 8 + drei 9 had hook errors with React 19. Downgraded for compatibility. | Locked |
-| Obsidian CAD design system (DS8) | Dark theme, purple accents, monospace labels. DS1 for Welcome screen only. | Locked |
-| Fabric.js for 2D, Three.js for 3D | Both read from same Zustand store. Neither mutates the other. | Locked |
+| Local-first, no backend | Single user, personal tool. IndexedDB sufficient. | ✓ Good — no sync headaches, instant saves |
+| Global product library | Jessica uploads once, uses across all projects. | ✓ Good — shipped as productStore separate from cadStore |
+| Image-only products (no required 3D models) | Jessica saves screenshots from Pinterest/stores. | ✓ Good — textured boxes read as realistic enough |
+| Optional dimensions | Some products she wants to see in the space — vibes over precision. | ✓ Good — placeholder dash works in 2D and 3D |
+| Desktop-only | Laptop workflow. iPad can come later. | ✓ Good — no responsive compromises |
+| React 18 (not 19) | R3F 8 + drei 9 had hook errors with React 19. | Locked — do not upgrade |
+| Obsidian CAD design system (DS8) | Dark theme, purple accents, monospace labels. | Locked |
+| Fabric.js for 2D, Three.js for 3D | Both read from same Zustand store. | Locked — clean one-way data flow |
+| CADSnapshot v2 with migration | Multi-room needed wrapping shape; v1 → v2 migrateSnapshot. | ✓ Good — backwards-compatible |
+| active-room selector pattern | Single null-guard call-site per action. | ✓ Good — 15 consumers wired cleanly |
+| History-boundary drag pattern | One snapshot at mousedown, no-history per frame. | ✓ Good — smooth drags without history bloat |
+| Module-level async caches (image/texture/floor) | Dedup concurrent loads, naturally dedup via Promise-valued cache. | ✓ Good — no double-fetch bugs |
+
+## Next Milestone Goals
+
+TBD — run `/gsd:new-milestone` to define v1.1 scope.
+
+Likely candidates from Phase 5.1 audit + v2 deferred list:
+
+- Nyquist compliance flag flip for all v1 phases (formal sign-off)
+- Manual browser verification pass of Phase 1 UI interactions
+- Floor texture cache per-mesh (fix split-view fragility)
+- Room linking via doorways (connected whole-house floor plan)
+- GLTF/OBJ product upload (if Jessica requests it)
+- iPad / touch support
 
 ## Tech Stack (Current)
 
 - React 18 + TypeScript + Vite 8
 - Fabric.js v6 (2D CAD canvas)
-- Three.js via @react-three/fiber v8 + drei v9 (3D viewport)
-- Zustand v5 + Immer (state management, undo/redo)
-- Tailwind CSS v4 (styling)
-- idb-keyval (IndexedDB persistence)
+- Three.js via @react-three/fiber v8 + drei v9 (3D viewport, walk mode via PointerLockControls)
+- Zustand v5 + Immer (cadStore + uiStore + productStore + projectStore, undo/redo, auto-save)
+- Tailwind CSS v4 (styling, Obsidian CAD theme inline in index.css)
+- idb-keyval (IndexedDB persistence — projects + product library)
+- Vitest + jsdom + @testing-library (115 tests + 3 todo)
 - IBM Plex Mono + Space Grotesk + Inter (typography)
 - Material Symbols Outlined (icons)
 
@@ -109,4 +131,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-04 after initialization*
+*Last updated: 2026-04-05 after v1.0 milestone*
