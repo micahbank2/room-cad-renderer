@@ -82,7 +82,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
   - [x] 04-00-PLAN.md — Wave 0 test stubs (walkCollision + uiStore cameraMode)
   - [x] 04-01-PLAN.md — uiStore cameraMode + walkCollision.canMoveTo pure module + passing tests
-  - [ ] 04-02-PLAN.md — WalkCameraController + ThreeViewport wiring + Toolbar/StatusBar/App UI
+  - [x] 04-02-PLAN.md — WalkCameraController + ThreeViewport wiring + Toolbar/StatusBar/App UI
 **UI hint**: yes
 
 ### Phase 5: Multi-Room

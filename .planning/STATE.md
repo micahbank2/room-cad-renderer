@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-04-05T12:44:16.887Z"
+status: verifying
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-04-05T12:49:32.086Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 18
-  completed_plans: 17
+  completed_plans: 18
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 
 Phase: 04 (3d-walkthrough) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-05
 
 Progress: [░░░░░░░░░░] 0%
@@ -69,6 +69,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03-3d-product-rendering P02 | 2m | 2 tasks | 5 files |
 | Phase 04-3d-walkthrough P00 | 1m | 1 tasks | 2 files |
 | Phase 04-3d-walkthrough P01 | 2m | 2 tasks | 4 files |
+| Phase 04-3d-walkthrough P02 | 5m | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,8 @@ Recent decisions affecting current work:
 - [Phase 03-3d-product-rendering]: 03-02: Stubbed HTMLCanvasElement.getContext('2d') in tests/setup.ts to let Canvas2D modules run under jsdom without native canvas dep
 - [Phase 04-3d-walkthrough]: Wave 0 stubs pinned via exact describe strings (walkCollision canMoveTo, uiStore cameraMode state) for Wave 1 import stability
 - [Phase 04-3d-walkthrough]: 04-01: cameraMode lives on uiStore (D-01); canMoveTo is pure walls-only AABB collision (D-07) + room-bounds clamp (D-08) with axis-slide fallback
+- [Phase 04-3d-walkthrough]: 04-02: orbit pos/target preserved in useRef with onChange listener; transient view state not stored in Zustand
+- [Phase 04-3d-walkthrough]: 04-02: WalkCameraController reads camera yaw via getWorldDirection per-frame so PointerLockControls drives movement direction
 
 ### Pending Todos
 
@@ -120,6 +123,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T12:44:07.947Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-04-05T12:49:23.632Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
