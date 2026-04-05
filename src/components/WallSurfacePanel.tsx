@@ -32,14 +32,21 @@ export default function WallSurfacePanel() {
     if (!file.type.startsWith("image/")) return;
     const reader = new FileReader();
     reader.onload = () => {
+      // Default to STRETCH (scaleFt=0) — users mostly upload wallpaper murals
       const material: Wallpaper = {
         kind: "pattern",
         imageUrl: reader.result as string,
-        scaleFt: wp?.scaleFt ?? 2,
+        scaleFt: 0,
       };
       setWallpaper(wall.id, material);
     };
     reader.readAsDataURL(file);
+  };
+
+  const toggleTile = () => {
+    if (!wp || wp.kind !== "pattern") return;
+    const newScale = (wp.scaleFt ?? 0) > 0 ? 0 : 2;
+    setWallpaper(wall.id, { ...wp, scaleFt: newScale });
   };
 
   const handleAddArt = (file: File) => {
@@ -100,6 +107,19 @@ export default function WallSurfacePanel() {
             e.target.value = "";
           }}
         />
+        {wp?.kind === "pattern" && (
+          <label className="flex items-center gap-2 mt-1 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={(wp.scaleFt ?? 0) > 0}
+              onChange={toggleTile}
+              className="w-3 h-3 accent-accent rounded-none"
+            />
+            <span className="font-mono text-[9px] text-text-dim tracking-wider">
+              TILE_PATTERN {(wp.scaleFt ?? 0) > 0 ? `(${wp.scaleFt}ft)` : "(stretch)"}
+            </span>
+          </label>
+        )}
       </div>
 
       {/* Wainscoting */}
