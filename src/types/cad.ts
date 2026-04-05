@@ -44,6 +44,9 @@ export interface RoomDoc {
   room: Room;
   walls: Record<string, WallSegment>;
   placedProducts: Record<string, PlacedProduct>;
+  /** Optional reference image (data URL) shown as background on the 2D canvas.
+   *  Useful for tracing an existing floor plan (e.g., an architect's drawing). */
+  floorPlanImage?: string;
 }
 
 export interface CADSnapshot {

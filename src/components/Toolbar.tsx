@@ -1,5 +1,6 @@
 import { useUIStore } from "@/stores/uiStore";
 import { useCADStore } from "@/stores/cadStore";
+import { useProjectStore } from "@/stores/projectStore";
 import { exportRenderedImage } from "@/lib/export";
 import type { ToolType } from "@/types/cad";
 import Tooltip from "@/components/Tooltip";
@@ -15,9 +16,10 @@ interface Props {
   viewMode: "2d" | "3d" | "split" | "library";
   onViewChange: (mode: "2d" | "3d" | "split" | "library") => void;
   onHome?: () => void;
+  onFloorPlanClick?: () => void;
 }
 
-export default function Toolbar({ viewMode, onViewChange, onHome }: Props) {
+export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Props) {
   const activeTool = useUIStore((s) => s.activeTool);
   const setTool = useUIStore((s) => s.setTool);
   const undo = useCADStore((s) => s.undo);
@@ -41,6 +43,17 @@ export default function Toolbar({ viewMode, onViewChange, onHome }: Props) {
 
       {/* View tabs */}
       <nav className="flex items-center gap-1 mr-6">
+        {onFloorPlanClick && (
+          <Tooltip content="Change floor plan / upload reference image" placement="bottom">
+            <button
+              onClick={onFloorPlanClick}
+              className="flex items-center gap-1.5 font-mono text-[10px] tracking-widest px-3 py-1 text-text-dim hover:text-accent-light transition-colors duration-150"
+            >
+              <span className="material-symbols-outlined text-[14px]">grid_view</span>
+              FLOOR_PLAN
+            </button>
+          </Tooltip>
+        )}
         {(["2d", "3d", "library", "split"] as const).map((mode) => {
           const labels = { "2d": "2D_PLAN", "3d": "3D_VIEW", library: "LIBRARY", split: "SPLIT" };
           return (
@@ -105,7 +118,7 @@ export default function Toolbar({ viewMode, onViewChange, onHome }: Props) {
 
         <div className="w-px h-5 bg-outline-variant/20 mx-1" />
 
-        <span className="font-mono text-[10px] text-text-ghost tracking-wider">SAVED</span>
+        <ToolbarSaveStatus />
 
         <Tooltip content="Export 3D view as PNG" placement="bottom">
           <button
@@ -149,6 +162,40 @@ const TOOL_SHORTCUTS: Record<ToolType, string> = {
   window: "N",
   product: "",
 };
+
+/** Prominent save indicator in the top toolbar (SAVE-04) */
+function ToolbarSaveStatus() {
+  const status = useProjectStore((s) => s.saveStatus);
+  const isSaving = status === "saving";
+  const isSaved = status === "saved" || status === "idle";
+  return (
+    <div className="flex items-center gap-1.5 min-w-[72px]">
+      {isSaving ? (
+        <>
+          <span className="material-symbols-outlined text-[14px] text-accent-light animate-spin">
+            progress_activity
+          </span>
+          <span className="font-mono text-[10px] tracking-widest text-accent-light">
+            SAVING
+          </span>
+        </>
+      ) : (
+        <>
+          <span className="material-symbols-outlined text-[14px] text-success">
+            cloud_done
+          </span>
+          <span
+            className={`font-mono text-[10px] tracking-widest ${
+              isSaved ? "text-success" : "text-text-ghost"
+            }`}
+          >
+            SAVED
+          </span>
+        </>
+      )}
+    </div>
+  );
+}
 
 /** Vertical tool palette — rendered inside the canvas area */
 export function ToolPalette() {

@@ -1,6 +1,5 @@
 import { useActiveWalls } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
-import SaveIndicator from "./SaveIndicator";
 
 const STATUS_MESSAGES: Record<string, string> = {
   select: "CLICK TO SELECT · DRAG TO MOVE · DEL TO REMOVE",
@@ -43,7 +42,6 @@ export default function StatusBar() {
         <span className="font-mono text-[9px] text-text-ghost tracking-wider">
           CAM: <span className="text-accent-light">{cameraMode === "walk" ? "WALK_MODE" : "ORBIT_MODE"}</span>
         </span>
-        <SaveIndicator />
       </div>
     </div>
   );
