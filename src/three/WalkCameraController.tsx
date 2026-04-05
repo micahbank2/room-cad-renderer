@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { useActiveRoom, useActiveWalls } from "@/stores/cadStore";
+import { useActiveRoom, useActiveWalls, useCADStore } from "@/stores/cadStore";
 import { canMoveTo } from "./walkCollision";
 
 export const EYE_HEIGHT = 5.5; // feet — D-06
@@ -22,16 +22,15 @@ export default function WalkCameraController() {
   const wallsRecord = useActiveWalls();
 
   const keys = useRef<KeyState>({ forward: false, back: false, left: false, right: false, run: false });
-  const didSpawn = useRef(false);
+  const activeRoomId = useCADStore((s) => s.activeRoomId);
 
-  // D-10: spawn at room center, eye level, yaw 0 — only on first mount
+  // D-06/D-10: re-center camera at room center, eye level, yaw 0 on mount
+  // and whenever the active room changes (05.1 fix: walk respawn across rooms)
   useEffect(() => {
-    if (!didSpawn.current) {
-      camera.position.set(room.width / 2, EYE_HEIGHT, room.length / 2);
-      camera.rotation.set(0, 0, 0);
-      didSpawn.current = true;
-    }
-  }, [camera, room.width, room.length]);
+    camera.position.set(room.width / 2, EYE_HEIGHT, room.length / 2);
+    camera.rotation.set(0, 0, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeRoomId]);
 
   // D-05: keyboard listeners (WASD + arrows + Shift)
   useEffect(() => {
