@@ -1,7 +1,7 @@
 import * as fabric from "fabric";
 import { useCADStore, getActiveRoomDoc } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
-import { snapPoint, constrainOrthogonal, distance } from "@/lib/geometry";
+import { snapPoint, constrainOrthogonal, distance, formatFeet } from "@/lib/geometry";
 import type { Point } from "@/types/cad";
 
 interface WallToolState {
@@ -9,6 +9,7 @@ interface WallToolState {
   previewLine: fabric.Line | null;
   startMarker: fabric.Circle | null;
   endpointHighlight: fabric.Circle | null;
+  lengthLabel: fabric.Group | null;
 }
 
 const state: WallToolState = {
@@ -16,6 +17,7 @@ const state: WallToolState = {
   previewLine: null,
   startMarker: null,
   endpointHighlight: null,
+  lengthLabel: null,
 };
 
 /** Snap threshold in feet — if cursor is within this distance of an existing
@@ -99,6 +101,8 @@ export function activateWallTool(
 
       useCADStore.getState().addWall(state.startPoint, endPoint);
       cleanup(fc);
+      // Auto-revert to Select after placing (EDIT-11)
+      useUIStore.getState().setTool("select");
     }
   };
 
@@ -166,6 +170,46 @@ export function activateWallTool(
       });
       fc.add(state.previewLine);
     }
+
+    // Live length label at the midpoint of the preview line (EDIT-13)
+    const lenFt = distance(state.startPoint, snapped);
+    const labelText = formatFeet(lenFt);
+    const mx = (sx + ex) / 2;
+    const my = (sy + ey) / 2;
+    if (state.lengthLabel) {
+      state.lengthLabel.set({ left: mx, top: my });
+      const textObj = state.lengthLabel.item(1) as fabric.Text;
+      if (textObj) textObj.set({ text: labelText });
+    } else {
+      const bg = new fabric.Rect({
+        width: 52,
+        height: 18,
+        fill: "#12121d",
+        stroke: "#7c5bf0",
+        strokeWidth: 1,
+        rx: 2,
+        ry: 2,
+        originX: "center",
+        originY: "center",
+      });
+      const text = new fabric.Text(labelText, {
+        fontFamily: "IBM Plex Mono",
+        fontSize: 10,
+        fill: "#ccbeff",
+        originX: "center",
+        originY: "center",
+      });
+      state.lengthLabel = new fabric.Group([bg, text], {
+        left: mx,
+        top: my,
+        originX: "center",
+        originY: "center",
+        selectable: false,
+        evented: false,
+      });
+      fc.add(state.lengthLabel);
+    }
+
     fc.renderAll();
   };
 
@@ -200,6 +244,10 @@ function cleanup(fc: fabric.Canvas) {
   if (state.endpointHighlight) {
     fc.remove(state.endpointHighlight);
     state.endpointHighlight = null;
+  }
+  if (state.lengthLabel) {
+    fc.remove(state.lengthLabel);
+    state.lengthLabel = null;
   }
   state.startPoint = null;
   fc.renderAll();
