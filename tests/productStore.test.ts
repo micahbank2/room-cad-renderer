@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const getMock = vi.fn();
-const setMock = vi.fn();
+const { getMock, setMock } = vi.hoisted(() => ({
+  getMock: vi.fn(),
+  setMock: vi.fn(),
+}));
 vi.mock("idb-keyval", () => ({
   get: getMock,
   set: setMock,
@@ -29,6 +31,7 @@ function makeProduct(overrides: Partial<Product> = {}): Product {
 beforeEach(() => {
   getMock.mockReset();
   setMock.mockReset();
+  setMock.mockResolvedValue(undefined);
   // Reset store to pristine initial state before every test
   useProductStore.setState({ products: [], loaded: false });
 });
