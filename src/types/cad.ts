@@ -26,6 +26,10 @@ export interface PlacedProduct {
   productId: string;
   position: Point; // center, in feet
   rotation: number; // degrees
+  /** Per-placement scale multiplier applied to the product's library dims.
+   *  1.0 = library default. Stored as a single number so width+depth always
+   *  scale together (aspect ratio preserved). */
+  sizeScale?: number;
 }
 
 export interface Room {

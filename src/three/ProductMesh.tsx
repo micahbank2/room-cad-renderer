@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function ProductMesh({ placed, product, isSelected }: Props) {
-  const { width, depth, height, isPlaceholder } = effectiveDimensions(product);
+  const { width, depth, height, isPlaceholder } = effectiveDimensions(product, placed.sizeScale);
 
   // D-03: placeholders never receive textures, even if imageUrl exists
   const textureUrl = !isPlaceholder && product?.imageUrl ? product.imageUrl : null;

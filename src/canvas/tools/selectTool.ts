@@ -1,18 +1,29 @@
 import * as fabric from "fabric";
 import { useCADStore, getActiveRoomDoc } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
-import { snapPoint, distance, closestPointOnWall } from "@/lib/geometry";
+import { snapPoint, distance, closestPointOnWall, formatFeet } from "@/lib/geometry";
 import type { Point, WallSegment, PlacedProduct } from "@/types/cad";
 import type { Product } from "@/types/product";
 import { effectiveDimensions } from "@/types/product";
 import { hitTestHandle, snapAngle, angleFromCenterToPointer } from "../rotationHandle";
+import {
+  hitTestWallHandle,
+  angleFromMidpointToPointer,
+  wallAngleDeg,
+  snapWallAngle,
+} from "../wallRotationHandle";
+import { hitTestResizeHandle } from "../resizeHandles";
 
 interface SelectState {
   dragging: boolean;
   dragId: string | null;
-  dragType: "wall" | "product" | "rotate" | null;
+  dragType: "wall" | "product" | "rotate" | "wall-rotate" | "product-resize" | null;
   dragOffsetFeet: Point | null;
   rotateInitialAngle: number | null;
+  wallRotateInitialAngleDeg: number | null;
+  wallRotatePointerStartDeg: number | null;
+  resizeInitialScale: number | null;
+  resizeInitialDiagFt: number | null;
 }
 
 const state: SelectState = {
@@ -21,6 +32,10 @@ const state: SelectState = {
   dragType: null,
   dragOffsetFeet: null,
   rotateInitialAngle: null,
+  wallRotateInitialAngleDeg: null,
+  wallRotatePointerStartDeg: null,
+  resizeInitialScale: null,
+  resizeInitialDiagFt: null,
 };
 
 function pxToFeet(
@@ -48,7 +63,7 @@ function hitTestStore(
   // Check products first (they're on top) — orphan + null-dim use 2x2 AABB
   for (const pp of Object.values(doc.placedProducts)) {
     const product = productLibrary.find((p) => p.id === pp.productId);
-    const { width, depth } = effectiveDimensions(product);
+    const { width, depth } = effectiveDimensions(product, pp.sizeScale);
     const halfW = width / 2;
     const halfD = depth / 2;
     // Simple AABB check (ignoring rotation for now)
@@ -86,6 +101,71 @@ function hitTestStore(
 // Product library reference — set by the canvas component
 let _productLibrary: Product[] = [];
 
+// Live size-tag shown during product resize
+let sizeTag: fabric.Group | null = null;
+
+function updateSizeTag(
+  fc: fabric.Canvas,
+  pp: PlacedProduct,
+  widthFt: number,
+  depthFt: number,
+  viewScale: number,
+  viewOrigin: { x: number; y: number },
+) {
+  const label = `${formatFeet(widthFt)} × ${formatFeet(depthFt)}`;
+  // Position the tag just below the product
+  const hw = widthFt / 2;
+  const hd = depthFt / 2;
+  const rad = (pp.rotation * Math.PI) / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  // Bottom-center of product in local coords → world
+  const localBottom = { x: 0, y: hd + 0.5 };
+  const worldX = pp.position.x + localBottom.x * cos - localBottom.y * sin;
+  const worldY = pp.position.y + localBottom.x * sin + localBottom.y * cos;
+  const px = viewOrigin.x + worldX * viewScale;
+  const py = viewOrigin.y + worldY * viewScale;
+
+  if (sizeTag) fc.remove(sizeTag);
+  const bg = new fabric.Rect({
+    width: 80,
+    height: 20,
+    fill: "#12121d",
+    stroke: "#7c5bf0",
+    strokeWidth: 1,
+    rx: 2,
+    ry: 2,
+    originX: "center",
+    originY: "center",
+  });
+  const text = new fabric.Text(label, {
+    fontFamily: "IBM Plex Mono",
+    fontSize: 10,
+    fill: "#ccbeff",
+    originX: "center",
+    originY: "center",
+  });
+  sizeTag = new fabric.Group([bg, text], {
+    left: px,
+    top: py,
+    originX: "center",
+    originY: "center",
+    selectable: false,
+    evented: false,
+  });
+  fc.add(sizeTag);
+  fc.renderAll();
+  void hw;
+}
+
+function clearSizeTag(fc: fabric.Canvas) {
+  if (sizeTag) {
+    fc.remove(sizeTag);
+    sizeTag = null;
+    fc.renderAll();
+  }
+}
+
 export function setSelectToolProductLibrary(products: Product[]) {
   _productLibrary = products;
 }
@@ -117,6 +197,33 @@ export function activateSelectTool(
           useCADStore.getState().rotateProduct(selId, pp.rotation);
           return;
         }
+        // Resize handle hit-test (EDIT-14)
+        const { width, depth } = effectiveDimensions(prod, pp.sizeScale);
+        if (hitTestResizeHandle(feet, pp, width, depth)) {
+          state.dragging = true;
+          state.dragId = selId;
+          state.dragType = "product-resize";
+          state.resizeInitialScale = pp.sizeScale ?? 1;
+          // Current diagonal distance from center to pointer
+          const dx = feet.x - pp.position.x;
+          const dy = feet.y - pp.position.y;
+          state.resizeInitialDiagFt = Math.sqrt(dx * dx + dy * dy);
+          // Push history snapshot at drag start
+          useCADStore.getState().resizeProduct(selId, state.resizeInitialScale);
+          return;
+        }
+      }
+      // Wall rotation handle (EDIT-12)
+      const wall = (getActiveRoomDoc()?.walls ?? {})[selId];
+      if (wall && hitTestWallHandle(feet, wall)) {
+        state.dragging = true;
+        state.dragId = selId;
+        state.dragType = "wall-rotate";
+        state.wallRotateInitialAngleDeg = wallAngleDeg(wall);
+        state.wallRotatePointerStartDeg = angleFromMidpointToPointer(wall, feet);
+        // Push history snapshot at drag start as undo boundary
+        useCADStore.getState().rotateWall(selId, 0);
+        return;
       }
     }
 
@@ -166,6 +273,43 @@ export function activateSelectTool(
       return;
     }
 
+    if (state.dragType === "product-resize") {
+      const pp = (getActiveRoomDoc()?.placedProducts ?? {})[state.dragId];
+      if (!pp || state.resizeInitialDiagFt == null || state.resizeInitialScale == null) return;
+      const dx = feet.x - pp.position.x;
+      const dy = feet.y - pp.position.y;
+      const currentDiag = Math.sqrt(dx * dx + dy * dy);
+      if (state.resizeInitialDiagFt < 1e-6) return;
+      const ratio = currentDiag / state.resizeInitialDiagFt;
+      const newScale = Math.max(0.1, Math.min(10, state.resizeInitialScale * ratio));
+      useCADStore.getState().resizeProductNoHistory(state.dragId, newScale);
+      // Update live size tag
+      const prod = _productLibrary.find((p) => p.id === pp.productId);
+      const dims = effectiveDimensions(prod, newScale);
+      const updatedPp = (getActiveRoomDoc()?.placedProducts ?? {})[state.dragId];
+      if (updatedPp) updateSizeTag(fc, updatedPp, dims.width, dims.depth, scale, origin);
+      return;
+    }
+
+    if (state.dragType === "wall-rotate") {
+      const wall = (getActiveRoomDoc()?.walls ?? {})[state.dragId];
+      if (!wall || state.wallRotatePointerStartDeg == null || state.wallRotateInitialAngleDeg == null) return;
+      const currentPointerDeg = angleFromMidpointToPointer(wall, feet);
+      const delta = currentPointerDeg - state.wallRotatePointerStartDeg;
+      // Desired absolute wall angle = initial + delta. But rotateWall takes
+      // an incremental delta each call, so we need to rotate by (desiredAngle
+      // - currentWallAngle).
+      const desired = state.wallRotateInitialAngleDeg + delta;
+      const shiftHeld = (opt.e as MouseEvent).shiftKey === true;
+      const snappedDesired = snapWallAngle(desired, shiftHeld);
+      const currentWallAngle = wallAngleDeg(wall);
+      const incremental = snappedDesired - currentWallAngle;
+      if (Math.abs(incremental) > 1e-4) {
+        useCADStore.getState().rotateWallNoHistory(state.dragId, incremental);
+      }
+      return;
+    }
+
     if (!state.dragOffsetFeet) return;
     const gridSnap = useUIStore.getState().gridSnap;
     const targetX = feet.x - state.dragOffsetFeet.x;
@@ -193,11 +337,18 @@ export function activateSelectTool(
   };
 
   const onMouseUp = () => {
+    if (state.dragType === "product-resize") {
+      clearSizeTag(fc);
+    }
     state.dragging = false;
     state.dragId = null;
     state.dragType = null;
     state.dragOffsetFeet = null;
     state.rotateInitialAngle = null;
+    state.wallRotateInitialAngleDeg = null;
+    state.wallRotatePointerStartDeg = null;
+    state.resizeInitialScale = null;
+    state.resizeInitialDiagFt = null;
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -227,6 +378,7 @@ export function activateSelectTool(
     fc.off("mouse:move", onMouseMove);
     fc.off("mouse:up", onMouseUp);
     document.removeEventListener("keydown", onKeyDown);
+    clearSizeTag(fc);
   };
 }
 
