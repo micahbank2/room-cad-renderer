@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-04-05T01:50:24.021Z"
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-04-05T01:51:39.684Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 6
-  completed_plans: 3
+  completed_plans: 5
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 ## Current Position
 
 Phase: 01 (2d-canvas-polish) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-04-05
 
@@ -55,6 +55,8 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-2d-canvas-polish P01 | 3m | 2 tasks | 3 files |
 | Phase 01-2d-canvas-polish P00 | 4min | 3 tasks | 11 files |
 | Phase 01-2d-canvas-polish P02 | 4m | 3 tasks | 6 files |
+| Phase 01-2d-canvas-polish P04 | 3m | 4 tasks | 6 files |
+| Phase 01-2d-canvas-polish P03 | 3min | 4 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -69,6 +71,9 @@ Recent decisions affecting current work:
 - [Phase 01-2d-canvas-polish]: EDIT-09: module-level HTMLImage cache with onReady callback (async load, no double-fetch)
 - [Phase 01-2d-canvas-polish]: Used bun instead of npm (node unavailable); kept existing vitest@^4 and jsdom@^29 versions
 - [Phase 01-2d-canvas-polish]: EDIT-07: placeProduct returns new id; HTML5 drag-drop with getScaleOrigin thunk for resize-safety
+- [Phase 01-2d-canvas-polish]: EDIT-06: 0.01ft epsilon for shared-endpoint corner propagation when resizing walls via dim label
+- [Phase 01-2d-canvas-polish]: EDIT-08: single-source-of-truth rotationHandle module shared by renderer and hit-tester
+- [Phase 01-2d-canvas-polish]: EDIT-08: history-boundary pattern (one rotateProduct at mousedown + rotateProductNoHistory per frame)
 
 ### Pending Todos
 
@@ -84,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T01:50:24.019Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-04-05T01:51:39.682Z
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None

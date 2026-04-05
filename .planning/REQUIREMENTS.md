@@ -15,9 +15,9 @@ Jessica can see her future room with her actual furniture before spending money.
 - [x] **EDIT-03**: User can place doors and windows on walls
 - [x] **EDIT-04**: User can select, move, and delete walls and products
 - [x] **EDIT-05**: User can undo/redo all actions (50-level history)
-- [ ] **EDIT-06**: User can edit wall dimensions by double-clicking the dimension label
+- [x] **EDIT-06**: User can edit wall dimensions by double-clicking the dimension label
 - [x] **EDIT-07**: User can drag products from library onto the canvas
-- [ ] **EDIT-08**: User can rotate placed products via drag handles in 2D
+- [x] **EDIT-08**: User can rotate placed products via drag handles in 2D
 - [x] **EDIT-09**: Product images render visibly on the 2D canvas (async image loading fix)
 
 ### Product Library
