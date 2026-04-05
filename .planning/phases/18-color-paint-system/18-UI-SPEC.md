@@ -28,6 +28,12 @@ Source: `src/index.css` `@theme {}` block + `CLAUDE.md` conventions. No componen
 
 ---
 
+## Visual Hierarchy
+
+Primary focal point: the F&B catalog swatch grid. It is the densest, most colorful element in the panel and carries the primary browsing action. All other elements (hue filter chips, search input, recently-used row, MY_COLORS, lime wash toggle, apply button) are subordinate supporting controls arranged above and below it.
+
+---
+
 ## Spacing Scale
 
 Declared values (must be multiples of 4):
@@ -45,7 +51,7 @@ Declared values (must be multiples of 4):
 Exceptions:
 - Swatch grid uses `gap-[3px]` (3px) — sub-4px allowed for dense color grids only
 - Touch target for swatch hover tooltip: minimum 20px × 20px per swatch (fits sidebar width constraint)
-- APPLY_TO_ALL_WALLS button: full-width, `py-1.5` vertical padding
+- APPLY_TO_ALL_WALLS button: full-width, `py-2` (8px) vertical padding
 - Sidebar panel uses `space-y-3 p-3` per existing WallSurfacePanel pattern — maintain this rhythm
 
 Source: existing `WallSurfacePanel.tsx` measured at `space-y-3 p-3 border-t border-outline-variant/20`.
@@ -116,6 +122,7 @@ SEARCH_COLORS                          ← text input, placeholder "SEARCH_BY_NA
 
 F&B_CATALOG (132 swatches)             ← sub-label with count
 [grid of 20×20px swatches, 8 per row, gap-[3px]]
+                                       ← PRIMARY FOCAL POINT — densest, most colorful element
                                        ← hover: tooltip showing F&B name (font-mono text-[8px])
                                        ← applied: ring-1 ring-accent ring-offset-1 ring-offset-obsidian-low
                                        ← scrollable container, max-h-40 overflow-y-auto
@@ -123,7 +130,7 @@ F&B_CATALOG (132 swatches)             ← sub-label with count
 ─────────────────────────────────────
 MY_COLORS                              ← sub-label
 [■][■] + ADD_COLOR                     ← custom swatches + add button
-  ↳ inline expand: [name input] [react-colorful picker] [SAVE]
+  ↳ inline expand: [name input] [react-colorful picker] [SAVE_COLOR]
                                        ← right-click swatch → DELETE (text-error)
 
 ─────────────────────────────────────
@@ -131,7 +138,7 @@ LIME_WASH                              ← checkbox label, text-text-dim text-[9
 ☐ LIME_WASH_FINISH
 
 ─────────────────────────────────────
-[   APPLY_TO_ALL_WALLS   ]             ← full-width button
+[   APPLY_TO_ALL_WALLS   ]             ← full-width button, py-2 (8px) vertical padding
                                        ← border border-outline-variant/30, text-text-dim
                                        ← hover: border-accent/50 text-accent-light
 ```
@@ -189,9 +196,9 @@ Source: CONTEXT.md D-01 through D-15.
 
 ### Add Custom Color (inline expand)
 - "+ ADD_COLOR" button expands an inline row directly below MY_COLORS swatches
-- Row contains: name text input + react-colorful HSL wheel (compact, ~160px wide) + SAVE button
-- SAVE is disabled until name is non-empty; shows `text-text-ghost cursor-not-allowed` when disabled
-- SAVE enabled: `text-accent-light hover:text-accent`
+- Row contains: name text input + react-colorful HSL wheel (compact, ~160px wide) + SAVE_COLOR button
+- SAVE_COLOR is disabled until name is non-empty; shows `text-text-ghost cursor-not-allowed` when disabled
+- SAVE_COLOR enabled: `text-accent-light hover:text-accent`
 - Pressing Enter in name field saves if color is set
 - Source: CONTEXT.md D-11
 
@@ -252,7 +259,7 @@ Source: CONTEXT.md D-02, Claude's Discretion for exact dimensions.
 | Name search placeholder | `SEARCH_BY_NAME` |
 | Add color button | `+ ADD_COLOR` |
 | Add color name placeholder | `COLOR_NAME` |
-| Add color save button | `SAVE` |
+| Add color save button | `SAVE_COLOR` |
 | Lime wash label | `LIME_WASH_FINISH` |
 | Apply all walls button | `APPLY_TO_ALL_WALLS` |
 | Ceiling section header | `CEILING_PAINT` |
@@ -292,11 +299,11 @@ Each interactive element must handle these states:
 ### APPLY_TO_ALL_WALLS Button
 | State | Visual |
 |-------|--------|
-| Default | `border border-outline-variant/30 text-text-dim` |
+| Default | `border border-outline-variant/30 text-text-dim py-2` |
 | Hover | `border-accent/50 text-accent-light` |
 | No paint applied | `opacity-40 cursor-not-allowed` (nothing to apply) |
 
-### SAVE Button (custom color)
+### SAVE_COLOR Button (custom color)
 | State | Visual |
 |-------|--------|
 | Disabled (no name) | `text-text-ghost cursor-not-allowed` |
