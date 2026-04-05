@@ -47,6 +47,8 @@ export interface WallArt {
   height: number;
   /** Image data URL. */
   imageUrl: string;
+  /** Frame style (Phase 15). Missing = no frame (flat plane, legacy). */
+  frameStyle?: import("./framedArt").FrameStyle;
 }
 
 export interface Opening {

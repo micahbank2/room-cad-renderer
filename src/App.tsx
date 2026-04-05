@@ -3,6 +3,7 @@ import type { ToolType } from "@/types/cad";
 import { useUIStore } from "@/stores/uiStore";
 import { useCADStore, useActiveWalls } from "@/stores/cadStore";
 import { useProductStore } from "@/stores/productStore";
+import { useFramedArtStore } from "@/stores/framedArtStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { useHelpRouteSync } from "@/hooks/useHelpRouteSync";
@@ -47,6 +48,7 @@ export default function App() {
   // Single load on mount — fixes dual-loader race
   useEffect(() => {
     useProductStore.getState().load();
+    useFramedArtStore.getState().load();
   }, []);
 
   // Hydrate last-saved project on mount (SAVE-02 reload support)
