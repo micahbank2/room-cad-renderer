@@ -10,6 +10,43 @@ export interface WallSegment {
   thickness: number; // feet, default 0.5
   height: number; // feet, default 8
   openings: Opening[];
+  /** Wallpaper applied to this wall (solid color or pattern image). */
+  wallpaper?: Wallpaper;
+  /** Wainscoting panel toggle. Defaults to off. */
+  wainscoting?: {
+    enabled: boolean;
+    heightFt: number; // default 3 (36")
+    color: string; // hex
+  };
+  /** Crown molding toggle. Defaults to off. */
+  crownMolding?: {
+    enabled: boolean;
+    heightFt: number; // band height, default 0.33 (4")
+    color: string;
+  };
+  /** Wall art items placed on this wall's interior face. */
+  wallArt?: WallArt[];
+}
+
+export interface Wallpaper {
+  kind: "color" | "pattern";
+  color?: string; // when kind="color"
+  imageUrl?: string; // when kind="pattern" (data URL)
+  scaleFt?: number; // pattern repeat distance, default 2
+}
+
+export interface WallArt {
+  id: string;
+  /** Position along the wall from start, in feet. */
+  offset: number;
+  /** Height above floor of the art's center, in feet. */
+  centerY: number;
+  /** Width in feet. */
+  width: number;
+  /** Height in feet. */
+  height: number;
+  /** Image data URL. */
+  imageUrl: string;
 }
 
 export interface Opening {

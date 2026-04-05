@@ -4,6 +4,7 @@ import { useProductStore } from "@/stores/productStore";
 import { formatFeet, wallLength } from "@/lib/geometry";
 import type { Product } from "@/types/product";
 import { hasDimensions } from "@/types/product";
+import WallSurfacePanel from "./WallSurfacePanel";
 
 interface Props {
   productLibrary: Product[];
@@ -56,6 +57,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
           <div className="font-mono text-[9px] text-text-ghost">
             {wall.openings.length} OPENING(S)
           </div>
+          <WallSurfacePanel />
         </div>
       )}
 

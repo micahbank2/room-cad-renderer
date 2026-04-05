@@ -44,6 +44,22 @@ Jessica can see her future room with her actual furniture before spending money.
 - [ ] **CUSTOM-04**: Custom elements render in 3D at their configured dimensions and material
 - [ ] **CUSTOM-05**: Saved custom elements persist in a per-project catalog for re-placement
 
+### Framed Art Library
+
+- [ ] **ART-01**: Jessica can upload art images to a dedicated ART_LIBRARY (separate from product library)
+- [ ] **ART-02**: Each art item has a frame preset chosen from 6-8 built-in styles (thin black, thick gold, natural wood, museum white, floating, ornate)
+- [ ] **ART-03**: Art + frame combinations save to the library and persist across projects
+- [ ] **ART-04**: Jessica can drag framed art from the library onto any wall (2D canvas or 3D directly)
+- [ ] **ART-05**: Framed art renders in 3D with real frame geometry (protruding box around the art) attached to the wall face
+- [ ] **ART-06**: Width + height of art + frame are independently editable after placement
+
+### Wainscoting Style Library
+
+- [ ] **WAIN-01**: Jessica picks from a library of wainscoting styles per wall (recessed panel, raised panel, beadboard, board-and-batten, shiplap, flat panel, English grid)
+- [ ] **WAIN-02**: Each style has configurable panel width, stile width, chair rail height, and depth (protrusion)
+- [ ] **WAIN-03**: All styles render as real 3D geometry in the 3D view
+- [ ] **WAIN-04**: Style choice + config persist per-wall
+
 ---
 
 ## v1 Requirements (Shipped)
@@ -101,3 +117,13 @@ See `.planning/milestones/v1.0-REQUIREMENTS.md` and `.planning/milestones/v1.1-R
 | CUSTOM-03 | Phase 14 | Active |
 | CUSTOM-04 | Phase 14 | Active |
 | CUSTOM-05 | Phase 14 | Active |
+| ART-01 | Phase 15 | Active |
+| ART-02 | Phase 15 | Active |
+| ART-03 | Phase 15 | Active |
+| ART-04 | Phase 15 | Active |
+| ART-05 | Phase 15 | Active |
+| ART-06 | Phase 15 | Active |
+| WAIN-01 | Phase 16 | Active |
+| WAIN-02 | Phase 16 | Active |
+| WAIN-03 | Phase 16 | Active |
+| WAIN-04 | Phase 16 | Active |
