@@ -26,6 +26,9 @@ interface CADState {
   setRoom: (changes: Partial<Room>) => void;
   addWall: (start: Point, end: Point) => void;
   updateWall: (id: string, changes: Partial<WallSegment>) => void;
+  updateWallNoHistory: (id: string, changes: Partial<WallSegment>) => void;
+  updateOpening: (wallId: string, openingId: string, changes: Partial<Opening>) => void;
+  updateOpeningNoHistory: (wallId: string, openingId: string, changes: Partial<Opening>) => void;
   resizeWallByLabel: (id: string, newLengthFt: number) => void;
   removeWall: (id: string) => void;
   addOpening: (wallId: string, opening: Omit<Opening, "id">) => void;
@@ -143,6 +146,43 @@ export const useCADStore = create<CADState>()((set) => ({
         if (!doc.walls[id]) return;
         pushHistory(s);
         Object.assign(doc.walls[id], changes);
+      })
+    ),
+
+  updateWallNoHistory: (id, changes) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        if (!doc.walls[id]) return;
+        Object.assign(doc.walls[id], changes);
+      })
+    ),
+
+  updateOpening: (wallId, openingId, changes) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const wall = doc.walls[wallId];
+        if (!wall) return;
+        const op = wall.openings.find((o) => o.id === openingId);
+        if (!op) return;
+        pushHistory(s);
+        Object.assign(op, changes);
+      })
+    ),
+
+  updateOpeningNoHistory: (wallId, openingId, changes) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const wall = doc.walls[wallId];
+        if (!wall) return;
+        const op = wall.openings.find((o) => o.id === openingId);
+        if (!op) return;
+        Object.assign(op, changes);
       })
     ),
 
