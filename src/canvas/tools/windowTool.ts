@@ -4,7 +4,7 @@ import { useUIStore } from "@/stores/uiStore";
 import { closestPointOnWall, distance, wallLength, angle as wallAngle } from "@/lib/geometry";
 import type { Point, WallSegment } from "@/types/cad";
 
-const SNAP_THRESHOLD = 1.0;
+const SNAP_THRESHOLD = 0.5;
 const WINDOW_WIDTH = 3;
 
 let previewPolygon: fabric.Polygon | null = null;
@@ -27,9 +27,11 @@ function findClosestWall(
   let best: { wall: WallSegment; offset: number; dist: number } | null = null;
 
   for (const wall of Object.values(walls)) {
+    const len = wallLength(wall);
+    // Skip walls too short to fit the window
+    if (len < WINDOW_WIDTH) continue;
     const { point, t } = closestPointOnWall(wall, feetPos);
     const d = distance(point, feetPos);
-    const len = wallLength(wall);
     const offset = t * len;
 
     if (d < SNAP_THRESHOLD && (!best || d < best.dist)) {
