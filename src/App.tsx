@@ -3,7 +3,9 @@ import type { ToolType } from "@/types/cad";
 import { useUIStore } from "@/stores/uiStore";
 import { useCADStore, useActiveWalls } from "@/stores/cadStore";
 import { useProductStore } from "@/stores/productStore";
+import { useProjectStore } from "@/stores/projectStore";
 import { useAutoSave } from "@/hooks/useAutoSave";
+import { listProjects } from "@/lib/serialization";
 import Toolbar from "@/components/Toolbar";
 import { ToolPalette } from "@/components/Toolbar";
 import Sidebar from "@/components/Sidebar";
@@ -38,6 +40,19 @@ export default function App() {
   // Single load on mount — fixes dual-loader race
   useEffect(() => {
     useProductStore.getState().load();
+  }, []);
+
+  // Hydrate last-saved project on mount (SAVE-02 reload support)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const projects = await listProjects();
+      if (cancelled || projects.length === 0) return;
+      const latest = projects[0];
+      useCADStore.getState().loadSnapshot(latest.snapshot);
+      useProjectStore.getState().setActive(latest.id, latest.name);
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   // Auto-detect if user has started (has walls or products)
