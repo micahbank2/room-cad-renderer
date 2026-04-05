@@ -1,13 +1,14 @@
 import * as THREE from "three";
-import { Suspense } from "react";
+import { Suspense, useRef, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Environment } from "@react-three/drei";
+import { OrbitControls, Environment, PointerLockControls } from "@react-three/drei";
 import { useCADStore } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import type { Product } from "@/types/product";
 import WallMesh from "./WallMesh";
 import ProductMesh from "./ProductMesh";
 import Lighting from "./Lighting";
+import WalkCameraController from "./WalkCameraController";
 import { getFloorTexture } from "./floorTexture";
 
 interface Props {
@@ -19,11 +20,17 @@ function Scene({ productLibrary }: Props) {
   const walls = useCADStore((s) => s.walls);
   const placedProducts = useCADStore((s) => s.placedProducts);
   const selectedIds = useUIStore((s) => s.selectedIds);
+  const cameraMode = useUIStore((s) => s.cameraMode);
 
   const halfW = room.width / 2;
   const halfL = room.length / 2;
 
   const floorTexture = getFloorTexture(room.width, room.length);
+
+  // D-09: preserve orbit camera position+target across mode switches
+  const orbitPosRef = useRef<[number, number, number] | null>(null);
+  const orbitTargetRef = useRef<[number, number, number]>([halfW, room.wallHeight / 3, halfL]);
+  const orbitControlsRef = useRef<any>(null);
 
   return (
     <>
@@ -72,25 +79,53 @@ function Scene({ productLibrary }: Props) {
         );
       })}
 
-      <OrbitControls
-        target={[halfW, room.wallHeight / 3, halfL]}
-        maxPolarAngle={Math.PI / 2}
-        minDistance={3}
-        maxDistance={80}
-        enableDamping
-        dampingFactor={0.1}
-      />
+      {cameraMode === "orbit" ? (
+        <OrbitControls
+          ref={orbitControlsRef}
+          target={orbitTargetRef.current}
+          maxPolarAngle={Math.PI / 2}
+          minDistance={3}
+          maxDistance={80}
+          enableDamping
+          dampingFactor={0.1}
+          onChange={() => {
+            const cam = orbitControlsRef.current?.object;
+            const tgt = orbitControlsRef.current?.target;
+            if (cam && tgt) {
+              orbitPosRef.current = [cam.position.x, cam.position.y, cam.position.z];
+              orbitTargetRef.current = [tgt.x, tgt.y, tgt.z];
+            }
+          }}
+        />
+      ) : (
+        <>
+          <PointerLockControls maxPolarAngle={Math.PI - 0.1} minPolarAngle={0.1} />
+          <WalkCameraController />
+        </>
+      )}
     </>
   );
 }
 
 export default function ThreeViewport({ productLibrary }: Props) {
   const room = useCADStore((s) => s.room);
+  const cameraMode = useUIStore((s) => s.cameraMode);
   const halfW = room.width / 2;
   const halfL = room.length / 2;
 
+  const [showToast, setShowToast] = useState(false);
+  useEffect(() => {
+    if (cameraMode === "walk") {
+      setShowToast(true);
+      const t = setTimeout(() => setShowToast(false), 4000);
+      return () => clearTimeout(t);
+    } else {
+      setShowToast(false);
+    }
+  }, [cameraMode]);
+
   return (
-    <div className="w-full h-full bg-obsidian-deepest">
+    <div className="w-full h-full bg-obsidian-deepest relative">
       <Canvas
         shadows="soft"
         gl={{ preserveDrawingBuffer: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0 }}
@@ -103,6 +138,14 @@ export default function ThreeViewport({ productLibrary }: Props) {
       >
         <Scene productLibrary={productLibrary} />
       </Canvas>
+      {showToast && (
+        <div
+          className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2 font-mono text-[10px] tracking-widest text-text-dim bg-obsidian-deepest/80 backdrop-blur-sm border border-outline-variant/20 rounded-sm pointer-events-none transition-opacity duration-500"
+          style={{ opacity: showToast ? 1 : 0 }}
+        >
+          WALK_MODE · WASD to move · Mouse to look · ESC to exit
+        </div>
+      )}
     </div>
   );
 }
