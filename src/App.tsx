@@ -4,6 +4,7 @@ import { useUIStore } from "@/stores/uiStore";
 import { useCADStore, useActiveWalls } from "@/stores/cadStore";
 import { useProductStore } from "@/stores/productStore";
 import { useFramedArtStore } from "@/stores/framedArtStore";
+import { useWainscotStyleStore } from "@/stores/wainscotStyleStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { useHelpRouteSync } from "@/hooks/useHelpRouteSync";
@@ -49,6 +50,7 @@ export default function App() {
   useEffect(() => {
     useProductStore.getState().load();
     useFramedArtStore.getState().load();
+    useWainscotStyleStore.getState().load();
   }, []);
 
   // Hydrate last-saved project on mount (SAVE-02 reload support)

@@ -6,6 +6,7 @@ import SidebarProductPicker from "./SidebarProductPicker";
 import FloorMaterialPicker from "./FloorMaterialPicker";
 import CustomElementsPanel from "./CustomElementsPanel";
 import FramedArtLibrary from "./FramedArtLibrary";
+import WainscotLibrary from "./WainscotLibrary";
 
 interface Props {
   productLibrary: Product[];
@@ -99,6 +100,9 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
 
         {/* Framed Art Library (Phase 15) */}
         <FramedArtLibrary />
+
+        {/* Wainscoting Style Library (Phase 16) */}
+        <WainscotLibrary />
 
         {/* Product picker (LIB-05) */}
         <div>

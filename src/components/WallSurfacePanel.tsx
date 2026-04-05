@@ -2,8 +2,10 @@ import { useRef, useState } from "react";
 import { useCADStore, useActiveWalls } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useFramedArtStore } from "@/stores/framedArtStore";
+import { useWainscotStyleStore } from "@/stores/wainscotStyleStore";
 import type { Wallpaper } from "@/types/cad";
 import { FRAME_PRESETS } from "@/types/framedArt";
+import { STYLE_META } from "@/types/wainscotStyle";
 
 /** Appears in PropertiesPanel when exactly one wall is selected. */
 export default function WallSurfacePanel() {
@@ -19,6 +21,7 @@ export default function WallSurfacePanel() {
   const wallpaperFileRef = useRef<HTMLInputElement>(null);
   const artFileRef = useRef<HTMLInputElement>(null);
   const framedArtItems = useFramedArtStore((s) => s.items);
+  const wainscotStyles = useWainscotStyleStore((s) => s.items);
   const [showLibrary, setShowLibrary] = useState(false);
 
   if (selectedIds.length !== 1) return null;
@@ -161,41 +164,57 @@ export default function WallSurfacePanel() {
         )}
       </div>
 
-      {/* Wainscoting */}
+      {/* Wainscoting — pick from library (Phase 16) */}
       <div>
         <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
             checked={wains?.enabled ?? false}
             onChange={(e) =>
-              toggleWainscoting(wall.id, activeSide, e.target.checked, wains?.heightFt, wains?.color)
+              toggleWainscoting(
+                wall.id,
+                activeSide,
+                e.target.checked,
+                wains?.heightFt,
+                wains?.color,
+                wains?.styleItemId
+              )
             }
             className="w-3 h-3 accent-accent rounded-none"
           />
           <span className="font-mono text-[9px] text-text-dim tracking-wider">WAINSCOTING</span>
         </label>
         {wains?.enabled && (
-          <div className="ml-5 mt-1 flex items-center gap-2">
-            <input
-              type="number"
-              step="0.25"
-              min="0.5"
-              max="6"
-              value={wains.heightFt}
-              onChange={(e) =>
-                toggleWainscoting(wall.id, activeSide, true, parseFloat(e.target.value) || 3, wains.color)
-              }
-              className="w-16 font-mono text-[9px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-1 py-0.5 rounded-sm"
-            />
-            <span className="font-mono text-[8px] text-text-ghost">FT</span>
-            <input
-              type="color"
-              value={wains.color}
-              onChange={(e) =>
-                toggleWainscoting(wall.id, activeSide, true, wains.heightFt, e.target.value)
-              }
-              className="w-6 h-5 bg-transparent border border-outline-variant/30 rounded-sm cursor-pointer"
-            />
+          <div className="ml-5 mt-1 space-y-1">
+            {wainscotStyles.length === 0 ? (
+              <div className="font-mono text-[8px] text-text-ghost">
+                CREATE_STYLE_IN_LIBRARY_FIRST
+              </div>
+            ) : (
+              <select
+                value={wains.styleItemId ?? ""}
+                onChange={(e) => {
+                  const id = e.target.value || undefined;
+                  const selected = id ? wainscotStyles.find((s) => s.id === id) : null;
+                  toggleWainscoting(
+                    wall.id,
+                    activeSide,
+                    true,
+                    selected?.heightFt ?? wains.heightFt,
+                    selected?.color ?? wains.color,
+                    id
+                  );
+                }}
+                className="w-full font-mono text-[9px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-1 py-0.5 rounded-sm"
+              >
+                <option value="">(LEGACY_DEFAULT)</option>
+                {wainscotStyles.map((it) => (
+                  <option key={it.id} value={it.id}>
+                    {it.name.toUpperCase()} · {STYLE_META[it.style].label}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
         )}
       </div>

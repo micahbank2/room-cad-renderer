@@ -53,7 +53,7 @@ interface CADState {
   removeCeiling: (id: string) => void;
   setFloorMaterial: (material: FloorMaterial | undefined) => void;
   setWallpaper: (wallId: string, side: WallSide, wallpaper: Wallpaper | undefined) => void;
-  toggleWainscoting: (wallId: string, side: WallSide, enabled: boolean, heightFt?: number, color?: string) => void;
+  toggleWainscoting: (wallId: string, side: WallSide, enabled: boolean, heightFt?: number, color?: string, styleItemId?: string) => void;
   toggleCrownMolding: (wallId: string, side: WallSide, enabled: boolean, heightFt?: number, color?: string) => void;
   addWallArt: (wallId: string, art: Omit<WallArt, "id">) => string;
   updateWallArt: (wallId: string, artId: string, changes: Partial<WallArt>) => void;
@@ -422,7 +422,7 @@ export const useCADStore = create<CADState>()((set) => ({
       })
     ),
 
-  toggleWainscoting: (wallId, side, enabled, heightFt = 3, color = "#ffffff") =>
+  toggleWainscoting: (wallId, side, enabled, heightFt = 3, color = "#ffffff", styleItemId) =>
     set(
       produce((s: CADState) => {
         const doc = activeDoc(s);
@@ -431,7 +431,12 @@ export const useCADStore = create<CADState>()((set) => ({
         const wall = doc.walls[wallId];
         if (!wall.wainscoting) wall.wainscoting = {};
         if (enabled) {
-          wall.wainscoting[side] = { enabled: true, heightFt, color };
+          wall.wainscoting[side] = {
+            enabled: true,
+            heightFt,
+            color,
+            ...(styleItemId ? { styleItemId } : {}),
+          };
         } else {
           delete wall.wainscoting[side];
         }
