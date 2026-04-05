@@ -59,26 +59,26 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PAINT-01 | — | Pending |
-| PAINT-02 | — | Pending |
-| PAINT-03 | — | Pending |
-| PAINT-04 | — | Pending |
-| PAINT-05 | — | Pending |
-| PAINT-06 | — | Pending |
-| PAINT-07 | — | Pending |
-| POLISH-01 | — | Pending |
-| POLISH-02 | — | Pending |
-| POLISH-03 | — | Pending |
-| POLISH-04 | — | Pending |
-| MAT-01 | — | Pending |
-| MAT-02 | — | Pending |
-| MAT-03 | — | Pending |
+| PAINT-01 | Phase 18 | Pending |
+| PAINT-02 | Phase 18 | Pending |
+| PAINT-03 | Phase 18 | Pending |
+| PAINT-04 | Phase 18 | Pending |
+| PAINT-05 | Phase 18 | Pending |
+| PAINT-06 | Phase 18 | Pending |
+| PAINT-07 | Phase 18 | Pending |
+| POLISH-01 | Phase 19 | Pending |
+| POLISH-02 | Phase 19 | Pending |
+| POLISH-03 | Phase 19 | Pending |
+| POLISH-04 | Phase 19 | Pending |
+| MAT-01 | Phase 20 | Pending |
+| MAT-02 | Phase 20 | Pending |
+| MAT-03 | Phase 20 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14 ⚠️
+- Mapped to phases: 14
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-05*
-*Last updated: 2026-04-05 after initial definition*
+*Last updated: 2026-04-05 — traceability filled after roadmap creation*
