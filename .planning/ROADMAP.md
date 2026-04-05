@@ -79,13 +79,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. A "Walk" or "Eye Level" button switches the 3D viewport from orbit camera to a first-person perspective at roughly standing height
   2. She can use arrow keys or WASD to move through the room and look around
   3. Switching back to orbit view restores the previous orbit camera position
-**Plans**: 6 plans
-  - [ ] 00-PLAN.md — Test infrastructure (Vitest + jsdom + stub test files)
-  - [x] 01-PLAN.md — EDIT-09 product image rendering (cache + fabricSync fix)
-  - [ ] 02-PLAN.md — EDIT-07 drag-drop placement (HTML5 DnD + auto-select)
-  - [ ] 03-PLAN.md — EDIT-08 rotation handle (Figma-style + 15° snap + Shift free-rotate)
-  - [ ] 04-PLAN.md — EDIT-06 dimension editing (dblclick overlay input + corner propagation)
-  - [ ] 05-PLAN.md — SAVE-02 auto-save (2s debounce + projectStore + SaveIndicator)
+**Plans**: 3 plans
+  - [x] 04-00-PLAN.md — Wave 0 test stubs (walkCollision + uiStore cameraMode)
+  - [ ] 04-01-PLAN.md — uiStore cameraMode + walkCollision.canMoveTo pure module + passing tests
+  - [ ] 04-02-PLAN.md — WalkCameraController + ThreeViewport wiring + Toolbar/StatusBar/App UI
 **UI hint**: yes
 
 ### Phase 5: Multi-Room

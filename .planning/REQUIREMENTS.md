@@ -34,7 +34,7 @@ Jessica can see her future room with her actual furniture before spending money.
 - [x] **VIZ-02**: User can orbit the 3D camera
 - [x] **VIZ-03**: User can toggle between 2D, 3D, and split views
 - [x] **VIZ-04**: Products render in 3D with their uploaded image as texture (not blank boxes)
-- [ ] **VIZ-05**: Eye-level camera walkthrough to feel the room from inside
+- [x] **VIZ-05**: Eye-level camera walkthrough to feel the room from inside
 - [x] **VIZ-06**: Smooth 3D experience (PBR materials, soft shadows, floor texture)
 
 ### Persistence
