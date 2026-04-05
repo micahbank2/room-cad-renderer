@@ -2,7 +2,7 @@ import * as fabric from "fabric";
 import type { WallSegment, PlacedProduct } from "@/types/cad";
 import type { Product } from "@/types/product";
 import { effectiveDimensions, hasDimensions } from "@/types/product";
-import { wallCorners, angle as wallAngle } from "@/lib/geometry";
+import { mitredWallCorners, angle as wallAngle } from "@/lib/geometry";
 import { drawWallDimension } from "./dimensions";
 import { getCachedImage } from "./productImageCache";
 import { getHandleWorldPos } from "./rotationHandle";
@@ -25,8 +25,9 @@ export function renderWalls(
   origin: { x: number; y: number },
   selectedIds: string[]
 ) {
-  for (const wall of Object.values(walls)) {
-    const corners = wallCorners(wall);
+  const wallList = Object.values(walls);
+  for (const wall of wallList) {
+    const corners = mitredWallCorners(wall, wallList);
     const isSelected = selectedIds.includes(wall.id);
 
     const points = corners.map((c) => ({
