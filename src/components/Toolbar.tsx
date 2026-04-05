@@ -156,6 +156,9 @@ export function ToolPalette() {
   const setTool = useUIStore((s) => s.setTool);
   const showGrid = useUIStore((s) => s.showGrid);
   const toggleGrid = useUIStore((s) => s.toggleGrid);
+  const userZoom = useUIStore((s) => s.userZoom);
+  const setUserZoom = useUIStore((s) => s.setUserZoom);
+  const resetView = useUIStore((s) => s.resetView);
 
   return (
     <div className="absolute left-3 top-3 z-10 flex flex-col gap-1 glass-panel p-1.5 rounded-sm">
@@ -190,6 +193,34 @@ export function ToolPalette() {
           <span className="material-symbols-outlined text-[18px]">grid_4x4</span>
         </button>
       </Tooltip>
+      <div className="w-full h-px bg-outline-variant/20 my-0.5" />
+      <Tooltip content="Zoom in" placement="right">
+        <button
+          onClick={() => setUserZoom(userZoom * 1.2)}
+          className="w-8 h-8 flex items-center justify-center rounded-sm text-text-dim hover:text-text-primary hover:bg-obsidian-high transition-colors"
+        >
+          <span className="material-symbols-outlined text-[18px]">zoom_in</span>
+        </button>
+      </Tooltip>
+      <Tooltip content="Zoom out" placement="right">
+        <button
+          onClick={() => setUserZoom(userZoom / 1.2)}
+          className="w-8 h-8 flex items-center justify-center rounded-sm text-text-dim hover:text-text-primary hover:bg-obsidian-high transition-colors"
+        >
+          <span className="material-symbols-outlined text-[18px]">zoom_out</span>
+        </button>
+      </Tooltip>
+      <Tooltip content="Fit to view" shortcut="0" placement="right">
+        <button
+          onClick={resetView}
+          className="w-8 h-8 flex items-center justify-center rounded-sm text-text-dim hover:text-text-primary hover:bg-obsidian-high transition-colors"
+        >
+          <span className="material-symbols-outlined text-[18px]">fit_screen</span>
+        </button>
+      </Tooltip>
+      <div className="w-8 h-5 flex items-center justify-center font-mono text-[9px] text-text-ghost tracking-wider">
+        {Math.round(userZoom * 100)}%
+      </div>
     </div>
   );
 }

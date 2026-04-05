@@ -111,6 +111,10 @@ export default function App() {
       };
       const tool = shortcuts[e.key.toLowerCase()];
       if (tool && viewMode !== "library") setTool(tool);
+      // "0" resets canvas view (fit-to-view) — Phase 6 NAV-03
+      if (e.key === "0" && (viewMode === "2d" || viewMode === "split")) {
+        useUIStore.getState().resetView();
+      }
       // D-03: 'e' toggles camera mode in 3D/split views
       if (e.key.toLowerCase() === "e" && (viewMode === "3d" || viewMode === "split")) {
         useUIStore.getState().toggleCameraMode();

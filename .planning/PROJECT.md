@@ -57,9 +57,36 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - ✓ Project save/load via IndexedDB — existing
 - ✓ Obsidian CAD design system + Welcome screen — existing
 
-### Active
+### Active (v1.1 UX Fixes & Polish)
 
-No active requirements — v1.0 shipped. Next milestone requirements to be defined via `/gsd:new-milestone`.
+**2D canvas navigation:**
+- [ ] Zoom + pan + fit-to-view on 2D canvas
+**Placement & interaction fixes:**
+- [ ] Door/window clicks land at cursor (accuracy fix)
+- [ ] Auto-revert to Select after placing element
+- [ ] Rotate already-placed walls/doors/windows
+- [ ] Live dimension display while drawing walls
+- [ ] Size tag while resizing products (Google-Slides style)
+**Home page + save + tabs:**
+- [ ] Welcome screen: 2 CTAs (Create vs Upload)
+- [ ] FLOOR_PLAN top-level tab
+- [ ] Template browser works (Living Room, Bedroom, Kitchen)
+- [ ] Auto-save status prominently visible
+- [ ] Remove/wire broken sidebar tabs
+
+### Planned (v1.2 New Element Types)
+- Ceilings
+- Editable floors
+- Wallpaper & wall art (wall surface overlays)
+- Wainscoting + crown molding presets
+- Freeform custom-element builder
+
+### Planned (v1.3 Color & Paint System)
+- Color/paint library (global)
+- Farrow & Ball catalog (~130 colors)
+- Custom color creation + save
+- Lime wash toggle (filter/shader)
+- Apply paint to walls + ceilings (2D + 3D)
 
 ### Out of Scope
 
@@ -90,16 +117,17 @@ No active requirements — v1.0 shipped. Next milestone requirements to be defin
 
 ## Next Milestone Goals
 
-TBD — run `/gsd:new-milestone` to define v1.1 scope.
+v1.1 UX Fixes & Polish — make the app usable without workarounds. See ROADMAP.md for full phase breakdown.
 
-Likely candidates from Phase 5.1 audit + v2 deferred list:
+Key fixes driving v1.1:
+- 2D canvas zoom/pan is missing (critical — makes larger rooms unworkable)
+- Click-placement offset bug (door lands next to wall, not on cursor)
+- Tools stay sticky after placing (should auto-revert to Select)
+- No live measurements while drawing
+- Home page flow needs refocusing on 2 CTAs
+- Broken nav tabs (LAYERS/ASSETS/MEASURE/HISTORY) either wired up or removed
 
-- Nyquist compliance flag flip for all v1 phases (formal sign-off)
-- Manual browser verification pass of Phase 1 UI interactions
-- Floor texture cache per-mesh (fix split-view fragility)
-- Room linking via doorways (connected whole-house floor plan)
-- GLTF/OBJ product upload (if Jessica requests it)
-- iPad / touch support
+After v1.1: v1.2 adds ceilings/floors/surfaces/custom elements, v1.3 adds the color & paint system with Farrow & Ball catalog and lime wash.
 
 ## Tech Stack (Current)
 

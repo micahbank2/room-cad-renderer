@@ -24,15 +24,33 @@ interface Props {
   productLibrary: Product[];
 }
 
-function getScale(roomW: number, roomH: number, canvasW: number, canvasH: number) {
+function getBaseFitScale(roomW: number, roomH: number, canvasW: number, canvasH: number) {
   const pad = 50;
   return Math.min((canvasW - pad * 2) / roomW, (canvasH - pad * 2) / roomH);
 }
 
-function getOrigin(roomW: number, roomH: number, scale: number, canvasW: number, canvasH: number) {
+function getBaseFitOrigin(roomW: number, roomH: number, baseScale: number, canvasW: number, canvasH: number) {
   return {
-    x: (canvasW - roomW * scale) / 2,
-    y: (canvasH - roomH * scale) / 2,
+    x: (canvasW - roomW * baseScale) / 2,
+    y: (canvasH - roomH * baseScale) / 2,
+  };
+}
+
+/** Returns the user-zoomed-and-panned scale + origin used for rendering and hit-testing. */
+function getViewTransform(
+  roomW: number,
+  roomH: number,
+  canvasW: number,
+  canvasH: number,
+  userZoom: number,
+  panOffset: { x: number; y: number },
+) {
+  const baseScale = getBaseFitScale(roomW, roomH, canvasW, canvasH);
+  const baseOrigin = getBaseFitOrigin(roomW, roomH, baseScale, canvasW, canvasH);
+  return {
+    scale: baseScale * userZoom,
+    origin: { x: baseOrigin.x + panOffset.x, y: baseOrigin.y + panOffset.y },
+    baseFit: { scale: baseScale, origin: baseOrigin },
   };
 }
 
@@ -49,6 +67,8 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const activeTool = useUIStore((s) => s.activeTool);
   const selectedIds = useUIStore((s) => s.selectedIds);
   const showGrid = useUIStore((s) => s.showGrid);
+  const userZoom = useUIStore((s) => s.userZoom);
+  const panOffset = useUIStore((s) => s.panOffset);
 
   // Keep select tool's product library reference up to date
   useEffect(() => {
@@ -70,8 +90,11 @@ export default function FabricCanvas({ productLibrary }: Props) {
     fc.clear();
     fc.backgroundColor = "#12121d";
 
-    const scale = getScale(room.width, room.length, cW, cH);
-    const origin = getOrigin(room.width, room.length, scale, cW, cH);
+    const userZoom = useUIStore.getState().userZoom;
+    const panOffset = useUIStore.getState().panOffset;
+    const { scale, origin } = getViewTransform(
+      room.width, room.length, cW, cH, userZoom, panOffset
+    );
 
     // 1. Grid
     drawGrid(fc, room.width, room.length, scale, origin, showGrid);
@@ -90,7 +113,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // Re-activate current tool with new scale/origin
     deactivateAllTools(fc);
     activateCurrentTool(fc, activeTool, scale, origin);
-  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid]);
+  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset]);
 
   // Init canvas
   useEffect(() => {
@@ -106,8 +129,10 @@ export default function FabricCanvas({ productLibrary }: Props) {
       const wrapper = wrapperRef.current!;
       const rect = wrapper.getBoundingClientRect();
       const r = getActiveRoomDoc()?.room ?? { width: 20, length: 16, wallHeight: 8 };
-      const scale = getScale(r.width, r.length, rect.width, rect.height);
-      const origin = getOrigin(r.width, r.length, scale, rect.width, rect.height);
+      const { userZoom, panOffset } = useUIStore.getState();
+      const { scale, origin } = getViewTransform(
+        r.width, r.length, rect.width, rect.height, userZoom, panOffset
+      );
       return { scale, origin };
     });
 
@@ -139,8 +164,10 @@ export default function FabricCanvas({ productLibrary }: Props) {
       const pointer = fc.getViewportPoint(opt.e as any);
       const rect = wrapper.getBoundingClientRect();
       const r = getActiveRoomDoc()?.room ?? { width: 20, length: 16, wallHeight: 8 };
-      const scale = getScale(r.width, r.length, rect.width, rect.height);
-      const origin = getOrigin(r.width, r.length, scale, rect.width, rect.height);
+      const { userZoom, panOffset } = useUIStore.getState();
+      const { scale, origin } = getViewTransform(
+        r.width, r.length, rect.width, rect.height, userZoom, panOffset
+      );
       const storeWalls = getActiveRoomDoc()?.walls ?? {};
       for (const wall of Object.values(storeWalls)) {
         if (hitTestDimLabel(pointer, wall, scale, origin)) {
@@ -161,6 +188,94 @@ export default function FabricCanvas({ productLibrary }: Props) {
   useEffect(() => {
     redraw();
   }, [redraw]);
+
+  // Scroll-wheel zoom + middle-drag pan (Phase 6 — NAV-01/02)
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = wrapper.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      const cursor = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      const r = getActiveRoomDoc()?.room ?? { width: 20, length: 16, wallHeight: 8 };
+      const baseScale = getBaseFitScale(r.width, r.length, rect.width, rect.height);
+      const baseOrigin = getBaseFitOrigin(r.width, r.length, baseScale, rect.width, rect.height);
+      // Smooth zoom factor: exponent based on deltaY. Ctrl/cmd+wheel = stronger.
+      const factor = Math.exp(-e.deltaY * (e.ctrlKey || e.metaKey ? 0.005 : 0.0015));
+      useUIStore.getState().zoomAt(cursor, factor, { scale: baseScale, origin: baseOrigin });
+    };
+
+    // Pan: middle-mouse drag OR space+left-drag
+    let panState: { startX: number; startY: number; originX: number; originY: number } | null = null;
+    let spaceDown = false;
+
+    const onMouseDown = (e: MouseEvent) => {
+      const isMiddle = e.button === 1;
+      const isSpacePan = spaceDown && e.button === 0;
+      if (!isMiddle && !isSpacePan) return;
+      e.preventDefault();
+      const { panOffset } = useUIStore.getState();
+      panState = {
+        startX: e.clientX,
+        startY: e.clientY,
+        originX: panOffset.x,
+        originY: panOffset.y,
+      };
+      wrapper.style.cursor = "grabbing";
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!panState) return;
+      const dx = e.clientX - panState.startX;
+      const dy = e.clientY - panState.startY;
+      useUIStore.getState().setPanOffset({
+        x: panState.originX + dx,
+        y: panState.originY + dy,
+      });
+    };
+
+    const onMouseUp = () => {
+      if (panState) {
+        panState = null;
+        wrapper.style.cursor = "";
+      }
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.code === "Space" && !spaceDown && !isInput(e.target)) {
+        spaceDown = true;
+        wrapper.style.cursor = "grab";
+      }
+    };
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (e.code === "Space") {
+        spaceDown = false;
+        if (!panState) wrapper.style.cursor = "";
+      }
+    };
+
+    wrapper.addEventListener("wheel", onWheel, { passive: false });
+    wrapper.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keyup", onKeyUp);
+    // Block browser context menu on middle click
+    const onAuxClick = (e: MouseEvent) => { if (e.button === 1) e.preventDefault(); };
+    wrapper.addEventListener("auxclick", onAuxClick);
+
+    return () => {
+      wrapper.removeEventListener("wheel", onWheel);
+      wrapper.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("keyup", onKeyUp);
+      wrapper.removeEventListener("auxclick", onAuxClick);
+    };
+  }, []);
 
   // Undo/redo keyboard shortcuts
   useEffect(() => {
@@ -190,8 +305,10 @@ export default function FabricCanvas({ productLibrary }: Props) {
     const wrapper = wrapperRef.current;
     if (wall && wrapper) {
       const rect = wrapper.getBoundingClientRect();
-      const scale = getScale(room.width, room.length, rect.width, rect.height);
-      const origin = getOrigin(room.width, room.length, scale, rect.width, rect.height);
+      const { userZoom, panOffset } = useUIStore.getState();
+      const { scale, origin } = getViewTransform(
+        room.width, room.length, rect.width, rect.height, userZoom, panOffset
+      );
       const label = computeLabelPx(wall, scale, origin);
       overlayStyle = {
         position: "absolute",
@@ -239,6 +356,14 @@ export default function FabricCanvas({ productLibrary }: Props) {
         />
       )}
     </div>
+  );
+}
+
+function isInput(target: EventTarget | null): boolean {
+  return (
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement
   );
 }
 
