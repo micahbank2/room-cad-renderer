@@ -1,20 +1,47 @@
 import * as fabric from "fabric";
-import { useCADStore } from "@/stores/cadStore";
+import { useCADStore, getActiveRoomDoc } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
-import { snapPoint, constrainOrthogonal } from "@/lib/geometry";
+import { snapPoint, constrainOrthogonal, distance } from "@/lib/geometry";
 import type { Point } from "@/types/cad";
 
 interface WallToolState {
   startPoint: Point | null;
   previewLine: fabric.Line | null;
   startMarker: fabric.Circle | null;
+  endpointHighlight: fabric.Circle | null;
 }
 
 const state: WallToolState = {
   startPoint: null,
   previewLine: null,
   startMarker: null,
+  endpointHighlight: null,
 };
+
+/** Snap threshold in feet — if cursor is within this distance of an existing
+ *  wall endpoint, snap to that endpoint instead of to the grid. */
+const ENDPOINT_SNAP_THRESHOLD_FT = 0.75;
+
+/** Find the nearest wall endpoint within threshold, or null. */
+function findNearestEndpoint(cursor: Point, excludeStart: Point | null): Point | null {
+  const walls = getActiveRoomDoc()?.walls ?? {};
+  let best: { point: Point; dist: number } | null = null;
+  for (const wall of Object.values(walls)) {
+    for (const endpoint of [wall.start, wall.end]) {
+      // Skip the in-progress start point itself (can't terminate a wall on its own start)
+      if (
+        excludeStart &&
+        endpoint.x === excludeStart.x &&
+        endpoint.y === excludeStart.y
+      ) continue;
+      const d = distance(cursor, endpoint);
+      if (d <= ENDPOINT_SNAP_THRESHOLD_FT && (!best || d < best.dist)) {
+        best = { point: endpoint, dist: d };
+      }
+    }
+  }
+  return best ? best.point : null;
+}
 
 function pxToFeet(
   px: { x: number; y: number },
@@ -38,7 +65,11 @@ export function activateWallTool(
     const pointer = fc.getViewportPoint(opt.e);
     const gridSnap = useUIStore.getState().gridSnap;
     const feet = pxToFeet(pointer, origin, scale);
-    const snapped = gridSnap > 0 ? snapPoint(feet, gridSnap) : feet;
+    // Endpoint snap beats grid snap
+    const endpoint = findNearestEndpoint(feet, state.startPoint);
+    const snapped = endpoint
+      ? endpoint
+      : gridSnap > 0 ? snapPoint(feet, gridSnap) : feet;
 
     if (!state.startPoint) {
       // First click: set start
@@ -72,12 +103,47 @@ export function activateWallTool(
   };
 
   const onMouseMove = (opt: fabric.TEvent) => {
-    if (!state.startPoint) return;
-
     const pointer = fc.getViewportPoint(opt.e);
     const gridSnap = useUIStore.getState().gridSnap;
     const feet = pxToFeet(pointer, origin, scale);
-    let snapped = gridSnap > 0 ? snapPoint(feet, gridSnap) : feet;
+
+    // Check if cursor is near an existing endpoint — show highlight
+    // (works even before the first click, to help users start walls at existing endpoints)
+    const endpoint = findNearestEndpoint(feet, state.startPoint);
+    if (endpoint) {
+      const hx = origin.x + endpoint.x * scale;
+      const hy = origin.y + endpoint.y * scale;
+      if (state.endpointHighlight) {
+        state.endpointHighlight.set({ left: hx, top: hy });
+      } else {
+        state.endpointHighlight = new fabric.Circle({
+          left: hx,
+          top: hy,
+          radius: 7,
+          fill: "transparent",
+          stroke: "#ccbeff",
+          strokeWidth: 2,
+          originX: "center",
+          originY: "center",
+          selectable: false,
+          evented: false,
+        });
+        fc.add(state.endpointHighlight);
+      }
+    } else if (state.endpointHighlight) {
+      fc.remove(state.endpointHighlight);
+      state.endpointHighlight = null;
+    }
+
+    if (!state.startPoint) {
+      fc.renderAll();
+      return;
+    }
+
+    // Endpoint snap beats grid snap
+    let snapped = endpoint
+      ? endpoint
+      : gridSnap > 0 ? snapPoint(feet, gridSnap) : feet;
 
     if (opt.e instanceof MouseEvent && opt.e.shiftKey) {
       snapped = constrainOrthogonal(state.startPoint, snapped);
@@ -130,6 +196,10 @@ function cleanup(fc: fabric.Canvas) {
   if (state.startMarker) {
     fc.remove(state.startMarker);
     state.startMarker = null;
+  }
+  if (state.endpointHighlight) {
+    fc.remove(state.endpointHighlight);
+    state.endpointHighlight = null;
   }
   state.startPoint = null;
   fc.renderAll();

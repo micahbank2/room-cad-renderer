@@ -25,6 +25,25 @@ export function renderWalls(
   origin: { x: number; y: number },
   selectedIds: string[]
 ) {
+  // Pre-compute shared endpoints so we can draw corner caps that hide the
+  // visible seams where wall rectangles overlap.
+  const endpointUsage = new Map<string, { point: { x: number; y: number }; halfT: number; count: number }>();
+  const keyFor = (p: { x: number; y: number }) =>
+    `${Math.round(p.x * 1000)},${Math.round(p.y * 1000)}`;
+  for (const wall of Object.values(walls)) {
+    for (const endpoint of [wall.start, wall.end]) {
+      const k = keyFor(endpoint);
+      const existing = endpointUsage.get(k);
+      const halfT = wall.thickness / 2;
+      if (existing) {
+        existing.count += 1;
+        existing.halfT = Math.max(existing.halfT, halfT);
+      } else {
+        endpointUsage.set(k, { point: endpoint, halfT, count: 1 });
+      }
+    }
+  }
+
   for (const wall of Object.values(walls)) {
     const corners = wallCorners(wall);
     const isSelected = selectedIds.includes(wall.id);
@@ -94,6 +113,106 @@ export function renderWalls(
     // Dimension label
     drawWallDimension(fc, wall, scale, origin);
   }
+
+  // For each shared endpoint with exactly two walls meeting, compute the
+  // outer-edge intersection and render a triangular cap that fills the gap
+  // between the two walls' end caps.
+  for (const entry of endpointUsage.values()) {
+    if (entry.count !== 2) continue; // only handle simple 2-wall junctions
+
+    const incident = Object.values(walls).filter((w) => {
+      const eps = 1e-6;
+      return (
+        (Math.abs(w.start.x - entry.point.x) < eps && Math.abs(w.start.y - entry.point.y) < eps) ||
+        (Math.abs(w.end.x - entry.point.x) < eps && Math.abs(w.end.y - entry.point.y) < eps)
+      );
+    });
+    if (incident.length !== 2) continue;
+
+    const cap = computeCornerCap(incident[0], incident[1], entry.point);
+    if (!cap) continue;
+
+    const capPx = cap.map((p) => ({
+      x: origin.x + p.x * scale,
+      y: origin.y + p.y * scale,
+    }));
+
+    fc.add(
+      new fabric.Polygon(capPx, {
+        fill: WALL_FILL,
+        stroke: null as unknown as string,
+        strokeWidth: 0,
+        selectable: false,
+        evented: false,
+        data: { type: "wall-corner-cap" },
+      })
+    );
+  }
+}
+
+/** Compute the corner-cap polygon that fills the gap between two walls
+ *  meeting at shared point C. Returns null if walls are collinear or the
+ *  junction doesn't require a cap (reflex corner). */
+function computeCornerCap(
+  wallA: WallSegment,
+  wallB: WallSegment,
+  C: { x: number; y: number }
+): { x: number; y: number }[] | null {
+  const eps = 1e-6;
+  const otherA =
+    Math.abs(wallA.start.x - C.x) < eps && Math.abs(wallA.start.y - C.y) < eps
+      ? wallA.end
+      : wallA.start;
+  const otherB =
+    Math.abs(wallB.start.x - C.x) < eps && Math.abs(wallB.start.y - C.y) < eps
+      ? wallB.end
+      : wallB.start;
+
+  const dAx = otherA.x - C.x;
+  const dAy = otherA.y - C.y;
+  const lenA = Math.hypot(dAx, dAy);
+  if (lenA < eps) return null;
+  const dA = { x: dAx / lenA, y: dAy / lenA };
+
+  const dBx = otherB.x - C.x;
+  const dBy = otherB.y - C.y;
+  const lenB = Math.hypot(dBx, dBy);
+  if (lenB < eps) return null;
+  const dB = { x: dBx / lenB, y: dBy / lenB };
+
+  const cross = dA.x * dB.y - dA.y * dB.x;
+  if (Math.abs(cross) < 1e-4) return null; // parallel
+
+  const perpA = { x: -dA.y, y: dA.x };
+  const perpB = { x: -dB.y, y: dB.x };
+
+  const halfTA = wallA.thickness / 2;
+  const halfTB = wallB.thickness / 2;
+
+  // Outer edge of A: side OPPOSITE to B's direction
+  //   if cross(dA,dB) > 0 (B CCW from A), outer = -perpA
+  //   if cross(dA,dB) < 0 (B CW  from A), outer = +perpA
+  const signA = cross > 0 ? -1 : 1;
+  const signB = cross > 0 ? 1 : -1;
+
+  // Outer edge endpoint of each wall at C
+  const aOuter = { x: C.x + signA * perpA.x * halfTA, y: C.y + signA * perpA.y * halfTA };
+  const bOuter = { x: C.x + signB * perpB.x * halfTB, y: C.y + signB * perpB.y * halfTB };
+
+  // Intersection of the two outer edge lines
+  // Line 1: aOuter + t*dA
+  // Line 2: bOuter + s*dB
+  const denom = dA.x * dB.y - dA.y * dB.x;
+  const t = ((bOuter.x - aOuter.x) * dB.y - (bOuter.y - aOuter.y) * dB.x) / denom;
+  const corner = { x: aOuter.x + t * dA.x, y: aOuter.y + t * dA.y };
+
+  // Sanity cap distance
+  const distFromC = Math.hypot(corner.x - C.x, corner.y - C.y);
+  const maxDist = Math.max(halfTA, halfTB) * 5;
+  if (distFromC > maxDist) return null;
+
+  // Quad: C -> aOuter -> corner -> bOuter -> back to C
+  return [C, aOuter, corner, bOuter];
 }
 
 /**
