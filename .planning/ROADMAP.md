@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 Room Visualization MVP** — Phases 1–5.1 (shipped 2026-04-05) — see [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
-- 🚧 **v1.1 UX Fixes & Polish** — Phases 6–8 (planning)
+- 🚧 **v1.1 UX Fixes & Polish** — Phases 6–9 (in progress — Phase 6 shipped)
 - 📋 **v1.2 New Element Types** — Phases 9–11 (planned)
 - 📋 **v1.3 Color & Paint System** — Phases 12–14 (planned)
 
@@ -34,6 +34,16 @@
   5. While resizing a product, a size tag (like Google Slides) shows the current dimensions
 **UI hint:** yes
 
+### Phase 9: Wall Rendering Polish
+**Goal:** Wall joints look clean in every configuration — X-junctions, dead ends, and mid-wall crossings all render correctly
+**Depends on:** Phase 6 (corner caps already handle 2-wall junctions)
+**Requirements:** WALL-01, WALL-02, WALL-03
+**Success Criteria:**
+  1. Three or more walls meeting at a single endpoint render as one clean joint, not as overlapping rectangles with boxes sticking out
+  2. Dead-end walls (no neighbors at one or both endpoints) render with a clean cap matching the Obsidian theme — no raw perpendicular butt ends
+  3. Two walls crossing through each other mid-segment render with a correct visual overlap (not a jagged X with misaligned thickness)
+**UI hint:** yes
+
 ### Phase 8: Home Page, Save Visibility, Tab Cleanup
 **Goal:** First-time users land in a focused welcome screen and understand their work is saved; broken tabs don't exist
 **Depends on:** Phase 7
@@ -50,9 +60,10 @@
 
 | Phase | Milestone | Plans Complete | Status |
 |-------|-----------|----------------|--------|
-| 6. 2D Canvas Navigation | v1.1 | 0/TBD | Not started |
+| 6. 2D Canvas Navigation | v1.1 | 1/1 | Complete (merged 2026-04-05) |
 | 7. Placement & Interaction Fixes | v1.1 | 0/TBD | Not started |
 | 8. Home Page + Save + Tabs | v1.1 | 0/TBD | Not started |
+| 9. Wall Rendering Polish | v1.1 | 0/TBD | Not started (endpoint snap + 2-wall caps done ad-hoc in Phase 6 PR) |
 
 ---
 

@@ -38,6 +38,12 @@ Jessica can see her future room with her actual furniture before spending money.
 
 - [ ] **UI-01**: Remove or wire up the non-functional sidebar tabs (LAYERS, ASSETS, MEASURE, HISTORY)
 
+### Wall Rendering Polish
+
+- [ ] **WALL-01**: X-junctions (3+ walls meeting at one endpoint) render as clean joints, not rectangle pile-ups
+- [ ] **WALL-02**: Dead-end walls (no neighbors) get cleaner end caps than the current perpendicular butt
+- [ ] **WALL-03**: Walls that cross through each other mid-segment (not sharing endpoints) render with correct visual overlap
+
 ---
 
 ## v1 Requirements (Validated — shipped)
@@ -97,3 +103,6 @@ See `.planning/milestones/v1.0-REQUIREMENTS.md` — all 14 v1.0 requirements com
 | HOME-02 | Phase 8 | Active |
 | HOME-03 | Phase 8 | Active |
 | UI-01 | Phase 8 | Active |
+| WALL-01 | Phase 9 | Active |
+| WALL-02 | Phase 9 | Active |
+| WALL-03 | Phase 9 | Active |

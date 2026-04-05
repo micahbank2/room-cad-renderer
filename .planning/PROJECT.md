@@ -73,6 +73,10 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - [ ] Template browser works (Living Room, Bedroom, Kitchen)
 - [ ] Auto-save status prominently visible
 - [ ] Remove/wire broken sidebar tabs
+**Wall rendering polish:**
+- [ ] X-junctions (3+ walls at one point) render clean
+- [ ] Dead-end wall caps (cleaner than perpendicular butt)
+- [ ] Walls crossing mid-segment render with correct overlap
 
 ### Planned (v1.2 New Element Types)
 - Ceilings
