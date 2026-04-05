@@ -2,6 +2,7 @@ import { useUIStore } from "@/stores/uiStore";
 import { useCADStore } from "@/stores/cadStore";
 import { exportRenderedImage } from "@/lib/export";
 import type { ToolType } from "@/types/cad";
+import Tooltip from "@/components/Tooltip";
 
 const tools: { id: ToolType; label: string; icon: string }[] = [
   { id: "select", label: "SELECT", icon: "arrow_selector_tool" },
@@ -25,6 +26,7 @@ export default function Toolbar({ viewMode, onViewChange, onHome }: Props) {
   const futureLen = useCADStore((s) => s.future.length);
   const cameraMode = useUIStore((s) => s.cameraMode);
   const toggleCameraMode = useUIStore((s) => s.toggleCameraMode);
+  const openHelp = useUIStore((s) => s.openHelp);
 
   return (
     <header className="h-14 bg-obsidian-deepest flex items-center px-4 shrink-0 ghost-border border-0 border-b">
@@ -58,18 +60,23 @@ export default function Toolbar({ viewMode, onViewChange, onHome }: Props) {
       </nav>
 
       {(viewMode === "3d" || viewMode === "split") && (
-        <button
-          onClick={toggleCameraMode}
-          title={cameraMode === "orbit" ? "Enter walk mode (E)" : "Exit to orbit (E)"}
-          className={`flex items-center gap-1.5 font-mono text-[10px] tracking-widest px-3 py-1 transition-colors duration-150 mr-6 ${
-            cameraMode === "walk"
-              ? "text-accent-light border-b-2 border-accent"
-              : "text-text-dim hover:text-accent-light"
-          }`}
+        <Tooltip
+          content={cameraMode === "orbit" ? "Enter walk mode" : "Exit to orbit"}
+          shortcut="E"
+          placement="bottom"
         >
-          <span className="material-symbols-outlined text-[14px]">directions_walk</span>
-          {cameraMode === "orbit" ? "WALK" : "ORBIT"}
-        </button>
+          <button
+            onClick={toggleCameraMode}
+            className={`flex items-center gap-1.5 font-mono text-[10px] tracking-widest px-3 py-1 transition-colors duration-150 mr-6 ${
+              cameraMode === "walk"
+                ? "text-accent-light border-b-2 border-accent"
+                : "text-text-dim hover:text-accent-light"
+            }`}
+          >
+            <span className="material-symbols-outlined text-[14px]">directions_walk</span>
+            {cameraMode === "orbit" ? "WALK" : "ORBIT"}
+          </button>
+        </Tooltip>
       )}
 
       {/* Spacer */}
@@ -77,40 +84,53 @@ export default function Toolbar({ viewMode, onViewChange, onHome }: Props) {
 
       {/* Right actions */}
       <div className="flex items-center gap-3">
-        <button
-          onClick={undo}
-          disabled={pastLen === 0}
-          title="Undo (Ctrl+Z)"
-          className="text-text-dim hover:text-text-primary disabled:opacity-20 transition-colors"
-        >
-          <span className="material-symbols-outlined text-[18px]">undo</span>
-        </button>
-        <button
-          onClick={redo}
-          disabled={futureLen === 0}
-          title="Redo (Ctrl+Shift+Z)"
-          className="text-text-dim hover:text-text-primary disabled:opacity-20 transition-colors"
-        >
-          <span className="material-symbols-outlined text-[18px]">redo</span>
-        </button>
+        <Tooltip content="Undo" shortcut="Ctrl+Z" placement="bottom">
+          <button
+            onClick={undo}
+            disabled={pastLen === 0}
+            className="text-text-dim hover:text-text-primary disabled:opacity-20 transition-colors"
+          >
+            <span className="material-symbols-outlined text-[18px]">undo</span>
+          </button>
+        </Tooltip>
+        <Tooltip content="Redo" shortcut="Ctrl+Shift+Z" placement="bottom">
+          <button
+            onClick={redo}
+            disabled={futureLen === 0}
+            className="text-text-dim hover:text-text-primary disabled:opacity-20 transition-colors"
+          >
+            <span className="material-symbols-outlined text-[18px]">redo</span>
+          </button>
+        </Tooltip>
 
         <div className="w-px h-5 bg-outline-variant/20 mx-1" />
 
         <span className="font-mono text-[10px] text-text-ghost tracking-wider">SAVED</span>
 
-        <button
-          onClick={() => {
-            if (viewMode === "2d") {
-              alert("Switch to 3D view to export render.");
-              return;
-            }
-            exportRenderedImage();
-          }}
-          className="font-mono text-[10px] tracking-widest px-3 py-1 border border-accent text-accent hover:bg-accent/10 transition-colors rounded-sm"
-        >
-          EXPORT
-        </button>
+        <Tooltip content="Export 3D view as PNG" placement="bottom">
+          <button
+            onClick={() => {
+              if (viewMode === "2d") {
+                alert("Switch to 3D view to export render.");
+                return;
+              }
+              exportRenderedImage();
+            }}
+            className="font-mono text-[10px] tracking-widest px-3 py-1 border border-accent text-accent hover:bg-accent/10 transition-colors rounded-sm"
+          >
+            EXPORT
+          </button>
+        </Tooltip>
 
+        <Tooltip content="Help &amp; shortcuts" shortcut="?" placement="bottom">
+          <button
+            onClick={() => openHelp()}
+            className="text-text-dim hover:text-text-primary transition-colors"
+            data-onboarding="help-button"
+          >
+            <span className="material-symbols-outlined text-[18px]">help</span>
+          </button>
+        </Tooltip>
         <button className="text-text-dim hover:text-text-primary transition-colors">
           <span className="material-symbols-outlined text-[18px]">settings</span>
         </button>
@@ -122,6 +142,14 @@ export default function Toolbar({ viewMode, onViewChange, onHome }: Props) {
   );
 }
 
+const TOOL_SHORTCUTS: Record<ToolType, string> = {
+  select: "V",
+  wall: "W",
+  door: "D",
+  window: "N",
+  product: "",
+};
+
 /** Vertical tool palette — rendered inside the canvas area */
 export function ToolPalette() {
   const activeTool = useUIStore((s) => s.activeTool);
@@ -132,29 +160,36 @@ export function ToolPalette() {
   return (
     <div className="absolute left-3 top-3 z-10 flex flex-col gap-1 glass-panel p-1.5 rounded-sm">
       {tools.map((t) => (
-        <button
+        <Tooltip
           key={t.id}
-          onClick={() => setTool(t.id)}
-          title={t.label}
-          className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-150 ${
-            activeTool === t.id
-              ? "bg-accent text-white shadow-[0_0_15px_rgba(124,91,240,0.3)]"
-              : "text-text-dim hover:text-text-primary hover:bg-obsidian-high"
-          }`}
+          content={t.label.charAt(0) + t.label.slice(1).toLowerCase() + " tool"}
+          shortcut={TOOL_SHORTCUTS[t.id]}
+          placement="right"
         >
-          <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
-        </button>
+          <button
+            onClick={() => setTool(t.id)}
+            data-onboarding={`tool-${t.id}`}
+            className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-150 ${
+              activeTool === t.id
+                ? "bg-accent text-white shadow-[0_0_15px_rgba(124,91,240,0.3)]"
+                : "text-text-dim hover:text-text-primary hover:bg-obsidian-high"
+            }`}
+          >
+            <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
+          </button>
+        </Tooltip>
       ))}
       <div className="w-full h-px bg-outline-variant/20 my-0.5" />
-      <button
-        onClick={toggleGrid}
-        title="Toggle Grid"
-        className={`w-8 h-8 flex items-center justify-center rounded-sm transition-colors ${
-          showGrid ? "text-accent" : "text-text-ghost"
-        } hover:bg-obsidian-high`}
-      >
-        <span className="material-symbols-outlined text-[18px]">grid_4x4</span>
-      </button>
+      <Tooltip content="Toggle grid" placement="right">
+        <button
+          onClick={toggleGrid}
+          className={`w-8 h-8 flex items-center justify-center rounded-sm transition-colors ${
+            showGrid ? "text-accent" : "text-text-ghost"
+          } hover:bg-obsidian-high`}
+        >
+          <span className="material-symbols-outlined text-[18px]">grid_4x4</span>
+        </button>
+      </Tooltip>
     </div>
   );
 }

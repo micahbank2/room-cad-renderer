@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import type { ToolType } from "@/types/cad";
 
+export type HelpSectionId =
+  | "getting-started"
+  | "shortcuts"
+  | "library"
+  | "3d";
+
 interface UIState {
   activeTool: ToolType;
   selectedIds: string[];
@@ -9,6 +15,8 @@ interface UIState {
   gridSnap: number; // feet, 0 = off
   showGrid: boolean;
   cameraMode: "orbit" | "walk";
+  showHelp: boolean;
+  activeHelpSection: HelpSectionId;
 
   setTool: (tool: ToolType) => void;
   select: (ids: string[]) => void;
@@ -20,6 +28,10 @@ interface UIState {
   toggleGrid: () => void;
   setCameraMode: (mode: "orbit" | "walk") => void;
   toggleCameraMode: () => void;
+  openHelp: (section?: HelpSectionId) => void;
+  closeHelp: () => void;
+  toggleHelp: () => void;
+  setHelpSection: (section: HelpSectionId) => void;
 }
 
 export const useUIStore = create<UIState>()((set) => ({
@@ -30,6 +42,8 @@ export const useUIStore = create<UIState>()((set) => ({
   gridSnap: 0.5,
   showGrid: true,
   cameraMode: "orbit",
+  showHelp: false,
+  activeHelpSection: "getting-started",
 
   setTool: (tool) => set({ activeTool: tool, selectedIds: [] }),
   select: (ids) => set({ selectedIds: ids }),
@@ -45,4 +59,12 @@ export const useUIStore = create<UIState>()((set) => ({
   setCameraMode: (mode) => set({ cameraMode: mode }),
   toggleCameraMode: () =>
     set((s) => ({ cameraMode: s.cameraMode === "orbit" ? "walk" : "orbit" })),
+  openHelp: (section) =>
+    set((s) => ({
+      showHelp: true,
+      activeHelpSection: section ?? s.activeHelpSection,
+    })),
+  closeHelp: () => set({ showHelp: false }),
+  toggleHelp: () => set((s) => ({ showHelp: !s.showHelp })),
+  setHelpSection: (section) => set({ activeHelpSection: section }),
 }));

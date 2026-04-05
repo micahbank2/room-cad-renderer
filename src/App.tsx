@@ -5,6 +5,7 @@ import { useCADStore, useActiveWalls } from "@/stores/cadStore";
 import { useProductStore } from "@/stores/productStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useAutoSave } from "@/hooks/useAutoSave";
+import { useHelpRouteSync } from "@/hooks/useHelpRouteSync";
 import { listProjects } from "@/lib/serialization";
 import Toolbar from "@/components/Toolbar";
 import { ToolPalette } from "@/components/Toolbar";
@@ -13,6 +14,9 @@ import StatusBar from "@/components/StatusBar";
 import PropertiesPanel from "@/components/PropertiesPanel";
 import ProductLibrary from "@/components/ProductLibrary";
 import AddProductModal from "@/components/AddProductModal";
+import HelpModal from "@/components/HelpModal";
+import OnboardingOverlay from "@/components/onboarding/OnboardingOverlay";
+import { useOnboardingStore } from "@/stores/onboardingStore";
 import WelcomeScreen from "@/components/WelcomeScreen";
 import RoomTabs from "@/components/RoomTabs";
 import AddRoomDialog from "@/components/AddRoomDialog";
@@ -32,6 +36,7 @@ export default function App() {
   const wallCount = Object.keys(activeWalls).length;
 
   useAutoSave();
+  useHelpRouteSync();
 
   const productLibrary = useProductStore((s) => s.products);
   const handleAddProduct = useProductStore((s) => s.addProduct);
@@ -60,14 +65,46 @@ export default function App() {
     if (wallCount > 0) setHasStarted(true);
   }, [wallCount]);
 
+  // Auto-start onboarding tour the first time the canvas is shown
+  useEffect(() => {
+    if (!hasStarted) return;
+    const st = useOnboardingStore.getState();
+    if (!st.completed && !st.running) {
+      // Small delay so DOM has time to render + toolbar mounts
+      const id = window.setTimeout(() => {
+        // Re-check in case user interacts quickly
+        const now = useOnboardingStore.getState();
+        if (!now.completed && !now.running) now.start();
+      }, 400);
+      return () => window.clearTimeout(id);
+    }
+  }, [hasStarted]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      // Escape always closes help first (highest priority), regardless of focus
+      if (e.key === "Escape" && useUIStore.getState().showHelp) {
+        useUIStore.getState().closeHelp();
+        e.preventDefault();
+        return;
+      }
+
       if (
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement ||
         e.target instanceof HTMLSelectElement
       ) return;
+
+      // "?" opens help (Shift+/ on US layout). Check both key and shifted "/"
+      if (e.key === "?" || (e.key === "/" && e.shiftKey)) {
+        useUIStore.getState().openHelp();
+        e.preventDefault();
+        return;
+      }
+
+      // Ignore tool shortcuts while help is open
+      if (useUIStore.getState().showHelp) return;
 
       const shortcuts: Record<string, ToolType> = {
         v: "select", w: "wall", d: "door", n: "window",
@@ -202,6 +239,12 @@ export default function App() {
           onClose={() => setShowAddModal(false)}
         />
       )}
+
+      {/* Help Modal */}
+      <HelpModal />
+
+      {/* Onboarding tour */}
+      <OnboardingOverlay />
     </div>
   );
 }
