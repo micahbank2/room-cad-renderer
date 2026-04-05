@@ -4,6 +4,7 @@ import type { Product } from "@/types/product";
 import { wallCorners, angle as wallAngle } from "@/lib/geometry";
 import { drawWallDimension } from "./dimensions";
 import { getCachedImage } from "./productImageCache";
+import { getHandleWorldPos } from "./rotationHandle";
 
 const WALL_FILL = "#343440";
 const WALL_STROKE = "#484554";
@@ -178,5 +179,34 @@ export function renderProducts(
     });
 
     fc.add(group);
+
+    // Rotation handle (EDIT-08): render when this product is single-selected
+    if (isSelected && selectedIds.length === 1) {
+      const handlePos = getHandleWorldPos(pp, product.depth);
+      const hx = origin.x + handlePos.x * scale;
+      const hy = origin.y + handlePos.y * scale;
+      const line = new fabric.Line([cx, cy, hx, hy], {
+        stroke: "#7c5bf0",
+        strokeWidth: 1,
+        selectable: false,
+        evented: false,
+        data: { type: "rotation-handle-line", placedProductId: pp.id },
+      });
+      const circle = new fabric.Circle({
+        left: hx,
+        top: hy,
+        radius: 5,
+        fill: "#12121d",
+        stroke: "#7c5bf0",
+        strokeWidth: 2,
+        originX: "center",
+        originY: "center",
+        selectable: false,
+        evented: false,
+        data: { type: "rotation-handle", placedProductId: pp.id },
+      });
+      fc.add(line);
+      fc.add(circle);
+    }
   }
 }
