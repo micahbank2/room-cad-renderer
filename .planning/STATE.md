@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-00-PLAN.md
-last_updated: "2026-04-05T13:14:46.000Z"
-last_activity: 2026-04-05 -- Phase 05 Plan 00 complete (Wave 0 test stubs)
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-04-05T13:19:32.900Z"
+last_activity: 2026-04-05
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 22
-  completed_plans: 19
+  completed_plans: 20
   percent: 86
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 ## Current Position
 
 Phase: 05 (multi-room) — EXECUTING
-Plan: 2 of 4
-Status: Executing Phase 05
-Last activity: 2026-04-05 -- Phase 05 Plan 00 complete (Wave 0 test stubs)
+Plan: 3 of 4
+Status: Ready to execute
+Last activity: 2026-04-05
 
 Progress: [████████░░] 86%
 
@@ -71,6 +71,7 @@ Progress: [████████░░] 86%
 | Phase 04-3d-walkthrough P01 | 2m | 2 tasks | 4 files |
 | Phase 04-3d-walkthrough P02 | 5m | 2 tasks | 5 files |
 | Phase 05-multi-room P00 | 1m | 1 tasks | 3 files |
+| Phase 05-multi-room P01 | 2m | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,8 @@ Recent decisions affecting current work:
 - [Phase 04-3d-walkthrough]: 04-02: WalkCameraController reads camera yaw via getWorldDirection per-frame so PointerLockControls drives movement direction
 - [Phase 05-multi-room]: Wave 0 stubs use vitest-only imports (no src/@) to remain orthogonal to Wave 1+ module creation
 - [Phase 05-multi-room]: 05-00: exact describe/it string anchors preserved verbatim — Wave 1/3 executors swap it.todo for it+body keeping strings identical
+- [Phase 05-multi-room]: 05-01: CADSnapshot v2 shape { version, rooms, activeRoomId } — migrateSnapshot wraps v1 into room_main 'Main Room'
+- [Phase 05-multi-room]: 05-01: ROOM_TEMPLATES (LIVING_ROOM/BEDROOM/KITCHEN/BLANK) pure modules — no React/Zustand deps, fully unit-tested
 
 ### Pending Todos
 
@@ -126,6 +129,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T13:14:46.000Z
-Stopped at: Completed 05-00-PLAN.md
-Resume file: .planning/phases/05-multi-room/05-01-PLAN.md
+Last session: 2026-04-05T13:19:26.137Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: None

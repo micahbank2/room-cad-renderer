@@ -45,8 +45,8 @@ Jessica can see her future room with her actual furniture before spending money.
 
 ### Rooms
 
-- [ ] **ROOM-01**: User can create multiple rooms within one project
-- [ ] **ROOM-02**: Room templates (living room, bedroom, kitchen presets with typical dimensions)
+- [x] **ROOM-01**: User can create multiple rooms within one project
+- [x] **ROOM-02**: Room templates (living room, bedroom, kitchen presets with typical dimensions)
 
 ---
 
