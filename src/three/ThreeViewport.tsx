@@ -1,11 +1,14 @@
+import * as THREE from "three";
+import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, Environment } from "@react-three/drei";
 import { useCADStore } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import type { Product } from "@/types/product";
 import WallMesh from "./WallMesh";
 import ProductMesh from "./ProductMesh";
 import Lighting from "./Lighting";
+import { getFloorTexture } from "./floorTexture";
 
 interface Props {
   productLibrary: Product[];
@@ -20,19 +23,26 @@ function Scene({ productLibrary }: Props) {
   const halfW = room.width / 2;
   const halfL = room.length / 2;
 
+  const floorTexture = getFloorTexture(room.width, room.length);
+
   return (
     <>
       <Lighting />
 
-      {/* Floor */}
+      {/* Floor — D-05 wood-plank procedural texture */}
       <mesh
         position={[halfW, 0, halfL]}
         rotation={[-Math.PI / 2, 0, 0]}
         receiveShadow
       >
         <planeGeometry args={[room.width, room.length]} />
-        <meshStandardMaterial color="#f5f0e8" roughness={0.9} metalness={0} />
+        <meshStandardMaterial map={floorTexture} roughness={0.75} metalness={0.0} />
       </mesh>
+
+      {/* Ambient PBR bounce — D-08 */}
+      <Suspense fallback={null}>
+        <Environment preset="apartment" />
+      </Suspense>
 
       {/* Floor grid helper */}
       <gridHelper
@@ -82,7 +92,8 @@ export default function ThreeViewport({ productLibrary }: Props) {
   return (
     <div className="w-full h-full bg-obsidian-deepest">
       <Canvas
-        shadows
+        shadows="soft"
+        gl={{ preserveDrawingBuffer: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0 }}
         camera={{
           position: [halfW + 15, 12, halfL + 15],
           fov: 50,
