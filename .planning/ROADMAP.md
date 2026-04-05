@@ -47,13 +47,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. A product Jessica uploads in Project A appears in the library when she opens Project B
   2. She can add a product with only an image and name — dimension fields are optional and skippable
   3. She can type part of a product name into a search field and see only matching results
-**Plans**: 6 plans
-  - [ ] 00-PLAN.md — Test infrastructure (Vitest + jsdom + stub test files)
-  - [x] 01-PLAN.md — EDIT-09 product image rendering (cache + fabricSync fix)
-  - [ ] 02-PLAN.md — EDIT-07 drag-drop placement (HTML5 DnD + auto-select)
-  - [ ] 03-PLAN.md — EDIT-08 rotation handle (Figma-style + 15° snap + Shift free-rotate)
-  - [ ] 04-PLAN.md — EDIT-06 dimension editing (dblclick overlay input + corner propagation)
-  - [ ] 05-PLAN.md — SAVE-02 auto-save (2s debounce + projectStore + SaveIndicator)
+**Plans**: 5 plans
+  - [ ] 02-00-PLAN.md — Test stubs (Wave 0 scaffolding for productStore/helpers/search/modal/picker)
+  - [ ] 02-01-PLAN.md — productStore + nullable Product dims + helpers (LIB-03/04 core)
+  - [ ] 02-02-PLAN.md — Skip dimensions UI + SIZE:UNSET + PropertiesPanel editable dims (LIB-04)
+  - [ ] 02-03-PLAN.md — App/Sidebar store consolidation + SidebarProductPicker (LIB-03/05)
+  - [ ] 02-04-PLAN.md — Orphan/null-dim rendering in fabricSync + ProductMesh + selectTool (LIB-03/04)
 
 ### Phase 3: 3D Product Rendering
 **Goal**: Products appear in the 3D view with their actual uploaded images as textures, the scene looks visually rich with proper materials and soft shadows, and she can capture the view as a PNG
