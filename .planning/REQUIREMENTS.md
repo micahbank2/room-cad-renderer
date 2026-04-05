@@ -41,7 +41,7 @@ Jessica can see her future room with her actual furniture before spending money.
 
 - [x] **SAVE-01**: User can save and load projects from browser storage
 - [x] **SAVE-02**: Auto-save with debounce so work is never lost
-- [ ] **SAVE-03**: User can export 3D view as PNG image
+- [x] **SAVE-03**: User can export 3D view as PNG image
 
 ### Rooms
 
