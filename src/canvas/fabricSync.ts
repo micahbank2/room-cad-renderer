@@ -1,5 +1,5 @@
 import * as fabric from "fabric";
-import type { WallSegment, PlacedProduct } from "@/types/cad";
+import type { WallSegment, PlacedProduct, Ceiling } from "@/types/cad";
 import type { Product } from "@/types/product";
 import { effectiveDimensions, hasDimensions } from "@/types/product";
 import { wallCorners, angle as wallAngle } from "@/lib/geometry";
@@ -10,6 +10,34 @@ import { getHandleWorldPos } from "./rotationHandle";
 import { getResizeHandles } from "./resizeHandles";
 import { getWallEndpointHandles, getWallThicknessHandle } from "./wallEditHandles";
 import { getOpeningHandles } from "./openingEditHandles";
+
+/** Render ceiling polygons as translucent overlays on the 2D canvas. */
+export function renderCeilings(
+  fc: fabric.Canvas,
+  ceilings: Record<string, Ceiling>,
+  scale: number,
+  origin: { x: number; y: number },
+  selectedIds: string[],
+) {
+  for (const c of Object.values(ceilings)) {
+    const pts = c.points.map((p) => ({
+      x: origin.x + p.x * scale,
+      y: origin.y + p.y * scale,
+    }));
+    const isSelected = selectedIds.includes(c.id);
+    fc.add(
+      new fabric.Polygon(pts, {
+        fill: c.material.startsWith("#") ? c.material + "30" : "rgba(124,91,240,0.08)",
+        stroke: isSelected ? "#7c5bf0" : "#938ea0",
+        strokeWidth: isSelected ? 2 : 1,
+        strokeDashArray: [4, 4],
+        selectable: false,
+        evented: false,
+        data: { type: "ceiling", ceilingId: c.id },
+      }),
+    );
+  }
+}
 
 const WALL_FILL = "#343440";
 const WALL_STROKE = "#484554";

@@ -109,7 +109,7 @@ export default function App() {
       if (useUIStore.getState().showHelp) return;
 
       const shortcuts: Record<string, ToolType> = {
-        v: "select", w: "wall", d: "door", n: "window",
+        v: "select", w: "wall", d: "door", n: "window", c: "ceiling",
       };
       const tool = shortcuts[e.key.toLowerCase()];
       if (tool && viewMode !== "library") setTool(tool);

@@ -2,11 +2,12 @@ import * as THREE from "three";
 import { Suspense, useRef, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, PointerLockControls } from "@react-three/drei";
-import { useActiveRoom, useActiveWalls, useActivePlacedProducts } from "@/stores/cadStore";
+import { useActiveRoom, useActiveWalls, useActivePlacedProducts, useActiveCeilings } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import type { Product } from "@/types/product";
 import WallMesh from "./WallMesh";
 import ProductMesh from "./ProductMesh";
+import CeilingMesh from "./CeilingMesh";
 import Lighting from "./Lighting";
 import WalkCameraController from "./WalkCameraController";
 import { getFloorTexture } from "./floorTexture";
@@ -19,6 +20,7 @@ function Scene({ productLibrary }: Props) {
   const room = useActiveRoom() ?? { width: 20, length: 16, wallHeight: 8 };
   const walls = useActiveWalls();
   const placedProducts = useActivePlacedProducts();
+  const ceilings = useActiveCeilings();
   const selectedIds = useUIStore((s) => s.selectedIds);
   const cameraMode = useUIStore((s) => s.cameraMode);
 
@@ -88,6 +90,11 @@ function Scene({ productLibrary }: Props) {
           />
         );
       })}
+
+      {/* Ceilings — overhead polygon surfaces */}
+      {Object.values(ceilings).map((c) => (
+        <CeilingMesh key={c.id} ceiling={c} isSelected={selectedIds.includes(c.id)} />
+      ))}
 
       {cameraMode === "orbit" ? (
         <OrbitControls

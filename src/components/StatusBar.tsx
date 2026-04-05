@@ -7,6 +7,7 @@ const STATUS_MESSAGES: Record<string, string> = {
   door: "CLICK ON WALL TO PLACE DOOR",
   window: "CLICK ON WALL TO PLACE WINDOW",
   product: "CLICK ON CANVAS TO PLACE PRODUCT · ESC TO CANCEL",
+  ceiling: "CLICK TO ADD VERTICES · CLICK FIRST POINT OR DBL-CLICK TO CLOSE · ESC TO CANCEL",
 };
 
 export default function StatusBar() {

@@ -38,6 +38,16 @@ export interface Room {
   wallHeight: number;
 }
 
+export interface Ceiling {
+  id: string;
+  /** Polygon vertices in feet, CCW winding. */
+  points: Point[];
+  /** Height above floor in feet. Defaults to room.wallHeight. */
+  height: number;
+  /** Solid hex color (e.g. "#f5f5f5") or material preset id (e.g. "mat-plaster"). */
+  material: string;
+}
+
 export interface RoomDoc {
   id: string;
   name: string;
@@ -47,6 +57,8 @@ export interface RoomDoc {
   /** Optional reference image (data URL) shown as background on the 2D canvas.
    *  Useful for tracing an existing floor plan (e.g., an architect's drawing). */
   floorPlanImage?: string;
+  /** Ceilings drawn as independent polygon surfaces overhead. */
+  ceilings?: Record<string, Ceiling>;
 }
 
 export interface CADSnapshot {
@@ -62,4 +74,4 @@ export interface LegacySnapshotV1 {
   placedProducts: Record<string, PlacedProduct>;
 }
 
-export type ToolType = "select" | "wall" | "door" | "window" | "product";
+export type ToolType = "select" | "wall" | "door" | "window" | "product" | "ceiling";

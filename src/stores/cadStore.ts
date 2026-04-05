@@ -8,6 +8,7 @@ import type {
   Point,
   Opening,
   RoomDoc,
+  Ceiling,
 } from "@/types/cad";
 import { uid, resizeWall } from "@/lib/geometry";
 import { ROOM_TEMPLATES, type RoomTemplateId } from "@/data/roomTemplates";
@@ -41,6 +42,9 @@ interface CADState {
   resizeProduct: (id: string, scale: number) => void;
   resizeProductNoHistory: (id: string, scale: number) => void;
   setFloorPlanImage: (dataUrl: string | undefined) => void;
+  addCeiling: (points: Point[], height: number, material?: string) => string;
+  updateCeiling: (id: string, changes: Partial<Ceiling>) => void;
+  removeCeiling: (id: string) => void;
   removeProduct: (id: string) => void;
   removeSelected: (ids: string[]) => void;
   undo: () => void;
@@ -334,6 +338,40 @@ export const useCADStore = create<CADState>()((set) => ({
       })
     ),
 
+  addCeiling: (points, height, material = "#f5f5f5") => {
+    const id = `ceiling_${uid()}`;
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        pushHistory(s);
+        if (!doc.ceilings) doc.ceilings = {};
+        doc.ceilings[id] = { id, points, height, material };
+      })
+    );
+    return id;
+  },
+
+  updateCeiling: (id, changes) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc || !doc.ceilings || !doc.ceilings[id]) return;
+        pushHistory(s);
+        Object.assign(doc.ceilings[id], changes);
+      })
+    ),
+
+  removeCeiling: (id) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc || !doc.ceilings || !doc.ceilings[id]) return;
+        pushHistory(s);
+        delete doc.ceilings[id];
+      })
+    ),
+
   removeProduct: (id) =>
     set(
       produce((s: CADState) => {
@@ -453,6 +491,10 @@ export const useActiveWalls = () =>
 
 export const useActivePlacedProducts = () =>
   useCADStore((s) => (s.activeRoomId ? s.rooms[s.activeRoomId]?.placedProducts ?? {} : {}));
+
+const EMPTY_CEILINGS: Record<string, Ceiling> = Object.freeze({});
+export const useActiveCeilings = () =>
+  useCADStore((s) => (s.activeRoomId ? s.rooms[s.activeRoomId]?.ceilings ?? EMPTY_CEILINGS : EMPTY_CEILINGS));
 
 // Non-hook for imperative paths (tools)
 export function getActiveRoomDoc(): RoomDoc | undefined {
