@@ -4,6 +4,7 @@ import { useUIStore } from "@/stores/uiStore";
 import { snapPoint, distance, closestPointOnWall } from "@/lib/geometry";
 import type { Point, WallSegment, PlacedProduct } from "@/types/cad";
 import type { Product } from "@/types/product";
+import { effectiveDimensions } from "@/types/product";
 import { hitTestHandle, snapAngle, angleFromCenterToPointer } from "../rotationHandle";
 
 interface SelectState {
@@ -43,13 +44,12 @@ function hitTestStore(
 ): { id: string; type: "wall" | "product" } | null {
   const cadState = useCADStore.getState();
 
-  // Check products first (they're on top)
+  // Check products first (they're on top) — orphan + null-dim use 2x2 AABB
   for (const pp of Object.values(cadState.placedProducts)) {
     const product = productLibrary.find((p) => p.id === pp.productId);
-    if (!product) continue;
-
-    const halfW = product.width / 2;
-    const halfD = product.depth / 2;
+    const { width, depth } = effectiveDimensions(product);
+    const halfW = width / 2;
+    const halfD = depth / 2;
     // Simple AABB check (ignoring rotation for now)
     if (
       feetPos.x >= pp.position.x - halfW &&
@@ -107,7 +107,7 @@ export function activateSelectTool(
       const pp = useCADStore.getState().placedProducts[selId];
       if (pp) {
         const prod = _productLibrary.find((p) => p.id === pp.productId);
-        if (prod && hitTestHandle(feet, pp, prod.depth)) {
+        if (prod && prod.depth != null && hitTestHandle(feet, pp, prod.depth)) {
           state.dragging = true;
           state.dragId = selId;
           state.dragType = "rotate";
