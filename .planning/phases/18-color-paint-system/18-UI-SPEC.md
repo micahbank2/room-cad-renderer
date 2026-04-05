@@ -49,7 +49,6 @@ Declared values (must be multiples of 4):
 | 3xl | 64px | Not used in sidebar panels |
 
 Exceptions:
-- Swatch grid uses `gap-[3px]` (3px) — sub-4px allowed for dense color grids only
 - Touch target for swatch hover tooltip: minimum 20px × 20px per swatch (fits sidebar width constraint)
 - APPLY_TO_ALL_WALLS button: full-width, `py-2` (8px) vertical padding
 - Sidebar panel uses `space-y-3 p-3` per existing WallSurfacePanel pattern — maintain this rhythm
@@ -110,7 +109,7 @@ These are the new UI elements this phase adds inside `WallSurfacePanel.tsx` and 
 PAINT                                  ← section header, text-accent-light text-[10px]
 ─────────────────────────────────────
 RECENTLY_USED                          ← sub-label, text-text-dim text-[9px]
-[■][■][■][■][■][■][■][■]              ← 8 swatch chips, 18×18px, gap-[3px], clickable
+[■][■][■][■][■][■][■][■]              ← 8 swatch chips, 18×18px, gap-1 (4px), clickable
 
 HUE_FILTER                             ← sub-label
 [Whites][Neutrals][Blues][Greens][Pinks][Yellows][Blacks]
@@ -121,7 +120,7 @@ SEARCH_COLORS                          ← text input, placeholder "SEARCH_BY_NA
                                        ← font-mono text-[9px], bg-obsidian-high
 
 F&B_CATALOG (132 swatches)             ← sub-label with count
-[grid of 20×20px swatches, 8 per row, gap-[3px]]
+[grid of 20×20px swatches, 8 per row, gap-1 (4px)]
                                        ← PRIMARY FOCAL POINT — densest, most colorful element
                                        ← hover: tooltip showing F&B name (font-mono text-[8px])
                                        ← applied: ring-1 ring-accent ring-offset-1 ring-offset-obsidian-low
@@ -170,7 +169,7 @@ Source: CONTEXT.md D-01 through D-15.
 ### Swatch Hover Tooltip
 - Hover a swatch for 300ms → small tooltip appears above the swatch
 - Tooltip content: F&B name in `font-mono text-[8px] text-text-primary`
-- Tooltip background: `bg-obsidian-highest border border-outline-variant/30 rounded-sm px-1 py-0.5`
+- Tooltip background: `bg-obsidian-highest border border-outline-variant/30 rounded-sm px-1 py-1`
 - Custom colors: show user-assigned name
 - Source: CONTEXT.md D-02
 
@@ -235,9 +234,9 @@ Source: CONTEXT.md D-01 through D-15.
 
 | Property | Value | Rationale |
 |----------|-------|-----------|
-| Swatch size | 20×20px | Fits 8 per row in ~200px sidebar width with 3px gaps |
-| Grid gap | 3px | Dense paint-chip feel per CONTEXT.md D-02 specifics |
-| Swatches per row | 8 | `(8 × 20) + (7 × 3) = 181px` — fits within `p-3` sidebar |
+| Swatch size | 20×20px | Fits 8 per row in ~200px sidebar width with 4px gaps |
+| Grid gap | 4px (`gap-1`) | Multiple of 4; dense paint-chip feel; `8 × 20 + 7 × 4 = 188px` — fits within `p-3` sidebar |
+| Swatches per row | 8 | `(8 × 20) + (7 × 4) = 188px` — fits within `p-3` sidebar |
 | Hue filter chip size | 14×14px | Compact row of 7 chips + labels |
 | Recently-used swatch | 18×18px | Slightly smaller to distinguish from catalog swatches |
 | Catalog max height | 160px (`max-h-40`) | Scrollable; shows ~5 rows before scroll |
