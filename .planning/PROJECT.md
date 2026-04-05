@@ -12,18 +12,39 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
-**v1.1 shipped 2026-04-05.** 21 UX fixes across 6 phases. The app is
-usable without workarounds — zoom + pan, click accuracy, tool auto-
-revert, live dimensions, wall rotation, product resize, corner-perfect
-wall rendering, edit handles for every placed element, prominent save
-status, focused welcome screen, upload-a-floor-plan tracing.
+**v1.2 shipped 2026-04-05.** 29 requirements across 7 phases. Beyond
+walls + products: ceilings, floor materials (8 presets + custom
+upload), per-wall wallpaper, wall art, wainscoting, crown molding, a
+custom element builder with per-project catalog, a framed art library
+(7 frame presets), a wainscoting style library (7 real 3D styles with
+live preview), and per-side (SIDE_A/SIDE_B) treatments so divider
+walls between rooms work correctly.
+
+**v1.1 shipped 2026-04-05.** 21 UX fixes across 6 phases. Zoom/pan,
+click accuracy, tool auto-revert, live dimensions, wall rotation,
+product resize, corner-perfect wall rendering, edit handles for every
+placed element, prominent save status, focused welcome screen.
 
 **v1.0 shipped 2026-04-05.** 14 requirements. The core loop works:
 global product library → dimensionally accurate 2D floor plans →
 textured 3D rendering → eye-level walkthrough → PNG export → auto-
 saved + restored on reload.
 
-See `.planning/MILESTONES.md` for all shipped work.
+See `.planning/ROADMAP.md` for links to each milestone archive.
+
+## Next Milestone Goals
+
+v1.3 is TBD — start with `/gsd:new-milestone` for fresh questioning,
+requirements, and roadmap. Strong candidates:
+
+- **Color & Paint System:** global paint library, Farrow & Ball
+  catalog (~130 colors), lime wash toggle, apply to walls + ceilings
+- **v1.2 polish pass:** custom element edit handles, library
+  edit-in-place UI, copy-side buttons, per-placement frame overrides
+- **Advanced materials:** unified ceiling/floor texture catalog
+
+See `.planning/v1.2-MILESTONE-AUDIT.md` for the full tech debt list
+carried forward.
 
 ## Target User
 
@@ -88,37 +109,21 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - ✓ Opening slide along host wall — v1.1 (EDIT-18, Phase 10)
 - ✓ Live dim tag during all drags — v1.1 (EDIT-19, Phase 10)
 
-### Active (v1.2 New Element Types)
+**v1.2 Milestone (2026-04-05) — 29 shipped requirements:**
 
-**Ceilings:**
-- [ ] Draw ceiling polygons with editable height + material (CEIL-01/02/03/04)
+- ✓ Ceilings with editable height + material (CEIL-01/02/03/04, Phase 11)
+- ✓ Floor materials — 8 presets + custom upload + scale/rotation (FLOOR-01/02/03, Phase 12)
+- ✓ Per-wall wallpaper + wall art + wainscoting + crown molding (SURFACE/TRIM, Phase 13)
+- ✓ Custom element builder with per-project catalog (CUSTOM-01..05, Phase 14)
+- ✓ Framed art library with 3D frame geometry (ART-01..06, Phase 15)
+- ✓ Per-side wall treatments (SIDE-01/02/03, Phase 17)
+- ✓ Wainscoting style library — 7 real 3D styles + live preview (WAIN-01..04, Phase 16)
 
-**Floor materials:**
-- [ ] Preset catalog + custom texture upload + scale/rotation controls (FLOOR-01/02/03)
+### Active
 
-**Wall surfaces:**
-- [ ] Per-wall wallpaper (SURFACE-01)
-- [ ] Wall art items at x/y positions per wall (SURFACE-02/03/04)
+None — v1.2 shipped, awaiting v1.3 kickoff via `/gsd:new-milestone`.
 
-**Architectural trim:**
-- [ ] Per-wall wainscoting toggle with editable height (TRIM-01)
-- [ ] Per-wall crown molding toggle (TRIM-02)
-- [ ] 3D rendering of both trim types (TRIM-03)
-
-**Custom element builder:**
-- [ ] Create custom items (name, shape, dims, material) (CUSTOM-01)
-- [ ] Place, move, rotate, resize on canvas (CUSTOM-02/03)
-- [ ] Render in 3D (CUSTOM-04)
-- [ ] Per-project catalog for re-placement (CUSTOM-05)
-
-### Planned (v1.2 New Element Types)
-- Ceilings
-- Editable floors
-- Wallpaper & wall art (wall surface overlays)
-- Wainscoting + crown molding presets
-- Freeform custom-element builder
-
-### Planned (v1.3 Color & Paint System)
+### Planned (v1.3 Color & Paint System — candidate)
 - Color/paint library (global)
 - Farrow & Ball catalog (~130 colors)
 - Custom color creation + save
