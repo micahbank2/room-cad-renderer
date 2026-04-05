@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { ToolType } from "@/types/cad";
+import type { ToolType, WallSide } from "@/types/cad";
 
 export type HelpSectionId =
   | "getting-started"
@@ -19,6 +19,7 @@ interface UIState {
   activeHelpSection: HelpSectionId;
   userZoom: number; // 1.0 = auto-fit, 2.0 = 2x, etc.
   panOffset: { x: number; y: number }; // pixel offset applied on top of auto-fit origin
+  activeWallSide: WallSide; // which face of the selected wall is being edited (Phase 17)
 
   setTool: (tool: ToolType) => void;
   select: (ids: string[]) => void;
@@ -38,6 +39,7 @@ interface UIState {
   setPanOffset: (offset: { x: number; y: number }) => void;
   zoomAt: (cursor: { x: number; y: number }, factor: number, baseFit: { scale: number; origin: { x: number; y: number } }) => void;
   resetView: () => void;
+  setActiveWallSide: (side: WallSide) => void;
 }
 
 const MIN_ZOOM = 0.25;
@@ -55,6 +57,7 @@ export const useUIStore = create<UIState>()((set) => ({
   activeHelpSection: "getting-started",
   userZoom: 1,
   panOffset: { x: 0, y: 0 },
+  activeWallSide: "A",
 
   setTool: (tool) => set({ activeTool: tool, selectedIds: [] }),
   select: (ids) => set({ selectedIds: ids }),
@@ -117,4 +120,5 @@ export const useUIStore = create<UIState>()((set) => ({
       };
     }),
   resetView: () => set({ userZoom: 1, panOffset: { x: 0, y: 0 } }),
+  setActiveWallSide: (side) => set({ activeWallSide: side }),
 }));
