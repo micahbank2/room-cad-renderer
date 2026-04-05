@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Product } from "@/types/product";
-import { PRODUCT_CATEGORIES } from "@/types/product";
+import { PRODUCT_CATEGORIES, hasDimensions } from "@/types/product";
 import { useUIStore } from "@/stores/uiStore";
 import { setPendingProduct } from "@/canvas/tools/productTool";
 import { DRAG_MIME } from "@/canvas/dragDrop";
@@ -159,7 +159,9 @@ export default function ProductLibrary({
                     {p.name.toUpperCase().replace(/\s/g, "_")}
                   </div>
                   <div className="font-mono text-[10px] text-text-ghost">
-                    W {p.width} × D {p.depth} × H {p.height} FT
+                    {hasDimensions(p)
+                      ? `W ${p.width} × D ${p.depth} × H ${p.height} FT`
+                      : "SIZE: UNSET"}
                   </div>
                 </div>
               </div>
