@@ -13,17 +13,46 @@ import {
   snapWallAngle,
 } from "../wallRotationHandle";
 import { hitTestResizeHandle } from "../resizeHandles";
+import {
+  hitTestWallEndpoint,
+  hitTestWallThickness,
+  projectThicknessDrag,
+} from "../wallEditHandles";
+import {
+  hitTestOpeningHandle,
+  projectOntoWall,
+} from "../openingEditHandles";
+import { wallLength } from "@/lib/geometry";
+
+type DragType =
+  | "wall"
+  | "product"
+  | "rotate"
+  | "wall-rotate"
+  | "product-resize"
+  | "wall-endpoint"
+  | "wall-thickness"
+  | "opening-slide"
+  | "opening-resize-left"
+  | "opening-resize-right"
+  | null;
 
 interface SelectState {
   dragging: boolean;
   dragId: string | null;
-  dragType: "wall" | "product" | "rotate" | "wall-rotate" | "product-resize" | null;
+  dragType: DragType;
   dragOffsetFeet: Point | null;
   rotateInitialAngle: number | null;
   wallRotateInitialAngleDeg: number | null;
   wallRotatePointerStartDeg: number | null;
   resizeInitialScale: number | null;
   resizeInitialDiagFt: number | null;
+  wallEndpointWhich: "start" | "end" | null;
+  openingWallId: string | null;
+  openingId: string | null;
+  openingInitialOffset: number | null;
+  openingInitialWidth: number | null;
+  openingInitialPointerOffset: number | null;
 }
 
 const state: SelectState = {
@@ -36,6 +65,12 @@ const state: SelectState = {
   wallRotatePointerStartDeg: null,
   resizeInitialScale: null,
   resizeInitialDiagFt: null,
+  wallEndpointWhich: null,
+  openingWallId: null,
+  openingId: null,
+  openingInitialOffset: null,
+  openingInitialWidth: null,
+  openingInitialPointerOffset: null,
 };
 
 function pxToFeet(
@@ -166,6 +201,48 @@ function clearSizeTag(fc: fabric.Canvas) {
   }
 }
 
+/** Generic text tag that follows a world-coords anchor point. Reuses the
+ *  sizeTag group so only one floating tag is visible at a time. */
+function updateTextTag(
+  fc: fabric.Canvas,
+  label: string,
+  worldAnchor: Point,
+  viewScale: number,
+  viewOrigin: { x: number; y: number },
+) {
+  const px = viewOrigin.x + worldAnchor.x * viewScale;
+  const py = viewOrigin.y + worldAnchor.y * viewScale;
+  if (sizeTag) fc.remove(sizeTag);
+  const bg = new fabric.Rect({
+    width: 60,
+    height: 18,
+    fill: "#12121d",
+    stroke: "#7c5bf0",
+    strokeWidth: 1,
+    rx: 2,
+    ry: 2,
+    originX: "center",
+    originY: "center",
+  });
+  const text = new fabric.Text(label, {
+    fontFamily: "IBM Plex Mono",
+    fontSize: 10,
+    fill: "#ccbeff",
+    originX: "center",
+    originY: "center",
+  });
+  sizeTag = new fabric.Group([bg, text], {
+    left: px,
+    top: py,
+    originX: "center",
+    originY: "center",
+    selectable: false,
+    evented: false,
+  });
+  fc.add(sizeTag);
+  fc.renderAll();
+}
+
 export function setSelectToolProductLibrary(products: Product[]) {
   _productLibrary = products;
 }
@@ -213,17 +290,56 @@ export function activateSelectTool(
           return;
         }
       }
-      // Wall rotation handle (EDIT-12)
+      // Wall handles (EDIT-12 rotate + EDIT-15 endpoints + EDIT-16 thickness)
       const wall = (getActiveRoomDoc()?.walls ?? {})[selId];
-      if (wall && hitTestWallHandle(feet, wall)) {
-        state.dragging = true;
-        state.dragId = selId;
-        state.dragType = "wall-rotate";
-        state.wallRotateInitialAngleDeg = wallAngleDeg(wall);
-        state.wallRotatePointerStartDeg = angleFromMidpointToPointer(wall, feet);
-        // Push history snapshot at drag start as undo boundary
-        useCADStore.getState().rotateWall(selId, 0);
-        return;
+      if (wall) {
+        // Endpoint drag (EDIT-15)
+        const whichEndpoint = hitTestWallEndpoint(feet, wall);
+        if (whichEndpoint) {
+          state.dragging = true;
+          state.dragId = selId;
+          state.dragType = "wall-endpoint";
+          state.wallEndpointWhich = whichEndpoint;
+          // Push history snapshot at drag start
+          useCADStore.getState().updateWall(selId, {});
+          return;
+        }
+        // Thickness drag (EDIT-16)
+        if (hitTestWallThickness(feet, wall)) {
+          state.dragging = true;
+          state.dragId = selId;
+          state.dragType = "wall-thickness";
+          useCADStore.getState().updateWall(selId, {});
+          return;
+        }
+        // Rotation (EDIT-12)
+        if (hitTestWallHandle(feet, wall)) {
+          state.dragging = true;
+          state.dragId = selId;
+          state.dragType = "wall-rotate";
+          state.wallRotateInitialAngleDeg = wallAngleDeg(wall);
+          state.wallRotatePointerStartDeg = angleFromMidpointToPointer(wall, feet);
+          useCADStore.getState().rotateWall(selId, 0);
+          return;
+        }
+        // Opening handles within this wall (EDIT-17/18)
+        for (const op of wall.openings) {
+          const hit = hitTestOpeningHandle(feet, wall, op);
+          if (hit) {
+            state.dragging = true;
+            state.dragId = selId;
+            state.openingWallId = selId;
+            state.openingId = op.id;
+            state.openingInitialOffset = op.offset;
+            state.openingInitialWidth = op.width;
+            state.openingInitialPointerOffset = projectOntoWall(feet, wall);
+            if (hit === "center") state.dragType = "opening-slide";
+            else if (hit === "left") state.dragType = "opening-resize-left";
+            else state.dragType = "opening-resize-right";
+            useCADStore.getState().updateOpening(selId, op.id, {});
+            return;
+          }
+        }
       }
     }
 
@@ -291,6 +407,89 @@ export function activateSelectTool(
       return;
     }
 
+    if (state.dragType === "wall-endpoint") {
+      const wall = (getActiveRoomDoc()?.walls ?? {})[state.dragId];
+      if (!wall || !state.wallEndpointWhich) return;
+      const gridSnap = useUIStore.getState().gridSnap;
+      const snapped = gridSnap > 0 ? snapPoint(feet, gridSnap) : feet;
+      const changes = state.wallEndpointWhich === "start"
+        ? { start: snapped }
+        : { end: snapped };
+      useCADStore.getState().updateWallNoHistory(state.dragId, changes);
+      // Live length tag
+      const w2 = (getActiveRoomDoc()?.walls ?? {})[state.dragId];
+      if (w2) {
+        const lenFt = wallLength(w2);
+        const mx = (w2.start.x + w2.end.x) / 2;
+        const my = (w2.start.y + w2.end.y) / 2;
+        updateTextTag(fc, `${formatFeet(lenFt)}`, { x: mx, y: my - 0.8 }, scale, origin);
+      }
+      return;
+    }
+
+    if (state.dragType === "wall-thickness") {
+      const wall = (getActiveRoomDoc()?.walls ?? {})[state.dragId];
+      if (!wall) return;
+      const signedDist = projectThicknessDrag(feet, wall);
+      // signed distance = new halfT, so newThickness = 2 * |signedDist|
+      const newThickness = Math.max(0.1, Math.min(3, 2 * Math.abs(signedDist)));
+      useCADStore.getState().updateWallNoHistory(state.dragId, { thickness: newThickness });
+      // Live thickness tag
+      const w2 = (getActiveRoomDoc()?.walls ?? {})[state.dragId];
+      if (w2) {
+        const mx = (w2.start.x + w2.end.x) / 2;
+        const my = (w2.start.y + w2.end.y) / 2;
+        updateTextTag(fc, formatFeet(w2.thickness), { x: mx, y: my }, scale, origin);
+      }
+      return;
+    }
+
+    if (
+      state.dragType === "opening-slide" ||
+      state.dragType === "opening-resize-left" ||
+      state.dragType === "opening-resize-right"
+    ) {
+      if (!state.openingWallId || !state.openingId ||
+          state.openingInitialOffset == null ||
+          state.openingInitialWidth == null ||
+          state.openingInitialPointerOffset == null) return;
+      const wall = (getActiveRoomDoc()?.walls ?? {})[state.openingWallId];
+      if (!wall) return;
+      const wLen = wallLength(wall);
+      const pointerOffset = projectOntoWall(feet, wall);
+      const delta = pointerOffset - state.openingInitialPointerOffset;
+
+      if (state.dragType === "opening-slide") {
+        const maxOffset = wLen - state.openingInitialWidth;
+        const newOffset = Math.max(0, Math.min(maxOffset, state.openingInitialOffset + delta));
+        useCADStore.getState().updateOpeningNoHistory(state.openingWallId, state.openingId, { offset: newOffset });
+      } else if (state.dragType === "opening-resize-right") {
+        // Right edge moves; keep offset fixed, change width
+        const newWidth = Math.max(0.5, Math.min(
+          wLen - state.openingInitialOffset,
+          state.openingInitialWidth + delta,
+        ));
+        useCADStore.getState().updateOpeningNoHistory(state.openingWallId, state.openingId, { width: newWidth });
+      } else {
+        // Left edge moves; offset and width both change (right edge stays fixed)
+        const rightEdge = state.openingInitialOffset + state.openingInitialWidth;
+        const newOffset = Math.max(0, Math.min(rightEdge - 0.5, state.openingInitialOffset + delta));
+        const newWidth = rightEdge - newOffset;
+        useCADStore.getState().updateOpeningNoHistory(state.openingWallId, state.openingId, {
+          offset: newOffset,
+          width: newWidth,
+        });
+      }
+      // Live width tag
+      const op = wall.openings.find((o) => o.id === state.openingId);
+      if (op) {
+        const cx = (wall.start.x + wall.end.x) / 2;
+        const cy = (wall.start.y + wall.end.y) / 2;
+        updateTextTag(fc, formatFeet(op.width), { x: cx, y: cy - 0.8 }, scale, origin);
+      }
+      return;
+    }
+
     if (state.dragType === "wall-rotate") {
       const wall = (getActiveRoomDoc()?.walls ?? {})[state.dragId];
       if (!wall || state.wallRotatePointerStartDeg == null || state.wallRotateInitialAngleDeg == null) return;
@@ -337,7 +536,14 @@ export function activateSelectTool(
   };
 
   const onMouseUp = () => {
-    if (state.dragType === "product-resize") {
+    if (
+      state.dragType === "product-resize" ||
+      state.dragType === "wall-endpoint" ||
+      state.dragType === "wall-thickness" ||
+      state.dragType === "opening-slide" ||
+      state.dragType === "opening-resize-left" ||
+      state.dragType === "opening-resize-right"
+    ) {
       clearSizeTag(fc);
     }
     state.dragging = false;
@@ -349,6 +555,12 @@ export function activateSelectTool(
     state.wallRotatePointerStartDeg = null;
     state.resizeInitialScale = null;
     state.resizeInitialDiagFt = null;
+    state.wallEndpointWhich = null;
+    state.openingWallId = null;
+    state.openingId = null;
+    state.openingInitialOffset = null;
+    state.openingInitialWidth = null;
+    state.openingInitialPointerOffset = null;
   };
 
   const onKeyDown = (e: KeyboardEvent) => {

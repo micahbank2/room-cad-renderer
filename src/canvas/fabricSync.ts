@@ -8,6 +8,8 @@ import { drawWallDimension } from "./dimensions";
 import { getCachedImage } from "./productImageCache";
 import { getHandleWorldPos } from "./rotationHandle";
 import { getResizeHandles } from "./resizeHandles";
+import { getWallEndpointHandles, getWallThicknessHandle } from "./wallEditHandles";
+import { getOpeningHandles } from "./openingEditHandles";
 
 const WALL_FILL = "#343440";
 const WALL_STROKE = "#484554";
@@ -115,12 +117,12 @@ export function renderWalls(
     // Dimension label
     drawWallDimension(fc, wall, scale, origin);
 
-    // Rotation handle for selected walls (EDIT-12)
+    // Edit handles for selected walls (EDIT-12 rotate + EDIT-15/16 endpoint + thickness)
     if (isSelected) {
+      // Rotation handle (EDIT-12)
       const h = getWallHandleWorldPos(wall);
       const hx = origin.x + h.x * scale;
       const hy = origin.y + h.y * scale;
-      // Stem line from wall midpoint to handle
       const cx = origin.x + ((wall.start.x + wall.end.x) / 2) * scale;
       const cy = origin.y + ((wall.start.y + wall.end.y) / 2) * scale;
       fc.add(
@@ -146,6 +148,85 @@ export function renderWalls(
           data: { type: "wall-rotate-handle", wallId: wall.id },
         })
       );
+
+      // Endpoint handles (EDIT-15)
+      const ep = getWallEndpointHandles(wall);
+      for (const [which, point] of [["start", ep.start], ["end", ep.end]] as const) {
+        fc.add(
+          new fabric.Rect({
+            left: origin.x + point.x * scale,
+            top: origin.y + point.y * scale,
+            width: 9,
+            height: 9,
+            fill: "#12121d",
+            stroke: WALL_SELECTED_STROKE,
+            strokeWidth: 2,
+            originX: "center",
+            originY: "center",
+            selectable: false,
+            evented: false,
+            data: { type: "wall-endpoint-handle", wallId: wall.id, which },
+          })
+        );
+      }
+
+      // Thickness handle (EDIT-16)
+      const th = getWallThicknessHandle(wall);
+      fc.add(
+        new fabric.Circle({
+          left: origin.x + th.x * scale,
+          top: origin.y + th.y * scale,
+          radius: 4,
+          fill: WALL_SELECTED_STROKE,
+          stroke: "#ffffff",
+          strokeWidth: 1,
+          originX: "center",
+          originY: "center",
+          selectable: false,
+          evented: false,
+          data: { type: "wall-thickness-handle", wallId: wall.id },
+        })
+      );
+
+      // Opening handles within this selected wall (EDIT-17/18)
+      for (const op of wall.openings) {
+        const oh = getOpeningHandles(wall, op);
+        // Center handle (slide)
+        fc.add(
+          new fabric.Circle({
+            left: origin.x + oh.center.x * scale,
+            top: origin.y + oh.center.y * scale,
+            radius: 4,
+            fill: "#ffb875",
+            stroke: "#ffffff",
+            strokeWidth: 1,
+            originX: "center",
+            originY: "center",
+            selectable: false,
+            evented: false,
+            data: { type: "opening-slide-handle", openingId: op.id },
+          })
+        );
+        // Left + right (resize) — small squares
+        for (const [which, p] of [["left", oh.left], ["right", oh.right]] as const) {
+          fc.add(
+            new fabric.Rect({
+              left: origin.x + p.x * scale,
+              top: origin.y + p.y * scale,
+              width: 7,
+              height: 7,
+              fill: "#ffb875",
+              stroke: "#ffffff",
+              strokeWidth: 1,
+              originX: "center",
+              originY: "center",
+              selectable: false,
+              evented: false,
+              data: { type: "opening-resize-handle", openingId: op.id, which },
+            })
+          );
+        }
+      }
     }
   }
 
