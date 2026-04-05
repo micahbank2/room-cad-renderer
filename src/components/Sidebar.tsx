@@ -5,6 +5,7 @@ import RoomSettings from "./RoomSettings";
 import SidebarProductPicker from "./SidebarProductPicker";
 import FloorMaterialPicker from "./FloorMaterialPicker";
 import CustomElementsPanel from "./CustomElementsPanel";
+import FramedArtLibrary from "./FramedArtLibrary";
 
 interface Props {
   productLibrary: Product[];
@@ -95,6 +96,9 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
 
         {/* Custom Elements (Phase 14) */}
         <CustomElementsPanel />
+
+        {/* Framed Art Library (Phase 15) */}
+        <FramedArtLibrary />
 
         {/* Product picker (LIB-05) */}
         <div>

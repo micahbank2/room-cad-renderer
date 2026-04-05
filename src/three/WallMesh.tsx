@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import * as THREE from "three";
 import type { WallSegment } from "@/types/cad";
 import { wallLength, angle } from "@/lib/geometry";
+import { FRAME_PRESETS } from "@/types/framedArt";
 
 interface Props {
   wall: WallSegment;
@@ -282,19 +283,67 @@ export default function WallMesh({ wall, isSelected }: Props) {
         </mesh>
       )}
 
-      {/* Wall art items — textured planes on interior face (never tiled) */}
+      {/* Wall art items — framed or flat, on interior face */}
       {(wall.wallArt ?? []).map((art) => {
         const tex = getWallArtTexture(art.imageUrl);
         const artX = art.offset - halfLen + art.width / 2;
         const artY = art.centerY - halfH;
+        const preset = art.frameStyle ? FRAME_PRESETS[art.frameStyle] : null;
+        const frameW = preset?.width ?? 0;
+        const frameD = preset?.depth ?? 0;
+        const baseZ = thickness / 2 + bandOffset * 2;
+
+        // No frame (or frameStyle="none") → flat plane (legacy behavior)
+        if (!preset || art.frameStyle === "none" || frameW === 0) {
+          return (
+            <mesh key={art.id} position={[artX, artY, baseZ]}>
+              <planeGeometry args={[art.width, art.height]} />
+              <meshStandardMaterial map={tex} roughness={0.5} metalness={0} side={THREE.DoubleSide} />
+            </mesh>
+          );
+        }
+
+        // Framed: inset art plane + 4 frame strips protruding from wall
+        const innerW = Math.max(0.01, art.width - 2 * frameW);
+        const innerH = Math.max(0.01, art.height - 2 * frameW);
+        // Art plane sits at the BACK of the frame (so frame depth appears to recess it)
+        const artZ = baseZ + 0.002;
+        const frameCenterZ = baseZ + frameD / 2;
+
         return (
-          <mesh
-            key={art.id}
-            position={[artX, artY, thickness / 2 + bandOffset * 2]}
-          >
-            <planeGeometry args={[art.width, art.height]} />
-            <meshStandardMaterial map={tex} roughness={0.5} metalness={0} side={THREE.DoubleSide} />
-          </mesh>
+          <group key={art.id} position={[artX, artY, 0]}>
+            {/* Art plane (recessed inside frame) */}
+            <mesh position={[0, 0, artZ]}>
+              <planeGeometry args={[innerW, innerH]} />
+              <meshStandardMaterial
+                map={tex}
+                roughness={0.5}
+                metalness={0}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+
+            {/* Top frame strip */}
+            <mesh position={[0, art.height / 2 - frameW / 2, frameCenterZ]} castShadow>
+              <boxGeometry args={[art.width, frameW, frameD]} />
+              <meshStandardMaterial color={preset.color} roughness={0.4} metalness={0.2} />
+            </mesh>
+            {/* Bottom frame strip */}
+            <mesh position={[0, -(art.height / 2 - frameW / 2), frameCenterZ]} castShadow>
+              <boxGeometry args={[art.width, frameW, frameD]} />
+              <meshStandardMaterial color={preset.color} roughness={0.4} metalness={0.2} />
+            </mesh>
+            {/* Left frame strip */}
+            <mesh position={[-(art.width / 2 - frameW / 2), 0, frameCenterZ]} castShadow>
+              <boxGeometry args={[frameW, innerH, frameD]} />
+              <meshStandardMaterial color={preset.color} roughness={0.4} metalness={0.2} />
+            </mesh>
+            {/* Right frame strip */}
+            <mesh position={[art.width / 2 - frameW / 2, 0, frameCenterZ]} castShadow>
+              <boxGeometry args={[frameW, innerH, frameD]} />
+              <meshStandardMaterial color={preset.color} roughness={0.4} metalness={0.2} />
+            </mesh>
+          </group>
         );
       })}
     </group>

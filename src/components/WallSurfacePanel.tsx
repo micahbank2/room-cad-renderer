@@ -1,7 +1,9 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useCADStore, useActiveWalls } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
+import { useFramedArtStore } from "@/stores/framedArtStore";
 import type { Wallpaper } from "@/types/cad";
+import { FRAME_PRESETS } from "@/types/framedArt";
 
 /** Appears in PropertiesPanel when exactly one wall is selected. */
 export default function WallSurfacePanel() {
@@ -14,6 +16,8 @@ export default function WallSurfacePanel() {
   const removeWallArt = useCADStore((s) => s.removeWallArt);
   const wallpaperFileRef = useRef<HTMLInputElement>(null);
   const artFileRef = useRef<HTMLInputElement>(null);
+  const framedArtItems = useFramedArtStore((s) => s.items);
+  const [showLibrary, setShowLibrary] = useState(false);
 
   if (selectedIds.length !== 1) return null;
   const wall = walls[selectedIds[0]];
@@ -62,6 +66,20 @@ export default function WallSurfacePanel() {
       });
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleAddFromLibrary = (itemId: string) => {
+    const item = framedArtItems.find((i) => i.id === itemId);
+    if (!item) return;
+    addWallArt(wall.id, {
+      offset: 2,
+      centerY: wall.height / 2,
+      width: 2,
+      height: 2.5,
+      imageUrl: item.imageUrl,
+      frameStyle: item.frameStyle,
+    });
+    setShowLibrary(false);
   };
 
   return (
@@ -198,13 +216,58 @@ export default function WallSurfacePanel() {
       <div>
         <div className="flex items-center justify-between mb-1">
           <span className="font-mono text-[9px] text-text-dim tracking-wider">WALL_ART ({artItems.length})</span>
-          <button
-            onClick={() => artFileRef.current?.click()}
-            className="font-mono text-[9px] text-accent-light hover:text-accent tracking-widest"
-          >
-            + ADD
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowLibrary((v) => !v)}
+              className="font-mono text-[9px] text-accent-light hover:text-accent tracking-widest"
+            >
+              {showLibrary ? "CLOSE" : "+ LIB"}
+            </button>
+            <button
+              onClick={() => artFileRef.current?.click()}
+              className="font-mono text-[9px] text-accent-light hover:text-accent tracking-widest"
+            >
+              + ADD
+            </button>
+          </div>
         </div>
+        {showLibrary && (
+          <div className="bg-obsidian-high rounded-sm p-2 mb-1 max-h-40 overflow-y-auto">
+            {framedArtItems.length === 0 ? (
+              <div className="font-mono text-[9px] text-text-ghost text-center py-1">
+                ART_LIBRARY_EMPTY
+              </div>
+            ) : (
+              <ul className="space-y-1">
+                {framedArtItems.map((it) => (
+                  <li key={it.id}>
+                    <button
+                      onClick={() => handleAddFromLibrary(it.id)}
+                      className="w-full flex items-center gap-2 px-1 py-1 hover:bg-obsidian-highest rounded-sm"
+                    >
+                      <div
+                        className="w-5 h-5 rounded-sm overflow-hidden shrink-0 border"
+                        style={{
+                          borderColor: FRAME_PRESETS[it.frameStyle].color,
+                          borderWidth: Math.max(1, FRAME_PRESETS[it.frameStyle].width * 8),
+                        }}
+                      >
+                        <img
+                          src={it.imageUrl}
+                          alt={it.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="font-mono text-[9px] text-text-dim truncate">
+                        {it.name.toUpperCase()}
+                      </div>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
         {artItems.length > 0 && (
           <ul className="space-y-1">
             {artItems.map((a) => (
