@@ -1,5 +1,11 @@
 import * as fabric from "fabric";
-import type { WallSegment, PlacedProduct, Ceiling } from "@/types/cad";
+import type {
+  WallSegment,
+  PlacedProduct,
+  Ceiling,
+  CustomElement,
+  PlacedCustomElement,
+} from "@/types/cad";
 import type { Product } from "@/types/product";
 import { effectiveDimensions, hasDimensions } from "@/types/product";
 import { wallCorners, angle as wallAngle } from "@/lib/geometry";
@@ -10,6 +16,59 @@ import { getHandleWorldPos } from "./rotationHandle";
 import { getResizeHandles } from "./resizeHandles";
 import { getWallEndpointHandles, getWallThicknessHandle } from "./wallEditHandles";
 import { getOpeningHandles } from "./openingEditHandles";
+
+/** Render placed custom elements as filled rectangles on the 2D canvas. */
+export function renderCustomElements(
+  fc: fabric.Canvas,
+  placed: Record<string, PlacedCustomElement>,
+  catalog: Record<string, CustomElement>,
+  scale: number,
+  origin: { x: number; y: number },
+  selectedIds: string[],
+) {
+  for (const p of Object.values(placed)) {
+    const el = catalog[p.customElementId];
+    if (!el) continue;
+    const sc = p.sizeScale ?? 1;
+    const pw = el.width * sc * scale;
+    const pd = el.depth * sc * scale;
+    const cx = origin.x + p.position.x * scale;
+    const cy = origin.y + p.position.y * scale;
+    const isSelected = selectedIds.includes(p.id);
+
+    const rect = new fabric.Rect({
+      left: cx,
+      top: cy,
+      width: pw,
+      height: pd,
+      fill: el.color + "66", // ~40% opacity
+      stroke: isSelected ? "#7c5bf0" : el.color,
+      strokeWidth: isSelected ? 2 : 1,
+      strokeDashArray: el.shape === "plane" ? [4, 3] : undefined,
+      originX: "center",
+      originY: "center",
+      angle: p.rotation,
+      selectable: false,
+      evented: false,
+      data: { type: "custom-element", placedId: p.id },
+    });
+    fc.add(rect);
+
+    // Name label
+    const label = new fabric.FabricText(el.name.toUpperCase(), {
+      left: cx,
+      top: cy,
+      fontSize: 9,
+      fontFamily: "IBM Plex Mono",
+      fill: "#e3e0f1",
+      originX: "center",
+      originY: "center",
+      selectable: false,
+      evented: false,
+    });
+    fc.add(label);
+  }
+}
 
 /** Render ceiling polygons as translucent overlays on the 2D canvas. */
 export function renderCeilings(

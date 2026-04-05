@@ -75,6 +75,26 @@ export interface Room {
   wallHeight: number;
 }
 
+export interface CustomElement {
+  id: string;
+  name: string;
+  /** "box" = full 3D box. "plane" = flat 2D plane (e.g. a custom rug, wall decal). */
+  shape: "box" | "plane";
+  width: number; // feet
+  depth: number; // feet
+  height: number; // feet (ignored for plane — plane lies flat on floor)
+  /** Hex color or material string. */
+  color: string;
+}
+
+export interface PlacedCustomElement {
+  id: string;
+  customElementId: string;
+  position: Point; // center in feet
+  rotation: number; // degrees
+  sizeScale?: number; // per-placement scale
+}
+
 export interface Ceiling {
   id: string;
   /** Polygon vertices in feet, CCW winding. */
@@ -110,12 +130,16 @@ export interface RoomDoc {
   ceilings?: Record<string, Ceiling>;
   /** Floor material (preset or custom upload). Per-room. */
   floorMaterial?: FloorMaterial;
+  /** Placed custom elements (references customElements catalog on snapshot). */
+  placedCustomElements?: Record<string, PlacedCustomElement>;
 }
 
 export interface CADSnapshot {
   version: 2;
   rooms: Record<string, RoomDoc>;
   activeRoomId: string | null;
+  /** Per-project catalog of custom elements (reusable across rooms). */
+  customElements?: Record<string, CustomElement>;
 }
 
 /** Pre-v2 on-disk shape — used only by migrateSnapshot. */
