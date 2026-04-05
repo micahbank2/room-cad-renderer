@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-00-PLAN.md
-last_updated: "2026-04-05T12:05:11.130Z"
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-04-05T12:07:42.315Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 15
-  completed_plans: 12
+  completed_plans: 13
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 ## Current Position
 
 Phase: 03 (3d-product-rendering) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-04-05
 
@@ -64,6 +64,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02-product-library P02 | 3m | 2 tasks | 5 files |
 | Phase 02-product-library P04 | 1m | 2 tasks | 5 files |
 | Phase 03-3d-product-rendering P00 | 1m | 1 tasks | 3 files |
+| Phase 03-3d-product-rendering P01 | 6m | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -93,6 +94,8 @@ Recent decisions affecting current work:
 - [Phase 02-product-library]: 02-04: placeholder dash [6,4] always-on regardless of selection; differentiate via strokeWidth
 - [Phase 02-product-library]: 02-04: ThreeViewport passes undefined products through to ProductMesh so orphans render (single contract)
 - [Phase 03-3d-product-rendering]: Wave 0 stubs use it.todo so vitest collects without failing
+- [Phase 03-3d-product-rendering]: 03-01: Promise-valued texture cache (not Texture-valued) naturally dedups concurrent in-flight loads
+- [Phase 03-3d-product-rendering]: 03-01: D-03 gate isPlaceholder short-circuits texture loading — placeholders never textured even if imageUrl exists
 
 ### Pending Todos
 
@@ -108,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T12:05:11.128Z
-Stopped at: Completed 03-00-PLAN.md
+Last session: 2026-04-05T12:07:42.313Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
