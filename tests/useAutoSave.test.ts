@@ -32,8 +32,9 @@ describe("useAutoSave hook", () => {
       useCADStore.getState().placeProduct(`prod_${i}`, { x: i, y: 0 });
       await vi.advanceTimersByTimeAsync(100);
     }
-    // 500ms elapsed + debounce window not yet reached
-    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS - 500 - 1);
+    // 500ms elapsed since t=0; last mutation was at t=400ms, so debounce fires at t=2400
+    // Advance to just before fire (t=2399)
+    await vi.advanceTimersByTimeAsync(DEBOUNCE_MS - 101);
     expect(saveProject).not.toHaveBeenCalled();
     await vi.advanceTimersByTimeAsync(2);
     // Allow pending promise to resolve
