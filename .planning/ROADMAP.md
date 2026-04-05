@@ -4,7 +4,7 @@
 
 - ✅ **v1.0 Room Visualization MVP** — Phases 1–5.1 (shipped 2026-04-05) — see [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
 - ✅ **v1.1 UX Fixes & Polish** — Phases 6–10 (shipped 2026-04-05) — see [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
-- 🚧 **v1.2 New Element Types** — Phases 11–15 (in progress — Phases 11 + 12 shipped)
+- 🚧 **v1.2 New Element Types** — Phases 11–16 (in progress — Phases 11 + 12 shipped)
 - 📋 **v1.3 Color & Paint System** — planned
 
 ## Current Milestone: v1.2 New Element Types
@@ -46,6 +46,17 @@
   6. Wainscoting + crown render as distinct architectural bands in 3D
 **UI hint:** yes
 
+### Phase 16: Wainscoting Style Library
+**Goal:** Jessica picks from a library of wainscoting styles per wall — because real wainscoting varies enormously (recessed, raised, beadboard, board-and-batten, shiplap, flat panel, English grid)
+**Depends on:** Phase 13 (wainscoting toggle + 3D rendering already in place)
+**Requirements:** WAIN-01, WAIN-02, WAIN-03, WAIN-04
+**Success Criteria:**
+  1. A style-picker dropdown in the WAIN properties section lists 7 styles: RECESSED_PANEL, RAISED_PANEL, BEADBOARD, BOARD_AND_BATTEN, SHIPLAP, FLAT_PANEL, ENGLISH_GRID
+  2. Each style has configurable knobs: panel width, stile width, chair rail height, depth (protrusion)
+  3. All styles render as real 3D geometry (no painted-on textures masquerading as depth)
+  4. Style + config stored per-wall in wainscoting field
+**UI hint:** yes
+
 ### Phase 15: Framed Art Library
 **Goal:** Jessica can upload art, combine it with a chosen frame preset, save to a reusable library, and place framed pieces on walls with real 3D frame geometry
 **Depends on:** Phase 13 (wall art rendering infrastructure already exists)
@@ -80,6 +91,7 @@
 | 13. Wall Surfaces + Trim | v1.2 | 1/1 | In PR (#10 open) |
 | 14. Custom Element Builder | v1.2 | 0/TBD | Not started |
 | 15. Framed Art Library | v1.2 | 0/TBD | Not started |
+| 16. Wainscoting Style Library | v1.2 | 0/TBD | Not started |
 
 ---
 

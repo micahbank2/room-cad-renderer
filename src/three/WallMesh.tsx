@@ -161,47 +161,109 @@ export default function WallMesh({ wall, isSelected }: Props) {
         />
       </mesh>
 
-      {/* Wainscoting — 3D extruded panels with chair rail cap */}
+      {/* Wainscoting — 3D recessed panels with real frame geometry */}
       {wainscotHeight > 0 && (() => {
         const color = wall.wainscoting!.color;
-        const tex = getWainscotingTexture(color);
-        const panelWidth = Math.max(1, wainscotHeight * 0.7);
-        tex.repeat.set(length / panelWidth, 1);
-        tex.needsUpdate = true;
-        const baseDepth = 0.08; // ~1" panel protrusion
-        const railDepth = 0.15; // ~1.8" chair rail (sticks out further)
-        const railHeight = 0.17; // ~2" chair rail height
-        return (
-          <group>
-            {/* Main wainscoting panel — extruded box protruding from wall */}
-            <mesh
-              position={[0, -halfH + wainscotHeight / 2, thickness / 2 + baseDepth / 2]}
-              castShadow
-              receiveShadow
-            >
-              <boxGeometry args={[length, wainscotHeight, baseDepth]} />
-              <meshStandardMaterial
-                map={tex}
-                color={color}
-                roughness={0.7}
-                metalness={0}
-              />
-            </mesh>
-            {/* Chair rail cap at the top — sticks out further, classic wainscoting profile */}
-            <mesh
-              position={[0, -halfH + wainscotHeight - railHeight / 2, thickness / 2 + railDepth / 2]}
-              castShadow
-              receiveShadow
-            >
-              <boxGeometry args={[length, railHeight, railDepth]} />
-              <meshStandardMaterial
-                color={color}
-                roughness={0.6}
-                metalness={0}
-              />
-            </mesh>
-          </group>
+        const frameColor = color;
+        // Frame/stile/rail protrusion (stick out further — raised)
+        const frameDepth = 0.18; // ~2"
+        // Recessed backing panel (sits further back)
+        const backDepth = 0.05; // ~0.6" — the "recessed" floor of each panel
+        // Frame strip thickness
+        const stileWidth = 0.33; // ~4" wide stiles
+        const railHeight = 0.33; // ~4" tall top/bottom rails
+        const chairCapHeight = 0.17; // ~2" chair rail cap
+        const chairCapDepth = 0.25; // ~3" — sticks out the most
+
+        // Target panel width ~ wainscotHeight (squarish panels)
+        const targetPanelWidth = Math.max(1.5, wainscotHeight * 0.9);
+        const interiorWidth = length - 2 * stileWidth;
+        const panelCount = Math.max(1, Math.round(interiorWidth / targetPanelWidth));
+        const actualPanelWidth = (interiorWidth - (panelCount - 1) * stileWidth) / panelCount;
+
+        const mat = (
+          <meshStandardMaterial
+            color={frameColor}
+            roughness={0.65}
+            metalness={0}
+          />
         );
+
+        const meshes: React.ReactNode[] = [];
+
+        // Recessed backing (full wainscoting area)
+        meshes.push(
+          <mesh
+            key="back"
+            position={[0, -halfH + wainscotHeight / 2, thickness / 2 + backDepth / 2]}
+            castShadow
+            receiveShadow
+          >
+            <boxGeometry args={[length, wainscotHeight, backDepth]} />
+            <meshStandardMaterial color={color} roughness={0.7} metalness={0} />
+          </mesh>
+        );
+
+        // Top rail (horizontal strip above panels)
+        const topRailY = -halfH + wainscotHeight - chairCapHeight - railHeight / 2;
+        meshes.push(
+          <mesh
+            key="top-rail"
+            position={[0, topRailY, thickness / 2 + frameDepth / 2]}
+            castShadow
+            receiveShadow
+          >
+            <boxGeometry args={[length, railHeight, frameDepth]} />
+            {mat}
+          </mesh>
+        );
+
+        // Bottom rail
+        const bottomRailY = -halfH + railHeight / 2;
+        meshes.push(
+          <mesh
+            key="bottom-rail"
+            position={[0, bottomRailY, thickness / 2 + frameDepth / 2]}
+            castShadow
+            receiveShadow
+          >
+            <boxGeometry args={[length, railHeight, frameDepth]} />
+            {mat}
+          </mesh>
+        );
+
+        // Vertical stiles (including edges)
+        const panelAreaHeight = wainscotHeight - chairCapHeight - 2 * railHeight;
+        const panelCenterY = -halfH + railHeight + panelAreaHeight / 2;
+        for (let i = 0; i <= panelCount; i++) {
+          const stileX = -length / 2 + stileWidth / 2 + i * (actualPanelWidth + stileWidth);
+          meshes.push(
+            <mesh
+              key={`stile-${i}`}
+              position={[stileX, panelCenterY, thickness / 2 + frameDepth / 2]}
+              castShadow
+              receiveShadow
+            >
+              <boxGeometry args={[stileWidth, panelAreaHeight, frameDepth]} />
+              {mat}
+            </mesh>
+          );
+        }
+
+        // Chair rail cap at very top — sticks out most
+        meshes.push(
+          <mesh
+            key="chair-cap"
+            position={[0, -halfH + wainscotHeight - chairCapHeight / 2, thickness / 2 + chairCapDepth / 2]}
+            castShadow
+            receiveShadow
+          >
+            <boxGeometry args={[length, chairCapHeight, chairCapDepth]} />
+            {mat}
+          </mesh>
+        );
+
+        return <group>{meshes}</group>;
       })()}
 
       {/* Crown molding — 3D extruded band at ceiling line */}

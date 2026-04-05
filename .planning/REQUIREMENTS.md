@@ -53,6 +53,13 @@ Jessica can see her future room with her actual furniture before spending money.
 - [ ] **ART-05**: Framed art renders in 3D with real frame geometry (protruding box around the art) attached to the wall face
 - [ ] **ART-06**: Width + height of art + frame are independently editable after placement
 
+### Wainscoting Style Library
+
+- [ ] **WAIN-01**: Jessica picks from a library of wainscoting styles per wall (recessed panel, raised panel, beadboard, board-and-batten, shiplap, flat panel, English grid)
+- [ ] **WAIN-02**: Each style has configurable panel width, stile width, chair rail height, and depth (protrusion)
+- [ ] **WAIN-03**: All styles render as real 3D geometry in the 3D view
+- [ ] **WAIN-04**: Style choice + config persist per-wall
+
 ---
 
 ## v1 Requirements (Shipped)
@@ -116,3 +123,7 @@ See `.planning/milestones/v1.0-REQUIREMENTS.md` and `.planning/milestones/v1.1-R
 | ART-04 | Phase 15 | Active |
 | ART-05 | Phase 15 | Active |
 | ART-06 | Phase 15 | Active |
+| WAIN-01 | Phase 16 | Active |
+| WAIN-02 | Phase 16 | Active |
+| WAIN-03 | Phase 16 | Active |
+| WAIN-04 | Phase 16 | Active |
