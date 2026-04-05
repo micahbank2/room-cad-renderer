@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 4 plans
   - [x] 05-00-PLAN.md — Wave 0 test stubs (cadStore.multiRoom + snapshotMigration + roomTemplates)
   - [x] 05-01-PLAN.md — Data model foundation (RoomDoc + CADSnapshot v2 + migrateSnapshot + roomTemplates)
-  - [ ] 05-02-PLAN.md — cadStore restructure (rooms + activeRoomId + room-management actions + selectors)
+  - [x] 05-02-PLAN.md — cadStore restructure (rooms + activeRoomId + room-management actions + selectors)
   - [ ] 05-03-PLAN.md — Consumer updates + RoomTabs + AddRoomDialog + Ctrl/Cmd+Tab wiring
 **UI hint**: yes
 
@@ -93,7 +93,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Products placed in one room do not appear in other rooms
 **Plans**: 4 plans
   - [x] 05-00-PLAN.md — Wave 0 test stubs (cadStore.multiRoom + snapshotMigration + roomTemplates)
-  - [ ] 05-01-PLAN.md — Data model foundation (RoomDoc + CADSnapshot v2 + migrateSnapshot + roomTemplates)
+  - [x] 05-01-PLAN.md — Data model foundation (RoomDoc + CADSnapshot v2 + migrateSnapshot + roomTemplates)
   - [ ] 05-02-PLAN.md — cadStore restructure (rooms + activeRoomId + room-management actions + selectors)
   - [ ] 05-03-PLAN.md — Consumer updates + RoomTabs + AddRoomDialog + Ctrl/Cmd+Tab wiring
 **UI hint**: yes
