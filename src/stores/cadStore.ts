@@ -8,7 +8,7 @@ import type {
   Point,
   Opening,
 } from "@/types/cad";
-import { uid } from "@/lib/geometry";
+import { uid, resizeWall } from "@/lib/geometry";
 
 const MAX_HISTORY = 50;
 
@@ -23,6 +23,7 @@ interface CADState {
   setRoom: (changes: Partial<Room>) => void;
   addWall: (start: Point, end: Point) => void;
   updateWall: (id: string, changes: Partial<WallSegment>) => void;
+  resizeWallByLabel: (id: string, newLengthFt: number) => void;
   removeWall: (id: string) => void;
   addOpening: (wallId: string, opening: Omit<Opening, "id">) => void;
   placeProduct: (productId: string, position: Point) => string;
@@ -87,6 +88,30 @@ export const useCADStore = create<CADState>()((set) => ({
         if (!s.walls[id]) return;
         pushHistory(s);
         Object.assign(s.walls[id], changes);
+      })
+    ),
+
+  resizeWallByLabel: (id, newLengthFt) =>
+    set(
+      produce((s: CADState) => {
+        const wall = s.walls[id];
+        if (!wall) return;
+        if (!(newLengthFt > 0)) return;
+        pushHistory(s);
+        const oldEnd = { x: wall.end.x, y: wall.end.y };
+        const newEnd = resizeWall(wall, newLengthFt);
+        wall.end = newEnd;
+        // Propagate to any wall whose start OR end matches oldEnd within epsilon
+        const EPS = 0.01;
+        for (const other of Object.values(s.walls)) {
+          if (other.id === id) continue;
+          if (Math.abs(other.start.x - oldEnd.x) < EPS && Math.abs(other.start.y - oldEnd.y) < EPS) {
+            other.start = { x: newEnd.x, y: newEnd.y };
+          }
+          if (Math.abs(other.end.x - oldEnd.x) < EPS && Math.abs(other.end.y - oldEnd.y) < EPS) {
+            other.end = { x: newEnd.x, y: newEnd.y };
+          }
+        }
       })
     ),
 

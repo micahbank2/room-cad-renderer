@@ -41,7 +41,24 @@ describe("cadStore actions", () => {
     expect(useCADStore.getState().placedProducts[id].rotation).toBe(30);
     expect(useCADStore.getState().past.length).toBe(before);
   });
-  it.todo("updateWall: wall resize corner propagates to shared-endpoint walls");
+  it("updateWall: wall resize corner propagates to shared-endpoint walls", () => {
+    useCADStore.getState().addWall({ x: 0, y: 0 }, { x: 10, y: 0 });
+    useCADStore.getState().addWall({ x: 10, y: 0 }, { x: 10, y: 10 });
+    const walls = useCADStore.getState().walls;
+    const wallAId = Object.values(walls).find((w) => w.start.x === 0)!.id;
+    const wallBId = Object.values(walls).find((w) => w.start.x === 10 && w.start.y === 0)!.id;
+
+    useCADStore.getState().resizeWallByLabel(wallAId, 5);
+
+    const wallA = useCADStore.getState().walls[wallAId];
+    const wallB = useCADStore.getState().walls[wallBId];
+    expect(wallA.end.x).toBeCloseTo(5);
+    expect(wallA.end.y).toBeCloseTo(0);
+    expect(wallB.start.x).toBeCloseTo(5);
+    expect(wallB.start.y).toBeCloseTo(0);
+    expect(wallB.end.x).toBeCloseTo(10);
+    expect(wallB.end.y).toBeCloseTo(10);
+  });
   it.todo("undo restores prior snapshot");
   it.todo("redo re-applies undone snapshot");
 });
