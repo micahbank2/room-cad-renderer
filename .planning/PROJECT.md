@@ -32,16 +32,14 @@ saved + restored on reload.
 
 See `.planning/ROADMAP.md` for links to each milestone archive.
 
-## Next Milestone Goals
+## Current Milestone: v1.3 Color, Polish & Materials
 
-v1.3 is TBD — start with `/gsd:new-milestone` for fresh questioning,
-requirements, and roadmap. Strong candidates:
+**Goal:** Round out v1.2 with a full paint system, fix v1.2 edit gaps, and unify material catalogs.
 
-- **Color & Paint System:** global paint library, Farrow & Ball
-  catalog (~130 colors), lime wash toggle, apply to walls + ceilings
-- **v1.2 polish pass:** custom element edit handles, library
-  edit-in-place UI, copy-side buttons, per-placement frame overrides
-- **Advanced materials:** unified ceiling/floor texture catalog
+**Target features (in order):**
+- **Color & Paint System** — global paint library, Farrow & Ball catalog (~130 colors), custom color creation, lime wash toggle, apply to walls + ceilings (2D + 3D)
+- **v1.2 Polish Pass** — custom element edit handles, library edit-in-place UI, copy-side buttons, per-placement frame overrides
+- **Advanced Materials** — unified ceiling/floor texture catalog
 
 See `.planning/v1.2-MILESTONE-AUDIT.md` for the full tech debt list
 carried forward.
@@ -121,14 +119,7 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 
 ### Active
 
-None — v1.2 shipped, awaiting v1.3 kickoff via `/gsd:new-milestone`.
-
-### Planned (v1.3 Color & Paint System — candidate)
-- Color/paint library (global)
-- Farrow & Ball catalog (~130 colors)
-- Custom color creation + save
-- Lime wash toggle (filter/shader)
-- Apply paint to walls + ceilings (2D + 3D)
+v1.3 Color, Polish & Materials — requirements being defined.
 
 ### Out of Scope
 
@@ -156,19 +147,6 @@ None — v1.2 shipped, awaiting v1.3 kickoff via `/gsd:new-milestone`.
 | active-room selector pattern | Single null-guard call-site per action. | ✓ Good — 15 consumers wired cleanly |
 | History-boundary drag pattern | One snapshot at mousedown, no-history per frame. | ✓ Good — smooth drags without history bloat |
 | Module-level async caches (image/texture/floor) | Dedup concurrent loads, naturally dedup via Promise-valued cache. | ✓ Good — no double-fetch bugs |
-
-## Next Milestone Goals
-
-v1.2 New Element Types — expand beyond walls + products to cover the architectural and decorative elements that make a room feel real.
-
-Key decisions locked in during scoping:
-- **Ceilings**: per-ceiling polygon with custom shape (flexible, supports future vaulted bits)
-- **Floors**: preset material catalog + custom texture upload
-- **Wall surfaces**: per-wall wallpaper + wall art placed with x/y/size
-- **Trim**: per-wall toggles for wainscoting + crown molding (matches real construction)
-- **Custom elements**: full 3D rendering with box/plane shapes
-
-After v1.2: v1.3 adds the color & paint system with Farrow & Ball catalog and lime wash.
 
 ## Tech Stack (Current)
 
@@ -200,4 +178,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-05 after v1.0 milestone*
+*Last updated: 2026-04-05 — v1.3 milestone kickoff*
