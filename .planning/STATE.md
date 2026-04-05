@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-04-05T03:00:33.731Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-04-05T03:05:01.843Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 11
-  completed_plans: 8
+  completed_plans: 10
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 ## Current Position
 
 Phase: 02 (product-library) — EXECUTING
-Plan: 3 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-04-05
 
@@ -60,6 +60,8 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-2d-canvas-polish P05 | 3m | 4 tasks | 6 files |
 | Phase 02-product-library P00 | 1m | 2 tasks | 5 files |
 | Phase 02-product-library P01 | 10m | 2 tasks | 4 files |
+| Phase 02-product-library P03 | 5m | 2 tasks | 4 files |
+| Phase 02-product-library P02 | 3m | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -83,6 +85,9 @@ Recent decisions affecting current work:
 - [Phase 02-product-library]: Pitfall 3 mitigation: productStore subscribe-persist is gated on state.loaded=true — initial empty state cannot overwrite IndexedDB
 - [Phase 02-product-library]: Legacy dim migration lives in productStore.load() (coerce non-number W/D/H to null on read) — self-heals mixed-shape IndexedDB data
 - [Phase 02-product-library]: searchProducts + effectiveDimensions centralized in types/product.ts so renderers + pickers reuse one filter/fallback contract
+- [Phase 02-product-library]: Sidebar product picker subscribes to productStore directly (no prop drilling)
+- [Phase 02-product-library]: App.tsx is single productStore.load() call site; fixes dual-loader race
+- [Phase 02-product-library]: 02-02: skipDims-gated grey-out pattern for conditional form fields + defaultValue/onBlur commit for uncontrolled dim editors
 
 ### Pending Todos
 
@@ -98,6 +103,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T03:00:27.607Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-04-05T03:05:01.808Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

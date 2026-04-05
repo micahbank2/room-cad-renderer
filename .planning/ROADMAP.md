@@ -50,8 +50,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 5 plans
   - [x] 02-00-PLAN.md — Test stubs (Wave 0 scaffolding for productStore/helpers/search/modal/picker)
   - [x] 02-01-PLAN.md — productStore + nullable Product dims + helpers (LIB-03/04 core)
-  - [ ] 02-02-PLAN.md — Skip dimensions UI + SIZE:UNSET + PropertiesPanel editable dims (LIB-04)
-  - [ ] 02-03-PLAN.md — App/Sidebar store consolidation + SidebarProductPicker (LIB-03/05)
+  - [x] 02-02-PLAN.md — Skip dimensions UI + SIZE:UNSET + PropertiesPanel editable dims (LIB-04)
+  - [x] 02-03-PLAN.md — App/Sidebar store consolidation + SidebarProductPicker (LIB-03/05)
   - [ ] 02-04-PLAN.md — Orphan/null-dim rendering in fabricSync + ProductMesh + selectTool (LIB-03/04)
 
 ### Phase 3: 3D Product Rendering
