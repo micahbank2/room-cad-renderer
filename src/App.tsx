@@ -55,6 +55,10 @@ export default function App() {
       };
       const tool = shortcuts[e.key.toLowerCase()];
       if (tool && viewMode !== "library") setTool(tool);
+      // D-03: 'e' toggles camera mode in 3D/split views
+      if (e.key.toLowerCase() === "e" && (viewMode === "3d" || viewMode === "split")) {
+        useUIStore.getState().toggleCameraMode();
+      }
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);

@@ -23,6 +23,8 @@ export default function Toolbar({ viewMode, onViewChange, onHome }: Props) {
   const redo = useCADStore((s) => s.redo);
   const pastLen = useCADStore((s) => s.past.length);
   const futureLen = useCADStore((s) => s.future.length);
+  const cameraMode = useUIStore((s) => s.cameraMode);
+  const toggleCameraMode = useUIStore((s) => s.toggleCameraMode);
 
   return (
     <header className="h-14 bg-obsidian-deepest flex items-center px-4 shrink-0 ghost-border border-0 border-b">
@@ -54,6 +56,21 @@ export default function Toolbar({ viewMode, onViewChange, onHome }: Props) {
           );
         })}
       </nav>
+
+      {(viewMode === "3d" || viewMode === "split") && (
+        <button
+          onClick={toggleCameraMode}
+          title={cameraMode === "orbit" ? "Enter walk mode (E)" : "Exit to orbit (E)"}
+          className={`flex items-center gap-1.5 font-mono text-[10px] tracking-widest px-3 py-1 transition-colors duration-150 mr-6 ${
+            cameraMode === "walk"
+              ? "text-accent-light border-b-2 border-accent"
+              : "text-text-dim hover:text-accent-light"
+          }`}
+        >
+          <span className="material-symbols-outlined text-[14px]">directions_walk</span>
+          {cameraMode === "orbit" ? "WALK" : "ORBIT"}
+        </button>
+      )}
 
       {/* Spacer */}
       <div className="flex-1" />

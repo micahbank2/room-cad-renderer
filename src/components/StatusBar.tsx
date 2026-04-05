@@ -15,6 +15,7 @@ export default function StatusBar() {
   const room = useCADStore((s) => s.room);
   const wallCount = useCADStore((s) => Object.keys(s.walls).length);
   const gridSnap = useUIStore((s) => s.gridSnap);
+  const cameraMode = useUIStore((s) => s.cameraMode);
 
   return (
     <div className="h-8 bg-obsidian-deepest flex items-center px-4 ghost-border border-0 border-t shrink-0">
@@ -38,6 +39,9 @@ export default function StatusBar() {
         </span>
         <span className="font-mono text-[9px] text-text-ghost tracking-wider">
           SCALE: <span className="text-accent-light">1:50</span>
+        </span>
+        <span className="font-mono text-[9px] text-text-ghost tracking-wider">
+          CAM: <span className="text-accent-light">{cameraMode === "walk" ? "WALK_MODE" : "ORBIT_MODE"}</span>
         </span>
         <SaveIndicator />
       </div>
