@@ -98,6 +98,17 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [ ] 05-03-PLAN.md — Consumer updates + RoomTabs + AddRoomDialog + Ctrl/Cmd+Tab wiring
 **UI hint**: yes
 
+### Phase 5.1: v1.0 Integration Gaps (INSERTED)
+**Goal**: Close the three integration gaps identified in v1.0 milestone audit — startup project hydration (SAVE-02), walk-camera respawn on room switch (VIZ-05×ROOM-01), and orbit camera position restore (VIZ-05)
+**Depends on**: Phase 5
+**Requirements**: SAVE-02, VIZ-05
+**Success Criteria** (what must be TRUE):
+  1. Reloading the browser restores Jessica's last-saved project (rooms, walls, placed products, active room)
+  2. Switching rooms while in walk mode re-spawns the camera at the new room's center at eye level
+  3. Switching walk→orbit restores both the previous camera position AND target (currently only target is restored)
+**Plans**: TBD
+**UI hint**: no
+
 ## Progress
 
 **Execution Order:**
