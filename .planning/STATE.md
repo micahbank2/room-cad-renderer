@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
+milestone_name: Integration Gaps
 status: verifying
-stopped_at: Completed 05-03-PLAN.md
-last_updated: "2026-04-05T13:29:51.282Z"
+stopped_at: Completed 05.1-v1-integration-gaps-00-PLAN.md
+last_updated: "2026-04-05T14:00:17.299Z"
 last_activity: 2026-04-05
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 22
-  completed_plans: 22
+  total_phases: 6
+  completed_phases: 6
+  total_plans: 23
+  completed_plans: 23
   percent: 86
 ---
 
@@ -74,6 +74,7 @@ Progress: [████████░░] 86%
 | Phase 05-multi-room P01 | 2m | 3 tasks | 5 files |
 | Phase 05-multi-room P02 | 2m | 1 tasks | 2 files |
 | Phase 05-multi-room P03 | 5m | 2 tasks | 22 files |
+| Phase 05.1-v1-integration-gaps P00 | 2m | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -120,6 +121,9 @@ Recent decisions affecting current work:
 - [Phase 05-multi-room]: 05-02: switchRoom uses plain set (no history per Pitfall 4); removeRoom last-room guard keeps activeRoomId always valid
 - [Phase 05-multi-room]: 05-03: active-room selector swap (useActive* hooks + getActiveRoomDoc) applied to all 15 consumers; useAutoSave comparator now refs state.rooms + activeRoomId (Pitfall 1)
 - [Phase 05-multi-room]: 05-03: loadSnapshot is single-source-of-truth for migration (runs migrateSnapshot internally) — callers pass raw data, no double-migrate
+- [Phase 05.1-v1-integration-gaps]: 05.1-00: startup hydration in App.tsx via async IIFE + cancel flag; listProjects DESC first entry restores last-saved project
+- [Phase 05.1-v1-integration-gaps]: 05.1-00: WalkCameraController keyed on activeRoomId replaces didSpawn gate — camera respawns at room center on every active-room change
+- [Phase 05.1-v1-integration-gaps]: 05.1-00: orbitPosRef initialized non-null; useEffect on cameraMode restores camera.position.set + ctrl.update() on walk->orbit
 
 ### Pending Todos
 
@@ -135,6 +139,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T13:29:43.577Z
-Stopped at: Completed 05-03-PLAN.md
+Last session: 2026-04-05T14:00:17.259Z
+Stopped at: Completed 05.1-v1-integration-gaps-00-PLAN.md
 Resume file: None
