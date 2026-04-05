@@ -2,12 +2,13 @@ import * as THREE from "three";
 import { Suspense, useRef, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, PointerLockControls } from "@react-three/drei";
-import { useActiveRoom, useActiveWalls, useActivePlacedProducts, useActiveCeilings } from "@/stores/cadStore";
+import { useActiveRoom, useActiveRoomDoc, useActiveWalls, useActivePlacedProducts, useActiveCeilings } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import type { Product } from "@/types/product";
 import WallMesh from "./WallMesh";
 import ProductMesh from "./ProductMesh";
 import CeilingMesh from "./CeilingMesh";
+import FloorMesh from "./FloorMesh";
 import Lighting from "./Lighting";
 import WalkCameraController from "./WalkCameraController";
 import { getFloorTexture } from "./floorTexture";
@@ -21,6 +22,8 @@ function Scene({ productLibrary }: Props) {
   const walls = useActiveWalls();
   const placedProducts = useActivePlacedProducts();
   const ceilings = useActiveCeilings();
+  const activeDoc = useActiveRoomDoc();
+  const floorMaterial = activeDoc?.floorMaterial;
   const selectedIds = useUIStore((s) => s.selectedIds);
   const cameraMode = useUIStore((s) => s.cameraMode);
 
@@ -48,15 +51,15 @@ function Scene({ productLibrary }: Props) {
     <>
       <Lighting />
 
-      {/* Floor — D-05 wood-plank procedural texture */}
-      <mesh
-        position={[halfW, 0, halfL]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        receiveShadow
-      >
-        <planeGeometry args={[room.width, room.length]} />
-        <meshStandardMaterial map={floorTexture} roughness={0.75} metalness={0.0} />
-      </mesh>
+      {/* Floor — procedural wood by default, or user-chosen material (FLOOR-01/02/03) */}
+      <FloorMesh
+        width={room.width}
+        length={room.length}
+        halfW={halfW}
+        halfL={halfL}
+        material={floorMaterial}
+        fallbackTexture={floorTexture}
+      />
 
       {/* Ambient PBR bounce — D-08 */}
       <Suspense fallback={null}>

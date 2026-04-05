@@ -3,6 +3,7 @@ import { useActiveRoom, useActiveWalls, useActivePlacedProducts } from "@/stores
 import { useUIStore } from "@/stores/uiStore";
 import RoomSettings from "./RoomSettings";
 import SidebarProductPicker from "./SidebarProductPicker";
+import FloorMaterialPicker from "./FloorMaterialPicker";
 
 interface Props {
   productLibrary: Product[];
@@ -70,6 +71,9 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
             </label>
           </div>
         </div>
+
+        {/* Floor material (FLOOR-01/02/03) */}
+        <FloorMaterialPicker />
 
         {/* Grid snap */}
         <div>
