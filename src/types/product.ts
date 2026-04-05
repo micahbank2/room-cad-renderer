@@ -35,21 +35,30 @@ export function hasDimensions(p: Product): boolean {
  * Returns effective render dimensions for a product.
  * If product is undefined (orphan) OR any dim is null, returns 2x2x2 + isPlaceholder:true.
  */
-export function effectiveDimensions(p: Product | undefined | null): {
+export function effectiveDimensions(
+  p: Product | undefined | null,
+  scale: number = 1,
+): {
   width: number;
   depth: number;
   height: number;
   isPlaceholder: boolean;
 } {
+  const s = scale > 0 ? scale : 1;
   if (!p || p.width == null || p.depth == null || p.height == null) {
     return {
-      width: PLACEHOLDER_DIM_FT,
-      depth: PLACEHOLDER_DIM_FT,
+      width: PLACEHOLDER_DIM_FT * s,
+      depth: PLACEHOLDER_DIM_FT * s,
       height: PLACEHOLDER_DIM_FT,
       isPlaceholder: true,
     };
   }
-  return { width: p.width, depth: p.depth, height: p.height, isPlaceholder: false };
+  return {
+    width: p.width * s,
+    depth: p.depth * s,
+    height: p.height,
+    isPlaceholder: false,
+  };
 }
 
 /**

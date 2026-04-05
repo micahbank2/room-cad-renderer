@@ -33,6 +33,10 @@ interface CADState {
   moveProduct: (id: string, position: Point) => void;
   rotateProduct: (id: string, angle: number) => void;
   rotateProductNoHistory: (id: string, angle: number) => void;
+  rotateWall: (id: string, angleDeltaDeg: number) => void;
+  rotateWallNoHistory: (id: string, angleDeltaDeg: number) => void;
+  resizeProduct: (id: string, scale: number) => void;
+  resizeProductNoHistory: (id: string, scale: number) => void;
   removeProduct: (id: string) => void;
   removeSelected: (ids: string[]) => void;
   undo: () => void;
@@ -62,6 +66,24 @@ function pushHistory(state: CADState): void {
 
 function activeDoc(s: CADState): RoomDoc | undefined {
   return s.activeRoomId ? s.rooms[s.activeRoomId] : undefined;
+}
+
+/** Rotate a wall around its midpoint by the given angle delta (degrees).
+ *  Mutates the wall in place. Does NOT update any neighbors — by design,
+ *  rotation detaches this wall from any shared corners. */
+function applyWallRotation(wall: WallSegment, angleDeltaDeg: number): void {
+  const cx = (wall.start.x + wall.end.x) / 2;
+  const cy = (wall.start.y + wall.end.y) / 2;
+  const rad = (angleDeltaDeg * Math.PI) / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  const rotatePoint = (p: Point) => {
+    const dx = p.x - cx;
+    const dy = p.y - cy;
+    return { x: cx + dx * cos - dy * sin, y: cy + dx * sin + dy * cos };
+  };
+  wall.start = rotatePoint(wall.start);
+  wall.end = rotatePoint(wall.end);
 }
 
 function initialState(): Pick<CADState, "rooms" | "activeRoomId" | "past" | "future"> {
@@ -213,6 +235,50 @@ export const useCADStore = create<CADState>()((set) => ({
         if (!doc) return;
         if (!doc.placedProducts[id]) return;
         doc.placedProducts[id].rotation = angle;
+      })
+    ),
+
+  rotateWall: (id, angleDeltaDeg) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const wall = doc.walls[id];
+        if (!wall) return;
+        pushHistory(s);
+        applyWallRotation(wall, angleDeltaDeg);
+      })
+    ),
+
+  rotateWallNoHistory: (id, angleDeltaDeg) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const wall = doc.walls[id];
+        if (!wall) return;
+        applyWallRotation(wall, angleDeltaDeg);
+      })
+    ),
+
+  resizeProduct: (id, scale) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        if (!doc.placedProducts[id]) return;
+        pushHistory(s);
+        doc.placedProducts[id].sizeScale = Math.max(0.1, Math.min(10, scale));
+      })
+    ),
+
+  resizeProductNoHistory: (id, scale) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        if (!doc.placedProducts[id]) return;
+        doc.placedProducts[id].sizeScale = Math.max(0.1, Math.min(10, scale));
       })
     ),
 

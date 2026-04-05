@@ -3,9 +3,11 @@ import type { WallSegment, PlacedProduct } from "@/types/cad";
 import type { Product } from "@/types/product";
 import { effectiveDimensions, hasDimensions } from "@/types/product";
 import { wallCorners, angle as wallAngle } from "@/lib/geometry";
+import { getWallHandleWorldPos } from "./wallRotationHandle";
 import { drawWallDimension } from "./dimensions";
 import { getCachedImage } from "./productImageCache";
 import { getHandleWorldPos } from "./rotationHandle";
+import { getResizeHandles } from "./resizeHandles";
 
 const WALL_FILL = "#343440";
 const WALL_STROKE = "#484554";
@@ -112,6 +114,39 @@ export function renderWalls(
 
     // Dimension label
     drawWallDimension(fc, wall, scale, origin);
+
+    // Rotation handle for selected walls (EDIT-12)
+    if (isSelected) {
+      const h = getWallHandleWorldPos(wall);
+      const hx = origin.x + h.x * scale;
+      const hy = origin.y + h.y * scale;
+      // Stem line from wall midpoint to handle
+      const cx = origin.x + ((wall.start.x + wall.end.x) / 2) * scale;
+      const cy = origin.y + ((wall.start.y + wall.end.y) / 2) * scale;
+      fc.add(
+        new fabric.Line([cx, cy, hx, hy], {
+          stroke: WALL_SELECTED_STROKE,
+          strokeWidth: 1,
+          selectable: false,
+          evented: false,
+        })
+      );
+      fc.add(
+        new fabric.Circle({
+          left: hx,
+          top: hy,
+          radius: 5,
+          fill: WALL_SELECTED_STROKE,
+          stroke: "#ffffff",
+          strokeWidth: 1,
+          originX: "center",
+          originY: "center",
+          selectable: false,
+          evented: false,
+          data: { type: "wall-rotate-handle", wallId: wall.id },
+        })
+      );
+    }
   }
 
   // For each shared endpoint with exactly two walls meeting, compute the
@@ -228,7 +263,7 @@ export function renderProducts(
 ) {
   for (const pp of Object.values(placedProducts)) {
     const product = productLibrary.find((p) => p.id === pp.productId);
-    const { width, depth, isPlaceholder } = effectiveDimensions(product);
+    const { width, depth, isPlaceholder } = effectiveDimensions(product, pp.sizeScale);
     const orphan = !product;
     const showPlaceholder = orphan || isPlaceholder;
 
@@ -340,6 +375,30 @@ export function renderProducts(
       });
       fc.add(line);
       fc.add(circle);
+    }
+
+    // Corner resize handles for selected products (EDIT-14)
+    if (isSelected && selectedIds.length === 1) {
+      const handles = getResizeHandles(pp, width, depth);
+      for (const key of ["ne", "nw", "sw", "se"] as const) {
+        const h = handles[key];
+        fc.add(
+          new fabric.Rect({
+            left: origin.x + h.x * scale,
+            top: origin.y + h.y * scale,
+            width: 10,
+            height: 10,
+            fill: "#12121d",
+            stroke: "#7c5bf0",
+            strokeWidth: 2,
+            originX: "center",
+            originY: "center",
+            selectable: false,
+            evented: false,
+            data: { type: "resize-handle", corner: key, placedProductId: pp.id },
+          })
+        );
+      }
     }
   }
 }
