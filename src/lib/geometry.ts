@@ -81,8 +81,10 @@ export function mitredWallCorners(
   if (startNeighbor) {
     const mitred = computeMitreCorners(wall, startNeighbor, wall.start);
     if (mitred) {
-      startLeft = mitred.left;
-      startRight = mitred.right;
+      // wallCorners() uses (-perp) for "left" at start, but our mitre uses
+      // (+perp) for its "left" — so assignments are swapped at start.
+      startLeft = mitred.right;
+      startRight = mitred.left;
     }
   }
 
@@ -95,9 +97,8 @@ export function mitredWallCorners(
   if (endNeighbor) {
     const mitred = computeMitreCorners(wall, endNeighbor, wall.end);
     if (mitred) {
-      // At end, corners are endLeft and endRight (note wallCorners order puts
-      // endRight before endLeft). The mitred.left corresponds to A's left
-      // perpendicular direction, which at the end still maps to endLeft.
+      // At end, dA points back toward start so our (+perp) flips to (-perp),
+      // which matches wallCorners()' "left" at end. No swap needed.
       endLeft = mitred.left;
       endRight = mitred.right;
     }
