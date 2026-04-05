@@ -44,6 +44,15 @@ Jessica can see her future room with her actual furniture before spending money.
 - [ ] **CUSTOM-04**: Custom elements render in 3D at their configured dimensions and material
 - [ ] **CUSTOM-05**: Saved custom elements persist in a per-project catalog for re-placement
 
+### Framed Art Library
+
+- [ ] **ART-01**: Jessica can upload art images to a dedicated ART_LIBRARY (separate from product library)
+- [ ] **ART-02**: Each art item has a frame preset chosen from 6-8 built-in styles (thin black, thick gold, natural wood, museum white, floating, ornate)
+- [ ] **ART-03**: Art + frame combinations save to the library and persist across projects
+- [ ] **ART-04**: Jessica can drag framed art from the library onto any wall (2D canvas or 3D directly)
+- [ ] **ART-05**: Framed art renders in 3D with real frame geometry (protruding box around the art) attached to the wall face
+- [ ] **ART-06**: Width + height of art + frame are independently editable after placement
+
 ---
 
 ## v1 Requirements (Shipped)
@@ -101,3 +110,9 @@ See `.planning/milestones/v1.0-REQUIREMENTS.md` and `.planning/milestones/v1.1-R
 | CUSTOM-03 | Phase 14 | Active |
 | CUSTOM-04 | Phase 14 | Active |
 | CUSTOM-05 | Phase 14 | Active |
+| ART-01 | Phase 15 | Active |
+| ART-02 | Phase 15 | Active |
+| ART-03 | Phase 15 | Active |
+| ART-04 | Phase 15 | Active |
+| ART-05 | Phase 15 | Active |
+| ART-06 | Phase 15 | Active |

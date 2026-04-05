@@ -4,7 +4,7 @@
 
 - ✅ **v1.0 Room Visualization MVP** — Phases 1–5.1 (shipped 2026-04-05) — see [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
 - ✅ **v1.1 UX Fixes & Polish** — Phases 6–10 (shipped 2026-04-05) — see [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
-- 🚧 **v1.2 New Element Types** — Phases 11–14 (planning)
+- 🚧 **v1.2 New Element Types** — Phases 11–15 (in progress — Phases 11 + 12 shipped)
 - 📋 **v1.3 Color & Paint System** — planned
 
 ## Current Milestone: v1.2 New Element Types
@@ -46,6 +46,19 @@
   6. Wainscoting + crown render as distinct architectural bands in 3D
 **UI hint:** yes
 
+### Phase 15: Framed Art Library
+**Goal:** Jessica can upload art, combine it with a chosen frame preset, save to a reusable library, and place framed pieces on walls with real 3D frame geometry
+**Depends on:** Phase 13 (wall art rendering infrastructure already exists)
+**Requirements:** ART-01, ART-02, ART-03, ART-04, ART-05, ART-06
+**Success Criteria:**
+  1. ART_LIBRARY sidebar section (separate from product library) lists all saved framed art items
+  2. Jessica can upload an art image and pick one of 6-8 built-in frame presets (thin black, thick gold, natural wood, museum white, floating, ornate)
+  3. Saved framed art persists across projects (global library, like products)
+  4. Jessica can drag framed art onto any wall — placed as a WallArt item
+  5. 3D rendering shows the frame as real protruding geometry around the art (not a flat plane)
+  6. Width + height of the framed piece can be edited after placement
+**UI hint:** yes
+
 ### Phase 14: Custom Element Builder
 **Goal:** Jessica can build and place custom decor/furniture items that aren't in her product library (built-ins, shelves, tables, etc.)
 **Depends on:** Phases 11–13 (reuses material catalog)
@@ -62,10 +75,11 @@
 
 | Phase | Milestone | Plans | Status |
 |-------|-----------|-------|--------|
-| 11. Ceilings | v1.2 | 0/TBD | Not started |
-| 12. Floor Materials | v1.2 | 0/TBD | Not started |
-| 13. Wall Surfaces + Trim | v1.2 | 0/TBD | Not started |
+| 11. Ceilings | v1.2 | 1/1 | Complete (PR #8 merged) |
+| 12. Floor Materials | v1.2 | 1/1 | Complete (PR #9 merged) |
+| 13. Wall Surfaces + Trim | v1.2 | 1/1 | In PR (#10 open) |
 | 14. Custom Element Builder | v1.2 | 0/TBD | Not started |
+| 15. Framed Art Library | v1.2 | 0/TBD | Not started |
 
 ---
 
