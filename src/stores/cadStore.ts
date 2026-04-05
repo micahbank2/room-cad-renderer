@@ -10,6 +10,8 @@ import type {
   RoomDoc,
   Ceiling,
   FloorMaterial,
+  Wallpaper,
+  WallArt,
 } from "@/types/cad";
 import { uid, resizeWall } from "@/lib/geometry";
 import { ROOM_TEMPLATES, type RoomTemplateId } from "@/data/roomTemplates";
@@ -47,6 +49,12 @@ interface CADState {
   updateCeiling: (id: string, changes: Partial<Ceiling>) => void;
   removeCeiling: (id: string) => void;
   setFloorMaterial: (material: FloorMaterial | undefined) => void;
+  setWallpaper: (wallId: string, wallpaper: Wallpaper | undefined) => void;
+  toggleWainscoting: (wallId: string, enabled: boolean, heightFt?: number, color?: string) => void;
+  toggleCrownMolding: (wallId: string, enabled: boolean, heightFt?: number, color?: string) => void;
+  addWallArt: (wallId: string, art: Omit<WallArt, "id">) => string;
+  updateWallArt: (wallId: string, artId: string, changes: Partial<WallArt>) => void;
+  removeWallArt: (wallId: string, artId: string) => void;
   removeProduct: (id: string) => void;
   removeSelected: (ids: string[]) => void;
   undo: () => void;
@@ -382,6 +390,81 @@ export const useCADStore = create<CADState>()((set) => ({
         pushHistory(s);
         if (material) doc.floorMaterial = material;
         else delete doc.floorMaterial;
+      })
+    ),
+
+  setWallpaper: (wallId, wallpaper) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc || !doc.walls[wallId]) return;
+        pushHistory(s);
+        if (wallpaper) doc.walls[wallId].wallpaper = wallpaper;
+        else delete doc.walls[wallId].wallpaper;
+      })
+    ),
+
+  toggleWainscoting: (wallId, enabled, heightFt = 3, color = "#ffffff") =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc || !doc.walls[wallId]) return;
+        pushHistory(s);
+        if (enabled) {
+          doc.walls[wallId].wainscoting = { enabled: true, heightFt, color };
+        } else {
+          delete doc.walls[wallId].wainscoting;
+        }
+      })
+    ),
+
+  toggleCrownMolding: (wallId, enabled, heightFt = 0.33, color = "#ffffff") =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc || !doc.walls[wallId]) return;
+        pushHistory(s);
+        if (enabled) {
+          doc.walls[wallId].crownMolding = { enabled: true, heightFt, color };
+        } else {
+          delete doc.walls[wallId].crownMolding;
+        }
+      })
+    ),
+
+  addWallArt: (wallId, art) => {
+    const id = `art_${uid()}`;
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc || !doc.walls[wallId]) return;
+        pushHistory(s);
+        if (!doc.walls[wallId].wallArt) doc.walls[wallId].wallArt = [];
+        doc.walls[wallId].wallArt!.push({ id, ...art });
+      })
+    );
+    return id;
+  },
+
+  updateWallArt: (wallId, artId, changes) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc || !doc.walls[wallId]?.wallArt) return;
+        const item = doc.walls[wallId].wallArt!.find((a) => a.id === artId);
+        if (!item) return;
+        pushHistory(s);
+        Object.assign(item, changes);
+      })
+    ),
+
+  removeWallArt: (wallId, artId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc || !doc.walls[wallId]?.wallArt) return;
+        pushHistory(s);
+        doc.walls[wallId].wallArt = doc.walls[wallId].wallArt!.filter((a) => a.id !== artId);
       })
     ),
 
