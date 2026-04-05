@@ -81,20 +81,21 @@ function updatePreview(
     { x: origin.x + (oEnd.x - pdx) * scale, y: origin.y + (oEnd.y - pdy) * scale },
   ];
 
+  // Recreate the polygon each update — Fabric doesn't recompute polygon
+  // bounds when .points is mutated, so the visible shape stays stuck at
+  // the first-rendered size.
   if (previewPolygon) {
-    previewPolygon.set({ points: pts });
-    (previewPolygon as any).setCoords?.();
-  } else {
-    previewPolygon = new fabric.Polygon(pts, {
-      fill: fillColor,
-      stroke: "#ccbeff",
-      strokeWidth: 1,
-      strokeDashArray: [4, 3],
-      selectable: false,
-      evented: false,
-    });
-    fc.add(previewPolygon);
+    fc.remove(previewPolygon);
   }
+  previewPolygon = new fabric.Polygon(pts, {
+    fill: fillColor,
+    stroke: "#ccbeff",
+    strokeWidth: 1,
+    strokeDashArray: [4, 3],
+    selectable: false,
+    evented: false,
+  });
+  fc.add(previewPolygon);
   fc.renderAll();
 }
 
