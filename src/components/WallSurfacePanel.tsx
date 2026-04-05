@@ -9,6 +9,8 @@ import { FRAME_PRESETS } from "@/types/framedArt";
 export default function WallSurfacePanel() {
   const selectedIds = useUIStore((s) => s.selectedIds);
   const walls = useActiveWalls();
+  const activeSide = useUIStore((s) => s.activeWallSide);
+  const setActiveSide = useUIStore((s) => s.setActiveWallSide);
   const setWallpaper = useCADStore((s) => s.setWallpaper);
   const toggleWainscoting = useCADStore((s) => s.toggleWainscoting);
   const toggleCrownMolding = useCADStore((s) => s.toggleCrownMolding);
@@ -23,13 +25,13 @@ export default function WallSurfacePanel() {
   const wall = walls[selectedIds[0]];
   if (!wall) return null;
 
-  const wp = wall.wallpaper;
-  const wains = wall.wainscoting;
-  const crown = wall.crownMolding;
-  const artItems = wall.wallArt ?? [];
+  const wp = wall.wallpaper?.[activeSide];
+  const wains = wall.wainscoting?.[activeSide];
+  const crown = wall.crownMolding?.[activeSide];
+  const artItems = (wall.wallArt ?? []).filter((a) => (a.side ?? "A") === activeSide);
 
   const handleWallpaperColor = (color: string) => {
-    setWallpaper(wall.id, { kind: "color", color });
+    setWallpaper(wall.id, activeSide, { kind: "color", color });
   };
 
   const handleWallpaperImage = (file: File) => {
@@ -42,7 +44,7 @@ export default function WallSurfacePanel() {
         imageUrl: reader.result as string,
         scaleFt: 0,
       };
-      setWallpaper(wall.id, material);
+      setWallpaper(wall.id, activeSide, material);
     };
     reader.readAsDataURL(file);
   };
@@ -50,7 +52,7 @@ export default function WallSurfacePanel() {
   const toggleTile = () => {
     if (!wp || wp.kind !== "pattern") return;
     const newScale = (wp.scaleFt ?? 0) > 0 ? 0 : 2;
-    setWallpaper(wall.id, { ...wp, scaleFt: newScale });
+    setWallpaper(wall.id, activeSide, { ...wp, scaleFt: newScale });
   };
 
   const handleAddArt = (file: File) => {
@@ -63,6 +65,7 @@ export default function WallSurfacePanel() {
         width: 2,
         height: 2.5,
         imageUrl: reader.result as string,
+        side: activeSide,
       });
     };
     reader.readAsDataURL(file);
@@ -78,6 +81,7 @@ export default function WallSurfacePanel() {
       height: 2.5,
       imageUrl: item.imageUrl,
       frameStyle: item.frameStyle,
+      side: activeSide,
     });
     setShowLibrary(false);
   };
@@ -87,6 +91,23 @@ export default function WallSurfacePanel() {
       <h3 className="font-mono text-[10px] text-accent-light tracking-widest uppercase">
         WALL_SURFACE
       </h3>
+
+      {/* Side toggle (Phase 17) */}
+      <div className="flex gap-1">
+        {(["A", "B"] as const).map((s) => (
+          <button
+            key={s}
+            onClick={() => setActiveSide(s)}
+            className={`flex-1 font-mono text-[9px] tracking-widest py-1 rounded-sm border ${
+              activeSide === s
+                ? "border-accent text-accent-light bg-accent/10"
+                : "border-outline-variant/30 text-text-dim"
+            }`}
+          >
+            SIDE_{s}
+          </button>
+        ))}
+      </div>
 
       {/* Wallpaper */}
       <div>
@@ -106,7 +127,7 @@ export default function WallSurfacePanel() {
           </button>
           {wp && (
             <button
-              onClick={() => setWallpaper(wall.id, undefined)}
+              onClick={() => setWallpaper(wall.id, activeSide, undefined)}
               className="font-mono text-[9px] text-text-ghost hover:text-text-primary px-2 py-1"
               title="Remove wallpaper"
             >
@@ -146,7 +167,9 @@ export default function WallSurfacePanel() {
           <input
             type="checkbox"
             checked={wains?.enabled ?? false}
-            onChange={(e) => toggleWainscoting(wall.id, e.target.checked, wains?.heightFt, wains?.color)}
+            onChange={(e) =>
+              toggleWainscoting(wall.id, activeSide, e.target.checked, wains?.heightFt, wains?.color)
+            }
             className="w-3 h-3 accent-accent rounded-none"
           />
           <span className="font-mono text-[9px] text-text-dim tracking-wider">WAINSCOTING</span>
@@ -160,7 +183,7 @@ export default function WallSurfacePanel() {
               max="6"
               value={wains.heightFt}
               onChange={(e) =>
-                toggleWainscoting(wall.id, true, parseFloat(e.target.value) || 3, wains.color)
+                toggleWainscoting(wall.id, activeSide, true, parseFloat(e.target.value) || 3, wains.color)
               }
               className="w-16 font-mono text-[9px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-1 py-0.5 rounded-sm"
             />
@@ -168,7 +191,9 @@ export default function WallSurfacePanel() {
             <input
               type="color"
               value={wains.color}
-              onChange={(e) => toggleWainscoting(wall.id, true, wains.heightFt, e.target.value)}
+              onChange={(e) =>
+                toggleWainscoting(wall.id, activeSide, true, wains.heightFt, e.target.value)
+              }
               className="w-6 h-5 bg-transparent border border-outline-variant/30 rounded-sm cursor-pointer"
             />
           </div>
@@ -182,7 +207,7 @@ export default function WallSurfacePanel() {
             type="checkbox"
             checked={crown?.enabled ?? false}
             onChange={(e) =>
-              toggleCrownMolding(wall.id, e.target.checked, crown?.heightFt, crown?.color)
+              toggleCrownMolding(wall.id, activeSide, e.target.checked, crown?.heightFt, crown?.color)
             }
             className="w-3 h-3 accent-accent rounded-none"
           />
@@ -197,7 +222,7 @@ export default function WallSurfacePanel() {
               max="1"
               value={crown.heightFt}
               onChange={(e) =>
-                toggleCrownMolding(wall.id, true, parseFloat(e.target.value) || 0.33, crown.color)
+                toggleCrownMolding(wall.id, activeSide, true, parseFloat(e.target.value) || 0.33, crown.color)
               }
               className="w-16 font-mono text-[9px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-1 py-0.5 rounded-sm"
             />
@@ -205,7 +230,9 @@ export default function WallSurfacePanel() {
             <input
               type="color"
               value={crown.color}
-              onChange={(e) => toggleCrownMolding(wall.id, true, crown.heightFt, e.target.value)}
+              onChange={(e) =>
+                toggleCrownMolding(wall.id, activeSide, true, crown.heightFt, e.target.value)
+              }
               className="w-6 h-5 bg-transparent border border-outline-variant/30 rounded-sm cursor-pointer"
             />
           </div>
@@ -215,7 +242,9 @@ export default function WallSurfacePanel() {
       {/* Wall art */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <span className="font-mono text-[9px] text-text-dim tracking-wider">WALL_ART ({artItems.length})</span>
+          <span className="font-mono text-[9px] text-text-dim tracking-wider">
+            WALL_ART ({artItems.length})
+          </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowLibrary((v) => !v)}

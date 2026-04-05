@@ -3,6 +3,20 @@ export interface Point {
   y: number;
 }
 
+export type WallSide = "A" | "B";
+
+export interface WainscotConfig {
+  enabled: boolean;
+  heightFt: number; // default 3 (36")
+  color: string; // hex
+}
+
+export interface CrownConfig {
+  enabled: boolean;
+  heightFt: number; // band height, default 0.33 (4")
+  color: string;
+}
+
 export interface WallSegment {
   id: string;
   start: Point;
@@ -10,21 +24,13 @@ export interface WallSegment {
   thickness: number; // feet, default 0.5
   height: number; // feet, default 8
   openings: Opening[];
-  /** Wallpaper applied to this wall (solid color or pattern image). */
-  wallpaper?: Wallpaper;
-  /** Wainscoting panel toggle. Defaults to off. */
-  wainscoting?: {
-    enabled: boolean;
-    heightFt: number; // default 3 (36")
-    color: string; // hex
-  };
-  /** Crown molding toggle. Defaults to off. */
-  crownMolding?: {
-    enabled: boolean;
-    heightFt: number; // band height, default 0.33 (4")
-    color: string;
-  };
-  /** Wall art items placed on this wall's interior face. */
+  /** Wallpaper per side (Phase 17). */
+  wallpaper?: { A?: Wallpaper; B?: Wallpaper };
+  /** Wainscoting per side (Phase 17). */
+  wainscoting?: { A?: WainscotConfig; B?: WainscotConfig };
+  /** Crown molding per side (Phase 17). */
+  crownMolding?: { A?: CrownConfig; B?: CrownConfig };
+  /** Wall art items. Each item has a side (defaults to "A"). */
   wallArt?: WallArt[];
 }
 
@@ -49,6 +55,8 @@ export interface WallArt {
   imageUrl: string;
   /** Frame style (Phase 15). Missing = no frame (flat plane, legacy). */
   frameStyle?: import("./framedArt").FrameStyle;
+  /** Which face of the wall the art hangs on (Phase 17). Defaults to "A". */
+  side?: WallSide;
 }
 
 export interface Opening {

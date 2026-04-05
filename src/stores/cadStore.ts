@@ -12,6 +12,7 @@ import type {
   FloorMaterial,
   Wallpaper,
   WallArt,
+  WallSide,
   CustomElement,
   PlacedCustomElement,
 } from "@/types/cad";
@@ -51,9 +52,9 @@ interface CADState {
   updateCeiling: (id: string, changes: Partial<Ceiling>) => void;
   removeCeiling: (id: string) => void;
   setFloorMaterial: (material: FloorMaterial | undefined) => void;
-  setWallpaper: (wallId: string, wallpaper: Wallpaper | undefined) => void;
-  toggleWainscoting: (wallId: string, enabled: boolean, heightFt?: number, color?: string) => void;
-  toggleCrownMolding: (wallId: string, enabled: boolean, heightFt?: number, color?: string) => void;
+  setWallpaper: (wallId: string, side: WallSide, wallpaper: Wallpaper | undefined) => void;
+  toggleWainscoting: (wallId: string, side: WallSide, enabled: boolean, heightFt?: number, color?: string) => void;
+  toggleCrownMolding: (wallId: string, side: WallSide, enabled: boolean, heightFt?: number, color?: string) => void;
   addWallArt: (wallId: string, art: Omit<WallArt, "id">) => string;
   updateWallArt: (wallId: string, artId: string, changes: Partial<WallArt>) => void;
   removeWallArt: (wallId: string, artId: string) => void;
@@ -406,42 +407,52 @@ export const useCADStore = create<CADState>()((set) => ({
       })
     ),
 
-  setWallpaper: (wallId, wallpaper) =>
+  setWallpaper: (wallId, side, wallpaper) =>
     set(
       produce((s: CADState) => {
         const doc = activeDoc(s);
         if (!doc || !doc.walls[wallId]) return;
         pushHistory(s);
-        if (wallpaper) doc.walls[wallId].wallpaper = wallpaper;
-        else delete doc.walls[wallId].wallpaper;
+        const wall = doc.walls[wallId];
+        if (!wall.wallpaper) wall.wallpaper = {};
+        if (wallpaper) wall.wallpaper[side] = wallpaper;
+        else delete wall.wallpaper[side];
+        // Clean up if both sides empty
+        if (!wall.wallpaper.A && !wall.wallpaper.B) delete wall.wallpaper;
       })
     ),
 
-  toggleWainscoting: (wallId, enabled, heightFt = 3, color = "#ffffff") =>
+  toggleWainscoting: (wallId, side, enabled, heightFt = 3, color = "#ffffff") =>
     set(
       produce((s: CADState) => {
         const doc = activeDoc(s);
         if (!doc || !doc.walls[wallId]) return;
         pushHistory(s);
+        const wall = doc.walls[wallId];
+        if (!wall.wainscoting) wall.wainscoting = {};
         if (enabled) {
-          doc.walls[wallId].wainscoting = { enabled: true, heightFt, color };
+          wall.wainscoting[side] = { enabled: true, heightFt, color };
         } else {
-          delete doc.walls[wallId].wainscoting;
+          delete wall.wainscoting[side];
         }
+        if (!wall.wainscoting.A && !wall.wainscoting.B) delete wall.wainscoting;
       })
     ),
 
-  toggleCrownMolding: (wallId, enabled, heightFt = 0.33, color = "#ffffff") =>
+  toggleCrownMolding: (wallId, side, enabled, heightFt = 0.33, color = "#ffffff") =>
     set(
       produce((s: CADState) => {
         const doc = activeDoc(s);
         if (!doc || !doc.walls[wallId]) return;
         pushHistory(s);
+        const wall = doc.walls[wallId];
+        if (!wall.crownMolding) wall.crownMolding = {};
         if (enabled) {
-          doc.walls[wallId].crownMolding = { enabled: true, heightFt, color };
+          wall.crownMolding[side] = { enabled: true, heightFt, color };
         } else {
-          delete doc.walls[wallId].crownMolding;
+          delete wall.crownMolding[side];
         }
+        if (!wall.crownMolding.A && !wall.crownMolding.B) delete wall.crownMolding;
       })
     ),
 
