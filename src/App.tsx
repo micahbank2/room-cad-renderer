@@ -12,6 +12,8 @@ import PropertiesPanel from "@/components/PropertiesPanel";
 import ProductLibrary from "@/components/ProductLibrary";
 import AddProductModal from "@/components/AddProductModal";
 import WelcomeScreen from "@/components/WelcomeScreen";
+import RoomTabs from "@/components/RoomTabs";
+import AddRoomDialog from "@/components/AddRoomDialog";
 import FabricCanvas from "@/canvas/FabricCanvas";
 
 const ThreeViewport = lazy(() => import("@/three/ThreeViewport"));
@@ -21,6 +23,7 @@ type ViewMode = "2d" | "3d" | "split" | "library";
 export default function App() {
   const [viewMode, setViewMode] = useState<ViewMode>("2d");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showAddRoomDialog, setShowAddRoomDialog] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const setTool = useUIStore((s) => s.setTool);
   const activeWalls = useActiveWalls();
@@ -59,6 +62,15 @@ export default function App() {
       // D-03: 'e' toggles camera mode in 3D/split views
       if (e.key.toLowerCase() === "e" && (viewMode === "3d" || viewMode === "split")) {
         useUIStore.getState().toggleCameraMode();
+      }
+      // D-10: Ctrl/Cmd+Tab cycles active room forward
+      if (e.key === "Tab" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        const st = useCADStore.getState();
+        const ids = Object.keys(st.rooms);
+        if (ids.length < 2 || !st.activeRoomId) return;
+        const i = ids.indexOf(st.activeRoomId);
+        st.switchRoom(ids[(i + 1) % ids.length]);
       }
     };
     document.addEventListener("keydown", onKeyDown);
@@ -128,7 +140,9 @@ export default function App() {
 
         {/* Canvas views */}
         {isCanvas && (
-          <div className="flex flex-1 overflow-hidden">
+          <div className="flex flex-1 flex-col overflow-hidden">
+            {isCanvas && <RoomTabs onAddClick={() => setShowAddRoomDialog(true)} />}
+            <div className="flex flex-1 overflow-hidden">
             {(viewMode === "2d" || viewMode === "split") && (
               <div className={`${viewMode === "split" ? "w-1/2" : "flex-1"} h-full relative`}>
                 <FabricCanvas productLibrary={productLibrary} />
@@ -157,9 +171,12 @@ export default function App() {
                 )}
               </div>
             )}
+            </div>
           </div>
         )}
       </div>
+
+      <AddRoomDialog open={showAddRoomDialog} onClose={() => setShowAddRoomDialog(false)} />
 
       <StatusBar />
 
