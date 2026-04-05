@@ -37,21 +37,25 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - ✓ Project save/load (IndexedDB) — existing
 - ✓ Obsidian CAD design system applied — existing
 - ✓ Welcome screen with blank room creation — existing
+- ✓ Product images render in 2D canvas (async FabricImage cache) — Validated in Phase 01: 2d-canvas-polish (EDIT-09)
+- ✓ Drag-and-drop from product library to canvas — Validated in Phase 01: 2d-canvas-polish (EDIT-07)
+- ✓ Product rotation in 2D via handles — Validated in Phase 01: 2d-canvas-polish (EDIT-08)
+- ✓ Editable dimension labels — Validated in Phase 01: 2d-canvas-polish (EDIT-06)
+- ✓ Auto-save with debounce + status indicator — Validated in Phase 01: 2d-canvas-polish (SAVE-02)
 
 ### Active
 
-- [ ] Product images render in 2D canvas (currently border-only, no async image loading)
 - [ ] Global product library persists across all projects (currently per-project IndexedDB)
 - [ ] Multi-room / whole-house floor plan support (connected rooms)
 - [ ] Product dimensions are optional (image-only upload, approximate placement)
 - [ ] 3D product rendering with uploaded textures (aesthetic vibe, not just placeholder boxes)
 - [ ] Eye-level camera walkthrough in 3D (feel the room from inside)
-- [ ] Drag-and-drop from product library to canvas (not click-to-place)
 - [ ] Room templates (living room, bedroom, kitchen presets)
-- [ ] Editable dimension labels (double-click wall to change length)
-- [ ] Auto-save with debounce
 - [ ] Smooth 3D experience (proper materials, shadows, ambient occlusion)
-- [ ] Product rotation in 2D via handles (not just placement)
+
+## Current State
+
+Phase 01 (2D Canvas Polish) complete — canvas is now fully interactive with async image rendering, drag-drop placement, rotation handles, editable dimensions, and debounced auto-save.
 
 ### Out of Scope
 
