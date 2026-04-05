@@ -7,19 +7,22 @@ import type {
   CADSnapshot,
   Point,
   Opening,
+  RoomDoc,
 } from "@/types/cad";
 import { uid, resizeWall } from "@/lib/geometry";
+import { ROOM_TEMPLATES, type RoomTemplateId } from "@/data/roomTemplates";
+import { migrateSnapshot } from "@/lib/snapshotMigration";
 
 const MAX_HISTORY = 50;
 
 interface CADState {
-  room: Room;
-  walls: Record<string, WallSegment>;
-  placedProducts: Record<string, PlacedProduct>;
+  rooms: Record<string, RoomDoc>;
+  activeRoomId: string | null;
 
   past: CADSnapshot[];
   future: CADSnapshot[];
 
+  // existing actions (signatures unchanged — mutate ACTIVE room only)
   setRoom: (changes: Partial<Room>) => void;
   addWall: (start: Point, end: Point) => void;
   updateWall: (id: string, changes: Partial<WallSegment>) => void;
@@ -34,14 +37,20 @@ interface CADState {
   removeSelected: (ids: string[]) => void;
   undo: () => void;
   redo: () => void;
-  loadSnapshot: (snap: CADSnapshot) => void;
+  loadSnapshot: (raw: unknown) => void;
+
+  // NEW: room-management actions
+  addRoom: (name: string, templateId?: RoomTemplateId) => string;
+  renameRoom: (id: string, name: string) => void;
+  removeRoom: (id: string) => void;
+  switchRoom: (id: string) => void;
 }
 
 function snapshot(state: CADState): CADSnapshot {
   return {
-    room: { ...state.room },
-    walls: JSON.parse(JSON.stringify(state.walls)),
-    placedProducts: JSON.parse(JSON.stringify(state.placedProducts)),
+    version: 2,
+    rooms: JSON.parse(JSON.stringify(state.rooms)),
+    activeRoomId: state.activeRoomId,
   };
 }
 
@@ -51,32 +60,53 @@ function pushHistory(state: CADState): void {
   state.future = [];
 }
 
+function activeDoc(s: CADState): RoomDoc | undefined {
+  return s.activeRoomId ? s.rooms[s.activeRoomId] : undefined;
+}
+
+function initialState(): Pick<CADState, "rooms" | "activeRoomId" | "past" | "future"> {
+  return {
+    rooms: {
+      room_main: {
+        id: "room_main",
+        name: "Main Room",
+        room: { width: 20, length: 16, wallHeight: 8 },
+        walls: {},
+        placedProducts: {},
+      },
+    },
+    activeRoomId: "room_main",
+    past: [],
+    future: [],
+  };
+}
+
 export const useCADStore = create<CADState>()((set) => ({
-  room: { width: 20, length: 16, wallHeight: 8 },
-  walls: {},
-  placedProducts: {},
-  past: [],
-  future: [],
+  ...initialState(),
 
   setRoom: (changes) =>
     set(
       produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
         pushHistory(s);
-        Object.assign(s.room, changes);
+        Object.assign(doc.room, changes);
       })
     ),
 
   addWall: (start, end) =>
     set(
       produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
         pushHistory(s);
         const id = `wall_${uid()}`;
-        s.walls[id] = {
+        doc.walls[id] = {
           id,
           start,
           end,
           thickness: 0.5,
-          height: s.room.wallHeight,
+          height: doc.room.wallHeight,
           openings: [],
         };
       })
@@ -85,16 +115,20 @@ export const useCADStore = create<CADState>()((set) => ({
   updateWall: (id, changes) =>
     set(
       produce((s: CADState) => {
-        if (!s.walls[id]) return;
+        const doc = activeDoc(s);
+        if (!doc) return;
+        if (!doc.walls[id]) return;
         pushHistory(s);
-        Object.assign(s.walls[id], changes);
+        Object.assign(doc.walls[id], changes);
       })
     ),
 
   resizeWallByLabel: (id, newLengthFt) =>
     set(
       produce((s: CADState) => {
-        const wall = s.walls[id];
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const wall = doc.walls[id];
         if (!wall) return;
         if (!(newLengthFt > 0)) return;
         pushHistory(s);
@@ -103,7 +137,7 @@ export const useCADStore = create<CADState>()((set) => ({
         wall.end = newEnd;
         // Propagate to any wall whose start OR end matches oldEnd within epsilon
         const EPS = 0.01;
-        for (const other of Object.values(s.walls)) {
+        for (const other of Object.values(doc.walls)) {
           if (other.id === id) continue;
           if (Math.abs(other.start.x - oldEnd.x) < EPS && Math.abs(other.start.y - oldEnd.y) < EPS) {
             other.start = { x: newEnd.x, y: newEnd.y };
@@ -118,18 +152,22 @@ export const useCADStore = create<CADState>()((set) => ({
   removeWall: (id) =>
     set(
       produce((s: CADState) => {
-        if (!s.walls[id]) return;
+        const doc = activeDoc(s);
+        if (!doc) return;
+        if (!doc.walls[id]) return;
         pushHistory(s);
-        delete s.walls[id];
+        delete doc.walls[id];
       })
     ),
 
   addOpening: (wallId, opening) =>
     set(
       produce((s: CADState) => {
-        if (!s.walls[wallId]) return;
+        const doc = activeDoc(s);
+        if (!doc) return;
+        if (!doc.walls[wallId]) return;
         pushHistory(s);
-        s.walls[wallId].openings.push({ ...opening, id: `op_${uid()}` });
+        doc.walls[wallId].openings.push({ ...opening, id: `op_${uid()}` });
       })
     ),
 
@@ -137,8 +175,10 @@ export const useCADStore = create<CADState>()((set) => ({
     const id = `pp_${uid()}`;
     set(
       produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
         pushHistory(s);
-        s.placedProducts[id] = { id, productId, position, rotation: 0 };
+        doc.placedProducts[id] = { id, productId, position, rotation: 0 };
       })
     );
     return id;
@@ -147,45 +187,55 @@ export const useCADStore = create<CADState>()((set) => ({
   moveProduct: (id, position) =>
     set(
       produce((s: CADState) => {
-        if (!s.placedProducts[id]) return;
+        const doc = activeDoc(s);
+        if (!doc) return;
+        if (!doc.placedProducts[id]) return;
         pushHistory(s);
-        s.placedProducts[id].position = position;
+        doc.placedProducts[id].position = position;
       })
     ),
 
   rotateProduct: (id, angle) =>
     set(
       produce((s: CADState) => {
-        if (!s.placedProducts[id]) return;
+        const doc = activeDoc(s);
+        if (!doc) return;
+        if (!doc.placedProducts[id]) return;
         pushHistory(s);
-        s.placedProducts[id].rotation = angle;
+        doc.placedProducts[id].rotation = angle;
       })
     ),
 
   rotateProductNoHistory: (id, angle) =>
     set(
       produce((s: CADState) => {
-        if (!s.placedProducts[id]) return;
-        s.placedProducts[id].rotation = angle;
+        const doc = activeDoc(s);
+        if (!doc) return;
+        if (!doc.placedProducts[id]) return;
+        doc.placedProducts[id].rotation = angle;
       })
     ),
 
   removeProduct: (id) =>
     set(
       produce((s: CADState) => {
-        if (!s.placedProducts[id]) return;
+        const doc = activeDoc(s);
+        if (!doc) return;
+        if (!doc.placedProducts[id]) return;
         pushHistory(s);
-        delete s.placedProducts[id];
+        delete doc.placedProducts[id];
       })
     ),
 
   removeSelected: (ids) =>
     set(
       produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
         pushHistory(s);
         for (const id of ids) {
-          delete s.walls[id];
-          delete s.placedProducts[id];
+          delete doc.walls[id];
+          delete doc.placedProducts[id];
         }
       })
     ),
@@ -196,9 +246,8 @@ export const useCADStore = create<CADState>()((set) => ({
         if (s.past.length === 0) return;
         s.future.push(snapshot(s));
         const prev = s.past.pop()!;
-        s.room = prev.room;
-        s.walls = prev.walls;
-        s.placedProducts = prev.placedProducts;
+        s.rooms = prev.rooms;
+        s.activeRoomId = prev.activeRoomId;
       })
     ),
 
@@ -208,20 +257,92 @@ export const useCADStore = create<CADState>()((set) => ({
         if (s.future.length === 0) return;
         s.past.push(snapshot(s));
         const next = s.future.pop()!;
-        s.room = next.room;
-        s.walls = next.walls;
-        s.placedProducts = next.placedProducts;
+        s.rooms = next.rooms;
+        s.activeRoomId = next.activeRoomId;
       })
     ),
 
-  loadSnapshot: (snap) =>
+  loadSnapshot: (raw) =>
     set(
       produce((s: CADState) => {
-        s.room = snap.room;
-        s.walls = snap.walls;
-        s.placedProducts = snap.placedProducts;
+        const snap = migrateSnapshot(raw);
+        s.rooms = snap.rooms;
+        s.activeRoomId = snap.activeRoomId;
         s.past = [];
         s.future = [];
       })
     ),
+
+  // NEW: room-management actions
+
+  addRoom: (name, templateId) => {
+    const newId = `room_${uid()}`;
+    set(
+      produce((s: CADState) => {
+        pushHistory(s);
+        const template = ROOM_TEMPLATES[templateId ?? "BLANK"];
+        s.rooms[newId] = {
+          id: newId,
+          name,
+          room: { ...template.room },
+          walls: template.makeWalls(),
+          placedProducts: {},
+        };
+        s.activeRoomId = newId;
+      })
+    );
+    return newId;
+  },
+
+  renameRoom: (id, name) =>
+    set(
+      produce((s: CADState) => {
+        if (!s.rooms[id]) return;
+        pushHistory(s);
+        s.rooms[id].name = name;
+      })
+    ),
+
+  removeRoom: (id) =>
+    set(
+      produce((s: CADState) => {
+        if (!s.rooms[id]) return;
+        if (Object.keys(s.rooms).length <= 1) return; // last-room guard
+        pushHistory(s);
+        delete s.rooms[id];
+        if (s.activeRoomId === id) {
+          s.activeRoomId = Object.keys(s.rooms)[0] ?? null;
+        }
+      })
+    ),
+
+  switchRoom: (id) =>
+    set((s) => {
+      if (!s.rooms[id]) return s;
+      return { ...s, activeRoomId: id };
+    }),
 }));
+
+// Selector hooks
+export const useActiveRoomDoc = () =>
+  useCADStore((s) => (s.activeRoomId ? s.rooms[s.activeRoomId] : undefined));
+
+export const useActiveRoom = () =>
+  useCADStore((s) => (s.activeRoomId ? s.rooms[s.activeRoomId]?.room : undefined));
+
+export const useActiveWalls = () =>
+  useCADStore((s) => (s.activeRoomId ? s.rooms[s.activeRoomId]?.walls ?? {} : {}));
+
+export const useActivePlacedProducts = () =>
+  useCADStore((s) => (s.activeRoomId ? s.rooms[s.activeRoomId]?.placedProducts ?? {} : {}));
+
+// Non-hook for imperative paths (tools)
+export function getActiveRoomDoc(): RoomDoc | undefined {
+  const s = useCADStore.getState();
+  return s.activeRoomId ? s.rooms[s.activeRoomId] : undefined;
+}
+
+// Test helper
+export function resetCADStoreForTests(): void {
+  useCADStore.setState(initialState() as Partial<CADState>);
+}
