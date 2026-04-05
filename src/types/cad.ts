@@ -7,8 +7,11 @@ export type WallSide = "A" | "B";
 
 export interface WainscotConfig {
   enabled: boolean;
-  heightFt: number; // default 3 (36")
-  color: string; // hex
+  /** Reference to a WainscotStyleItem in the global library (Phase 16).
+   *  If missing, renders using heightFt + color as legacy recessed-panel. */
+  styleItemId?: string;
+  heightFt: number; // default 3 (36") — legacy fallback
+  color: string; // legacy fallback
 }
 
 export interface CrownConfig {
