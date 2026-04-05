@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 01-00-PLAN.md
-last_updated: "2026-04-05T01:45:46.084Z"
+last_updated: "2026-04-05T01:45:53.676Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 5
@@ -66,6 +66,7 @@ Recent decisions affecting current work:
 - Init: Fabric.js for 2D, Three.js for 3D — both read from Zustand, neither mutates the other
 - Init: Local-first, no backend — IndexedDB only
 - [Phase 01-2d-canvas-polish]: EDIT-09: module-level HTMLImage cache with onReady callback (async load, no double-fetch)
+- [Phase 01-2d-canvas-polish]: Used bun instead of npm (node unavailable); kept existing vitest@^4 and jsdom@^29 versions
 
 ### Pending Todos
 
