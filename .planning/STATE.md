@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-03-PLAN.md
-last_updated: "2026-04-05T12:11:03.476Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-04-05T12:11:48.408Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 5
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-04)
 ## Current Position
 
 Phase: 03 (3d-product-rendering) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-04-05
 
@@ -66,6 +66,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03-3d-product-rendering P00 | 1m | 1 tasks | 3 files |
 | Phase 03-3d-product-rendering P01 | 6m | 2 tasks | 3 files |
 | Phase 03-3d-product-rendering P03 | 1m | 2 tasks | 4 files |
+| Phase 03-3d-product-rendering P02 | 2m | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,8 @@ Recent decisions affecting current work:
 - [Phase 03-3d-product-rendering]: 03-01: Promise-valued texture cache (not Texture-valued) naturally dedups concurrent in-flight loads
 - [Phase 03-3d-product-rendering]: 03-01: D-03 gate isPlaceholder short-circuits texture loading — placeholders never textured even if imageUrl exists
 - [Phase 03-3d-product-rendering]: 03-03: export.ts selector .bg-gray-900 -> .bg-obsidian-deepest; datestamp filename via formatExportFilename(); 3D-only (no 2D fallback)
+- [Phase 03-3d-product-rendering]: 03-02: Module-memoized CanvasTexture with repeat.set() per call keeps floor tile scale in sync with live room dims
+- [Phase 03-3d-product-rendering]: 03-02: Stubbed HTMLCanvasElement.getContext('2d') in tests/setup.ts to let Canvas2D modules run under jsdom without native canvas dep
 
 ### Pending Todos
 
@@ -113,6 +116,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T12:11:03.474Z
-Stopped at: Completed 03-03-PLAN.md
+Last session: 2026-04-05T12:11:40.964Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
