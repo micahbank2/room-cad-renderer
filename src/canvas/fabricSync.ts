@@ -1,6 +1,7 @@
 import * as fabric from "fabric";
 import type { WallSegment, PlacedProduct } from "@/types/cad";
 import type { Product } from "@/types/product";
+import { effectiveDimensions, hasDimensions } from "@/types/product";
 import { wallCorners, angle as wallAngle } from "@/lib/geometry";
 import { drawWallDimension } from "./dimensions";
 import { getCachedImage } from "./productImageCache";
@@ -10,6 +11,8 @@ const WALL_FILL = "#343440";
 const WALL_STROKE = "#484554";
 const WALL_SELECTED_STROKE = "#7c5bf0";
 const PRODUCT_STROKE = "#7c5bf0";
+const PLACEHOLDER_DASH = [6, 4];
+const REAL_DASH = [4, 3];
 
 /**
  * Render wall segments on the Fabric canvas.
@@ -106,32 +109,43 @@ export function renderProducts(
 ) {
   for (const pp of Object.values(placedProducts)) {
     const product = productLibrary.find((p) => p.id === pp.productId);
-    if (!product) continue;
+    const { width, depth, isPlaceholder } = effectiveDimensions(product);
+    const orphan = !product;
+    const showPlaceholder = orphan || isPlaceholder;
 
-    const pw = product.width * scale;
-    const pd = product.depth * scale;
+    const pw = width * scale;
+    const pd = depth * scale;
     const isSelected = selectedIds.includes(pp.id);
 
     const cx = origin.x + pp.position.x * scale;
     const cy = origin.y + pp.position.y * scale;
 
-    // Border rect
+    // Border rect — placeholders always dashed + accent-colored
     const border = new fabric.Rect({
       width: pw,
       height: pd,
-      fill: "rgba(124,91,240,0.06)",
-      stroke: isSelected ? PRODUCT_STROKE : "#94a3b8",
+      fill: showPlaceholder ? "rgba(124,91,240,0.04)" : "rgba(124,91,240,0.06)",
+      stroke: showPlaceholder
+        ? PRODUCT_STROKE
+        : isSelected
+        ? PRODUCT_STROKE
+        : "#94a3b8",
       strokeWidth: isSelected ? 2 : 1,
-      strokeDashArray: isSelected ? undefined : [4, 3],
+      strokeDashArray: showPlaceholder
+        ? PLACEHOLDER_DASH
+        : isSelected
+        ? undefined
+        : REAL_DASH,
       originX: "center",
       originY: "center",
     });
 
     // Name label
-    const nameLabel = new fabric.FabricText(product.name, {
+    const labelText = orphan ? "MISSING_PRODUCT" : product!.name;
+    const nameLabel = new fabric.FabricText(labelText, {
       fontSize: 10,
       fontFamily: "Inter, system-ui, sans-serif",
-      fill: "#e3e0f1",
+      fill: orphan ? PRODUCT_STROKE : "#e3e0f1",
       fontWeight: "600",
       originX: "center",
       originY: "bottom",
@@ -139,23 +153,23 @@ export function renderProducts(
     });
 
     // Dimension label
-    const dimLabel = new fabric.FabricText(
-      `${product.width}' x ${product.depth}'`,
-      {
-        fontSize: 9,
-        fontFamily: "Inter, system-ui, sans-serif",
-        fill: PRODUCT_STROKE,
-        originX: "center",
-        originY: "top",
-        top: pd / 2 + 3,
-      }
-    );
+    const dimText = showPlaceholder
+      ? "SIZE: UNSET"
+      : `${product!.width}' x ${product!.depth}'`;
+    const dimLabel = new fabric.FabricText(dimText, {
+      fontSize: 9,
+      fontFamily: "Inter, system-ui, sans-serif",
+      fill: PRODUCT_STROKE,
+      originX: "center",
+      originY: "top",
+      top: pd / 2 + 3,
+    });
 
     const children: fabric.FabricObject[] = [border, nameLabel, dimLabel];
 
-    // Async image loading via cache (EDIT-09 fix)
-    if (product.imageUrl) {
-      const cachedImg = getCachedImage(product.id, product.imageUrl, () => fc.renderAll());
+    // Async image loading via cache — only for real products with images
+    if (!showPlaceholder && product!.imageUrl) {
+      const cachedImg = getCachedImage(product!.id, product!.imageUrl, () => fc.renderAll());
       if (cachedImg) {
         const fImg = new fabric.FabricImage(cachedImg, {
           scaleX: pw / cachedImg.naturalWidth,
@@ -180,9 +194,9 @@ export function renderProducts(
 
     fc.add(group);
 
-    // Rotation handle (EDIT-08): render when this product is single-selected
-    if (isSelected && selectedIds.length === 1) {
-      const handlePos = getHandleWorldPos(pp, product.depth);
+    // Rotation handle — only for real-dimension products
+    if (isSelected && selectedIds.length === 1 && !showPlaceholder && product && hasDimensions(product)) {
+      const handlePos = getHandleWorldPos(pp, product.depth as number);
       const hx = origin.x + handlePos.x * scale;
       const hy = origin.y + handlePos.y * scale;
       const line = new fabric.Line([cx, cy, hx, hy], {
