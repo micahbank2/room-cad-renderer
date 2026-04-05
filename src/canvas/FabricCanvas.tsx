@@ -1,6 +1,12 @@
 import { useRef, useEffect, useCallback, useState } from "react";
 import * as fabric from "fabric";
-import { useCADStore } from "@/stores/cadStore";
+import {
+  useCADStore,
+  useActiveRoom,
+  useActiveWalls,
+  useActivePlacedProducts,
+  getActiveRoomDoc,
+} from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { drawGrid } from "./grid";
 import { drawRoomDimensions } from "./dimensions";
@@ -37,9 +43,9 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const [editingWallId, setEditingWallId] = useState<string | null>(null);
   const [pendingValue, setPendingValue] = useState<string>("");
 
-  const room = useCADStore((s) => s.room);
-  const walls = useCADStore((s) => s.walls);
-  const placedProducts = useCADStore((s) => s.placedProducts);
+  const room = useActiveRoom() ?? { width: 20, length: 16, wallHeight: 8 };
+  const walls = useActiveWalls();
+  const placedProducts = useActivePlacedProducts();
   const activeTool = useUIStore((s) => s.activeTool);
   const selectedIds = useUIStore((s) => s.selectedIds);
   const showGrid = useUIStore((s) => s.showGrid);
@@ -99,7 +105,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
     const detachDragDrop = attachDragDropHandlers(wrapperRef.current!, () => {
       const wrapper = wrapperRef.current!;
       const rect = wrapper.getBoundingClientRect();
-      const r = useCADStore.getState().room;
+      const r = getActiveRoomDoc()?.room ?? { width: 20, length: 16, wallHeight: 8 };
       const scale = getScale(r.width, r.length, rect.width, rect.height);
       const origin = getOrigin(r.width, r.length, scale, rect.width, rect.height);
       return { scale, origin };
@@ -132,10 +138,10 @@ export default function FabricCanvas({ productLibrary }: Props) {
     const onDblClick = (opt: { e: Event }) => {
       const pointer = fc.getViewportPoint(opt.e as any);
       const rect = wrapper.getBoundingClientRect();
-      const r = useCADStore.getState().room;
+      const r = getActiveRoomDoc()?.room ?? { width: 20, length: 16, wallHeight: 8 };
       const scale = getScale(r.width, r.length, rect.width, rect.height);
       const origin = getOrigin(r.width, r.length, scale, rect.width, rect.height);
-      const storeWalls = useCADStore.getState().walls;
+      const storeWalls = getActiveRoomDoc()?.walls ?? {};
       for (const wall of Object.values(storeWalls)) {
         if (hitTestDimLabel(pointer, wall, scale, origin)) {
           const currentLen = Math.sqrt(
@@ -180,7 +186,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
 
   let overlayStyle: React.CSSProperties | null = null;
   if (editingWallId) {
-    const wall = useCADStore.getState().walls[editingWallId];
+    const wall = getActiveRoomDoc()?.walls[editingWallId];
     const wrapper = wrapperRef.current;
     if (wall && wrapper) {
       const rect = wrapper.getBoundingClientRect();

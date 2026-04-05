@@ -9,6 +9,7 @@ import {
   type SavedProject,
 } from "@/lib/serialization";
 import { uid } from "@/lib/geometry";
+import { defaultSnapshot } from "@/lib/snapshotMigration";
 
 export default function ProjectManager() {
   const [projects, setProjects] = useState<SavedProject[]>([]);
@@ -19,9 +20,6 @@ export default function ProjectManager() {
   const clearActive = useProjectStore((s) => s.clearActive);
   const setActiveName = useProjectStore((s) => s.setActiveName);
 
-  const room = useCADStore((s) => s.room);
-  const walls = useCADStore((s) => s.walls);
-  const placedProducts = useCADStore((s) => s.placedProducts);
   const loadSnapshot = useCADStore((s) => s.loadSnapshot);
 
   useEffect(() => {
@@ -31,7 +29,8 @@ export default function ProjectManager() {
   async function handleSave() {
     setSaving(true);
     const id = currentId ?? `proj_${uid()}`;
-    await saveProject(id, projectName, { room, walls, placedProducts });
+    const { rooms, activeRoomId } = useCADStore.getState();
+    await saveProject(id, projectName, { version: 2, rooms, activeRoomId });
     setActive(id, projectName);
     const updated = await listProjects();
     setProjects(updated);
@@ -55,11 +54,7 @@ export default function ProjectManager() {
 
   function handleNew() {
     clearActive();
-    loadSnapshot({
-      room: { width: 20, length: 16, wallHeight: 8 },
-      walls: {},
-      placedProducts: {},
-    });
+    loadSnapshot(defaultSnapshot());
   }
 
   return (

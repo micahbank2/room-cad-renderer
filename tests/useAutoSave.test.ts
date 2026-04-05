@@ -6,20 +6,14 @@ vi.mock("@/lib/serialization", () => ({
 }));
 
 import { useAutoSave, DEBOUNCE_MS } from "@/hooks/useAutoSave";
-import { useCADStore } from "@/stores/cadStore";
+import { useCADStore, resetCADStoreForTests } from "@/stores/cadStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { saveProject } from "@/lib/serialization";
 
 beforeEach(() => {
   vi.useFakeTimers();
   vi.mocked(saveProject).mockClear();
-  useCADStore.setState({
-    room: { width: 20, length: 16, wallHeight: 8 },
-    walls: {},
-    placedProducts: {},
-    past: [],
-    future: [],
-  });
+  resetCADStoreForTests();
   useProjectStore.setState({ activeId: null, activeName: "Untitled Room", saveStatus: "idle" });
 });
 afterEach(() => { vi.useRealTimers(); });

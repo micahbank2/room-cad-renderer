@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import type { ToolType } from "@/types/cad";
 import { useUIStore } from "@/stores/uiStore";
-import { useCADStore } from "@/stores/cadStore";
+import { useCADStore, useActiveWalls } from "@/stores/cadStore";
 import { useProductStore } from "@/stores/productStore";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import Toolbar from "@/components/Toolbar";
@@ -23,7 +23,8 @@ export default function App() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const setTool = useUIStore((s) => s.setTool);
-  const wallCount = useCADStore((s) => Object.keys(s.walls).length);
+  const activeWalls = useActiveWalls();
+  const wallCount = Object.keys(activeWalls).length;
 
   useAutoSave();
 

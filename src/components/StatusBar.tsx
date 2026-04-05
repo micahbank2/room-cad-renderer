@@ -1,4 +1,4 @@
-import { useCADStore } from "@/stores/cadStore";
+import { useActiveWalls } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import SaveIndicator from "./SaveIndicator";
 
@@ -12,8 +12,8 @@ const STATUS_MESSAGES: Record<string, string> = {
 
 export default function StatusBar() {
   const activeTool = useUIStore((s) => s.activeTool);
-  const room = useCADStore((s) => s.room);
-  const wallCount = useCADStore((s) => Object.keys(s.walls).length);
+  const walls = useActiveWalls();
+  const wallCount = Object.keys(walls).length;
   const gridSnap = useUIStore((s) => s.gridSnap);
   const cameraMode = useUIStore((s) => s.cameraMode);
 

@@ -1,23 +1,18 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { useCADStore } from "@/stores/cadStore";
+import { useCADStore, resetCADStoreForTests } from "@/stores/cadStore";
 
-function reset() {
-  useCADStore.setState({
-    room: { width: 20, length: 16, wallHeight: 8 },
-    walls: {},
-    placedProducts: {},
-    past: [],
-    future: [],
-  });
+function activeDoc() {
+  const s = useCADStore.getState();
+  return s.rooms[s.activeRoomId!];
 }
 
 describe("cadStore actions", () => {
-  beforeEach(reset);
+  beforeEach(() => { resetCADStoreForTests(); });
 
   it("placeProduct returns new id and adds to placedProducts", () => {
     const id = useCADStore.getState().placeProduct("prod_1", { x: 5, y: 6 });
     expect(id).toMatch(/^pp_/);
-    const pp = useCADStore.getState().placedProducts[id];
+    const pp = activeDoc().placedProducts[id];
     expect(pp).toBeDefined();
     expect(pp.productId).toBe("prod_1");
     expect(pp.position).toEqual({ x: 5, y: 6 });
@@ -30,7 +25,7 @@ describe("cadStore actions", () => {
     const id = useCADStore.getState().placeProduct("prod_1", { x: 0, y: 0 });
     const before = useCADStore.getState().past.length;
     useCADStore.getState().rotateProduct(id, 45);
-    expect(useCADStore.getState().placedProducts[id].rotation).toBe(45);
+    expect(activeDoc().placedProducts[id].rotation).toBe(45);
     expect(useCADStore.getState().past.length).toBe(before + 1);
   });
 
@@ -38,20 +33,20 @@ describe("cadStore actions", () => {
     const id = useCADStore.getState().placeProduct("prod_1", { x: 0, y: 0 });
     const before = useCADStore.getState().past.length;
     useCADStore.getState().rotateProductNoHistory(id, 30);
-    expect(useCADStore.getState().placedProducts[id].rotation).toBe(30);
+    expect(activeDoc().placedProducts[id].rotation).toBe(30);
     expect(useCADStore.getState().past.length).toBe(before);
   });
   it("updateWall: wall resize corner propagates to shared-endpoint walls", () => {
     useCADStore.getState().addWall({ x: 0, y: 0 }, { x: 10, y: 0 });
     useCADStore.getState().addWall({ x: 10, y: 0 }, { x: 10, y: 10 });
-    const walls = useCADStore.getState().walls;
+    const walls = activeDoc().walls;
     const wallAId = Object.values(walls).find((w) => w.start.x === 0)!.id;
     const wallBId = Object.values(walls).find((w) => w.start.x === 10 && w.start.y === 0)!.id;
 
     useCADStore.getState().resizeWallByLabel(wallAId, 5);
 
-    const wallA = useCADStore.getState().walls[wallAId];
-    const wallB = useCADStore.getState().walls[wallBId];
+    const wallA = activeDoc().walls[wallAId];
+    const wallB = activeDoc().walls[wallBId];
     expect(wallA.end.x).toBeCloseTo(5);
     expect(wallA.end.y).toBeCloseTo(0);
     expect(wallB.start.x).toBeCloseTo(5);

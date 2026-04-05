@@ -15,9 +15,8 @@ export function useAutoSave(): void {
     const unsub = useCADStore.subscribe((state, prevState) => {
       // Only trigger on data changes, not past/future mutations
       if (
-        state.room === prevState.room &&
-        state.walls === prevState.walls &&
-        state.placedProducts === prevState.placedProducts
+        state.rooms === prevState.rooms &&
+        state.activeRoomId === prevState.activeRoomId
       ) {
         return;
       }
@@ -33,8 +32,8 @@ export function useAutoSave(): void {
           useProjectStore.getState().setActive(id, name);
         }
         useProjectStore.getState().setSaveStatus("saving");
-        const { room, walls, placedProducts } = useCADStore.getState();
-        await saveProject(id, name, { room, walls, placedProducts });
+        const { rooms, activeRoomId } = useCADStore.getState();
+        await saveProject(id, name, { version: 2, rooms, activeRoomId });
         useProjectStore.getState().setSaveStatus("saved");
         if (fadeTimer) clearTimeout(fadeTimer);
         fadeTimer = setTimeout(() => {

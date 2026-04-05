@@ -1,4 +1,4 @@
-import { useCADStore } from "@/stores/cadStore";
+import { useCADStore, useActiveWalls, useActivePlacedProducts } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useProductStore } from "@/stores/productStore";
 import { formatFeet, wallLength } from "@/lib/geometry";
@@ -11,8 +11,8 @@ interface Props {
 
 export default function PropertiesPanel({ productLibrary }: Props) {
   const selectedIds = useUIStore((s) => s.selectedIds);
-  const walls = useCADStore((s) => s.walls);
-  const placedProducts = useCADStore((s) => s.placedProducts);
+  const walls = useActiveWalls();
+  const placedProducts = useActivePlacedProducts();
   const removeSelected = useCADStore((s) => s.removeSelected);
   const clearSelection = useUIStore((s) => s.clearSelection);
   const updateProduct = useProductStore((s) => s.updateProduct);

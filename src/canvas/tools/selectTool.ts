@@ -1,5 +1,5 @@
 import * as fabric from "fabric";
-import { useCADStore } from "@/stores/cadStore";
+import { useCADStore, getActiveRoomDoc } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { snapPoint, distance, closestPointOnWall } from "@/lib/geometry";
 import type { Point, WallSegment, PlacedProduct } from "@/types/cad";
@@ -42,10 +42,11 @@ function hitTestStore(
   feetPos: Point,
   productLibrary: Product[]
 ): { id: string; type: "wall" | "product" } | null {
-  const cadState = useCADStore.getState();
+  const doc = getActiveRoomDoc();
+  if (!doc) return null;
 
   // Check products first (they're on top) — orphan + null-dim use 2x2 AABB
-  for (const pp of Object.values(cadState.placedProducts)) {
+  for (const pp of Object.values(doc.placedProducts)) {
     const product = productLibrary.find((p) => p.id === pp.productId);
     const { width, depth } = effectiveDimensions(product);
     const halfW = width / 2;
@@ -66,7 +67,7 @@ function hitTestStore(
   let closestWallId: string | null = null;
   let closestDist = Infinity;
 
-  for (const wall of Object.values(cadState.walls)) {
+  for (const wall of Object.values(doc.walls)) {
     const { point } = closestPointOnWall(wall, feetPos);
     const d = distance(point, feetPos);
     if (d < HIT_THRESHOLD && d < closestDist) {
@@ -104,7 +105,7 @@ export function activateSelectTool(
     const currentSelection = useUIStore.getState().selectedIds;
     if (currentSelection.length === 1) {
       const selId = currentSelection[0];
-      const pp = useCADStore.getState().placedProducts[selId];
+      const pp = (getActiveRoomDoc()?.placedProducts ?? {})[selId];
       if (pp) {
         const prod = _productLibrary.find((p) => p.id === pp.productId);
         if (prod && prod.depth != null && hitTestHandle(feet, pp, prod.depth)) {
@@ -128,7 +129,7 @@ export function activateSelectTool(
       state.dragType = hit.type;
 
       if (hit.type === "product") {
-        const pp = useCADStore.getState().placedProducts[hit.id];
+        const pp = (getActiveRoomDoc()?.placedProducts ?? {})[hit.id];
         if (pp) {
           state.dragOffsetFeet = {
             x: feet.x - pp.position.x,
@@ -136,7 +137,7 @@ export function activateSelectTool(
           };
         }
       } else if (hit.type === "wall") {
-        const wall = useCADStore.getState().walls[hit.id];
+        const wall = (getActiveRoomDoc()?.walls ?? {})[hit.id];
         if (wall) {
           const cx = (wall.start.x + wall.end.x) / 2;
           const cy = (wall.start.y + wall.end.y) / 2;
@@ -156,7 +157,7 @@ export function activateSelectTool(
     const feet = pxToFeet(pointer, origin, scale);
 
     if (state.dragType === "rotate") {
-      const pp = useCADStore.getState().placedProducts[state.dragId];
+      const pp = (getActiveRoomDoc()?.placedProducts ?? {})[state.dragId];
       if (!pp) return;
       const raw = angleFromCenterToPointer(pp.position, feet);
       const shiftHeld = (opt.e as MouseEvent).shiftKey === true;
@@ -177,7 +178,7 @@ export function activateSelectTool(
     if (state.dragType === "product") {
       useCADStore.getState().moveProduct(state.dragId, snapped);
     } else if (state.dragType === "wall") {
-      const wall = useCADStore.getState().walls[state.dragId];
+      const wall = (getActiveRoomDoc()?.walls ?? {})[state.dragId];
       if (wall) {
         const cx = (wall.start.x + wall.end.x) / 2;
         const cy = (wall.start.y + wall.end.y) / 2;

@@ -1,5 +1,5 @@
 import type { Product } from "@/types/product";
-import { useCADStore } from "@/stores/cadStore";
+import { useActiveRoom, useActiveWalls, useActivePlacedProducts } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import RoomSettings from "./RoomSettings";
 import SidebarProductPicker from "./SidebarProductPicker";
@@ -9,9 +9,11 @@ interface Props {
 }
 
 export default function Sidebar({ productLibrary: _productLibrary }: Props) {
-  const room = useCADStore((s) => s.room);
-  const wallCount = useCADStore((s) => Object.keys(s.walls).length);
-  const productCount = useCADStore((s) => Object.keys(s.placedProducts).length);
+  const room = useActiveRoom() ?? { width: 20, length: 16, wallHeight: 8 };
+  const walls = useActiveWalls();
+  const placedProducts = useActivePlacedProducts();
+  const wallCount = Object.keys(walls).length;
+  const productCount = Object.keys(placedProducts).length;
   const showGrid = useUIStore((s) => s.showGrid);
   const toggleGrid = useUIStore((s) => s.toggleGrid);
   const gridSnap = useUIStore((s) => s.gridSnap);

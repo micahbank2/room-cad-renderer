@@ -1,7 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { clientToFeet, attachDragDropHandlers, DRAG_MIME } from "@/canvas/dragDrop";
-import { useCADStore } from "@/stores/cadStore";
+import { useCADStore, resetCADStoreForTests } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
+
+function activeDoc() {
+  const s = useCADStore.getState();
+  return s.rooms[s.activeRoomId!];
+}
 
 // Minimal DataTransfer polyfill for jsdom (does not implement it natively).
 class MockDataTransfer {
@@ -24,13 +29,7 @@ function makeDropEvent(
 }
 
 beforeEach(() => {
-  useCADStore.setState({
-    room: { width: 20, length: 16, wallHeight: 8 },
-    walls: {},
-    placedProducts: {},
-    past: [],
-    future: [],
-  });
+  resetCADStoreForTests();
   useUIStore.setState({ selectedIds: [], gridSnap: 0.5 });
 });
 
@@ -53,7 +52,7 @@ describe("drag-drop placement", () => {
     dt.setData(DRAG_MIME, "prod_xyz");
     wrapper.dispatchEvent(makeDropEvent("drop", { clientX: 32, clientY: 47, dt }));
 
-    const products = Object.values(useCADStore.getState().placedProducts);
+    const products = Object.values(activeDoc().placedProducts);
     expect(products).toHaveLength(1);
     // clientToFeet -> (32/10, 47/10) = (3.2, 4.7); snap 0.5 -> (3.0, 4.5)
     expect(products[0].position).toEqual({ x: 3.0, y: 4.5 });
@@ -75,7 +74,7 @@ describe("drag-drop placement", () => {
     const selected = useUIStore.getState().selectedIds;
     expect(selected).toHaveLength(1);
     expect(selected[0]).toMatch(/^pp_/);
-    const placedIds = Object.keys(useCADStore.getState().placedProducts);
+    const placedIds = Object.keys(activeDoc().placedProducts);
     expect(selected[0]).toBe(placedIds[0]);
     cleanup();
     wrapper.remove();

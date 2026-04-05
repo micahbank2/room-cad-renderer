@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Suspense, useRef, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, PointerLockControls } from "@react-three/drei";
-import { useCADStore } from "@/stores/cadStore";
+import { useActiveRoom, useActiveWalls, useActivePlacedProducts } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import type { Product } from "@/types/product";
 import WallMesh from "./WallMesh";
@@ -16,9 +16,9 @@ interface Props {
 }
 
 function Scene({ productLibrary }: Props) {
-  const room = useCADStore((s) => s.room);
-  const walls = useCADStore((s) => s.walls);
-  const placedProducts = useCADStore((s) => s.placedProducts);
+  const room = useActiveRoom() ?? { width: 20, length: 16, wallHeight: 8 };
+  const walls = useActiveWalls();
+  const placedProducts = useActivePlacedProducts();
   const selectedIds = useUIStore((s) => s.selectedIds);
   const cameraMode = useUIStore((s) => s.cameraMode);
 
@@ -108,7 +108,7 @@ function Scene({ productLibrary }: Props) {
 }
 
 export default function ThreeViewport({ productLibrary }: Props) {
-  const room = useCADStore((s) => s.room);
+  const room = useActiveRoom() ?? { width: 20, length: 16, wallHeight: 8 };
   const cameraMode = useUIStore((s) => s.cameraMode);
   const halfW = room.width / 2;
   const halfL = room.length / 2;

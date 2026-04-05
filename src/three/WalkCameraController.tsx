@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { useCADStore } from "@/stores/cadStore";
+import { useActiveRoom, useActiveWalls } from "@/stores/cadStore";
 import { canMoveTo } from "./walkCollision";
 
 export const EYE_HEIGHT = 5.5; // feet — D-06
@@ -18,8 +18,8 @@ interface KeyState {
 
 export default function WalkCameraController() {
   const { camera } = useThree();
-  const room = useCADStore((s) => s.room);
-  const wallsRecord = useCADStore((s) => s.walls);
+  const room = useActiveRoom() ?? { width: 20, length: 16, wallHeight: 8 };
+  const wallsRecord = useActiveWalls();
 
   const keys = useRef<KeyState>({ forward: false, back: false, left: false, right: false, run: false });
   const didSpawn = useRef(false);
