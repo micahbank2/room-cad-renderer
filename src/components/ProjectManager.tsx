@@ -29,8 +29,13 @@ export default function ProjectManager() {
   async function handleSave() {
     setSaving(true);
     const id = currentId ?? `proj_${uid()}`;
-    const { rooms, activeRoomId } = useCADStore.getState();
-    await saveProject(id, projectName, { version: 2, rooms, activeRoomId });
+    const st = useCADStore.getState() as any;
+    await saveProject(id, projectName, {
+      version: 2,
+      rooms: st.rooms,
+      activeRoomId: st.activeRoomId,
+      ...(st.customElements ? { customElements: st.customElements } : {}),
+    });
     setActive(id, projectName);
     const updated = await listProjects();
     setProjects(updated);
