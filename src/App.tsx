@@ -1,9 +1,8 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from "react";
-import { get, set } from "idb-keyval";
-import type { Product } from "@/types/product";
+import { useState, useEffect, lazy, Suspense } from "react";
 import type { ToolType } from "@/types/cad";
 import { useUIStore } from "@/stores/uiStore";
 import { useCADStore } from "@/stores/cadStore";
+import { useProductStore } from "@/stores/productStore";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import Toolbar from "@/components/Toolbar";
 import { ToolPalette } from "@/components/Toolbar";
@@ -19,10 +18,7 @@ const ThreeViewport = lazy(() => import("@/three/ThreeViewport"));
 
 type ViewMode = "2d" | "3d" | "split" | "library";
 
-const PRODUCTS_KEY = "room-cad-products";
-
 export default function App() {
-  const [productLibrary, setProductLibrary] = useState<Product[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("2d");
   const [showAddModal, setShowAddModal] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
@@ -31,28 +27,14 @@ export default function App() {
 
   useAutoSave();
 
-  // Load products from IndexedDB
+  const productLibrary = useProductStore((s) => s.products);
+  const handleAddProduct = useProductStore((s) => s.addProduct);
+  const handleRemoveProduct = useProductStore((s) => s.removeProduct);
+
+  // Single load on mount — fixes dual-loader race
   useEffect(() => {
-    get<Product[]>(PRODUCTS_KEY).then((stored) => {
-      if (stored && stored.length > 0) setProductLibrary(stored);
-    });
+    useProductStore.getState().load();
   }, []);
-
-  const persistProducts = useCallback((products: Product[]) => {
-    set(PRODUCTS_KEY, products);
-  }, []);
-
-  function handleAddProduct(product: Product) {
-    const next = [...productLibrary, product];
-    setProductLibrary(next);
-    persistProducts(next);
-  }
-
-  function handleRemoveProduct(id: string) {
-    const next = productLibrary.filter((p) => p.id !== id);
-    setProductLibrary(next);
-    persistProducts(next);
-  }
 
   // Auto-detect if user has started (has walls or products)
   useEffect(() => {
@@ -92,10 +74,7 @@ export default function App() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left sidebar — only on canvas views */}
         {isCanvas && (
-          <Sidebar
-            productLibrary={productLibrary}
-            setProductLibrary={setProductLibrary}
-          />
+          <Sidebar productLibrary={productLibrary} />
         )}
 
         {/* Library view */}
