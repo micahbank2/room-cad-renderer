@@ -20,6 +20,7 @@ interface UIState {
   userZoom: number; // 1.0 = auto-fit, 2.0 = 2x, etc.
   panOffset: { x: number; y: number }; // pixel offset applied on top of auto-fit origin
   activeWallSide: WallSide; // which face of the selected wall is being edited (Phase 17)
+  showSidebar: boolean;
 
   setTool: (tool: ToolType) => void;
   select: (ids: string[]) => void;
@@ -40,6 +41,7 @@ interface UIState {
   zoomAt: (cursor: { x: number; y: number }, factor: number, baseFit: { scale: number; origin: { x: number; y: number } }) => void;
   resetView: () => void;
   setActiveWallSide: (side: WallSide) => void;
+  toggleSidebar: () => void;
 }
 
 const MIN_ZOOM = 0.25;
@@ -58,6 +60,7 @@ export const useUIStore = create<UIState>()((set) => ({
   userZoom: 1,
   panOffset: { x: 0, y: 0 },
   activeWallSide: "A",
+  showSidebar: true,
 
   setTool: (tool) => set({ activeTool: tool, selectedIds: [] }),
   select: (ids) => set({ selectedIds: ids }),
@@ -121,4 +124,5 @@ export const useUIStore = create<UIState>()((set) => ({
     }),
   resetView: () => set({ userZoom: 1, panOffset: { x: 0, y: 0 } }),
   setActiveWallSide: (side) => set({ activeWallSide: side }),
+  toggleSidebar: () => set((s) => ({ showSidebar: !s.showSidebar })),
 }));
