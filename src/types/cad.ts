@@ -125,6 +125,8 @@ export interface Ceiling {
   paintId?: string;
   /** Lime wash toggle for ceiling paint (Phase 18). */
   limeWash?: boolean;
+  /** Surface material preset FK into SURFACE_MATERIALS catalog (Phase 20). */
+  surfaceMaterialId?: string;
 }
 
 export interface FloorMaterial {

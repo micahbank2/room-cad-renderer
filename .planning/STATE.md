@@ -2,32 +2,33 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Color, Polish & Materials
-status: "REQUIREMENTS.md + ROADMAP.md drafted. Next: `/gsd:plan-phase 11`"
-stopped_at: Completed 19-04-PLAN.md
-last_updated: "2026-04-06T01:49:46.309Z"
+status: complete
+stopped_at: Milestone v1.3 archived
+last_updated: "2026-04-06T02:45:00.000Z"
 progress:
   total_phases: 3
-  completed_phases: 2
-  total_plans: 9
-  completed_plans: 9
-  percent: 0
+  completed_phases: 3
+  total_plans: 11
+  completed_plans: 11
+  percent: 100
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-05)
+See: .planning/PROJECT.md (updated 2026-04-06)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** v1.2 New Element Types — Phase 11 (Ceilings) ready to plan
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Milestone: v1.2 New Element Types — PLANNING
-Phases planned: 4 (11, 12, 13, 14)
+Phase: —
+Plan: —
+Milestone: v1.3 Color, Polish & Materials — SHIPPED
 Requirements: 19 active
-Status: REQUIREMENTS.md + ROADMAP.md drafted. Next: `/gsd:plan-phase 11`
+Status: Phase complete — ready for verification
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -76,6 +77,8 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05.1-v1-integration-gaps P00 | 2m | 3 tasks | 3 files |
 | Phase 19 P03 | 8 | 2 tasks | 3 files |
 | Phase 19-v1-2-polish-pass P04 | 72 | 2 tasks | 2 files |
+| Phase 20-advanced-materials P01 | 4 | 2 tasks | 9 files |
+| Phase 20-advanced-materials P02 | 4 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -127,6 +130,12 @@ Recent decisions affecting current work:
 - [Phase 05.1-v1-integration-gaps]: 05.1-00: orbitPosRef initialized non-null; useEffect on cameraMode restores camera.position.set + ctrl.update() on walk->orbit
 - [Phase 19]: CollapsibleSection is a local file-scoped component in Sidebar.tsx; SYSTEM_STATS/LAYERS/SNAP default collapsed to reduce initial sidebar height
 - [Phase 19-v1-2-polish-pass]: isMetaClick variable defined once combining metaKey and ctrlKey — reused in both handle guard and toggle block
+- [Phase 20-advanced-materials]: CONCRETE has surface:'both' - appears in floor and ceiling results from materialsForSurface
+- [Phase 20-advanced-materials]: getFloorTexture clones cached texture and shares source - independent repeat per consumer (split-view safe)
+- [Phase 20-advanced-materials]: setCeilingSurfaceMaterial clears paintId and limeWash on set (mutual exclusion)
+- [Phase 20-advanced-materials]: SurfaceMaterialPicker uses className join array pattern for conditional active border
+- [Phase 20-advanced-materials]: handleApplyPaint sets surfaceMaterialId: undefined inline - updateCeiling handles both atomically
+- [Phase 20-advanced-materials]: FloorMaterialPicker activeId maps isCustom to undefined so no swatch highlights when custom image active
 
 ### Pending Todos
 
@@ -145,6 +154,6 @@ Known non-blocking debt (carried to v1.1 candidates):
 
 ## Session Continuity
 
-Last session: 2026-04-06T01:30:15.223Z
-Stopped at: Completed 19-04-PLAN.md
+Last session: 2026-04-06T02:29:46.312Z
+Stopped at: Completed 20-advanced-materials-02-PLAN.md
 Resume file: None

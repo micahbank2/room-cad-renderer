@@ -23,10 +23,18 @@ describe("floorTexture (VIZ-06)", () => {
     expect(tex.wrapT).toBe(THREE.RepeatWrapping);
   });
 
-  it("getFloorTexture: module-level memoization returns same texture instance on repeat calls", () => {
+  it("getFloorTexture: returns distinct texture instances per call (clone fix)", () => {
     const a = getFloorTexture(16, 12);
     const b = getFloorTexture(20, 10);
-    expect(a).toBe(b);
+    expect(a).not.toBe(b);
+    expect(a.source).toBe(b.source); // shared canvas data
+  });
+
+  it("getFloorTexture: distinct room dims produce textures with different repeat values", () => {
+    const a = getFloorTexture(16, 12);
+    const b = getFloorTexture(8, 8);
+    expect(a.repeat.x).toBe(4); // 16/4
+    expect(b.repeat.x).toBe(2); // 8/4
   });
 
   it("tileRepeatFor: room 16x12 at 4ft scale returns repeat (4, 3)", () => {

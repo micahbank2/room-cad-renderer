@@ -66,13 +66,16 @@ export function createFloorTexture(): THREE.CanvasTexture {
 
 let cached: THREE.CanvasTexture | null = null;
 
-/** Returns the memoized floor texture with repeat set to match room dimensions. */
+/** Returns a cloned floor texture with repeat set to match room dimensions.
+ *  Each consumer gets an independent repeat value (split-view safe). */
 export function getFloorTexture(roomW: number, roomL: number): THREE.CanvasTexture {
   if (!cached) cached = createFloorTexture();
+  const tex = cached.clone();
+  tex.source = cached.source; // share canvas data, independent repeat
   const { x, y } = tileRepeatFor(roomW, roomL);
-  cached.repeat.set(x, y);
-  cached.needsUpdate = true;
-  return cached;
+  tex.repeat.set(x, y);
+  tex.needsUpdate = true;
+  return tex;
 }
 
 /** For tests only — clears the module memoization. */

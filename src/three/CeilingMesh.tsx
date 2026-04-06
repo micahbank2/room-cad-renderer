@@ -3,6 +3,7 @@ import * as THREE from "three";
 import type { Ceiling } from "@/types/cad";
 import { resolvePaintHex } from "@/lib/colorUtils";
 import { usePaintStore } from "@/stores/paintStore";
+import { SURFACE_MATERIALS } from "@/data/surfaceMaterials";
 
 interface Props {
   ceiling: Ceiling;
@@ -26,10 +27,25 @@ export default function CeilingMesh({ ceiling, isSelected }: Props) {
     return geom;
   }, [ceiling.points]);
 
-  const color = ceiling.paintId
-    ? resolvePaintHex(ceiling.paintId, customColors)
-    : ceiling.material.startsWith("#") ? ceiling.material : "#f5f5f5";
-  const roughness = ceiling.limeWash ? 0.95 : 0.8;
+  const { color, roughness } = useMemo(() => {
+    // Tier 1: surface material preset
+    if (ceiling.surfaceMaterialId) {
+      const mat = SURFACE_MATERIALS[ceiling.surfaceMaterialId];
+      if (mat) return { color: mat.color, roughness: mat.roughness };
+    }
+    // Tier 2: paint (F&B or custom)
+    if (ceiling.paintId) {
+      return {
+        color: resolvePaintHex(ceiling.paintId, customColors),
+        roughness: ceiling.limeWash ? 0.95 : 0.8,
+      };
+    }
+    // Tier 3: legacy material fallback
+    return {
+      color: ceiling.material.startsWith("#") ? ceiling.material : "#f5f5f5",
+      roughness: 0.8,
+    };
+  }, [ceiling.surfaceMaterialId, ceiling.paintId, ceiling.limeWash, ceiling.material, customColors]);
 
   return (
     <mesh

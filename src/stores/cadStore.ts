@@ -76,6 +76,9 @@ interface CADState {
   redo: () => void;
   loadSnapshot: (raw: unknown) => void;
 
+  // Surface material actions (Phase 20)
+  setCeilingSurfaceMaterial: (ceilingId: string, materialId: string | undefined) => void;
+
   // Paint actions (Phase 18)
   addCustomPaint: (item: Omit<PaintColor, "id" | "source">) => string;
   removeCustomPaint: (id: string) => void;
@@ -405,6 +408,23 @@ export const useCADStore = create<CADState>()((set) => ({
           const root = s as any;
           const recent: string[] = root.recentPaints ?? [];
           root.recentPaints = [changes.paintId, ...recent.filter((id: string) => id !== changes.paintId)].slice(0, 8);
+        }
+      })
+    ),
+
+  setCeilingSurfaceMaterial: (ceilingId, materialId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.ceilings?.[ceilingId]) return;
+        pushHistory(s);
+        const c = doc.ceilings[ceilingId];
+        if (materialId) {
+          c.surfaceMaterialId = materialId;
+          delete c.paintId;
+          delete c.limeWash;
+        } else {
+          delete c.surfaceMaterialId;
         }
       })
     ),

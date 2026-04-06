@@ -1,5 +1,40 @@
 # Milestones — Room CAD Renderer
 
+## v1.3 — Color, Polish & Materials ✅
+
+**Shipped:** 2026-04-06
+**Timeline:** 2026-04-05 → 2026-04-06 (1 day)
+**Phases:** 3 (18, 19, 20) — 11 plans
+**Files changed:** 72 | **LOC:** ~13,300 TypeScript (+4,738 from v1.2)
+**Git range:** `94d96a4` → `cdc7dc9`
+**Tag:** `v1.3`
+
+**Delivered:** Jessica can paint any wall or ceiling with named Farrow & Ball colors, create custom hex colors, toggle lime wash finishes, and see results in both 2D and 3D. Custom elements have full edit handles, multi-select enables bulk painting, and floor/ceiling materials share a unified swatch catalog.
+
+**Key accomplishments:**
+
+1. **Full paint system** — 132 Farrow & Ball swatches with hue filter + name search, custom hex palette, lime wash toggle, recently-used row, paint-all-walls action (PAINT-01..07)
+2. **Paint rendering** — wall and ceiling paint in both 2D floor plans (solid fill + lime wash overlay) and 3D views (PBR material with roughness) (PAINT-01/02/05)
+3. **Custom element edit handles** — drag, rotate, resize placed custom elements via same interaction model as products (POLISH-01)
+4. **Cmd+click multi-select** — select multiple walls in 2D, then bulk-paint with one action (POLISH-05)
+5. **Sidebar UX** — collapsible sections, sidebar collapse toggle, full scroll support (POLISH-06 partial)
+6. **Unified surface material catalog** — single picker for floor and ceiling texture presets, floor texture clone fix for split-view safety (MAT-01/02/03)
+
+### Known Gaps
+
+Accepted as tech debt for v1.4:
+- **POLISH-02**: Wainscot library inline edit (code landed but not verified end-to-end)
+- **POLISH-03**: Copy SIDE_A treatments to SIDE_B (copyWallSide action exists, UI button landed but not verified)
+- **POLISH-04**: Per-placement frame color override (frameColorOverride type + picker landed but not verified)
+- **POLISH-06**: Sidebar scroll/collapse (implemented but not fully verified on every page/view)
+
+**Archives:**
+
+- [v1.3-ROADMAP.md](milestones/v1.3-ROADMAP.md) — full phase breakdown
+- [v1.3-REQUIREMENTS.md](milestones/v1.3-REQUIREMENTS.md) — 12/16 requirements validated (4 gaps)
+
+---
+
 ## v1.1 — UX Fixes & Polish ✅
 
 **Shipped:** 2026-04-05
