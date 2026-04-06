@@ -345,8 +345,13 @@ export default function WallSurfacePanel() {
                     <input
                       type="color"
                       value={a.frameColorOverride ?? FRAME_PRESETS[a.frameStyle].color}
-                      onChange={(e) =>
+                      onFocus={() =>
                         useCADStore.getState().updateWallArt(wall.id, a.id, {
+                          frameColorOverride: a.frameColorOverride ?? FRAME_PRESETS[a.frameStyle].color,
+                        })
+                      }
+                      onChange={(e) =>
+                        useCADStore.getState().updateWallArtNoHistory(wall.id, a.id, {
                           frameColorOverride: e.target.value,
                         })
                       }

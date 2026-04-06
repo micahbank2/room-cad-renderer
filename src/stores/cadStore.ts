@@ -58,6 +58,7 @@ interface CADState {
   toggleCrownMolding: (wallId: string, side: WallSide, enabled: boolean, heightFt?: number, color?: string) => void;
   addWallArt: (wallId: string, art: Omit<WallArt, "id">) => string;
   updateWallArt: (wallId: string, artId: string, changes: Partial<WallArt>) => void;
+  updateWallArtNoHistory: (wallId: string, artId: string, changes: Partial<WallArt>) => void;
   removeWallArt: (wallId: string, artId: string) => void;
   // Custom elements (v1.2 Phase 14)
   addCustomElement: (el: Omit<CustomElement, "id">) => string;
@@ -532,6 +533,17 @@ export const useCADStore = create<CADState>()((set) => ({
         const item = doc.walls[wallId].wallArt!.find((a) => a.id === artId);
         if (!item) return;
         pushHistory(s);
+        Object.assign(item, changes);
+      })
+    ),
+
+  updateWallArtNoHistory: (wallId, artId, changes) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc || !doc.walls[wallId]?.wallArt) return;
+        const item = doc.walls[wallId].wallArt!.find((a) => a.id === artId);
+        if (!item) return;
         Object.assign(item, changes);
       })
     ),
