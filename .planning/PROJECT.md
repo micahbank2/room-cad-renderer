@@ -12,6 +12,8 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
+**Phase 20 complete (2026-04-06).** Unified surface material catalog (11 entries — 8 floor, 3 ceiling, CONCRETE shared). SurfaceMaterialPicker swatch grid replaces floor dropdown. Ceiling texture presets with 3-tier resolution (material > paint > hex fallback). Floor texture clone fix for split-view safety. v1.3 milestone nearing completion.
+
 **v1.2 shipped 2026-04-05.** 29 requirements across 7 phases. Beyond
 walls + products: ceilings, floor materials (8 presets + custom
 upload), per-wall wallpaper, wall art, wainscoting, crown molding, a
