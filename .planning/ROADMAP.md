@@ -50,7 +50,13 @@ Plans:
   4. User can select any placed framed art piece and override just its frame color from the properties panel without changing the library entry
   5. User can Cmd+click to multi-select walls/elements in 2D and apply bulk actions (e.g. paint all selected walls one color)
   6. Sidebar panels are fully scrollable, each section is collapsible, and entire sidebars can be collapsed — verified on every page/view
-**Plans**: TBD
+**Plans:** 5 plans
+Plans:
+- [ ] 19-01-PLAN.md — Custom element edit handles (drag, rotate, resize) in cadStore + selectTool + fabricSync
+- [ ] 19-02-PLAN.md — Wainscot inline edit + copy wall side + frame color override
+- [ ] 19-03-PLAN.md — Sidebar scroll, collapsible sections, and sidebar collapse toggle
+- [ ] 19-04-PLAN.md — Cmd+click multi-select + bulk paint actions
+- [ ] 19-05-PLAN.md — Visual verification checkpoint
 **UI hint**: yes
 
 ### Phase 20: Advanced Materials
@@ -69,7 +75,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 18. Color & Paint System | 4/4 | Complete    | 2026-04-06 |
-| 19. v1.2 Polish Pass | 0/? | Not started | - |
+| 19. v1.2 Polish Pass | 0/5 | Not started | - |
 | 20. Advanced Materials | 0/? | Not started | - |
 
 ---
