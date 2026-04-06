@@ -15,7 +15,7 @@
 
 ## Phases
 
-- [ ] **Phase 18: Color & Paint System** — Global paint library with 132 Farrow & Ball colors + custom colors; apply paint to walls and ceilings in 2D and 3D
+- [x] **Phase 18: Color & Paint System** — Global paint library with 132 Farrow & Ball colors + custom colors; apply paint to walls and ceilings in 2D and 3D
 - [ ] **Phase 19: v1.2 Polish Pass** — Edit handles for custom elements, wainscot edit-in-place, copy-side wall treatments, per-placement frame overrides
 - [ ] **Phase 20: Advanced Materials** — Unified ceiling/floor surface material catalog with texture presets; floor texture cache fix
 
@@ -36,7 +36,7 @@ Plans:
 - [x] 18-01-PLAN.md — Data foundation: types, F&B catalog, paintStore, colorUtils, cadStore extensions
 - [x] 18-02-PLAN.md — Rendering: 3D paint + lime wash in WallMesh/CeilingMesh, 2D paint + lime wash in fabricSync
 - [x] 18-03-PLAN.md — UI: PaintSection component, CeilingPaintSection, WallSurfacePanel integration
-- [ ] 18-04-PLAN.md — Visual verification checkpoint
+- [x] 18-04-PLAN.md — Visual verification checkpoint
 **UI hint**: yes
 
 ### Phase 19: v1.2 Polish Pass
@@ -66,7 +66,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 18. Color & Paint System | 3/4 | Complete    | 2026-04-06 |
+| 18. Color & Paint System | 4/4 | Complete    | 2026-04-06 |
 | 19. v1.2 Polish Pass | 0/? | Not started | - |
 | 20. Advanced Materials | 0/? | Not started | - |
 
