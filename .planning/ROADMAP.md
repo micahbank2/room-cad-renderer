@@ -34,8 +34,8 @@
 **Plans:** 4 plans
 Plans:
 - [x] 18-01-PLAN.md — Data foundation: types, F&B catalog, paintStore, colorUtils, cadStore extensions
-- [ ] 18-02-PLAN.md — Rendering: 3D paint + lime wash in WallMesh/CeilingMesh, 2D paint + lime wash in fabricSync
-- [ ] 18-03-PLAN.md — UI: PaintSection component, CeilingPaintSection, WallSurfacePanel integration
+- [x] 18-02-PLAN.md — Rendering: 3D paint + lime wash in WallMesh/CeilingMesh, 2D paint + lime wash in fabricSync
+- [x] 18-03-PLAN.md — UI: PaintSection component, CeilingPaintSection, WallSurfacePanel integration
 - [ ] 18-04-PLAN.md — Visual verification checkpoint
 **UI hint**: yes
 
@@ -66,7 +66,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 18. Color & Paint System | 1/4 | In Progress|  |
+| 18. Color & Paint System | 3/4 | In Progress|  |
 | 19. v1.2 Polish Pass | 0/? | Not started | - |
 | 20. Advanced Materials | 0/? | Not started | - |
 

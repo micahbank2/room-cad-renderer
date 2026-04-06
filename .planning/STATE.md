@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Color, Polish & Materials
 status: executing
-stopped_at: Completed 18-02-PLAN.md
-last_updated: "2026-04-06T00:33:11.857Z"
+stopped_at: Completed 18-03-PLAN.md
+last_updated: "2026-04-06T00:39:50.334Z"
 last_activity: 2026-04-06
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
+  completed_plans: 3
   percent: 25
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-05)
 ## Current Position
 
 Phase: 18 (color-paint-system) — EXECUTING
-Plan: 3 of 4 (Plan 01 complete)
+Plan: 4 of 4 (Plan 01 complete)
 Status: Ready to execute
 Last activity: 2026-04-06
 
@@ -63,6 +63,7 @@ Decisions are logged in PROJECT.md Key Decisions table. See milestone archives f
 - `selectTool.ts` hit-test extension for `placedCustomElements` is first task of Phase 19
 - [Phase 18]: Paint branch in WallMesh placed before color branch to prevent fall-through (Pitfall 3)
 - [Phase 18]: getLimeWashPattern cached at module scope in fabricSync.ts to prevent flicker on Fabric redraws
+- [Phase 18]: Ceiling selection implemented via point-in-polygon in selectTool — consistent with existing wall/product hit-testing; ceilings are select-only (no drag)
 
 ### Pending Todos
 
@@ -80,8 +81,8 @@ Known technical prerequisites per phase:
 
 ## Session Continuity
 
-Last session: 2026-04-06T00:33:11.855Z
-Stopped at: Completed 18-02-PLAN.md
+Last session: 2026-04-06T00:39:50.331Z
+Stopped at: Completed 18-03-PLAN.md
 Resume file: None
 
 Next step: Execute 18-02-PLAN.md (paint rendering in 2D/3D)
