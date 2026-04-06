@@ -19,7 +19,7 @@ export const SURFACE_MATERIALS: Record<string, SurfaceMaterial> = {
   // ── Floor materials ──────────────────────────────────────────────────────
   WOOD_OAK: {
     id: "WOOD_OAK",
-    label: "WOOD_OAK",
+    label: "WOOD OAK",
     color: "#b08158",
     roughness: 0.7,
     surface: "floor",
@@ -27,7 +27,7 @@ export const SURFACE_MATERIALS: Record<string, SurfaceMaterial> = {
   },
   WOOD_WALNUT: {
     id: "WOOD_WALNUT",
-    label: "WOOD_WALNUT",
+    label: "WOOD WALNUT",
     color: "#5a3a28",
     roughness: 0.7,
     surface: "floor",
@@ -35,7 +35,7 @@ export const SURFACE_MATERIALS: Record<string, SurfaceMaterial> = {
   },
   TILE_WHITE: {
     id: "TILE_WHITE",
-    label: "TILE_WHITE",
+    label: "TILE WHITE",
     color: "#efefef",
     roughness: 0.3,
     surface: "floor",
@@ -43,7 +43,7 @@ export const SURFACE_MATERIALS: Record<string, SurfaceMaterial> = {
   },
   TILE_BLACK: {
     id: "TILE_BLACK",
-    label: "TILE_BLACK",
+    label: "TILE BLACK",
     color: "#1c1c1c",
     roughness: 0.3,
     surface: "floor",
@@ -93,7 +93,7 @@ export const SURFACE_MATERIALS: Record<string, SurfaceMaterial> = {
   },
   WOOD_PLANK: {
     id: "WOOD_PLANK",
-    label: "WOOD_PLANK",
+    label: "WOOD PLANK",
     color: "#a0794f",
     roughness: 0.75,
     surface: "ceiling",
@@ -101,7 +101,7 @@ export const SURFACE_MATERIALS: Record<string, SurfaceMaterial> = {
   },
   PAINTED_DRYWALL: {
     id: "PAINTED_DRYWALL",
-    label: "PAINTED_DRYWALL",
+    label: "PAINTED DRYWALL",
     color: "#f5f5f5",
     roughness: 0.8,
     surface: "ceiling",
