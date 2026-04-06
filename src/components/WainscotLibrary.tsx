@@ -63,7 +63,7 @@ export default function WainscotLibrary() {
         </h3>
         <button
           onClick={() => setCreating((v) => !v)}
-          className="font-mono text-[9px] text-accent-light hover:text-accent tracking-widest"
+          className="font-mono text-[11px] text-accent-light hover:text-accent tracking-widest"
         >
           {creating ? "CANCEL" : "+ NEW"}
         </button>
@@ -147,7 +147,7 @@ export default function WainscotLibrary() {
           <Suspense
             fallback={
               <div className="w-full aspect-video bg-obsidian-base rounded-sm border border-outline-variant/30 grid place-items-center">
-                <span className="font-mono text-[9px] text-text-ghost">LOADING_PREVIEW...</span>
+                <span className="font-mono text-[11px] text-text-ghost">LOADING_PREVIEW...</span>
               </div>
             }
           >
@@ -165,7 +165,7 @@ export default function WainscotLibrary() {
       )}
 
       {items.length === 0 ? (
-        <div className="font-mono text-[9px] text-text-ghost text-center py-2">
+        <div className="font-mono text-[11px] text-text-ghost text-center py-2">
           NO_WAINSCOT_STYLES_YET
         </div>
       ) : (
@@ -206,7 +206,7 @@ export default function WainscotLibrary() {
                     />
                     <button
                       onClick={() => setEditingId(null)}
-                      className="font-mono text-[9px] text-accent-light hover:text-accent px-1"
+                      className="font-mono text-[11px] text-accent-light hover:text-accent px-1"
                     >
                       DONE
                     </button>
@@ -223,7 +223,7 @@ export default function WainscotLibrary() {
                       <div className="font-mono text-[10px] text-text-primary truncate">
                         {it.name.toUpperCase()}
                       </div>
-                      <div className="font-mono text-[8px] text-text-ghost">
+                      <div className="font-mono text-[11px] text-text-ghost">
                         {STYLE_META[it.style].label} · {it.heightFt}'
                       </div>
                     </div>
@@ -231,7 +231,7 @@ export default function WainscotLibrary() {
                   <button
                     onClick={() => removeItem(it.id)}
                     title="Delete from library"
-                    className="font-mono text-[9px] text-text-ghost hover:text-text-primary px-1"
+                    className="font-mono text-[11px] text-text-ghost hover:text-text-primary px-1"
                   >
                     ✕
                   </button>
@@ -262,7 +262,7 @@ function NumberKnob({
 }) {
   return (
     <label className="block">
-      <span className="font-mono text-[8px] text-text-ghost block">{label}</span>
+      <span className="font-mono text-[11px] text-text-ghost block">{label}</span>
       <input
         type="number"
         step={step}

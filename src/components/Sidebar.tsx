@@ -27,12 +27,12 @@ function CollapsibleSection({
     <div>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between mb-2"
+        className="w-full flex items-center justify-between mb-2 py-1"
       >
-        <h3 className="font-mono text-[10px] text-text-ghost tracking-widest uppercase">
+        <h3 className="font-mono text-xs text-text-ghost tracking-widest uppercase">
           {label}
         </h3>
-        <span className="font-mono text-[9px] text-text-ghost">
+        <span className="font-mono text-sm text-text-ghost">
           {open ? "\u2212" : "+"}
         </span>
       </button>
@@ -54,13 +54,13 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
 
   return (
-    <aside className="w-56 shrink-0 bg-obsidian-low flex flex-col overflow-hidden">
+    <aside className="w-64 shrink-0 bg-obsidian-low flex flex-col overflow-hidden">
       {/* Sidebar header with collapse button */}
-      <div className="flex items-center justify-between px-4 pt-3 pb-1">
-        <span className="font-mono text-[9px] text-text-ghost tracking-widest">PANELS</span>
+      <div className="flex items-center justify-between px-4 pt-3 pb-2">
+        <span className="font-mono text-xs text-text-ghost tracking-widest">PANELS</span>
         <button
           onClick={toggleSidebar}
-          className="font-mono text-[9px] text-text-ghost hover:text-text-primary"
+          className="font-mono text-base text-text-ghost hover:text-text-primary px-1"
           title="COLLAPSE_SIDEBAR"
         >
           &#x25C0;

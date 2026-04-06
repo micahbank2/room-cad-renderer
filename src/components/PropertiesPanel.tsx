@@ -37,18 +37,18 @@ export default function PropertiesPanel({ productLibrary }: Props) {
     const totalCount = selectedIds.length;
 
     return (
-      <div className="absolute right-3 top-3 z-10 w-60 glass-panel rounded-sm p-4 space-y-3">
-        <h3 className="font-mono text-[10px] text-text-ghost tracking-widest">
+      <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto glass-panel rounded-sm p-4 space-y-3">
+        <h3 className="font-mono text-[11px] text-text-ghost tracking-widest">
           BULK_ACTIONS
         </h3>
-        <div className="font-mono text-[10px] text-accent-light">
+        <div className="font-mono text-[11px] text-accent-light">
           {totalCount} ITEMS_SELECTED
           {wallIds.length > 0 && ` (${wallIds.length} WALLS)`}
         </div>
 
         {wallIds.length > 0 && (
           <div className="space-y-2 border-t border-outline-variant/20 pt-2">
-            <div className="font-mono text-[9px] text-text-dim">PAINT_ALL_WALLS</div>
+            <div className="font-mono text-[11px] text-text-dim">PAINT_ALL_WALLS</div>
             <div className="flex items-center gap-2">
               <input
                 type="color"
@@ -62,7 +62,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
                 }}
                 className="w-8 h-7 bg-transparent border border-outline-variant/30 rounded-sm cursor-pointer"
               />
-              <span className="font-mono text-[8px] text-text-ghost">
+              <span className="font-mono text-[11px] text-text-ghost">
                 APPLIES_TO_BOTH_SIDES
               </span>
             </div>
@@ -71,7 +71,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
 
         <button
           onClick={handleDelete}
-          className="w-full font-mono text-[9px] text-error tracking-widest py-1 border border-error/30 rounded-sm hover:bg-error/10"
+          className="w-full font-mono text-[11px] text-error tracking-widest py-1 border border-error/30 rounded-sm hover:bg-error/10"
         >
           DELETE_ALL ({totalCount})
         </button>
@@ -82,8 +82,8 @@ export default function PropertiesPanel({ productLibrary }: Props) {
   if (!wall && !pp && !ceiling) return null;
 
   return (
-    <div className="absolute right-3 top-3 z-10 w-60 glass-panel rounded-sm p-4 space-y-3">
-      <h3 className="font-mono text-[10px] text-text-ghost tracking-widest">
+    <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto glass-panel rounded-sm p-4 space-y-3">
+      <h3 className="font-mono text-[11px] text-text-ghost tracking-widest">
         PROPERTIES
       </h3>
 
@@ -118,7 +118,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
               value={`${wall.end.x.toFixed(1)}, ${wall.end.y.toFixed(1)}`}
             />
           </div>
-          <div className="font-mono text-[9px] text-text-ghost">
+          <div className="font-mono text-[11px] text-text-ghost">
             {wall.openings.length} OPENING(S)
           </div>
           <WallSurfacePanel />
@@ -159,7 +159,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
             </div>
             {libProduct && !hasDimensions(libProduct) && (
               <div className="space-y-1.5 pt-2 border-t border-outline-variant/20">
-                <span className="font-mono text-[9px] text-text-ghost tracking-wider">
+                <span className="font-mono text-[11px] text-text-ghost tracking-wider">
                   SET_DIMENSIONS (FT)
                 </span>
                 <div className="grid grid-cols-3 gap-1">
@@ -175,7 +175,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
                         const v = parseFloat(e.target.value);
                         if (v > 0) updateProduct(libProduct.id, { [axis]: v });
                       }}
-                      className="w-full px-1.5 py-1 text-[10px] font-mono bg-obsidian-deepest border border-outline-variant/30"
+                      className="w-full px-1.5 py-1 text-[11px] font-mono bg-obsidian-deepest border border-outline-variant/30"
                     />
                   ))}
                 </div>
@@ -187,7 +187,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
 
       <button
         onClick={handleDelete}
-        className="w-full py-1.5 rounded-sm font-mono text-[10px] tracking-widest bg-red-900/30 text-red-400 border border-red-900/40 hover:bg-red-900/50 transition-colors"
+        className="w-full py-1.5 rounded-sm font-mono text-[11px] tracking-widest bg-red-900/30 text-red-400 border border-red-900/40 hover:bg-red-900/50 transition-colors"
       >
         DELETE_ELEMENT
       </button>
@@ -198,7 +198,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-center">
-      <span className="font-mono text-[9px] text-text-ghost tracking-wider">{label}</span>
+      <span className="font-mono text-[11px] text-text-ghost tracking-wider">{label}</span>
       <span className="font-mono text-[11px] text-accent-light">{value}</span>
     </div>
   );

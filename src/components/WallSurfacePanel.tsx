@@ -103,7 +103,7 @@ export default function WallSurfacePanel() {
           <button
             key={s}
             onClick={() => setActiveSide(s)}
-            className={`flex-1 font-mono text-[9px] tracking-widest py-1 rounded-sm border ${
+            className={`flex-1 font-mono text-[11px] tracking-widest py-2 rounded-sm border ${
               activeSide === s
                 ? "border-accent text-accent-light bg-accent/10"
                 : "border-outline-variant/30 text-text-dim"
@@ -118,14 +118,14 @@ export default function WallSurfacePanel() {
           const target = activeSide === "A" ? "B" : "A";
           copyWallSide(wall.id, activeSide, target);
         }}
-        className="w-full font-mono text-[9px] text-accent-light hover:text-accent tracking-widest py-1 border border-accent/20 rounded-sm hover:bg-accent/10"
+        className="w-full font-mono text-[11px] text-accent-light hover:text-accent tracking-widest py-2 border border-accent/20 rounded-sm hover:bg-accent/10"
       >
         COPY_TO_SIDE_{activeSide === "A" ? "B" : "A"}
       </button>
 
       {/* Wallpaper */}
       <div>
-        <div className="font-mono text-[9px] text-text-dim mb-1">WALLPAPER</div>
+        <div className="font-mono text-[11px] text-text-dim mb-1">WALLPAPER</div>
         <div className="flex items-center gap-2">
           <input
             type="color"
@@ -135,14 +135,14 @@ export default function WallSurfacePanel() {
           />
           <button
             onClick={() => wallpaperFileRef.current?.click()}
-            className="flex-1 font-mono text-[9px] text-text-dim hover:text-accent-light tracking-widest uppercase px-2 py-1 border border-outline-variant/30 rounded-sm"
+            className="flex-1 font-mono text-[11px] text-text-dim hover:text-accent-light tracking-widest uppercase px-2 py-1 border border-outline-variant/30 rounded-sm"
           >
             UPLOAD_PATTERN
           </button>
           {wp && (
             <button
               onClick={() => setWallpaper(wall.id, activeSide, undefined)}
-              className="font-mono text-[9px] text-text-ghost hover:text-text-primary px-2 py-1"
+              className="font-mono text-[11px] text-text-ghost hover:text-text-primary px-2 py-1"
               title="Remove wallpaper"
             >
               ✕
@@ -168,7 +168,7 @@ export default function WallSurfacePanel() {
               onChange={toggleTile}
               className="w-3 h-3 accent-accent rounded-none"
             />
-            <span className="font-mono text-[9px] text-text-dim tracking-wider">
+            <span className="font-mono text-[11px] text-text-dim tracking-wider">
               TILE_PATTERN {(wp.scaleFt ?? 0) > 0 ? `(${wp.scaleFt}ft)` : "(stretch)"}
             </span>
           </label>
@@ -196,7 +196,7 @@ export default function WallSurfacePanel() {
             }
             className="w-3 h-3 accent-accent rounded-none"
           />
-          <span className="font-mono text-[9px] text-text-dim tracking-wider">WAINSCOTING</span>
+          <span className="font-mono text-[11px] text-text-dim tracking-wider">WAINSCOTING</span>
         </label>
         {wains?.enabled && (
           <div className="ml-5 mt-1 space-y-1">
@@ -219,7 +219,7 @@ export default function WallSurfacePanel() {
                     id
                   );
                 }}
-                className="w-full font-mono text-[9px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-1 py-0.5 rounded-sm"
+                className="w-full font-mono text-[11px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-1 py-0.5 rounded-sm"
               >
                 <option value="">(LEGACY_DEFAULT)</option>
                 {wainscotStyles.map((it) => (
@@ -244,7 +244,7 @@ export default function WallSurfacePanel() {
             }
             className="w-3 h-3 accent-accent rounded-none"
           />
-          <span className="font-mono text-[9px] text-text-dim tracking-wider">CROWN_MOLDING</span>
+          <span className="font-mono text-[11px] text-text-dim tracking-wider">CROWN_MOLDING</span>
         </label>
         {crown?.enabled && (
           <div className="ml-5 mt-1 flex items-center gap-2">
@@ -257,7 +257,7 @@ export default function WallSurfacePanel() {
               onChange={(e) =>
                 toggleCrownMolding(wall.id, activeSide, true, parseFloat(e.target.value) || 0.33, crown.color)
               }
-              className="w-16 font-mono text-[9px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-1 py-0.5 rounded-sm"
+              className="w-16 font-mono text-[11px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-1 py-0.5 rounded-sm"
             />
             <span className="font-mono text-[8px] text-text-ghost">FT</span>
             <input
@@ -275,19 +275,19 @@ export default function WallSurfacePanel() {
       {/* Wall art */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <span className="font-mono text-[9px] text-text-dim tracking-wider">
+          <span className="font-mono text-[11px] text-text-dim tracking-wider">
             WALL_ART ({artItems.length})
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowLibrary((v) => !v)}
-              className="font-mono text-[9px] text-accent-light hover:text-accent tracking-widest"
+              className="font-mono text-[11px] text-accent-light hover:text-accent tracking-widest"
             >
               {showLibrary ? "CLOSE" : "+ LIB"}
             </button>
             <button
               onClick={() => artFileRef.current?.click()}
-              className="font-mono text-[9px] text-accent-light hover:text-accent tracking-widest"
+              className="font-mono text-[11px] text-accent-light hover:text-accent tracking-widest"
             >
               + ADD
             </button>
@@ -296,7 +296,7 @@ export default function WallSurfacePanel() {
         {showLibrary && (
           <div className="bg-obsidian-high rounded-sm p-2 mb-1 max-h-40 overflow-y-auto">
             {framedArtItems.length === 0 ? (
-              <div className="font-mono text-[9px] text-text-ghost text-center py-1">
+              <div className="font-mono text-[11px] text-text-ghost text-center py-1">
                 ART_LIBRARY_EMPTY
               </div>
             ) : (
@@ -320,7 +320,7 @@ export default function WallSurfacePanel() {
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div className="font-mono text-[9px] text-text-dim truncate">
+                      <div className="font-mono text-[11px] text-text-dim truncate">
                         {it.name.toUpperCase()}
                       </div>
                     </button>
@@ -335,7 +335,7 @@ export default function WallSurfacePanel() {
             {artItems.map((a) => (
               <li
                 key={a.id}
-                className="flex items-center justify-between font-mono text-[9px] text-text-dim px-2 py-1 bg-obsidian-high rounded-sm"
+                className="flex items-center justify-between font-mono text-[11px] text-text-dim px-2 py-1 bg-obsidian-high rounded-sm"
               >
                 <div className="flex items-center gap-2 min-w-0 flex-1">
                   <span className="truncate">
