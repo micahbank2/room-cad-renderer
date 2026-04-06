@@ -38,8 +38,10 @@ export interface WallSegment {
 }
 
 export interface Wallpaper {
-  kind: "color" | "pattern";
+  kind: "color" | "pattern" | "paint";
   color?: string; // when kind="color"
+  paintId?: string; // when kind="paint" — FK into F&B catalog or custom paints
+  limeWash?: boolean; // per-placement lime wash toggle
   imageUrl?: string; // when kind="pattern" (data URL)
   scaleFt?: number; // pattern repeat distance, default 2
 }
@@ -116,6 +118,10 @@ export interface Ceiling {
   height: number;
   /** Solid hex color (e.g. "#f5f5f5") or material preset id (e.g. "mat-plaster"). */
   material: string;
+  /** Paint color FK into F&B catalog or custom paints (Phase 18). */
+  paintId?: string;
+  /** Lime wash toggle for ceiling paint (Phase 18). */
+  limeWash?: boolean;
 }
 
 export interface FloorMaterial {
@@ -153,6 +159,10 @@ export interface CADSnapshot {
   activeRoomId: string | null;
   /** Per-project catalog of custom elements (reusable across rooms). */
   customElements?: Record<string, CustomElement>;
+  /** User-created custom paint colors — persisted in snapshot for undo safety (Phase 18). */
+  customPaints?: import("./paint").PaintColor[];
+  /** Last 8 applied paintId values — prepend on apply, max 8, no duplicates (Phase 18). */
+  recentPaints?: string[];
 }
 
 /** Pre-v2 on-disk shape — used only by migrateSnapshot. */
