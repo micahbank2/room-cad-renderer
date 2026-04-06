@@ -19,7 +19,7 @@ Requirements for milestone v1.3 — Color, Polish & Materials. Each maps to road
 
 ### v1.2 Polish Pass
 
-- [ ] **POLISH-01**: User can drag, rotate, and resize placed custom elements via edit handles (same interaction as products)
+- [x] **POLISH-01**: User can drag, rotate, and resize placed custom elements via edit handles (same interaction as products)
 - [ ] **POLISH-02**: User can edit wainscot library styles in-place from the library panel
 - [ ] **POLISH-03**: User can copy all SIDE_A wall treatments to SIDE_B with one click
 - [ ] **POLISH-04**: User can override frame color per-placement for framed wall art
@@ -68,7 +68,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PAINT-05 | Phase 18 | Complete |
 | PAINT-06 | Phase 18 | Complete |
 | PAINT-07 | Phase 18 | Complete |
-| POLISH-01 | Phase 19 | Pending |
+| POLISH-01 | Phase 19 | Complete |
 | POLISH-02 | Phase 19 | Pending |
 | POLISH-03 | Phase 19 | Pending |
 | POLISH-04 | Phase 19 | Pending |

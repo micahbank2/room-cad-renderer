@@ -52,9 +52,9 @@ Plans:
   6. Sidebar panels are fully scrollable, each section is collapsible, and entire sidebars can be collapsed — verified on every page/view
 **Plans:** 5 plans
 Plans:
-- [ ] 19-01-PLAN.md — Custom element edit handles (drag, rotate, resize) in cadStore + selectTool + fabricSync
+- [x] 19-01-PLAN.md — Custom element edit handles (drag, rotate, resize) in cadStore + selectTool + fabricSync
 - [ ] 19-02-PLAN.md — Wainscot inline edit + copy wall side + frame color override
-- [ ] 19-03-PLAN.md — Sidebar scroll, collapsible sections, and sidebar collapse toggle
+- [x] 19-03-PLAN.md — Sidebar scroll, collapsible sections, and sidebar collapse toggle
 - [ ] 19-04-PLAN.md — Cmd+click multi-select + bulk paint actions
 - [ ] 19-05-PLAN.md — Visual verification checkpoint
 **UI hint**: yes
@@ -75,7 +75,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 18. Color & Paint System | 4/4 | Complete    | 2026-04-06 |
-| 19. v1.2 Polish Pass | 0/5 | Not started | - |
+| 19. v1.2 Polish Pass | 2/5 | In Progress|  |
 | 20. Advanced Materials | 0/? | Not started | - |
 
 ---

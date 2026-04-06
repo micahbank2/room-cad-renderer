@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Color, Polish & Materials
 status: executing
-stopped_at: Completed 18-03-PLAN.md
-last_updated: "2026-04-06T00:47:55.224Z"
+stopped_at: Completed 19-01-PLAN.md
+last_updated: "2026-04-06T01:23:37.254Z"
 last_activity: 2026-04-06
 progress:
   total_phases: 3
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 9
+  completed_plans: 6
   percent: 25
 ---
 
@@ -21,12 +21,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-05)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 18 — color-paint-system
+**Current focus:** Phase 19 — v1-2-polish-pass
 
 ## Current Position
 
-Phase: 19
-Plan: Not started
+Phase: 19 (v1-2-polish-pass) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
 Last activity: 2026-04-06
 
@@ -64,6 +64,8 @@ Decisions are logged in PROJECT.md Key Decisions table. See milestone archives f
 - [Phase 18]: Paint branch in WallMesh placed before color branch to prevent fall-through (Pitfall 3)
 - [Phase 18]: getLimeWashPattern cached at module scope in fabricSync.ts to prevent flicker on Fabric redraws
 - [Phase 18]: Ceiling selection implemented via point-in-polygon in selectTool — consistent with existing wall/product hit-testing; ceilings are select-only (no drag)
+- [Phase 19]: Cast PlacedCustomElement as PlacedProduct for rotation/resize helpers — both types share position/rotation/sizeScale shape so no runtime issue
+- [Phase 19]: hitTestStore returns type=product for custom elements — allows reuse of existing drag/rotate/resize code paths with minimal branching
 
 ### Pending Todos
 
@@ -81,8 +83,8 @@ Known technical prerequisites per phase:
 
 ## Session Continuity
 
-Last session: 2026-04-06T00:39:50.331Z
-Stopped at: Completed 18-03-PLAN.md
+Last session: 2026-04-06T01:23:37.252Z
+Stopped at: Completed 19-01-PLAN.md
 Resume file: None
 
 Next step: Execute 18-02-PLAN.md (paint rendering in 2D/3D)
