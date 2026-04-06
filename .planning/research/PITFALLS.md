@@ -1,112 +1,85 @@
-# Domain Pitfalls
+# Domain Pitfalls: v1.4 Polish & Tech Debt
 
-**Domain:** Interior design CAD — Paint system, material catalog unification, edit handle additions
-**Milestone:** v1.3 Color, Polish & Materials
-**Researched:** 2026-04-05
-**Confidence:** HIGH (codebase directly inspected, Three.js/Fabric.js issues verified against official sources)
+**Domain:** Interior design CAD tool -- deferred polish verification + UI label cleanup
+**Researched:** 2026-04-06
+**Confidence:** HIGH (all pitfalls verified by direct codebase inspection of relevant source files)
 
 ---
 
 ## Critical Pitfalls
 
-Mistakes that cause visual regressions, broken saves, or rewrites.
+Mistakes that cause visual regressions, broken interaction, or data loss.
 
 ---
 
-### Pitfall 1: Three.js Color Space — Farrow & Ball Hex Values Will Render Darker Than Swatch
+### Pitfall 1: Underscore removal destroys the Obsidian CAD design system's visual identity
 
-**What goes wrong:** You define the F&B palette as `#f8f0e3` hex strings and pass them to `meshStandardMaterial color={hex}`. In Three.js r152+ (this project uses Three.js 0.183), `THREE.ColorManagement` is enabled by default and R3F enables it automatically. Hex strings passed as color props are treated as sRGB inputs and converted to linear working space before the shader runs. The conversion makes the color darker than the designer-intended swatch value. A paint called "Off-Black" (#0e0d0d) survives fine, but mid-range warm whites and sage greens — exactly the F&B palette — shift noticeably. Jessica will compare the 3D wall to the F&B website swatches and they won't match.
+**What goes wrong:** The requirement says "remove underscores from UI labels" but the codebase has TWO distinct categories of underscore usage:
 
-**Why it happens:** Three.js internal shader pipeline applies `colorspace_fragment` at the end, converting linear output back to sRGB for display. The round-trip is correct when the input hex is already sRGB — the problem arises when developers accidentally pass hex values that they want to be literal, or when the catalog's stored hex values were eyedropped from the browser (which are already in sRGB) and the pipeline double-converts.
+1. **Intentional design tokens** -- hardcoded labels like `WALL_SURFACE`, `ROOM_CONFIG`, `SYSTEM_STATS`, `COPY_TO_SIDE_B`, `CROWN_MOLDING`, `WAINSCOT_LIBRARY`, `3_INCH`, `6_INCH`. These are the Obsidian CAD theme's signature aesthetic (monospace + tracking-widest + underscores = "CAD terminal" feel). There are 50+ instances across components, help content, and onboarding.
 
-Verified against Three.js forum r152 discussion: "Colors washed out or too dark" — this is the documented breaking change for hex material inputs post-r152.
+2. **Dynamic content labels** -- `.toUpperCase().replace(/\s/g, "_")` applied to user-entered names. These turn "Leather Sofa" into "LEATHER_SOFA". There are exactly 4 call sites:
+   - `PropertiesPanel.tsx:134`
+   - `SidebarProductPicker.tsx:50`
+   - `ProductLibrary.tsx:159`
+   - `RoomTabs.tsx:32`
 
-**Consequences:** Every painted wall surface will be slightly wrong in 3D. The ceiling `CeilingMesh` uses the same pattern (`color={hex}`) at line 26 in `CeilingMesh.tsx` — that code is already shipping and already has this behavior. Adding paint to walls amplifies the discrepancy because now walls and ceilings may visibly mismatch even when set to the same paint color.
+Only category 2 should change. Category 1 IS the design system.
 
-**Prevention:**
-- Store F&B catalog colors as hex sRGB strings (the F&B website values are already sRGB — that's correct).
-- When creating `THREE.Color` instances imperatively, confirm `ColorManagement.enabled === true` (R3F default) and rely on the automatic conversion. Do NOT set `colorSpace = LinearSRGBColorSpace` on material colors.
-- For the 2D Fabric canvas, hex is used directly as fill/stroke and is sRGB-correct by default — no conversion needed there.
-- Write one smoke test: render a `#f5f0e8` color in isolation, read it back, confirm it matches the expected swatch visually. If it looks correct, the pipeline is working.
-- In `WallMesh.tsx`, the current `baseColor = "#f8f5ef"` passes directly to `meshStandardMaterial color={}` — this is the existing pattern and R3F's default auto-conversion handles it correctly. Mirror that pattern exactly for paint colors.
-
-**Detection:** The mismatch is most visible on warm neutrals and muted greens — F&B's most popular colors. Compare `color="#d4c5a9"` (String Warm White) on a 3D wall against the same hex shown in the UI color picker. If the 3D surface is noticeably darker, color space conversion is wrong.
-
-**Phase affected:** Color & Paint System (Phase A).
-
----
-
-### Pitfall 2: Floor Texture Cache Mutates Shared `.repeat` — Breaks Multi-Room and Split View
-
-**What goes wrong:** `getFloorTexture()` in `floorTexture.ts` (lines 70-76) returns a module-level singleton `cached` and calls `cached.repeat.set(x, y)` and `cached.needsUpdate = true` on every invocation. When v1.3 adds a ceiling texture catalog that mirrors this pattern, there will be two module-level caches both mutating `.repeat` on shared `THREE.Texture` instances. In split-view (2D + 3D both mounted), or when switching between rooms with different dimensions, the last render to call `getFloorTexture` or a hypothetical `getCeilingTexture` will corrupt the repeat for all other consumers of that shared reference.
-
-The audit file explicitly calls this out as carried-forward tech debt: "Floor texture cache mutates shared .repeat — fragile under split-view."
-
-**Why it happens:** The cache was designed to avoid re-loading textures but incorrectly treats per-instance state (`.repeat`) as a property it can mutate on the shared object. `THREE.Texture.repeat` is a `THREE.Vector2` that belongs to the texture instance — all materials sharing that texture instance will see the mutated value simultaneously.
+**Why it happens:** A developer interprets "remove underscores" as a global operation, touching hardcoded string literals alongside dynamic `.replace()` calls. Or worse, uses a global find-and-replace regex that also hits code identifiers (`PRODUCT_CATEGORIES`, `MAX_HISTORY`), CSS class names, TypeScript constants, import paths, and data attributes.
 
 **Consequences:**
-- Room A (12ft wide) and Room B (20ft wide) opened in split view: the floor tiles in Room A may suddenly scale to Room B's proportions (or vice versa) mid-session without any user action.
-- A ceiling texture catalog added in v1.3 that copies this pattern will multiply the problem across ceilings + floors.
-- The bug is intermittent and hard to repro in isolation, which makes it a debugging trap.
+- Removing category 1 underscores: `ROOM CONFIG` looks like a broken label, not a design choice. The monospace + tracking-widest + underscore combo reads as "CAD terminal." Without underscores it is just shouty text with no design language.
+- Removing from code identifiers: Build failures, broken constants, test breakage.
 
 **Prevention:**
-- Fix the floor texture cache before adding any new texture catalog. The fix is one of two approaches:
-  1. **Clone on fetch:** `return cached.clone()` — each call gets a new texture handle sharing the GPU-uploaded image data (no re-upload) but with independent `repeat`, `rotation`, `offset` vectors. Three.js documentation confirms `.clone()` shares the source data reference.
-  2. **Keyed cache:** Key the cache on `${roomW}x${roomL}` — return a cached instance per dimension set, with repeat pre-set. Never mutate repeat on a returned instance.
-- Apply the same pattern to any new texture cache added for ceiling materials, wall paint procedural textures, or unified material catalog entries.
+- Scope the fix to ONLY the 4 dynamic `.replace(/\s/g, "_")` call sites listed above.
+- Simply remove the `.replace()` call -- `.toUpperCase()` alone produces "LEATHER SOFA" with a space.
+- Do NOT touch hardcoded string literals like `WALL_SURFACE`, `CROWN_MOLDING`, `SYSTEM_STATS`.
+- Do NOT use a global regex find-and-replace on underscore characters.
+- Run `npm run build` and `npm run test` after each file edit.
 
-**Detection:** Open two rooms with different widths in split view. If the floor tile scale in Room A changes after you switch to Room B, the shared reference mutation is live.
+**Detection:** After the change, product names and room tab labels should have spaces. Section headers (`ROOM_CONFIG`, `WALL_SURFACE`) should still have underscores. TypeScript should compile cleanly.
 
-**Phase affected:** Fix before Advanced Materials (Phase C). The floor cache fix should be Phase B or earlier, since Phase C adds ceiling texture catalog with the same risk.
+**Phase affected:** UI cleanup phase.
 
 ---
 
-### Pitfall 3: Paint Undo/Redo Breaks Because `paintLibrary` Lives Outside Zustand CAD History
+### Pitfall 2: Double-click event collision between dimension labels and wainscot inline edit
 
-**What goes wrong:** The v1.3 paint system needs a global paint library (F&B catalog + custom colors). If that library is stored in a separate Zustand store or an IndexedDB key outside `cadStore`, then `setWallColor` actions that reference a `paintId` will undo/redo correctly (the wall's `paintId` field is in history), but if the user simultaneously edits the paint library (rename, delete a custom color), those library mutations are NOT in `cadStore.past[]`. Undo restores the wall to reference `paintId: "custom-sage-001"` but the paint library no longer contains that ID. The 3D wall falls through to a default color silently — exactly the CUSTOM-05 pattern from v1.2.
+**What goes wrong:** The 2D canvas already uses `mouse:dblclick` for wall dimension label editing (`FabricCanvas.tsx:224`). The handler iterates all walls checking `hitTestDimLabel()`. Adding a wainscot inline-edit double-click handler on the canvas creates ambiguous dispatch -- both features would fire on the same gesture when click targets overlap with wall regions.
 
-The v1.2 audit documented this class of bug explicitly: `customElements` lived at the snapshot level but save call-sites constructed their own payload object and skipped it. The same structural risk applies here.
+**Why it happens:** The wainscot inline edit feature (POLISH-02) is described as "double-click to change style/height in place." If "in place" means on the 2D canvas, it conflicts with the existing dblclick handler. If "in place" means in the sidebar panel, there is no conflict.
 
-**Why it happens:** Catalog CRUD (add/rename/delete paint swatches) and CAD mutations (apply paint to wall) are two different concerns that developers naturally put in two different stores or IndexedDB keys. They're coupled at runtime but decoupled in history.
-
-**Consequences:**
-- Undo a wall color → wall references a paint that no longer exists → fallback color appears → Jessica thinks the undo didn't work.
-- Delete a custom paint swatch → undo does not restore it → all walls that used it go to fallback → silent data loss.
-- Save + reload exposes both failure modes simultaneously.
+**Consequences:** Double-clicking a wall either edits the dimension label when the user wanted wainscoting (or vice versa), or fires both handlers, creating two simultaneous edit states.
 
 **Prevention:**
-- If paint colors are per-project (custom colors only, F&B catalog is static code), store custom colors inside `CADSnapshot` alongside `customElements`. They participate in undo/redo and save automatically.
-- If paint colors are global (shared across projects), they cannot be in `CADSnapshot`. In that case, make wall paint references always degrade gracefully: if `paintId` not found, show fallback but preserve the id in the data so it rehydrates correctly if the library is restored.
-- The F&B static catalog (130 colors, hardcoded in source) never needs IndexedDB or undo — it is always present. Custom user colors are the only catalog data that needs persistence planning.
-- Extend `useAutoSave.ts` subscription to include `customPaints` changes if they live in cadStore, mirroring the CUSTOM-05 fix pattern.
-- When implementing `saveProject` calls in `useAutoSave.ts` and `ProjectManager.tsx`, explicitly include the `customPaints` key in the payload — do not rely on the call-site "forgetting" nothing again.
+- Wainscot inline edit should live in the sidebar `WallSurfacePanel.tsx`, NOT on the canvas. The existing `WainscotLibrary.tsx` already has `onDoubleClick={() => setEditingId(it.id)}` (line 177) for editing library items -- this pattern already exists and should be the verification target.
+- If canvas-based inline edit is truly required, add hit-test priority: dimension labels first (smaller, more specific target), then wainscot regions, with early return on first hit.
+- Verify the existing `WainscotLibrary.tsx` double-click edit path works end-to-end: double-click a library item, change style/height, confirm the change persists and renders correctly in 3D.
 
-**Detection:** Create a custom paint color → apply it to wall → reload → check if wall shows correct color vs fallback.
+**Detection:** Test double-clicking near a wall's dimension label when wainscoting is enabled on that wall. If both editors open or the wrong one opens, the collision exists.
 
-**Phase affected:** Color & Paint System (Phase A). Must be decided before implementation begins, not discovered after.
+**Phase affected:** POLISH-02 (wainscot inline edit).
 
 ---
 
-### Pitfall 4: `selectTool.ts` Hit-Test Does Not Cover `PlacedCustomElement` — Edit Handles Will Be Ignored
+### Pitfall 3: Frame color picker floods undo history during drag interaction
 
-**What goes wrong:** `hitTestStore()` in `selectTool.ts` (lines 91-134) checks `doc.placedProducts` and `doc.walls` only. `PlacedCustomElement` records in `doc.placedCustomElements` are never hit-tested. This means clicking a placed custom element in the 2D canvas does not select it, so none of the planned edit handles (rotate, resize, drag) will fire. This is v1.2 tech debt confirmed in the audit: "Edit-handle wiring: selectTool doesn't hit-test PlacedCustomElement."
+**What goes wrong:** In `WallSurfacePanel.tsx:349`, the `frameColorOverride` color picker's `onChange` calls `useCADStore.getState().updateWallArt(wall.id, a.id, { frameColorOverride: e.target.value })`. The `updateWallArt` action calls `pushHistory()` on every invocation (`cadStore.ts:529-535`). Browser color pickers fire many `change` events during a drag. Each drag position fires `updateWallArt` which pushes a full snapshot -- dragging through colors can flood the undo stack with dozens of intermediate states.
 
-**Why it happens:** The custom element feature was added (Phase 14) as a parallel system to products. The select tool was not extended to cover the new placement type.
+**Why it happens:** The codebase has the `*NoHistory` pattern for drags (e.g., `rotateProductNoHistory`, `resizeProductNoHistory`, `moveCustomElement` vs. history-boundary mousedown pattern). But `updateWallArt` has no no-history variant.
 
-**Consequences:**
-- The v1.3 Polish Pass feature "custom element edit handles" is blocked until `hitTestStore` is extended.
-- Any attempt to add rotate/resize handles for custom elements will be unreachable without this fix.
-- `renderCustomElements` in `fabricSync.ts` already renders them on the canvas. The visual is there; the interactivity isn't.
+**Consequences:** User changes frame color by dragging the picker, then hits Ctrl+Z. Instead of reverting to the original color in one step, they undo through 20+ intermediate color states. The undo stack fills with noise, potentially pushing out meaningful history entries (MAX_HISTORY = 50).
 
 **Prevention:**
-- Phase B (Polish Pass) must add a third hit-test branch to `hitTestStore`: iterate `doc.placedCustomElements`, look up the element in `(useCADStore.getState() as any).customElements`, compute AABB using `el.width * sc` and `el.depth * sc`, return `{ id: p.id, type: "custom-element" }`.
-- Extend `DragType` union in `selectTool.ts` to include `"custom-element"` | `"custom-element-rotate"` | `"custom-element-resize"`.
-- The existing rotate handle (`rotationHandle.ts`) and resize handle (`resizeHandles.ts`) can be reused — they are tool-agnostic hit tests given a position + dims.
-- Add `moveCustomElement` / `rotateCustomElementNoHistory` / `resizeCustomElementNoHistory` actions to cadStore mirroring the product equivalents.
+- Add `updateWallArtNoHistory` action to cadStore, following the existing `*NoHistory` pattern.
+- Use `updateWallArtNoHistory` on the color picker's `onChange` and push history only on the final committed value (on picker close/blur).
+- Alternative: debounce the `updateWallArt` call with a 300ms trailing delay so only the final color pushes history.
 
-**Detection:** Place any custom element → try clicking it → `useUIStore.getState().selectedIds` should contain its id. Currently it will be empty.
+**Detection:** Open a frame color picker, drag through several colors, then count how many Ctrl+Z presses it takes to restore the original color. Should be 1; will be 10+ without the fix.
 
-**Phase affected:** v1.2 Polish Pass (Phase B).
+**Phase affected:** POLISH-04 (frame color override).
 
 ---
 
@@ -114,101 +87,80 @@ The v1.2 audit documented this class of bug explicitly: `customElements` lived a
 
 ---
 
-### Pitfall 5: Lime Wash Toggle as a ShaderMaterial Will Require Color-Space-Correct Output
+### Pitfall 4: copyWallSide silently destroys existing target-side art without confirmation
 
-**What goes wrong:** A lime wash visual effect (chalky, irregular pigment over a base coat) typically requires a custom `ShaderMaterial` or `CustomShaderMaterial` rather than `MeshStandardMaterial` with a color prop. Custom shader materials do NOT automatically receive `colorspace_fragment` injection from Three.js — the developer must manually convert output color from linear to sRGB at the end of the fragment shader, or use `THREE-CustomShaderMaterial` which extends built-in materials and retains the pipeline.
+**What goes wrong:** The `copyWallSide` action (`cadStore.ts:808`) removes ALL existing art on the target side before cloning source art: `wall.wallArt = (wall.wallArt ?? []).filter(a => (a.side ?? "A") !== to)`. Then it clones source-side art with new IDs and the target side value. If the user had carefully positioned art on side B, copying A to B permanently destroys B's art.
 
-If the fragment shader outputs colors in linear space without the colorspace conversion, the lime wash effect will appear washed out relative to the base coat painted with `MeshStandardMaterial`. The mismatch will be most visible at the boundary between a lime-washed wall and a standard-painted ceiling.
+**Why it happens:** "Copy" semantically means "replace" in the current implementation, which is reasonable. But users may expect "merge" or "copy only surface treatments, not art."
+
+**Consequences:** User places carefully positioned art on side B, then copies side A's paint/wainscoting to B (intending to copy only surface treatment). All side B art is gone. Undo is the only recovery path.
 
 **Prevention:**
-- Prefer `THREE-CustomShaderMaterial` (CSM) over raw `ShaderMaterial` — CSM patches into `MeshStandardMaterial`'s pipeline, getting tone mapping and color space conversion for free. The GitHub repo (`FarazzShaikh/THREE-CustomShaderMaterial`) is actively maintained and compatible with R3F.
-- If raw `ShaderMaterial` is used, add `#include <colorspace_fragment>` at the end of the fragment shader to ensure Three.js injects the correct color space output.
-- Alternatively, implement lime wash as a `MeshStandardMaterial` with a procedural `CanvasTexture` (paint the chalky noise pattern using 2D canvas) — no custom shader needed, full pipeline compatibility guaranteed.
-- Given that this is a personal tool with one user and desktop-only target, the `CanvasTexture` approach is the safest path: generate a 512×512 canvas texture with noise overlay once per color, cache by hex key, apply as `map` on top of `MeshStandardMaterial`.
+- Verify the behavior during testing: place art on both sides, copy A to B, confirm B's original art is replaced.
+- Verify undo fully restores the target side's original art.
+- Document "copy = full replace" as accepted behavior for v1.4.
+- If the behavior feels destructive during testing, consider scoping copy to only wallpaper/wainscoting/crown (not wall art). This requires a targeted change to `copyWallSide`.
 
-**Detection:** Lime wash wall adjacent to a plain-painted ceiling. If the lime-washed surface appears obviously brighter or more washed-out than expected, the fragment shader is missing the colorspace conversion.
+**Detection:** Place different art on side A and side B. Copy A to B. Verify B now shows A's art only, not both.
 
-**Phase affected:** Color & Paint System (Phase A) — only if lime wash is implemented as a custom shader.
+**Phase affected:** POLISH-03 (copy wall side).
 
 ---
 
-### Pitfall 6: Farrow & Ball Catalog Bundle Size Is Manageable But Must Stay Out of cadStore History
+### Pitfall 5: copyWallSide shallow-clone risk on nested objects
 
-**What goes wrong:** 130 F&B colors as static TypeScript constants add approximately 15-25KB to the JS bundle (each entry has name, hex, collection, description). That's negligible. The pitfall is if the catalog array is accidentally included in `CADSnapshot` via `JSON.parse(JSON.stringify(state))` in the `snapshot()` function in `cadStore.ts` (lines 81-91). Each undo/redo history entry (max 50) would carry 50× the catalog payload — ~1-1.25MB of heap for history alone, just from static data.
+**What goes wrong:** If `copyWallSide` used spread or `Object.assign` instead of `JSON.parse(JSON.stringify(...))`, both sides would share the same nested object references. Immer's `produce()` would then mutate Side A and Side B would silently change too.
 
-**Why it happens:** Developers add catalog data to a store for easy access, then the snapshot function deep-clones all store state including the catalog.
+**Why it happens:** JavaScript object spread creates shallow copies. Nested objects (wallArt items with `frameColorOverride`, wainscot config with `styleItemId`) remain shared references.
 
-**Prevention:**
-- Keep the F&B static catalog as a plain TypeScript module (`src/data/paintCatalog.ts`) imported directly — never put it in Zustand.
-- Custom user colors (if per-project) live in `cadStore` but as a small `Record<string, {name, hex}>` keyed by id — not the full F&B array.
-- The `snapshot()` function in `cadStore.ts` should explicitly enumerate what it captures. Review line 83-90 after any new store field is added.
+**Consequences:** Editing one side of a wall changes the other side. Undo may not fully revert because the reference is shared.
 
-**Detection:** `JSON.stringify(useCADStore.getState().past[0])` in the console — if it contains F&B catalog data, it's in history.
+**Prevention:** The existing `copyWallSide` action already uses `JSON.parse(JSON.stringify(...))` for deep clones (verified at cadStore.ts lines 787, 793, 799, 811). This is correct. During verification, confirm this by testing:
+1. Copy side A to B.
+2. Edit side A's wallpaper color.
+3. Confirm side B's color did NOT change.
+4. Also verify copied wallArt items have new IDs (not shared IDs with source side) -- the code generates new IDs at line 812.
 
-**Phase affected:** Color & Paint System (Phase A).
+**Detection:** Copy side A to B. Edit side A wallpaper. If side B also changed, shared reference bug exists. The current code is correct but verification confirms it.
 
----
-
-### Pitfall 7: `WallSurfacePanel` Will Have Two Competing Color Inputs — Wallpaper "color" Kind vs Paint Color
-
-**What goes wrong:** `WallSegment.wallpaper` currently uses `kind: "color" | "pattern"` with a `color?: string` field for solid wall color. The new paint system adds paint application to walls. If paint is stored as `paintId` alongside the existing wallpaper structure, the rendering path in `WallMesh.tsx` (lines 92-121) must reconcile two overlapping color sources: `wallpaper.A.kind === "color"` with `wallpaper.A.color` vs a new `paint.A.paintId` field. Without a clear hierarchy, the two systems will silently override each other and users will not understand which control wins.
-
-**Prevention:**
-- Define a clear schema before coding: the paint system adds `paintColor?: { hex: string; paintId?: string }` per-side at `WallSegment` level, separate from `wallpaper`. Paint is the base coat; wallpaper overlays on top. The rendering layer renders paint first, then wallpaper plane on top of it. This matches the real-world hierarchy.
-- Deprecate or remove `wallpaper.kind === "color"` — replace it with a paint-layer concept. Existing saves with `wallpaper: { A: { kind: "color", color: "#fff" } }` need a migration in `snapshotMigration.ts` that lifts the color to the new paint field.
-- Keep the migration additive and idempotent: if `wallpaper.A.kind === "color"` detected, move `color` to `paintColor.hex`, set `wallpaper.A` to undefined.
-
-**Detection:** Apply paint to wall → then apply wallpaper → check that wallpaper appears over the paint, not replacing it. Apply paint → undo → check that no ghost wallpaper remains.
-
-**Phase affected:** Color & Paint System (Phase A).
+**Phase affected:** POLISH-03 (copy wall side).
 
 ---
 
-### Pitfall 8: Copy-Side Button Will Produce a Deep-Clone Reference Trap on Sub-Collections
+### Pitfall 6: Nested scroll containers in sidebar trap scroll events
 
-**What goes wrong:** The "copy SIDE_A → SIDE_B" feature for wall treatments copies a `WainscotConfig`, `CrownConfig`, or `Wallpaper` from one side to the other. If the copy is a shallow `Object.assign` or spread, both sides will share the same object reference in memory. Zustand's Immer `produce()` call will mutate Side A's object and the mutation will propagate to Side B silently because they point to the same reference. This is the same hazard as the `update()` full-replace pattern documented in the v1.1 CLAUDE.md patterns.
+**What goes wrong:** The Sidebar has `overflow-hidden` on the outer `<aside>` and `overflow-y-auto` on the inner scrollable `<div>` (`Sidebar.tsx:57,71`). Several sub-panels within the scrollable area use their own `max-h-* overflow-y-auto` containers (e.g., art library popup in `WallSurfacePanel.tsx:297` uses `max-h-40 overflow-y-auto`). On macOS, when the cursor is over a nested scrollable region that has reached its boundary, the outer sidebar stops scrolling.
+
+**Why it happens:** Browser native scroll event propagation stops at the first `overflow: auto/scroll` element. Once the inner container hits its boundary, scroll events may or may not propagate to the parent depending on platform and momentum.
+
+**Consequences:** User tries to scroll through the sidebar but gets "stuck" when hovering over the art library list, wainscot style list, or product library. They must move the cursor outside the nested container to continue scrolling.
 
 **Prevention:**
-- Always deep-copy when copying side data: `JSON.parse(JSON.stringify(sideAConfig))`.
-- Alternatively, define a `cloneWainscotConfig(config: WainscotConfig): WainscotConfig` helper that constructs a new object — ensures type safety and prevents accidentally sharing nested objects.
-- Add a test: copy SIDE_A config to SIDE_B → mutate SIDE_A color → confirm SIDE_B color did not change.
+- Test with ALL collapsible sections expanded simultaneously.
+- Scroll from top to bottom with the cursor in one position. Verify continuous scrolling.
+- If trapping occurs, add `overscroll-behavior: contain` to inner scroll containers, or remove `max-h` constraints and let inner lists expand fully within the outer scroll context.
+- Also verify `min-h-0` is present on the flex child containing the scrollable area (common flexbox scroll pitfall). Current code has `flex-1` but may need explicit `min-h-0` to prevent the flex child from refusing to shrink below content height.
 
-**Phase affected:** v1.2 Polish Pass (Phase B).
+**Detection:** Open all sidebar sections, hover cursor over any nested scrollable list, try to scroll past it. If scrolling stops, nested scroll trapping is present.
+
+**Phase affected:** POLISH-06 (sidebar scroll verification).
 
 ---
 
-### Pitfall 9: Wainscot Library Edit-in-Place UI Will Trigger Full Re-Render of All Walls Using That Style
+### Pitfall 7: Wainscot style/height state appears lost after undo due to cross-store reference
 
-**What goes wrong:** When a user edits a wainscoting library item (name, height, color), `wainscotStyleStore.updateItem(id, changes)` updates the store. Every `WallMesh` component that reads `useWainscotStyleStore((s) => s.items)` will re-render because the selector returns the entire items array and its reference changes on every update. With 10+ walls in a room, this means 10+ `WallMesh` re-renders plus geometry recalculations (the `useMemo` in `WallMesh.tsx` line 43 depends on `wall` props, not the wainscot items directly, so geometry won't recalculate — but the component still re-renders unnecessarily).
+**What goes wrong:** Wainscoting config on walls stores `styleItemId` as a foreign key to a `WainscotStyleItem` in the separate `wainscotStyleStore`. The `snapshot()` function (`cadStore.ts:95-111`) captures `rooms`, `customElements`, `customPaints`, `recentPaints` but NOT wainscot style items. If a user applies a style, undoes, deletes the style from the library, then redoes -- the wall references a deleted style ID.
 
-**Prevention:**
-- Use a more granular selector: `useWainscotStyleStore((s) => s.items.find((i) => i.id === styleItemId))` inside `WallMesh`. This selector only triggers re-render for walls using that specific style item.
-- This is a performance polish, not a correctness bug. The UX impact in a personal tool with typical room sizes (<20 walls) is probably imperceptible. Defer optimization until it's felt.
-
-**Detection:** Add 15+ walls, all using the same wainscot style. Open library editor, type in the style name field. If the frame rate drops noticeably, the selector is too broad.
-
-**Phase affected:** v1.2 Polish Pass (Phase B).
-
----
-
-### Pitfall 10: Unified Material Catalog Migration Must Handle Existing `FloorMaterial` Records Without Breaking Saves
-
-**What goes wrong:** `RoomDoc.floorMaterial` currently uses `{ kind: "preset" | "custom", presetId?, imageUrl?, scaleFt, rotationDeg }`. If v1.3 unifies ceiling and floor materials into a single catalog schema, existing saved projects still have the old `floorMaterial` shape. A migration in `snapshotMigration.ts` that runs `migrateSnapshot()` on load must handle all three cases:
-
-1. Old preset: `{ kind: "preset", presetId: "WOOD_OAK", scaleFt: 4, rotationDeg: 0 }` → new unified catalog reference
-2. Old custom: `{ kind: "custom", imageUrl: "data:...", scaleFt: 2, rotationDeg: 45 }` → new unified shape preserving the data URL
-3. Missing `floorMaterial` field → no migration needed, field stays absent
-
-The ceiling `material` field is currently just a hex string (`ceiling.material: string`). Migrating it to a unified `CeilingMaterial` type that supports texture presets requires every `Ceiling` record to be touched.
+**Consequences:** `WallMesh.tsx` does `wainscotStyles.find(s => s.id === wains.styleItemId)` -- returns `undefined` -- falls to legacy fallback rendering (different visual, but no crash). User sees unexpected wainscoting appearance.
 
 **Prevention:**
-- Design the unified `MaterialRef` type to be a superset of both existing schemas — add new fields rather than replacing. Keep `kind: "preset" | "custom" | "catalog"` where `"catalog"` is the new unified catalog reference, and `"preset"` and `"custom"` remain valid (migrate lazily or eagerly on load).
-- Write migration in `snapshotMigration.ts` using the same additive-and-idempotent pattern already established for `migrateWallsPerSide`. Test with a real saved project snapshot from v1.2 before shipping.
-- The `CEIL-04` tech debt (preset id path unimplemented — CeilingMesh only handles hex colors) must be resolved as part of this migration. If `ceiling.material` becomes a structured type, the dead code path disappears naturally.
+- Accept this as a known edge case (delete-then-redo is rare for a single-user tool).
+- When verifying wainscot inline edit: test the full cycle (apply style, undo, redo) and confirm the correct style renders.
+- Ensure the fallback rendering path in WallMesh produces reasonable output -- it already does (legacy recessed-panel defaults).
 
-**Detection:** Save a project in v1.2 format. Load it in v1.3. Confirm floor and ceiling materials display correctly without manual re-selection.
+**Detection:** Apply a wainscoting style, undo, redo, confirm 3D renders the correct style (not fallback).
 
-**Phase affected:** Advanced Materials (Phase C).
+**Phase affected:** POLISH-02 (wainscot inline edit verification).
 
 ---
 
@@ -216,59 +168,72 @@ The ceiling `material` field is currently just a hex string (`ceiling.material: 
 
 ---
 
-### Pitfall 11: Per-Placement Frame Override UI Will Duplicate Frame Preset Keys in Multiple Places
+### Pitfall 8: Help content and onboarding reference labels that may become inconsistent
 
-**What goes wrong:** `FRAME_PRESETS` in `framedArt.ts` is the global frame definition. `WallArt.frameStyle` is a key into that record. Adding per-placement frame color override means adding a `frameColorOverride?: string` to `WallArt`. If the override is not clearly documented in the type, future developers (or the same developer in three months) will try to set `frameStyle` to achieve color override and wonder why it doesn't work.
+**What goes wrong:** Help content files (`helpContent.tsx`, `helpIndex.ts`, `onboardingSteps.ts`) contain inline references to UI labels: `ADD_PRODUCT`, `SKIP_DIMENSIONS`, `ROOM_CONFIG`, `3D_VIEW`, `2D_PLAN`. These reference hardcoded design system labels. If the underscore removal is mistakenly applied to help content, the help text will not match the actual UI (which retains underscores).
 
-**Prevention:**
-- Add `frameColorOverride?: string` explicitly to the `WallArt` interface in `cad.ts` with a JSDoc comment: "Overrides the FRAME_PRESETS default color for this placement only. Leave undefined to use preset default."
-- In `WallMesh.tsx` rendering (line 181), use `art.frameColorOverride ?? preset.color` for the frame material color.
+**Prevention:** Do NOT change help content strings. After the fix, open the help panel and spot-check that referenced label names still match the actual UI.
 
-**Phase affected:** v1.2 Polish Pass (Phase B).
+**Detection:** Open help, search for "product" or "room" -- verify referenced labels match the actual UI labels.
+
+**Phase affected:** UI cleanup phase.
 
 ---
 
-### Pitfall 12: 2D Canvas Paint Color Must Match 3D — Fabric `fill` and Three.js `color` Must Be Kept in Sync
+### Pitfall 9: Frame color override persists across frame style changes
 
-**What goes wrong:** When a wall is painted in the 2D canvas (Fabric), the fill color used in `fabricSync.ts` for wall polygons must match what Three.js shows in 3D. Currently `baseColor` in `WallMesh.tsx` is hardcoded to `"#f8f5ef"` (line 88). The 2D canvas wall rendering in `fabricSync.ts` also uses hardcoded fill colors. If paint colors are stored on wall data and only applied in one renderer, the 2D and 3D views will disagree — 2D shows paint, 3D shows drywall, or vice versa.
+**What goes wrong:** If a user sets `frameColorOverride` to red on an art piece, then changes `frameStyle` to "Gold Classic," the art renders with the red override color, not the gold default. The override is sticky and invisible.
 
 **Prevention:**
-- Store paint color on `WallSegment` per-side. Both `fabricSync.ts` (reads wall data to draw Fabric polygons) and `WallMesh.tsx` (reads wall data to render Three.js meshes) must read from the same field.
-- In 2D, the wall polygon `fill` should use the paint color (with some transparency for the drywall-like look). In 3D, `baseColor` in `WallMesh.tsx` should use the paint color with the paint system's roughness/metalness values.
-- Add a single helper function `getWallBaseColor(wall: WallSegment, side: WallSide): string` that both renderers call — single source of truth.
+- Verify behavior: change frame style after setting a color override. Decide if the override should clear on style change.
+- If clearing is desired, add `frameColorOverride: undefined` to the `updateWallArt` call when frame style changes.
+- For v1.4, documenting the behavior is sufficient. The existing guard (`WallSurfacePanel.tsx:344`: color picker only shows when `art.frameStyle && art.frameStyle !== "none"`) is already correct.
 
-**Phase affected:** Color & Paint System (Phase A).
+**Detection:** Set frame color override to red. Change frame style. If the new style renders red instead of its default, the override persists.
+
+**Phase affected:** POLISH-04 (frame color override).
+
+---
+
+### Pitfall 10: CollapsibleSection state resets on sidebar toggle
+
+**What goes wrong:** `CollapsibleSection` uses local `useState` with `defaultOpen` (`Sidebar.tsx:25`). When the sidebar is collapsed and reopened, all sections reset. Sections that were `defaultOpen={false}` (SYSTEM_STATS, LAYERS, SNAP) revert to closed even if the user had opened them.
+
+**Prevention:** Note as known behavior during sidebar scroll verification. Do not fix in v1.4 unless explicitly requested.
+
+**Detection:** Expand all sections, collapse sidebar, reopen. SYSTEM_STATS, LAYERS, SNAP sections will be collapsed again.
+
+**Phase affected:** POLISH-06 (sidebar scroll verification) -- observation only, not a fix target.
 
 ---
 
 ## Phase-Specific Warnings
 
-| Phase | Topic | Likely Pitfall | Mitigation |
-|-------|-------|----------------|------------|
-| Phase A: Color & Paint System | Three.js hex color rendering | Colors render darker than picker swatches (sRGB/linear conversion) | R3F auto-converts sRGB hex correctly — trust the default, do not set LinearSRGBColorSpace manually on material colors |
-| Phase A: Color & Paint System | Paint schema vs wallpaper schema | Two overlapping color sources on wall surfaces silently override each other | Define `paintColor` as separate field from `wallpaper`, migrate `wallpaper.kind==="color"` records in `snapshotMigration.ts` |
-| Phase A: Color & Paint System | Custom paint persistence | Custom colors lost on reload (CUSTOM-05 class of bug) | Put custom user colors in `cadStore`/`CADSnapshot`, not a separate IndexedDB key |
-| Phase A: Color & Paint System | Lime wash as ShaderMaterial | Fragment shader outputs in wrong color space, visible mismatch with standard walls | Use `THREE-CustomShaderMaterial` or implement as `CanvasTexture` over `MeshStandardMaterial` |
-| Phase B: Polish Pass | Custom element hit testing | Edit handles unreachable — click on placed custom element does nothing | Extend `hitTestStore()` in `selectTool.ts` with a third branch for `placedCustomElements` |
-| Phase B: Polish Pass | Copy-side implementation | Shallow copy creates shared reference, mutations bleed across sides | Always deep-copy with `JSON.parse(JSON.stringify(...))` when copying side configs |
-| Phase B: Polish Pass | Library edit-in-place UI | All walls re-render on every keystroke in library editor | Narrow Zustand selector to `find(i => i.id === styleItemId)` per wall |
-| Phase C: Advanced Materials | Unified catalog migration | Old `floorMaterial` and ceiling hex string records incompatible with new catalog type | Additive migration in `snapshotMigration.ts`; resolve `CEIL-04` dead code path simultaneously |
-| Phase C: Advanced Materials | Floor texture cache | `getFloorTexture()` mutates shared `.repeat` — multi-room and split-view corrupt each other | Fix before adding ceiling texture cache: use `.clone()` or key cache by dimensions |
-| Phase A+C: All texture work | Shared texture repeat mutation | Any new texture cache that mutates `.repeat` on a singleton will break split-view | Every texture cache entry must be immutable after creation; set `repeat` before adding to cache |
+| Phase Topic | Likely Pitfall | Mitigation |
+|-------------|---------------|------------|
+| Wainscot inline edit (POLISH-02) | Double-click collision with dimension label editor | Keep edit in sidebar, verify existing WainscotLibrary.tsx onDoubleClick path works end-to-end |
+| Wainscot inline edit (POLISH-02) | Style not persisting through undo/redo | Test apply/undo/redo cycle. Accept wainscotStyleStore-vs-history gap as known edge case |
+| Copy wall side (POLISH-03) | Silent art destruction on target side | Test with art on both sides. Document "copy = full replace" behavior |
+| Copy wall side (POLISH-03) | Shallow clone shares references | Verify JSON.parse(JSON.stringify) in copyWallSide (already correct in code, needs runtime verification) |
+| Frame color override (POLISH-04) | Undo history flooding from color picker drag | Add `updateWallArtNoHistory` or debounce onChange. Follow history-boundary pattern |
+| Frame color override (POLISH-04) | Override persists across frame style changes | Decide policy: clear on style change or keep. Document whichever |
+| Sidebar scroll (POLISH-06) | Nested scroll containers trap scroll events | Test with all sections expanded. Add `overscroll-behavior: contain` if needed |
+| Sidebar scroll (POLISH-06) | Flex child min-height prevents scrollbar | Verify or add `min-h-0` on flex-1 container |
+| Remove underscores (UI cleanup) | Destroying design system labels' underscore aesthetic | Only change 4 dynamic `.replace()` call sites. Leave 50+ hardcoded labels alone |
+| Remove underscores (UI cleanup) | Breaking code identifiers, constants, CSS classes | Edit labels individually, never global regex. Build + test after each file |
+| Remove underscores (UI cleanup) | Help content label references become inconsistent | Do NOT change help content strings |
 
 ---
 
 ## Sources
 
-- Three.js forum — r152 color management changes: [Updates to Color Management in three.js r152](https://discourse.threejs.org/t/updates-to-color-management-in-three-js-r152/50791)
-- Three.js forum — colors washed out or too dark: [r152 Colors washed out or too dark](https://discourse.threejs.org/t/three-js-r152-colors-washed-out-or-too-dark-tips-or-advice/56591)
-- Three.js GitHub — color management documentation: [ColorManagement: Document which colors are in linear vs sRGB space](https://github.com/mrdoob/three.js/issues/26721)
-- Three.js forum — hex color inputs and color space: [Why don't hexadecimal color inputs use the renderer's color space?](https://discourse.threejs.org/t/why-dont-hexadecimal-color-inputs-use-the-renderers-color-space/86420)
-- R3F GitHub — sRGB handling discussion: [Proper sRGB handling in react-three-fiber](https://github.com/pmndrs/react-three-fiber/issues/344)
-- Three.js GitHub — texture ambiguity with repeat on clones: [Ambiguity with texture transformation and texture cloning](https://github.com/mrdoob/three.js/issues/12788)
-- THREE-CustomShaderMaterial: [FarazzShaikh/THREE-CustomShaderMaterial](https://github.com/FarazzShaikh/THREE-CustomShaderMaterial)
-- Zustand — out of memory with large IndexedDB state: [Out of Memory and large (IndexedDB) state](https://github.com/pmndrs/zustand/discussions/1773)
-- Codebase — floor texture cache singleton (inspected): `src/three/floorTexture.ts` lines 67-76
-- Codebase — selectTool hit-test gap (inspected): `src/canvas/tools/selectTool.ts` lines 91-134
-- Codebase — cadStore snapshot function (inspected): `src/stores/cadStore.ts` lines 81-91
-- v1.2 Milestone Audit: `.planning/v1.2-MILESTONE-AUDIT.md` — tech_debt, CUSTOM-05 pattern, CEIL-04 dead code
+- Direct codebase inspection: `cadStore.ts` (copyWallSide lines 777-817, snapshot lines 95-111, updateWallArt lines 529-535)
+- Direct codebase inspection: `WallSurfacePanel.tsx` (frameColorOverride picker line 347, copyWallSide button line 119, frame guard line 344)
+- Direct codebase inspection: `FabricCanvas.tsx` (dblclick handler line 224)
+- Direct codebase inspection: `WainscotLibrary.tsx` (onDoubleClick line 177)
+- Direct codebase inspection: `Sidebar.tsx` (overflow patterns lines 57, 71, CollapsibleSection line 25)
+- Direct codebase inspection: `WallMesh.tsx` (frameColorOverride usage line 206, wainscot style lookup lines 155-160)
+- Grep results: `.toUpperCase().replace(/\s/g, "_")` confirmed in exactly 4 files (PropertiesPanel, SidebarProductPicker, ProductLibrary, RoomTabs)
+- Grep results: 50+ hardcoded `UPPER_SNAKE_CASE` labels across components and help content
+- Project context: `.planning/PROJECT.md`
+- Design system conventions: `CLAUDE.md` (Obsidian CAD theme, UI label convention)
