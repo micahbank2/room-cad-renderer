@@ -38,15 +38,14 @@ created: 2026-04-05
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 18-01-01 | 01 | 1 | PAINT-01 | unit | `npx vitest run src/__tests__/paintStore.test.ts` | ❌ W0 | ⬜ pending |
-| 18-01-02 | 01 | 1 | PAINT-02 | unit | `npx vitest run src/__tests__/farrowAndBall.test.ts` | ❌ W0 | ⬜ pending |
-| 18-02-01 | 02 | 1 | PAINT-03 | unit | `npx vitest run src/__tests__/customPaints.test.ts` | ❌ W0 | ⬜ pending |
-| 18-02-02 | 02 | 1 | PAINT-04 | unit | `npx vitest run src/__tests__/limeWash.test.ts` | ❌ W0 | ⬜ pending |
-| 18-03-01 | 03 | 2 | PAINT-05 | manual | visual 2D/3D | n/a | ⬜ pending |
-| 18-03-02 | 03 | 2 | PAINT-06 | unit | `npx vitest run src/__tests__/applyAllWalls.test.ts` | ❌ W0 | ⬜ pending |
-| 18-03-03 | 03 | 2 | PAINT-07 | unit | `npx vitest run src/__tests__/recentPaints.test.ts` | ❌ W0 | ⬜ pending |
+| 18-01-01 | 01 | 1 | PAINT-01, PAINT-03 | unit | `npx vitest run src/__tests__/farrowAndBall.test.ts src/__tests__/paintStore.test.ts src/__tests__/colorUtils.test.ts` | :x: W0 | :white_large_square: pending |
+| 18-01-02 | 01 | 1 | PAINT-04, PAINT-06, PAINT-07 | unit | `npx vitest run src/__tests__/cadStore.paint.test.ts` | :x: W0 | :white_large_square: pending |
+| 18-02-01 | 02 | 2 | PAINT-01, PAINT-02, PAINT-05 | type-check | `npx tsc --noEmit` | n/a | :white_large_square: pending |
+| 18-03-01 | 03 | 3 | PAINT-01, PAINT-03, PAINT-04 | type-check | `npx tsc --noEmit` | n/a | :white_large_square: pending |
+| 18-03-02 | 03 | 3 | PAINT-05 | manual | visual 2D/3D | n/a | :white_large_square: pending |
+| 18-04-01 | 04 | 4 | PAINT-01 through PAINT-07 | manual | visual full verification | n/a | :white_large_square: pending |
 
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+*Status: :white_large_square: pending · :white_check_mark: green · :x: red · :warning: flaky*
 
 ---
 
@@ -54,12 +53,10 @@ created: 2026-04-05
 
 - [ ] `vitest` + `@testing-library/react` — install dev dependencies
 - [ ] `vitest.config.ts` — basic config with path aliases
-- [ ] `src/__tests__/paintStore.test.ts` — stubs for PAINT-01
-- [ ] `src/__tests__/farrowAndBall.test.ts` — stubs for PAINT-02
-- [ ] `src/__tests__/customPaints.test.ts` — stubs for PAINT-03
-- [ ] `src/__tests__/limeWash.test.ts` — stubs for PAINT-04
-- [ ] `src/__tests__/applyAllWalls.test.ts` — stubs for PAINT-06
-- [ ] `src/__tests__/recentPaints.test.ts` — stubs for PAINT-07
+- [ ] `src/__tests__/farrowAndBall.test.ts` — F&B catalog shape, count, hue families, no dupes
+- [ ] `src/__tests__/paintStore.test.ts` — derived view reflects cadStore.customPaints
+- [ ] `src/__tests__/colorUtils.test.ts` — resolvePaintHex F&B, custom, fallback
+- [ ] `src/__tests__/cadStore.paint.test.ts` — snapshot/undo/redo customPaints + recentPaints, addCustomPaint, removeCustomPaint, applyPaintToAllWalls
 
 ---
 
@@ -67,9 +64,9 @@ created: 2026-04-05
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| Paint color visible in 2D floor plan | PAINT-05 | Visual rendering on Fabric.js canvas | 1. Select wall → apply F&B color → verify fill color in 2D |
-| Paint color visible in 3D view | PAINT-05 | Visual rendering in Three.js scene | 1. Apply paint → switch to 3D → verify material color |
-| Lime wash chalky appearance | PAINT-04 | Visual roughness assessment | 1. Apply paint → enable lime wash → verify matte/chalky look in 3D |
+| Paint color visible in 2D floor plan | PAINT-05 | Visual rendering on Fabric.js canvas | 1. Select wall -> apply F&B color -> verify fill color in 2D |
+| Paint color visible in 3D view | PAINT-05 | Visual rendering in Three.js scene | 1. Apply paint -> switch to 3D -> verify material color |
+| Lime wash chalky appearance | PAINT-04 | Visual roughness assessment | 1. Apply paint -> enable lime wash -> verify matte/chalky look in 3D |
 
 ---
 
