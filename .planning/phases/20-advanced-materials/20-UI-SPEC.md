@@ -33,7 +33,7 @@ Declared values (must be multiples of 4):
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| xs | 4px | Swatch grid gap, inline icon spacing |
+| xs | 4px | Swatch grid gap, inline icon spacing, swatch label margin-top |
 | sm | 8px | Compact element spacing, inner padding |
 | md | 16px | Default section padding, panel padding |
 | lg | 24px | Section breaks within PropertiesPanel |
@@ -47,16 +47,20 @@ Exceptions: Swatch grid uses `gap-1` (4px) to maximize swatches in the 64-wide c
 
 ## Typography
 
-| Role | Size | Weight | Line Height | Font |
-|------|------|--------|-------------|------|
-| Section header | 10px | 400 | 1.2 | IBM Plex Mono |
-| Label | 9px | 400 | 1.2 | IBM Plex Mono |
-| Value | 11px | 400 | 1.3 | IBM Plex Mono |
-| Active mode indicator | 10px | 500 | 1.2 | IBM Plex Mono |
+3 sizes, 2 weights. All UI text uses `font-mono` (IBM Plex Mono). No serif or display fonts in this phase.
 
-Source: Measured from existing FloorMaterialPicker.tsx (`text-[10px]` headers, `text-[9px]` labels, `text-[11px]` values) and PropertiesPanel.tsx.
+| Role | Size | Weight | Line Height | Font | Tailwind |
+|------|------|--------|-------------|------|----------|
+| Micro | 8px | 400 | 1.2 | IBM Plex Mono | `text-[8px]` |
+| Label | 10px | 400 | 1.2 | IBM Plex Mono | `text-[10px]` |
+| Value | 11px | 400 | 1.3 | IBM Plex Mono | `text-[11px]` |
 
-All UI text uses `font-mono` (IBM Plex Mono). No serif or display fonts in this phase.
+Usage mapping:
+- **Micro (8px):** Swatch name labels, override notes (`OVERRIDDEN_BY_MATERIAL`, `OVERRIDDEN_BY_PAINT`)
+- **Label (10px):** Section headers (`SURFACE_MATERIAL`, `CEILING_PAINT`, `FLOOR_MATERIAL`), active mode indicator text, CLEAR_MATERIAL button, UPLOAD_IMAGE button
+- **Value (11px):** Active material indicator (`MATERIAL: PLASTER`), hex values, scale/rotation values
+
+Source: Consolidated from existing FloorMaterialPicker.tsx and PropertiesPanel.tsx patterns. Original 7px and 9px sizes merged up to 8px and 10px respectively for perceptible differentiation.
 
 ---
 
@@ -83,6 +87,18 @@ Source: Existing PropertiesPanel.tsx, SwatchPicker.tsx, FloorMaterialPicker.tsx 
 
 ---
 
+## Focal Points
+
+| Component | Primary Focal Point | Rationale |
+|-----------|-------------------|-----------|
+| SurfaceMaterialPicker | The currently-selected swatch (accent border + ring glow) | User needs to instantly see which material is active among the grid |
+| CeilingPaintSection (full layout) | The active section header in `text-accent-light` | The accent-colored header signals which mode (material vs. paint) is currently controlling the ceiling; the dimmed section recedes |
+| FloorMaterialPicker (updated) | The active preset swatch (accent border) | Same pattern as SurfaceMaterialPicker -- selected state draws the eye |
+
+When no material or paint is selected, no focal point activates -- both sections appear at equal visual weight, inviting the user to choose.
+
+---
+
 ## Component Inventory
 
 ### New Components
@@ -104,7 +120,7 @@ interface Props {
 
 **Layout:** 4-column grid of square color swatches. Each swatch is a button containing:
 1. A square color preview div (`aspect-square`, background-color from material catalog)
-2. A mono label below the swatch (`text-[7px] text-text-dim`, truncated, UPPER_SNAKE_CASE)
+2. A mono label below the swatch (`text-[8px] text-text-dim`, truncated, UPPER_SNAKE_CASE)
 
 **States:**
 | State | Visual |
@@ -117,7 +133,7 @@ interface Props {
 
 **Grid dimensions:** 4 columns. Floor shows 9 swatches (8 presets + CONCRETE shared). Ceiling shows 4 swatches (PLASTER, WOOD_PLANK, PAINTED_DRYWALL, CONCRETE). Grid auto-rows, no fixed height.
 
-**Swatch size:** Each swatch button gets `p-1` (4px) internal padding. The color square fills available width. Label is `mt-0.5` below the square.
+**Swatch size:** Each swatch button gets `p-1` (4px) internal padding. The color square fills available width. Label is `mt-1` (4px) below the square.
 
 ### Modified Components
 
@@ -130,8 +146,8 @@ interface Props {
 **Layout (top to bottom):**
 1. **SURFACE_MATERIAL** header (`text-[10px] text-accent-light tracking-widest`)
 2. SurfaceMaterialPicker with `surface="ceiling"`
-3. Active material indicator: `MATERIAL: {LABEL}` in `text-[9px] text-accent-light` when a material is active, or nothing when no material is selected
-4. CLEAR_MATERIAL button (`text-[9px] text-text-ghost hover:text-text-primary tracking-widest`) -- only visible when a material is active
+3. Active material indicator: `MATERIAL: {LABEL}` in `text-[10px] text-accent-light` when a material is active, or nothing when no material is selected
+4. CLEAR_MATERIAL button (`text-[10px] text-text-ghost hover:text-text-primary tracking-widest`) -- only visible when a material is active
 5. Divider: `border-t border-outline-variant/20 pt-3 mt-3`
 6. **CEILING_PAINT** header (existing)
 7. SwatchPicker (existing) -- visually dimmed when surfaceMaterialId is active: wrapper gets `opacity-40 pointer-events-none`
@@ -151,7 +167,7 @@ interface Props {
 **Layout (top to bottom):**
 1. **FLOOR_MATERIAL** header (existing, unchanged)
 2. SurfaceMaterialPicker with `surface="floor"` and `activeId` derived from current `FloorMaterial.presetId`
-3. **UPLOAD_IMAGE** button: `font-mono text-[9px] text-text-ghost tracking-widest border border-outline-variant/20 rounded-sm py-1 w-full` with hidden file input (existing logic, restyled from dropdown option to standalone button)
+3. **UPLOAD_IMAGE** button: `font-mono text-[10px] text-text-ghost tracking-widest border border-outline-variant/20 rounded-sm py-1 w-full` with hidden file input (existing logic, restyled from dropdown option to standalone button)
 4. Active indicator: color swatch + hex value row (existing pattern, shown when preset or custom is active)
 5. Scale + rotation controls (existing, unchanged)
 6. RESET_TO_DEFAULT button (existing, unchanged)
@@ -261,7 +277,7 @@ Inline style: `backgroundColor: material.color`
 
 ### SurfaceMaterialPicker swatch label
 ```
-font-mono text-[7px] text-text-dim block mt-0.5 truncate
+font-mono text-[8px] text-text-dim block mt-1 truncate
 ```
 
 ### Section header (reused pattern)
@@ -277,7 +293,7 @@ font-mono text-[8px] text-text-ghost tracking-wider italic
 
 ### CLEAR button
 ```
-font-mono text-[9px] text-text-ghost hover:text-text-primary tracking-widest uppercase py-1
+font-mono text-[10px] text-text-ghost hover:text-text-primary tracking-widest uppercase py-1
 ```
 
 ### Dimmed section wrapper
@@ -287,7 +303,7 @@ opacity-40 pointer-events-none
 
 ### UPLOAD_IMAGE button
 ```
-w-full font-mono text-[9px] text-text-ghost hover:text-text-primary tracking-widest uppercase py-1 border border-outline-variant/20 rounded-sm mt-2
+w-full font-mono text-[10px] text-text-ghost hover:text-text-primary tracking-widest uppercase py-1 border border-outline-variant/20 rounded-sm mt-2
 ```
 
 ---
