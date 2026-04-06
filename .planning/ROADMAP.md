@@ -70,7 +70,7 @@ Plans:
 **Plans:** 2 plans
 Plans:
 - [x] 20-01-PLAN.md — Data foundation: unified surface material catalog, floor texture clone fix, cadStore ceiling material action, CeilingMesh resolution
-- [ ] 20-02-PLAN.md — UI: SurfaceMaterialPicker component, CeilingPaintSection material integration, FloorMaterialPicker swatch grid
+- [x] 20-02-PLAN.md — UI: SurfaceMaterialPicker component, CeilingPaintSection material integration, FloorMaterialPicker swatch grid
 **UI hint**: yes
 
 ## Progress
@@ -79,7 +79,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 18. Color & Paint System | 4/4 | Complete    | 2026-04-06 |
 | 19. v1.2 Polish Pass | 4/5 | Complete    | 2026-04-06 |
-| 20. Advanced Materials | 1/2 | In Progress|  |
+| 20. Advanced Materials | 2/2 | Complete   | 2026-04-06 |
 
 ---
 
