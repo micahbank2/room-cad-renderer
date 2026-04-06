@@ -6,6 +6,7 @@ import { useWainscotStyleStore } from "@/stores/wainscotStyleStore";
 import type { Wallpaper } from "@/types/cad";
 import { FRAME_PRESETS } from "@/types/framedArt";
 import { STYLE_META } from "@/types/wainscotStyle";
+import PaintSection from "./PaintSection";
 
 /** Appears in PropertiesPanel when exactly one wall is selected. */
 export default function WallSurfacePanel() {
@@ -163,6 +164,9 @@ export default function WallSurfacePanel() {
           </label>
         )}
       </div>
+
+      {/* Paint — F&B catalog + custom colors (Phase 18) */}
+      <PaintSection wallId={wall.id} side={activeSide} currentWallpaper={wp} />
 
       {/* Wainscoting — pick from library (Phase 16) */}
       <div>

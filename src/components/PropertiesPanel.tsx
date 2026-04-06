@@ -1,10 +1,11 @@
-import { useCADStore, useActiveWalls, useActivePlacedProducts } from "@/stores/cadStore";
+import { useCADStore, useActiveWalls, useActivePlacedProducts, useActiveCeilings } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useProductStore } from "@/stores/productStore";
 import { formatFeet, wallLength } from "@/lib/geometry";
 import type { Product } from "@/types/product";
 import { hasDimensions } from "@/types/product";
 import WallSurfacePanel from "./WallSurfacePanel";
+import CeilingPaintSection from "./CeilingPaintSection";
 
 interface Props {
   productLibrary: Product[];
@@ -14,6 +15,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
   const selectedIds = useUIStore((s) => s.selectedIds);
   const walls = useActiveWalls();
   const placedProducts = useActivePlacedProducts();
+  const ceilings = useActiveCeilings();
   const removeSelected = useCADStore((s) => s.removeSelected);
   const clearSelection = useUIStore((s) => s.clearSelection);
   const updateProduct = useProductStore((s) => s.updateProduct);
@@ -22,8 +24,9 @@ export default function PropertiesPanel({ productLibrary }: Props) {
   const id = selectedIds[0];
   const wall = id ? walls[id] : undefined;
   const pp = id ? placedProducts[id] : undefined;
+  const ceiling = id ? ceilings[id] : undefined;
 
-  if (!wall && !pp) return null;
+  if (!wall && !pp && !ceiling) return null;
 
   function handleDelete() {
     removeSelected(selectedIds);
@@ -35,6 +38,19 @@ export default function PropertiesPanel({ productLibrary }: Props) {
       <h3 className="font-mono text-[10px] text-text-ghost tracking-widest">
         PROPERTIES
       </h3>
+
+      {ceiling && (
+        <div className="space-y-2">
+          <div className="font-mono text-xs text-accent-light">
+            CEILING_{ceiling.id.slice(-4).toUpperCase()}
+          </div>
+          <div className="space-y-1.5">
+            <Row label="HEIGHT" value={`${ceiling.height.toFixed(1)} FT`} />
+            <Row label="VERTICES" value={String(ceiling.points.length)} />
+          </div>
+          <CeilingPaintSection ceilingId={ceiling.id} ceiling={ceiling} />
+        </div>
+      )}
 
       {wall && (
         <div className="space-y-2">

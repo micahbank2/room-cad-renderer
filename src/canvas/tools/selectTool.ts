@@ -85,13 +85,30 @@ function pxToFeet(
 }
 
 /**
+ * Ray-casting point-in-polygon test for ceiling selection.
+ * Returns true if pt is inside the polygon defined by points.
+ */
+function pointInPolygon(pt: Point, polygon: Point[]): boolean {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].x, yi = polygon[i].y;
+    const xj = polygon[j].x, yj = polygon[j].y;
+    const intersect =
+      yi > pt.y !== yj > pt.y &&
+      pt.x < ((xj - xi) * (pt.y - yi)) / (yj - yi) + xi;
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+/**
  * Hit test against CAD store data using real-world coordinates.
  * This avoids Fabric.js containsPoint issues with evented:false objects.
  */
 function hitTestStore(
   feetPos: Point,
   productLibrary: Product[]
-): { id: string; type: "wall" | "product" } | null {
+): { id: string; type: "wall" | "product" | "ceiling" } | null {
   const doc = getActiveRoomDoc();
   if (!doc) return null;
 
@@ -109,6 +126,13 @@ function hitTestStore(
       feetPos.y <= pp.position.y + halfD
     ) {
       return { id: pp.id, type: "product" };
+    }
+  }
+
+  // Check ceilings — point-in-polygon for each ceiling (Phase 18)
+  for (const c of Object.values(doc.ceilings ?? {})) {
+    if (c.points && c.points.length >= 3 && pointInPolygon(feetPos, c.points)) {
+      return { id: c.id, type: "ceiling" };
     }
   }
 
@@ -347,9 +371,18 @@ export function activateSelectTool(
 
     if (hit) {
       useUIStore.getState().select([hit.id]);
+
+      // Ceilings are not draggable — just select, no drag state
+      if (hit.type === "ceiling") {
+        state.dragging = false;
+        state.dragId = null;
+        state.dragType = null;
+        return;
+      }
+
       state.dragging = true;
       state.dragId = hit.id;
-      state.dragType = hit.type;
+      state.dragType = hit.type as "wall" | "product";
 
       if (hit.type === "product") {
         const pp = (getActiveRoomDoc()?.placedProducts ?? {})[hit.id];
