@@ -94,6 +94,62 @@ export function renderCustomElements(
       evented: false,
     });
     fc.add(label);
+
+    // Rotation handle for selected custom element (POLISH-01)
+    if (isSelected && selectedIds.length === 1) {
+      const sc = p.sizeScale ?? 1;
+      const d = el.depth * sc;
+      // Reuse the product rotation handle helper — PlacedCustomElement has
+      // same position/rotation shape as PlacedProduct.
+      const handlePos = getHandleWorldPos(p as unknown as import("@/types/cad").PlacedProduct, d);
+      const hx = origin.x + handlePos.x * scale;
+      const hy = origin.y + handlePos.y * scale;
+      const line = new fabric.Line([cx, cy, hx, hy], {
+        stroke: "#7c5bf0",
+        strokeWidth: 1,
+        selectable: false,
+        evented: false,
+        data: { type: "rotation-handle-line", placedId: p.id },
+      });
+      const circle = new fabric.Circle({
+        left: hx,
+        top: hy,
+        radius: 5,
+        fill: "#12121d",
+        stroke: "#7c5bf0",
+        strokeWidth: 2,
+        originX: "center",
+        originY: "center",
+        selectable: false,
+        evented: false,
+        data: { type: "rotation-handle", placedId: p.id },
+      });
+      fc.add(line);
+      fc.add(circle);
+
+      // Corner resize handles (POLISH-01)
+      const w = el.width * sc;
+      const handles = getResizeHandles(p as unknown as import("@/types/cad").PlacedProduct, w, d);
+      for (const key of ["ne", "nw", "sw", "se"] as const) {
+        const h = handles[key];
+        fc.add(
+          new fabric.Rect({
+            left: origin.x + h.x * scale,
+            top: origin.y + h.y * scale,
+            width: 10,
+            height: 10,
+            fill: "#12121d",
+            stroke: "#7c5bf0",
+            strokeWidth: 2,
+            originX: "center",
+            originY: "center",
+            selectable: false,
+            evented: false,
+            data: { type: "resize-handle", corner: key, placedId: p.id },
+          })
+        );
+      }
+    }
   }
 }
 
