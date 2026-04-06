@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { useCADStore, useActiveRoomDoc } from "@/stores/cadStore";
 import { FLOOR_PRESETS, FLOOR_PRESET_IDS, type FloorPresetId } from "@/data/floorMaterials";
+import SurfaceMaterialPicker from "./SurfaceMaterialPicker";
 import type { FloorMaterial } from "@/types/cad";
 
 export default function FloorMaterialPicker() {
@@ -62,28 +63,24 @@ export default function FloorMaterialPicker() {
         FLOOR_MATERIAL
       </h3>
 
-      {/* Preset dropdown */}
-      <select
-        value={isCustom ? "CUSTOM" : currentPresetId}
-        onChange={(e) => {
-          const v = e.target.value;
-          if (v === "CUSTOM") fileInputRef.current?.click();
-          else handlePreset(v as FloorPresetId | "DEFAULT");
-        }}
-        className="w-full font-mono text-[10px] bg-obsidian-high text-text-primary border border-outline-variant/30 px-2 py-1 rounded-sm mb-2"
+      {/* Preset swatch grid */}
+      <SurfaceMaterialPicker
+        surface="floor"
+        activeId={isCustom ? undefined : (currentPresetId === "DEFAULT" ? undefined : currentPresetId)}
+        onSelect={(id) => handlePreset((id ?? "DEFAULT") as FloorPresetId | "DEFAULT")}
+      />
+
+      {/* Upload button */}
+      <button
+        onClick={() => fileInputRef.current?.click()}
+        className="w-full font-mono text-[10px] text-text-ghost hover:text-text-primary tracking-widest uppercase py-1 border border-outline-variant/20 rounded-sm mt-2"
       >
-        <option value="DEFAULT">DEFAULT_WOOD</option>
-        {FLOOR_PRESET_IDS.map((id) => (
-          <option key={id} value={id}>
-            {FLOOR_PRESETS[id].label}
-          </option>
-        ))}
-        <option value="CUSTOM">{isCustom ? "CUSTOM_IMAGE ✓" : "UPLOAD_IMAGE..."}</option>
-      </select>
+        {isCustom ? "CUSTOM_IMAGE" : "UPLOAD_IMAGE..."}
+      </button>
 
       {/* Color swatch preview */}
       {!isCustom && currentPresetId !== "DEFAULT" && (
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-2 mt-2">
           <div
             className="w-4 h-4 rounded-sm border border-outline-variant/30"
             style={{ backgroundColor: FLOOR_PRESETS[currentPresetId as FloorPresetId].color }}
