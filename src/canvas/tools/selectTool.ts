@@ -302,8 +302,9 @@ export function activateSelectTool(
     const feet = pxToFeet(pointer, origin, scale);
 
     // Rotation handle hit-test takes priority (EDIT-08)
+    const isMetaClick = (opt.e as MouseEvent).metaKey || (opt.e as MouseEvent).ctrlKey;
     const currentSelection = useUIStore.getState().selectedIds;
-    if (currentSelection.length === 1) {
+    if (currentSelection.length === 1 && !isMetaClick) {
       const selId = currentSelection[0];
       const pp = (getActiveRoomDoc()?.placedProducts ?? {})[selId];
       if (pp) {
@@ -422,6 +423,22 @@ export function activateSelectTool(
     const hit = hitTestStore(feet, _productLibrary);
 
     if (hit) {
+      if (isMetaClick) {
+        // Multi-select: toggle the hit item in/out of selection (POLISH-05)
+        const current = useUIStore.getState().selectedIds;
+        if (current.includes(hit.id)) {
+          // Deselect if already selected
+          useUIStore.getState().select(current.filter((id) => id !== hit.id));
+        } else {
+          useUIStore.getState().addToSelection(hit.id);
+        }
+        // Do NOT start drag on meta-click — just adjust selection
+        state.dragging = false;
+        state.dragId = null;
+        state.dragType = null;
+        return;
+      }
+
       useUIStore.getState().select([hit.id]);
 
       // Ceilings are not draggable — just select, no drag state
