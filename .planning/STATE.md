@@ -1,16 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.2
-milestone_name: New Element Types
-status: planning
-stopped_at: Requirements + roadmap drafted, awaiting Phase 11 planning
-last_updated: "2026-04-05T17:00:00.000Z"
-last_activity: 2026-04-05
+milestone: v1.3
+milestone_name: candidates
+status: "REQUIREMENTS.md + ROADMAP.md drafted. Next: `/gsd:plan-phase 11`"
+stopped_at: Completed 19-03-PLAN.md
+last_updated: "2026-04-06T01:23:10.124Z"
 progress:
-  total_phases: 4
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_phases: 19
+  completed_phases: 19
+  total_plans: 36
+  completed_plans: 36
   percent: 0
 ---
 
@@ -75,6 +74,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05-multi-room P02 | 2m | 1 tasks | 2 files |
 | Phase 05-multi-room P03 | 5m | 2 tasks | 22 files |
 | Phase 05.1-v1-integration-gaps P00 | 2m | 3 tasks | 3 files |
+| Phase 19 P03 | 8 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -124,6 +124,7 @@ Recent decisions affecting current work:
 - [Phase 05.1-v1-integration-gaps]: 05.1-00: startup hydration in App.tsx via async IIFE + cancel flag; listProjects DESC first entry restores last-saved project
 - [Phase 05.1-v1-integration-gaps]: 05.1-00: WalkCameraController keyed on activeRoomId replaces didSpawn gate — camera respawns at room center on every active-room change
 - [Phase 05.1-v1-integration-gaps]: 05.1-00: orbitPosRef initialized non-null; useEffect on cameraMode restores camera.position.set + ctrl.update() on walk->orbit
+- [Phase 19]: CollapsibleSection is a local file-scoped component in Sidebar.tsx; SYSTEM_STATS/LAYERS/SNAP default collapsed to reduce initial sidebar height
 
 ### Pending Todos
 
@@ -134,6 +135,7 @@ None yet.
 - None blocking — all v1.0 blockers resolved.
 
 Known non-blocking debt (carried to v1.1 candidates):
+
 - Nyquist compliance flag not flipped for any phase (VALIDATION.md files exist, formal sign-off deferred)
 - Phase 1 UI interactions never manually verified in browser (VERIFICATION.md status `human_needed`)
 - Floor texture cache mutates shared `.repeat` — fragile under split-view
@@ -141,6 +143,6 @@ Known non-blocking debt (carried to v1.1 candidates):
 
 ## Session Continuity
 
-Last session: 2026-04-05T15:00:00.000Z
-Stopped at: v1.0 milestone archived, tagged v1.0
+Last session: 2026-04-06T01:23:10.121Z
+Stopped at: Completed 19-03-PLAN.md
 Resume file: None
