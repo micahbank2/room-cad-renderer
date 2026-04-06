@@ -22,13 +22,16 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 See `.planning/ROADMAP.md` for links to each milestone archive.
 
-## Next Milestone Goals
+## Current Milestone: v1.4 Polish & Tech Debt
 
-Planning next milestone. Candidate areas:
-- **v1.4 Polish & Verification** — verify POLISH-02/03/04/06, fix remaining v1.3 edge cases, product library UX improvements
-- **v2.0 Backend + Sharing** — Fastify + Postgres + R2, auth, project sharing (major scope increase)
+**Goal:** Close all deferred v1.3 verification gaps and clean up UI label formatting.
 
-Run `/gsd:new-milestone` to define scope.
+**Target features:**
+- Wainscot inline edit — double-click to change style/height in place (POLISH-02)
+- Copy wall treatment to opposite side (POLISH-03)
+- Frame style override per wall art piece (POLISH-04)
+- Sidebar scroll verification — ensure all panels scroll correctly (POLISH-06)
+- Remove all underscores from UI labels (UI cleanup)
 
 ## Target User
 
@@ -114,7 +117,7 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 
 ### Active
 
-Next milestone requirements to be defined via `/gsd:new-milestone`.
+v1.4 requirements — see `.planning/REQUIREMENTS.md`
 
 ### Out of Scope
 
@@ -178,4 +181,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-06 after v1.3 milestone*
+*Last updated: 2026-04-06 after v1.4 milestone start*
