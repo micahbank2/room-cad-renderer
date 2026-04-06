@@ -13,7 +13,9 @@ export default function WainscotLibrary() {
   const items = useWainscotStyleStore((s) => s.items);
   const addItem = useWainscotStyleStore((s) => s.addItem);
   const removeItem = useWainscotStyleStore((s) => s.removeItem);
+  const updateItem = useWainscotStyleStore((s) => s.updateItem);
   const [creating, setCreating] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Omit<WainscotStyleItem, "id">>({
     name: "",
     style: "recessed-panel",
@@ -171,29 +173,70 @@ export default function WainscotLibrary() {
           {items.map((it) => (
             <li
               key={it.id}
-              className="flex items-center justify-between bg-obsidian-high rounded-sm px-2 py-1.5"
+              className="bg-obsidian-high rounded-sm px-2 py-1.5"
+              onDoubleClick={() => setEditingId(it.id)}
+              title="DOUBLE_CLICK_TO_EDIT"
             >
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                <div
-                  className="w-3 h-3 rounded-sm border border-outline-variant/30 shrink-0"
-                  style={{ backgroundColor: it.color }}
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="font-mono text-[10px] text-text-primary truncate">
-                    {it.name.toUpperCase()}
-                  </div>
-                  <div className="font-mono text-[8px] text-text-ghost">
-                    {STYLE_META[it.style].label} · {it.heightFt}'
+              {editingId === it.id ? (
+                <div className="space-y-1 w-full">
+                  <input
+                    type="text"
+                    value={it.name}
+                    onChange={(e) => updateItem(it.id, { name: e.target.value })}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === "Escape") setEditingId(null);
+                    }}
+                    autoFocus
+                    className="w-full font-mono text-[10px] bg-obsidian-base text-text-primary border border-accent/50 px-1 py-0.5 rounded-sm"
+                  />
+                  <div className="flex items-center gap-1">
+                    <NumberKnob
+                      label="HT"
+                      value={it.heightFt}
+                      step={0.25}
+                      min={0.5}
+                      max={8}
+                      onChange={(v) => updateItem(it.id, { heightFt: v })}
+                    />
+                    <input
+                      type="color"
+                      value={it.color}
+                      onChange={(e) => updateItem(it.id, { color: e.target.value })}
+                      className="w-7 h-6 bg-transparent border border-outline-variant/30 rounded-sm cursor-pointer"
+                    />
+                    <button
+                      onClick={() => setEditingId(null)}
+                      className="font-mono text-[9px] text-accent-light hover:text-accent px-1"
+                    >
+                      DONE
+                    </button>
                   </div>
                 </div>
-              </div>
-              <button
-                onClick={() => removeItem(it.id)}
-                title="Delete from library"
-                className="font-mono text-[9px] text-text-ghost hover:text-text-primary px-1"
-              >
-                ✕
-              </button>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <div
+                      className="w-3 h-3 rounded-sm border border-outline-variant/30 shrink-0"
+                      style={{ backgroundColor: it.color }}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="font-mono text-[10px] text-text-primary truncate">
+                        {it.name.toUpperCase()}
+                      </div>
+                      <div className="font-mono text-[8px] text-text-ghost">
+                        {STYLE_META[it.style].label} · {it.heightFt}'
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => removeItem(it.id)}
+                    title="Delete from library"
+                    className="font-mono text-[9px] text-text-ghost hover:text-text-primary px-1"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
             </li>
           ))}
         </ul>
