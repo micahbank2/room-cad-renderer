@@ -63,7 +63,9 @@
   2. User can select a placed wall art piece and change its frame color independently from the default frame style
   3. User can expand every sidebar section simultaneously and scroll the full panel without any content clipping or overflow hiding
   4. Frame color changes do not flood undo history (each picker interaction produces at most one undo entry)
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 21-01-PLAN.md — Fix frame color undo flooding + sidebar scroll CSS + tests for copyWallSide
 **UI hint**: yes
 
 ### Phase 22: Wainscot Inline Edit
@@ -96,6 +98,6 @@ Phases execute in numeric order: 21 → 22 → 23
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 21. Deferred Feature Verification | v1.4 | 0/TBD | Not started | - |
+| 21. Deferred Feature Verification | v1.4 | 0/1 | Planned | - |
 | 22. Wainscot Inline Edit | v1.4 | 0/TBD | Not started | - |
 | 23. Label Cleanup | v1.4 | 0/TBD | Not started | - |
