@@ -9,11 +9,11 @@ Requirements for milestone v1.3 — Color, Polish & Materials. Each maps to road
 
 ### Color & Paint System
 
-- [ ] **PAINT-01**: User can apply a paint color to any wall side (2D shows solid fill, 3D shows colored material)
-- [ ] **PAINT-02**: User can apply a paint color to any ceiling (2D + 3D)
+- [x] **PAINT-01**: User can apply a paint color to any wall side (2D shows solid fill, 3D shows colored material)
+- [x] **PAINT-02**: User can apply a paint color to any ceiling (2D + 3D)
 - [ ] **PAINT-03**: User can browse Farrow & Ball 132-color catalog with swatch grid, name search, and hue family filter
 - [ ] **PAINT-04**: User can create, name, save, and delete custom paint colors via hex picker
-- [ ] **PAINT-05**: User can toggle lime wash finish on any paint color (renders as matte chalky surface in 3D)
+- [x] **PAINT-05**: User can toggle lime wash finish on any paint color (renders as matte chalky surface in 3D)
 - [ ] **PAINT-06**: User sees a recently-used palette row showing last-used paint colors
 - [ ] **PAINT-07**: User can apply one paint color to all walls in a room with a single action
 
@@ -59,11 +59,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PAINT-01 | Phase 18 | Pending |
-| PAINT-02 | Phase 18 | Pending |
+| PAINT-01 | Phase 18 | Complete |
+| PAINT-02 | Phase 18 | Complete |
 | PAINT-03 | Phase 18 | Pending |
 | PAINT-04 | Phase 18 | Pending |
-| PAINT-05 | Phase 18 | Pending |
+| PAINT-05 | Phase 18 | Complete |
 | PAINT-06 | Phase 18 | Pending |
 | PAINT-07 | Phase 18 | Pending |
 | POLISH-01 | Phase 19 | Pending |

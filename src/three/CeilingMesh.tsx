@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 import type { Ceiling } from "@/types/cad";
+import { resolvePaintHex } from "@/lib/colorUtils";
+import { usePaintStore } from "@/stores/paintStore";
 
 interface Props {
   ceiling: Ceiling;
@@ -9,6 +11,7 @@ interface Props {
 
 /** Ceiling rendered as a horizontal polygon mesh at its height, facing down. */
 export default function CeilingMesh({ ceiling, isSelected }: Props) {
+  const customColors = usePaintStore((s) => s.customColors);
   const geometry = useMemo(() => {
     const shape = new THREE.Shape();
     if (ceiling.points.length === 0) return new THREE.ShapeGeometry(shape);
@@ -23,7 +26,10 @@ export default function CeilingMesh({ ceiling, isSelected }: Props) {
     return geom;
   }, [ceiling.points]);
 
-  const color = ceiling.material.startsWith("#") ? ceiling.material : "#f5f5f5";
+  const color = ceiling.paintId
+    ? resolvePaintHex(ceiling.paintId, customColors)
+    : ceiling.material.startsWith("#") ? ceiling.material : "#f5f5f5";
+  const roughness = ceiling.limeWash ? 0.95 : 0.8;
 
   return (
     <mesh
@@ -34,7 +40,7 @@ export default function CeilingMesh({ ceiling, isSelected }: Props) {
       <meshStandardMaterial
         color={color}
         side={THREE.DoubleSide}
-        roughness={0.8}
+        roughness={roughness}
         metalness={0}
         emissive={isSelected ? "#7c5bf0" : "#000000"}
         emissiveIntensity={isSelected ? 0.2 : 0}

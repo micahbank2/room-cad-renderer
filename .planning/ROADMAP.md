@@ -33,7 +33,7 @@
   5. User can paint all walls in the current room a single color in one action, and the recently-used palette row reflects the colors just applied
 **Plans:** 4 plans
 Plans:
-- [ ] 18-01-PLAN.md — Data foundation: types, F&B catalog, paintStore, colorUtils, cadStore extensions
+- [x] 18-01-PLAN.md — Data foundation: types, F&B catalog, paintStore, colorUtils, cadStore extensions
 - [ ] 18-02-PLAN.md — Rendering: 3D paint + lime wash in WallMesh/CeilingMesh, 2D paint + lime wash in fabricSync
 - [ ] 18-03-PLAN.md — UI: PaintSection component, CeilingPaintSection, WallSurfacePanel integration
 - [ ] 18-04-PLAN.md — Visual verification checkpoint
@@ -66,7 +66,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 18. Color & Paint System | 0/4 | Planned | - |
+| 18. Color & Paint System | 1/4 | In Progress|  |
 | 19. v1.2 Polish Pass | 0/? | Not started | - |
 | 20. Advanced Materials | 0/? | Not started | - |
 

@@ -16,6 +16,33 @@ import { getHandleWorldPos } from "./rotationHandle";
 import { getResizeHandles } from "./resizeHandles";
 import { getWallEndpointHandles, getWallThicknessHandle } from "./wallEditHandles";
 import { getOpeningHandles } from "./openingEditHandles";
+import { resolvePaintHex } from "@/lib/colorUtils";
+import { usePaintStore } from "@/stores/paintStore";
+
+// ---------------------------------------------------------------------------
+// Lime wash pattern — cached to prevent flicker on every redraw (Pitfall 5).
+// Fixed dot positions (no Math.random()) guarantee stable output.
+// ---------------------------------------------------------------------------
+let _cachedLimeWashPattern: fabric.Pattern | null = null;
+function getLimeWashPattern(): fabric.Pattern {
+  if (_cachedLimeWashPattern) return _cachedLimeWashPattern;
+  const size = 32;
+  const patternCanvas = document.createElement("canvas");
+  patternCanvas.width = size;
+  patternCanvas.height = size;
+  const ctx = patternCanvas.getContext("2d")!;
+  const dots = [
+    [4, 7], [12, 3], [20, 15], [28, 8], [8, 22], [16, 28], [24, 20], [30, 27],
+  ] as const;
+  for (const [x, y] of dots) {
+    ctx.fillStyle = "rgba(255,255,255,0.18)";
+    ctx.beginPath();
+    ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  _cachedLimeWashPattern = new fabric.Pattern({ source: patternCanvas, repeat: "repeat" });
+  return _cachedLimeWashPattern;
+}
 
 /** Render placed custom elements as filled rectangles on the 2D canvas. */
 export function renderCustomElements(
@@ -78,15 +105,26 @@ export function renderCeilings(
   origin: { x: number; y: number },
   selectedIds: string[],
 ) {
+  const customColors = usePaintStore.getState().customColors;
   for (const c of Object.values(ceilings)) {
     const pts = c.points.map((p) => ({
       x: origin.x + p.x * scale,
       y: origin.y + p.y * scale,
     }));
     const isSelected = selectedIds.includes(c.id);
+
+    // Resolve fill: paintId takes precedence over material string
+    let baseFill: string;
+    if (c.paintId) {
+      const hex = resolvePaintHex(c.paintId, customColors);
+      baseFill = hex + "30"; // translucent overlay like the existing material path
+    } else {
+      baseFill = c.material.startsWith("#") ? c.material + "30" : "rgba(124,91,240,0.08)";
+    }
+
     fc.add(
       new fabric.Polygon(pts, {
-        fill: c.material.startsWith("#") ? c.material + "30" : "rgba(124,91,240,0.08)",
+        fill: baseFill,
         stroke: isSelected ? "#7c5bf0" : "#938ea0",
         strokeWidth: isSelected ? 2 : 1,
         strokeDashArray: [4, 4],
@@ -95,6 +133,21 @@ export function renderCeilings(
         data: { type: "ceiling", ceilingId: c.id },
       }),
     );
+
+    // Lime wash stipple overlay
+    if (c.limeWash && pts.length >= 3) {
+      fc.add(
+        new fabric.Polygon([...pts], {
+          fill: getLimeWashPattern(),
+          opacity: 0.2,
+          stroke: undefined,
+          strokeWidth: 0,
+          selectable: false,
+          evented: false,
+          data: { type: "ceiling-limewash", ceilingId: c.id },
+        }),
+      );
+    }
   }
 }
 
@@ -135,6 +188,8 @@ export function renderWalls(
     }
   }
 
+  const customColors = usePaintStore.getState().customColors;
+
   for (const wall of Object.values(walls)) {
     const corners = wallCorners(wall);
     const isSelected = selectedIds.includes(wall.id);
@@ -144,8 +199,15 @@ export function renderWalls(
       y: origin.y + c.y * scale,
     }));
 
+    // Resolve wall fill: kind="paint" on Side A takes precedence
+    let wallFill = WALL_FILL;
+    const wpA = wall.wallpaper?.A;
+    if (wpA?.kind === "paint" && wpA.paintId) {
+      wallFill = resolvePaintHex(wpA.paintId, customColors);
+    }
+
     const polygon = new fabric.Polygon(points, {
-      fill: WALL_FILL,
+      fill: wallFill,
       stroke: isSelected ? WALL_SELECTED_STROKE : WALL_STROKE,
       strokeWidth: isSelected ? 2 : 1,
       selectable: false, // selection handled by tool
@@ -154,6 +216,21 @@ export function renderWalls(
     });
 
     fc.add(polygon);
+
+    // Lime wash stipple overlay for painted walls
+    if (wpA?.kind === "paint" && wpA.limeWash) {
+      fc.add(
+        new fabric.Polygon([...points], {
+          fill: getLimeWashPattern(),
+          opacity: 0.2,
+          stroke: undefined,
+          strokeWidth: 0,
+          selectable: false,
+          evented: false,
+          data: { type: "wall-limewash", wallId: wall.id },
+        }),
+      );
+    }
 
     // Render openings as white rectangles cut into the wall
     for (const opening of wall.openings) {
