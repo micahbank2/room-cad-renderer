@@ -53,9 +53,9 @@ Plans:
 **Plans:** 5 plans
 Plans:
 - [x] 19-01-PLAN.md — Custom element edit handles (drag, rotate, resize) in cadStore + selectTool + fabricSync
-- [ ] 19-02-PLAN.md — Wainscot inline edit + copy wall side + frame color override
+- [x] 19-02-PLAN.md — Wainscot inline edit + copy wall side + frame color override
 - [x] 19-03-PLAN.md — Sidebar scroll, collapsible sections, and sidebar collapse toggle
-- [ ] 19-04-PLAN.md — Cmd+click multi-select + bulk paint actions
+- [x] 19-04-PLAN.md — Cmd+click multi-select + bulk paint actions
 - [ ] 19-05-PLAN.md — Visual verification checkpoint
 **UI hint**: yes
 
@@ -75,7 +75,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 18. Color & Paint System | 4/4 | Complete    | 2026-04-06 |
-| 19. v1.2 Polish Pass | 2/5 | In Progress|  |
+| 19. v1.2 Polish Pass | 4/5 | In Progress|  |
 | 20. Advanced Materials | 0/? | Not started | - |
 
 ---

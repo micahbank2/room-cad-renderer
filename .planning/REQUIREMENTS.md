@@ -23,7 +23,7 @@ Requirements for milestone v1.3 — Color, Polish & Materials. Each maps to road
 - [ ] **POLISH-02**: User can edit wainscot library styles in-place from the library panel
 - [ ] **POLISH-03**: User can copy all SIDE_A wall treatments to SIDE_B with one click
 - [ ] **POLISH-04**: User can override frame color per-placement for framed wall art
-- [ ] **POLISH-05**: User can Cmd+click to multi-select walls/elements in 2D, then apply bulk actions (e.g. paint all selected walls one color)
+- [x] **POLISH-05**: User can Cmd+click to multi-select walls/elements in 2D, then apply bulk actions (e.g. paint all selected walls one color)
 - [ ] **POLISH-06**: Sidebar panels are fully scrollable (no content cut off), each section is collapsible, and entire left/right sidebars can be collapsed — verified on every page/view
 
 ### Advanced Materials
@@ -72,7 +72,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | POLISH-02 | Phase 19 | Pending |
 | POLISH-03 | Phase 19 | Pending |
 | POLISH-04 | Phase 19 | Pending |
-| POLISH-05 | Phase 19 | Pending |
+| POLISH-05 | Phase 19 | Complete |
 | POLISH-06 | Phase 19 | Pending |
 | MAT-01 | Phase 20 | Pending |
 | MAT-02 | Phase 20 | Pending |
