@@ -18,6 +18,7 @@ export default function WallSurfacePanel() {
   const toggleCrownMolding = useCADStore((s) => s.toggleCrownMolding);
   const addWallArt = useCADStore((s) => s.addWallArt);
   const removeWallArt = useCADStore((s) => s.removeWallArt);
+  const copyWallSide = useCADStore((s) => s.copyWallSide);
   const wallpaperFileRef = useRef<HTMLInputElement>(null);
   const artFileRef = useRef<HTMLInputElement>(null);
   const framedArtItems = useFramedArtStore((s) => s.items);
@@ -111,6 +112,15 @@ export default function WallSurfacePanel() {
           </button>
         ))}
       </div>
+      <button
+        onClick={() => {
+          const target = activeSide === "A" ? "B" : "A";
+          copyWallSide(wall.id, activeSide, target);
+        }}
+        className="w-full font-mono text-[9px] text-accent-light hover:text-accent tracking-widest py-1 border border-accent/20 rounded-sm hover:bg-accent/10"
+      >
+        COPY_TO_SIDE_{activeSide === "A" ? "B" : "A"}
+      </button>
 
       {/* Wallpaper */}
       <div>
@@ -323,12 +333,27 @@ export default function WallSurfacePanel() {
                 key={a.id}
                 className="flex items-center justify-between font-mono text-[9px] text-text-dim px-2 py-1 bg-obsidian-high rounded-sm"
               >
-                <span>
-                  {a.width.toFixed(1)}' × {a.height.toFixed(1)}' @ {a.offset.toFixed(1)}ft
-                </span>
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <span className="truncate">
+                    {a.width.toFixed(1)}' × {a.height.toFixed(1)}' @ {a.offset.toFixed(1)}ft
+                  </span>
+                  {a.frameStyle && a.frameStyle !== "none" && (
+                    <input
+                      type="color"
+                      value={a.frameColorOverride ?? FRAME_PRESETS[a.frameStyle].color}
+                      onChange={(e) =>
+                        useCADStore.getState().updateWallArt(wall.id, a.id, {
+                          frameColorOverride: e.target.value,
+                        })
+                      }
+                      title="FRAME_COLOR_OVERRIDE"
+                      className="w-5 h-4 bg-transparent border border-outline-variant/30 rounded-sm cursor-pointer shrink-0"
+                    />
+                  )}
+                </div>
                 <button
                   onClick={() => removeWallArt(wall.id, a.id)}
-                  className="text-text-ghost hover:text-text-primary"
+                  className="text-text-ghost hover:text-text-primary shrink-0"
                 >
                   ✕
                 </button>
