@@ -48,7 +48,7 @@
 
 ## Phases
 
-- [ ] **Phase 21: Deferred Feature Verification** - Verify copy-side, frame override, and sidebar scroll features shipped in v1.3
+- [x] **Phase 21: Deferred Feature Verification** - Verify copy-side, frame override, and sidebar scroll features shipped in v1.3 (completed 2026-04-06)
 - [ ] **Phase 22: Wainscot Inline Edit** - Build double-click inline edit for wainscot style and height
 - [ ] **Phase 23: Label Cleanup** - Remove all underscores from user-facing labels
 
@@ -65,7 +65,7 @@
   4. Frame color changes do not flood undo history (each picker interaction produces at most one undo entry)
 **Plans**: 1 plan
 Plans:
-- [ ] 21-01-PLAN.md — Fix frame color undo flooding + sidebar scroll CSS + tests for copyWallSide
+- [x] 21-01-PLAN.md — Fix frame color undo flooding + sidebar scroll CSS + tests for copyWallSide
 **UI hint**: yes
 
 ### Phase 22: Wainscot Inline Edit
@@ -98,6 +98,6 @@ Phases execute in numeric order: 21 → 22 → 23
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 21. Deferred Feature Verification | v1.4 | 0/1 | Planned | - |
+| 21. Deferred Feature Verification | v1.4 | 1/1 | Complete   | 2026-04-06 |
 | 22. Wainscot Inline Edit | v1.4 | 0/TBD | Not started | - |
 | 23. Label Cleanup | v1.4 | 0/TBD | Not started | - |

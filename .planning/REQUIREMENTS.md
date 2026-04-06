@@ -10,9 +10,9 @@ Requirements for the polish & tech debt milestone. Each maps to roadmap phases.
 ### Verification (Deferred v1.3 Gaps)
 
 - [ ] **POLISH-02**: User can double-click a wainscoted wall to inline-edit wainscot style and height
-- [ ] **POLISH-03**: User can copy wall treatments from SIDE_A to SIDE_B with one click
-- [ ] **POLISH-04**: User can override frame color on individual wall art placements
-- [ ] **POLISH-06**: User can scroll all sidebar panels without content clipping when all sections are expanded
+- [x] **POLISH-03**: User can copy wall treatments from SIDE_A to SIDE_B with one click
+- [x] **POLISH-04**: User can override frame color on individual wall art placements
+- [x] **POLISH-06**: User can scroll all sidebar panels without content clipping when all sections are expanded
 
 ### UI Cleanup
 
@@ -55,9 +55,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | POLISH-02 | Phase 22 | Pending |
-| POLISH-03 | Phase 21 | Pending |
-| POLISH-04 | Phase 21 | Pending |
-| POLISH-06 | Phase 21 | Pending |
+| POLISH-03 | Phase 21 | Complete |
+| POLISH-04 | Phase 21 | Complete |
+| POLISH-06 | Phase 21 | Complete |
 | LABEL-01 | Phase 23 | Pending |
 | LABEL-02 | Phase 23 | Pending |
 
