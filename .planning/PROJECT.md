@@ -12,39 +12,23 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
-**Phase 20 complete (2026-04-06).** Unified surface material catalog (11 entries — 8 floor, 3 ceiling, CONCRETE shared). SurfaceMaterialPicker swatch grid replaces floor dropdown. Ceiling texture presets with 3-tier resolution (material > paint > hex fallback). Floor texture clone fix for split-view safety. v1.3 milestone nearing completion.
+**v1.3 shipped 2026-04-06.** Full paint system (132 Farrow & Ball + custom hex), lime wash finish, bulk painting via multi-select, custom element edit handles, collapsible sidebars, unified surface material catalog. 12/16 requirements shipped; 4 polish items (wainscot inline edit, copy-side, frame override, sidebar verification) landed as code but deferred formal verification to v1.4.
 
-**v1.2 shipped 2026-04-05.** 29 requirements across 7 phases. Beyond
-walls + products: ceilings, floor materials (8 presets + custom
-upload), per-wall wallpaper, wall art, wainscoting, crown molding, a
-custom element builder with per-project catalog, a framed art library
-(7 frame presets), a wainscoting style library (7 real 3D styles with
-live preview), and per-side (SIDE_A/SIDE_B) treatments so divider
-walls between rooms work correctly.
+**v1.2 shipped 2026-04-05.** 29 requirements across 7 phases. Ceilings, floor materials, wallpaper, wall art, wainscoting, crown molding, custom element builder, framed art library, 7 wainscoting styles, per-side wall treatments.
 
-**v1.1 shipped 2026-04-05.** 21 UX fixes across 6 phases. Zoom/pan,
-click accuracy, tool auto-revert, live dimensions, wall rotation,
-product resize, corner-perfect wall rendering, edit handles for every
-placed element, prominent save status, focused welcome screen.
+**v1.1 shipped 2026-04-05.** 21 UX fixes across 6 phases. Zoom/pan, click accuracy, tool auto-revert, live dimensions, wall rotation, product resize, corner-perfect walls, edit handles, save status, welcome screen.
 
-**v1.0 shipped 2026-04-05.** 14 requirements. The core loop works:
-global product library → dimensionally accurate 2D floor plans →
-textured 3D rendering → eye-level walkthrough → PNG export → auto-
-saved + restored on reload.
+**v1.0 shipped 2026-04-05.** 14 requirements. Product library → 2D plans → 3D rendering → walkthrough → export → auto-save.
 
 See `.planning/ROADMAP.md` for links to each milestone archive.
 
-## Current Milestone: v1.3 Color, Polish & Materials
+## Next Milestone Goals
 
-**Goal:** Round out v1.2 with a full paint system, fix v1.2 edit gaps, and unify material catalogs.
+Planning next milestone. Candidate areas:
+- **v1.4 Polish & Verification** — verify POLISH-02/03/04/06, fix remaining v1.3 edge cases, product library UX improvements
+- **v2.0 Backend + Sharing** — Fastify + Postgres + R2, auth, project sharing (major scope increase)
 
-**Target features (in order):**
-- **Color & Paint System** — global paint library, Farrow & Ball catalog (~130 colors), custom color creation, lime wash toggle, apply to walls + ceilings (2D + 3D)
-- **v1.2 Polish Pass** — custom element edit handles, library edit-in-place UI, copy-side buttons, per-placement frame overrides
-- **Advanced Materials** — unified ceiling/floor texture catalog
-
-See `.planning/v1.2-MILESTONE-AUDIT.md` for the full tech debt list
-carried forward.
+Run `/gsd:new-milestone` to define scope.
 
 ## Target User
 
@@ -57,7 +41,7 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - Jessica wants HER products in HER rooms at the right scale
 - "Feel the space" matters as much as "does it fit"
 - Desktop-first (laptop/monitor). iPad is future wishlist, not v1.
-- Codebase is ~8,600 LOC TypeScript across React 18 + Fabric.js + Three.js + Zustand
+- Codebase is ~13,300 LOC TypeScript across React 18 + Fabric.js + Three.js + Zustand
 
 ## Requirements
 
@@ -119,9 +103,18 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - ✓ Per-side wall treatments (SIDE-01/02/03, Phase 17)
 - ✓ Wainscoting style library — 7 real 3D styles + live preview (WAIN-01..04, Phase 16)
 
+**v1.3 Milestone (2026-04-06) — 12 shipped requirements:**
+
+- ✓ Full paint system — F&B catalog, custom hex, lime wash, recently-used, paint-all-walls (PAINT-01..07, Phase 18)
+- ✓ Custom element edit handles — drag, rotate, resize (POLISH-01, Phase 19)
+- ✓ Cmd+click multi-select + bulk paint (POLISH-05, Phase 19)
+- ✓ Unified surface material catalog — floor + ceiling swatch picker (MAT-01/02/03, Phase 20)
+
+*Deferred to v1.4: POLISH-02 (wainscot inline edit), POLISH-03 (copy side), POLISH-04 (frame override), POLISH-06 (sidebar scroll verification)*
+
 ### Active
 
-v1.3 Color, Polish & Materials — requirements being defined.
+Next milestone requirements to be defined via `/gsd:new-milestone`.
 
 ### Out of Scope
 
@@ -149,6 +142,11 @@ v1.3 Color, Polish & Materials — requirements being defined.
 | active-room selector pattern | Single null-guard call-site per action. | ✓ Good — 15 consumers wired cleanly |
 | History-boundary drag pattern | One snapshot at mousedown, no-history per frame. | ✓ Good — smooth drags without history bloat |
 | Module-level async caches (image/texture/floor) | Dedup concurrent loads, naturally dedup via Promise-valued cache. | ✓ Good — no double-fetch bugs |
+| react-colorful for paint picker | Lightweight hex picker, no heavy deps. | ✓ Good — clean integration |
+| Unified surface material catalog | One data file serves both floor and ceiling pickers. | ✓ Good — reduced duplication |
+| Floor texture clone pattern | Clone cached texture, share source — independent repeat per consumer. | ✓ Good — split-view safe |
+| Paint mutual exclusion (paintId clears surfaceMaterialId) | Single material state per ceiling, no ambiguous combos. | ✓ Good — clean UX |
+| CollapsibleSection as file-scoped component | Only Sidebar uses it, no need for shared component. | ✓ Good — minimal surface area |
 
 ## Tech Stack (Current)
 
@@ -180,4 +178,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-05 — v1.3 milestone kickoff*
+*Last updated: 2026-04-06 after v1.3 milestone*
