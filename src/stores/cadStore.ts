@@ -19,6 +19,7 @@ import type {
 import { uid, resizeWall } from "@/lib/geometry";
 import { ROOM_TEMPLATES, type RoomTemplateId } from "@/data/roomTemplates";
 import { migrateSnapshot } from "@/lib/snapshotMigration";
+import type { PaintColor } from "@/types/paint";
 
 const MAX_HISTORY = 50;
 
@@ -71,6 +72,11 @@ interface CADState {
   redo: () => void;
   loadSnapshot: (raw: unknown) => void;
 
+  // Paint actions (Phase 18)
+  addCustomPaint: (item: Omit<PaintColor, "id" | "source">) => string;
+  removeCustomPaint: (id: string) => void;
+  applyPaintToAllWalls: (paintId: string, side: WallSide) => void;
+
   // NEW: room-management actions
   addRoom: (name: string, templateId?: RoomTemplateId) => string;
   renameRoom: (id: string, name: string) => void;
@@ -86,6 +92,12 @@ function snapshot(state: CADState): CADSnapshot {
     activeRoomId: state.activeRoomId,
     ...(root.customElements
       ? { customElements: JSON.parse(JSON.stringify(root.customElements)) }
+      : {}),
+    ...(root.customPaints
+      ? { customPaints: JSON.parse(JSON.stringify(root.customPaints)) }
+      : {}),
+    ...(root.recentPaints
+      ? { recentPaints: [...root.recentPaints] }
       : {}),
   };
 }
@@ -383,6 +395,12 @@ export const useCADStore = create<CADState>()((set) => ({
         if (!doc || !doc.ceilings || !doc.ceilings[id]) return;
         pushHistory(s);
         Object.assign(doc.ceilings[id], changes);
+        // Track recentPaints when applying a paint to ceiling
+        if (changes.paintId) {
+          const root = s as any;
+          const recent: string[] = root.recentPaints ?? [];
+          root.recentPaints = [changes.paintId, ...recent.filter((id: string) => id !== changes.paintId)].slice(0, 8);
+        }
       })
     ),
 
@@ -419,6 +437,12 @@ export const useCADStore = create<CADState>()((set) => ({
         else delete wall.wallpaper[side];
         // Clean up if both sides empty
         if (!wall.wallpaper.A && !wall.wallpaper.B) delete wall.wallpaper;
+        // Track recentPaints when applying a paint kind
+        if (wallpaper?.kind === "paint" && wallpaper.paintId) {
+          const root = s as any;
+          const recent: string[] = root.recentPaints ?? [];
+          root.recentPaints = [wallpaper.paintId, ...recent.filter((id: string) => id !== wallpaper.paintId)].slice(0, 8);
+        }
       })
     ),
 
@@ -611,6 +635,8 @@ export const useCADStore = create<CADState>()((set) => ({
         s.rooms = prev.rooms;
         s.activeRoomId = prev.activeRoomId;
         (s as any).customElements = (prev as any).customElements ?? {};
+        (s as any).customPaints = (prev as any).customPaints ?? [];
+        (s as any).recentPaints = (prev as any).recentPaints ?? [];
       })
     ),
 
@@ -623,6 +649,8 @@ export const useCADStore = create<CADState>()((set) => ({
         s.rooms = next.rooms;
         s.activeRoomId = next.activeRoomId;
         (s as any).customElements = (next as any).customElements ?? {};
+        (s as any).customPaints = (next as any).customPaints ?? [];
+        (s as any).recentPaints = (next as any).recentPaints ?? [];
       })
     ),
 
@@ -633,8 +661,51 @@ export const useCADStore = create<CADState>()((set) => ({
         s.rooms = snap.rooms;
         s.activeRoomId = snap.activeRoomId;
         (s as any).customElements = (snap as any).customElements ?? {};
+        (s as any).customPaints = (snap as any).customPaints ?? [];
+        (s as any).recentPaints = (snap as any).recentPaints ?? [];
         s.past = [];
         s.future = [];
+      })
+    ),
+
+  // Paint actions (Phase 18)
+
+  addCustomPaint: (item) => {
+    const id = `custom_${Math.random().toString(36).slice(2, 10)}`;
+    set(
+      produce((s: CADState) => {
+        pushHistory(s);
+        const root = s as any;
+        const paints: PaintColor[] = root.customPaints ?? [];
+        root.customPaints = [...paints, { id, ...item, source: "custom" }];
+      })
+    );
+    return id;
+  },
+
+  removeCustomPaint: (id) =>
+    set(
+      produce((s: CADState) => {
+        pushHistory(s);
+        const root = s as any;
+        const paints: PaintColor[] = root.customPaints ?? [];
+        root.customPaints = paints.filter((c: PaintColor) => c.id !== id);
+      })
+    ),
+
+  applyPaintToAllWalls: (paintId, side) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        pushHistory(s);
+        for (const wall of Object.values(doc.walls)) {
+          if (!wall.wallpaper) wall.wallpaper = {};
+          wall.wallpaper[side] = { kind: "paint", paintId };
+        }
+        const root = s as any;
+        const recent: string[] = root.recentPaints ?? [];
+        root.recentPaints = [paintId, ...recent.filter((id: string) => id !== paintId)].slice(0, 8);
       })
     ),
 
