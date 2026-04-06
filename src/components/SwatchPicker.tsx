@@ -85,11 +85,11 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
       {/* RECENTLY_USED row */}
       <div>
         <span className="font-mono text-[9px] tracking-widest uppercase text-text-dim">
-          RECENTLY_USED
+          RECENTLY USED
         </span>
         <div className="flex gap-1 flex-wrap mt-1">
           {recentPaints.length === 0 ? (
-            <span className="font-mono text-[9px] text-text-ghost">NO_RECENT_COLORS</span>
+            <span className="font-mono text-[9px] text-text-ghost">NO RECENT COLORS</span>
           ) : (
             recentPaints.map((id) => {
               const hex = resolvePaintHex(id, customColors);
@@ -114,7 +114,7 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
       {/* HUE_FILTER chips */}
       <div>
         <span className="font-mono text-[9px] tracking-widest uppercase text-text-dim">
-          HUE_FILTER
+          HUE FILTER
         </span>
         <div className="flex gap-1 items-center flex-wrap mt-1">
           {HUE_FAMILIES.map((family) => (
@@ -136,7 +136,7 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
       {/* SEARCH_COLORS input */}
       <input
         type="text"
-        placeholder="SEARCH_BY_NAME"
+        placeholder="SEARCH BY NAME"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="w-full bg-obsidian-high border border-outline-variant/20 rounded-sm px-2 py-1 font-mono text-[9px] text-text-primary placeholder:text-text-ghost focus:border-accent/50 outline-none"
@@ -145,12 +145,12 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
       {/* F&B_CATALOG swatch grid */}
       <div>
         <span className="font-mono text-[9px] tracking-widest uppercase text-text-dim">
-          F&amp;B_CATALOG ({filteredColors.length})
+          F&amp;B CATALOG ({filteredColors.length})
         </span>
         <div className="grid grid-cols-8 gap-1 max-h-40 overflow-y-auto mt-1">
           {filteredColors.length === 0 ? (
             <div className="col-span-8 text-center py-2 font-mono text-[9px] text-text-ghost">
-              NO_COLORS_FOUND
+              NO COLORS FOUND
             </div>
           ) : (
             filteredColors.map((c) => (
@@ -176,18 +176,18 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
       <div>
         <div className="flex items-center justify-between">
           <span className="font-mono text-[9px] tracking-widest uppercase text-text-dim">
-            MY_COLORS
+            MY COLORS
           </span>
           <button
             onClick={() => setShowAddForm((v) => !v)}
             className="font-mono text-[9px] text-text-dim hover:text-accent-light"
           >
-            + ADD_COLOR
+            + ADD COLOR
           </button>
         </div>
         <div className="flex gap-1 flex-wrap mt-1">
           {customColors.length === 0 ? (
-            <span className="font-mono text-[9px] text-text-ghost">NO_CUSTOM_COLORS</span>
+            <span className="font-mono text-[9px] text-text-ghost">NO CUSTOM COLORS</span>
           ) : (
             customColors.map((c) => (
               <button
@@ -217,7 +217,7 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
           <div className="mt-2 space-y-2 p-2 bg-obsidian-mid border border-outline-variant/20 rounded-sm">
             <input
               type="text"
-              placeholder="COLOR_NAME"
+              placeholder="COLOR NAME"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => {
@@ -239,7 +239,7 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
                   : "font-mono text-[9px] text-text-ghost cursor-not-allowed"
               }
             >
-              SAVE_COLOR
+              SAVE COLOR
             </button>
           </div>
         )}

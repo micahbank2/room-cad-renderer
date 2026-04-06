@@ -66,7 +66,7 @@ export default function HelpModal() {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-outline-variant/20 shrink-0">
           <h2 className="font-mono text-sm text-text-primary tracking-widest uppercase">
-            Help_&amp;_Documentation
+            Help &amp; Documentation
           </h2>
           <button
             onClick={closeHelp}
@@ -128,10 +128,10 @@ export default function HelpModal() {
                 className="font-mono text-[10px] tracking-widest text-text-dim hover:text-accent-light transition-colors flex items-center gap-1"
               >
                 <span className="material-symbols-outlined text-[14px]">replay</span>
-                REPLAY_TOUR
+                REPLAY TOUR
               </button>
               <span className="font-mono text-[9px] text-text-ghost tracking-widest">
-                ESC_TO_CLOSE
+                ESC TO CLOSE
               </span>
             </div>
           </div>

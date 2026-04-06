@@ -31,7 +31,7 @@ export default function FramedArtLibrary() {
     <div>
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-mono text-[10px] text-text-ghost tracking-widest uppercase">
-          ART_LIBRARY
+          ART LIBRARY
         </h3>
         <button
           onClick={() => setCreating((v) => !v)}
@@ -64,7 +64,7 @@ export default function FramedArtLibrary() {
             onClick={() => fileInputRef.current?.click()}
             className="w-full font-mono text-[9px] tracking-widest py-1 bg-obsidian-base text-text-dim border border-outline-variant/30 rounded-sm hover:text-text-primary"
           >
-            {imageUrl ? "CHANGE_IMAGE" : "+ UPLOAD_IMAGE"}
+            {imageUrl ? "CHANGE IMAGE" : "+ UPLOAD IMAGE"}
           </button>
           {imageUrl && (
             <div className="w-full aspect-video bg-obsidian-base rounded-sm border border-outline-variant/30 overflow-hidden">
@@ -87,14 +87,14 @@ export default function FramedArtLibrary() {
             disabled={!name.trim() || !imageUrl}
             className="w-full font-mono text-[10px] tracking-widest py-1 bg-accent text-white rounded-sm hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
           >
-            SAVE_TO_LIBRARY
+            SAVE TO LIBRARY
           </button>
         </div>
       )}
 
       {items.length === 0 ? (
         <div className="font-mono text-[9px] text-text-ghost text-center py-2">
-          NO_ART_YET
+          NO ART YET
         </div>
       ) : (
         <ul className="space-y-1">

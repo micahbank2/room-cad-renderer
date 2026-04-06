@@ -45,17 +45,17 @@ export default function ProductLibrary({
         <div className="flex items-start justify-between mb-1">
           <div>
             <span className="font-mono text-[10px] text-text-ghost tracking-widest block mb-1">
-              YOUR_LIBRARY
+              YOUR LIBRARY
             </span>
             <h1 className="font-display font-bold text-2xl text-text-primary tracking-tight">
-              PRODUCT_REGISTRY
+              PRODUCT REGISTRY
             </h1>
           </div>
           <button
             onClick={onOpenAddModal}
             className="font-mono text-[10px] tracking-widest px-4 py-2 bg-accent text-white rounded-sm hover:opacity-90 active:scale-95 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
           >
-            + ADD_PRODUCT
+            + ADD PRODUCT
           </button>
         </div>
         <span className="font-mono text-sm text-accent-light">
@@ -67,7 +67,7 @@ export default function ProductLibrary({
       <div className="px-6 pb-3 shrink-0">
         <input
           type="text"
-          placeholder="SEARCH_ASSETS..."
+          placeholder="SEARCH ASSETS..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-64 px-3 py-1.5 text-xs mb-3"
@@ -97,14 +97,14 @@ export default function ProductLibrary({
               inventory_2
             </span>
             <span className="font-mono text-[10px] text-text-ghost tracking-widest">
-              NO_ITEMS_FOUND
+              NO ITEMS FOUND
             </span>
             <button
               onClick={onOpenAddModal}
               className="mt-3 font-mono text-[10px] tracking-widest px-4 py-1.5 text-accent border border-accent/30 rounded-sm hover:bg-accent/10 transition-colors"
             >
-              + ADD_PRODUCT
-            </button>
+              + ADD PRODUCT
+</button>
           </div>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

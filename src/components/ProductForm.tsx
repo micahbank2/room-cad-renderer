@@ -79,7 +79,7 @@ export default function ProductForm({ onAdd }: Props) {
           className="w-3 h-3 accent-accent"
         />
         <span className="font-mono text-[8px] text-text-ghost tracking-wider">
-          SKIP_DIMENSIONS
+          SKIP DIMENSIONS
         </span>
       </label>
       <div className={`grid grid-cols-3 gap-1.5 ${skipDims ? "opacity-40 pointer-events-none" : ""}`}>

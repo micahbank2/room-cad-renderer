@@ -40,7 +40,7 @@ export default function CustomElementsPanel() {
     <div>
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-mono text-[10px] text-text-ghost tracking-widest uppercase">
-          CUSTOM_ELEMENTS
+          CUSTOM ELEMENTS
         </h3>
         <button
           onClick={() => setCreating((v) => !v)}
@@ -107,7 +107,7 @@ export default function CustomElementsPanel() {
 
       {items.length === 0 ? (
         <div className="font-mono text-[9px] text-text-ghost text-center py-2">
-          NO_CUSTOM_ELEMENTS_YET
+          NO CUSTOM ELEMENTS YET
         </div>
       ) : (
         <ul className="space-y-1">

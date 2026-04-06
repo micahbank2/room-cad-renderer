@@ -69,7 +69,7 @@ export function WainscotPopover({ wallId, side, style, onClose }: Props) {
       className="glass-panel ghost-border rounded-sm p-2 w-[180px] outline-none"
     >
       <div className="font-mono text-[10px] text-text-ghost tracking-widest uppercase mb-2">
-        WAINSCOT_EDIT
+        WAINSCOT EDIT
       </div>
 
       {/* Style dropdown */}
@@ -93,7 +93,7 @@ export function WainscotPopover({ wallId, side, style, onClose }: Props) {
           }}
           className="w-full font-mono text-[11px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-1 py-0.5 rounded-sm"
         >
-          <option value="">(LEGACY_DEFAULT)</option>
+          <option value="">(LEGACY DEFAULT)</option>
           {wainscotStyles.map((it) => (
             <option key={it.id} value={it.id}>
               {it.name.toUpperCase()} &middot; {STYLE_META[it.style].label}
@@ -105,7 +105,7 @@ export function WainscotPopover({ wallId, side, style, onClose }: Props) {
       {/* Height input */}
       <div>
         <div className="font-mono text-[10px] text-text-ghost tracking-widest uppercase mb-0.5">
-          HEIGHT_FT
+          HEIGHT FT
         </div>
         <input
           type="number"

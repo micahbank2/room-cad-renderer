@@ -34,8 +34,8 @@ export default function AddRoomDialog({ open, onClose }: Props) {
       data-testid="ADD_ROOM"
     >
       <div className="bg-obsidian-mid border border-outline-variant/30 p-6 w-[480px] font-mono">
-        <h2 className="text-accent-light text-sm mb-4 tracking-widest">ADD_ROOM</h2>
-        <label className="block text-text-dim text-[9px] tracking-wider mb-1">ROOM_NAME</label>
+        <h2 className="text-accent-light text-sm mb-4 tracking-widest">ADD ROOM</h2>
+        <label className="block text-text-dim text-[9px] tracking-wider mb-1">ROOM NAME</label>
         <input
           autoFocus
           value={name}
@@ -51,7 +51,7 @@ export default function AddRoomDialog({ open, onClose }: Props) {
             }
           }}
           className="w-full bg-obsidian-deepest text-text-primary px-2 py-1.5 border border-outline-variant/30 mb-4 font-mono text-xs outline-none focus:border-accent"
-          placeholder="ROOM_NAME"
+          placeholder="ROOM NAME"
         />
         <label className="block text-text-dim text-[9px] tracking-wider mb-2">TEMPLATE</label>
         <div className="grid grid-cols-2 gap-2 mb-4">

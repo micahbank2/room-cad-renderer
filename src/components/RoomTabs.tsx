@@ -57,7 +57,7 @@ export default function RoomTabs({ onAddClick }: Props) {
         onClick={onAddClick}
         className="ml-auto font-mono text-[10px] tracking-wider text-text-dim hover:text-accent-light transition-colors px-2"
       >
-        + ADD_ROOM
+        + ADD ROOM
       </button>
     </div>
   );

@@ -22,7 +22,7 @@ export default function StatusBar() {
       <div className="flex items-center gap-1.5">
         <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
         <span className="font-mono text-[9px] text-text-ghost tracking-widest">
-          {activeTool.toUpperCase()}_TOOL
+          {activeTool.toUpperCase()} TOOL
         </span>
         <span className="font-mono text-[9px] text-text-ghost mx-2">·</span>
         <span className="font-mono text-[9px] text-text-dim tracking-wider">
@@ -41,7 +41,7 @@ export default function StatusBar() {
           SCALE: <span className="text-accent-light">1:50</span>
         </span>
         <span className="font-mono text-[9px] text-text-ghost tracking-wider">
-          CAM: <span className="text-accent-light">{cameraMode === "walk" ? "WALK_MODE" : "ORBIT_MODE"}</span>
+          CAM: <span className="text-accent-light">{cameraMode === "walk" ? "WALK MODE" : "ORBIT MODE"}</span>
         </span>
       </div>
     </div>
