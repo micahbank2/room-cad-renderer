@@ -36,6 +36,8 @@ export default function App() {
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const setTool = useUIStore((s) => s.setTool);
+  const showSidebar = useUIStore((s) => s.showSidebar);
+  const toggleSidebar = useUIStore((s) => s.toggleSidebar);
   const activeWalls = useActiveWalls();
   const wallCount = Object.keys(activeWalls).length;
 
@@ -157,8 +159,19 @@ export default function App() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left sidebar — only on canvas views */}
-        {isCanvas && (
+        {isCanvas && showSidebar && (
           <Sidebar productLibrary={productLibrary} />
+        )}
+
+        {/* Show sidebar button — visible when sidebar is collapsed */}
+        {isCanvas && !showSidebar && (
+          <button
+            onClick={toggleSidebar}
+            className="absolute left-2 top-2 z-20 w-8 h-8 bg-obsidian-low rounded-sm border border-outline-variant/30 flex items-center justify-center hover:bg-obsidian-mid"
+            title="SHOW_SIDEBAR"
+          >
+            <span className="font-mono text-[10px] text-text-dim">&#9776;</span>
+          </button>
         )}
 
         {/* Library view */}

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: candidates
 status: "REQUIREMENTS.md + ROADMAP.md drafted. Next: `/gsd:plan-phase 11`"
-stopped_at: Completed 19-02-PLAN.md
-last_updated: "2026-04-06T01:24:05.643Z"
+stopped_at: Completed 19-03-PLAN.md
+last_updated: "2026-04-06T01:23:10.124Z"
 progress:
-  total_phases: 20
+  total_phases: 19
   completed_phases: 19
   total_plans: 36
-  completed_plans: 37
+  completed_plans: 36
   percent: 0
 ---
 
@@ -74,7 +74,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05-multi-room P02 | 2m | 1 tasks | 2 files |
 | Phase 05-multi-room P03 | 5m | 2 tasks | 22 files |
 | Phase 05.1-v1-integration-gaps P00 | 2m | 3 tasks | 3 files |
-| Phase 19-v1-2-polish-pass P02 | 20 | 2 tasks | 5 files |
+| Phase 19 P03 | 8 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -124,7 +124,7 @@ Recent decisions affecting current work:
 - [Phase 05.1-v1-integration-gaps]: 05.1-00: startup hydration in App.tsx via async IIFE + cancel flag; listProjects DESC first entry restores last-saved project
 - [Phase 05.1-v1-integration-gaps]: 05.1-00: WalkCameraController keyed on activeRoomId replaces didSpawn gate — camera respawns at room center on every active-room change
 - [Phase 05.1-v1-integration-gaps]: 05.1-00: orbitPosRef initialized non-null; useEffect on cameraMode restores camera.position.set + ctrl.update() on walk->orbit
-- [Phase 19-v1-2-polish-pass]: copyWallSide uses JSON.parse(JSON.stringify) deep clone; frameColorOverride uses fire-and-forget getState() pattern in color picker
+- [Phase 19]: CollapsibleSection is a local file-scoped component in Sidebar.tsx; SYSTEM_STATS/LAYERS/SNAP default collapsed to reduce initial sidebar height
 
 ### Pending Todos
 
@@ -143,6 +143,6 @@ Known non-blocking debt (carried to v1.1 candidates):
 
 ## Session Continuity
 
-Last session: 2026-04-06T01:24:05.640Z
-Stopped at: Completed 19-02-PLAN.md
+Last session: 2026-04-06T01:23:10.121Z
+Stopped at: Completed 19-03-PLAN.md
 Resume file: None
