@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Color, Polish & Materials
 status: executing
-stopped_at: Completed 18-01-PLAN.md
-last_updated: "2026-04-06T00:45:00.000Z"
-last_activity: 2026-04-06 -- Phase 18 Plan 01 complete
+stopped_at: Completed 18-02-PLAN.md
+last_updated: "2026-04-06T00:33:11.857Z"
+last_activity: 2026-04-06
 progress:
   total_phases: 3
   completed_phases: 0
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-05)
 ## Current Position
 
 Phase: 18 (color-paint-system) — EXECUTING
-Plan: 2 of 4 (Plan 01 complete)
-Status: Executing Phase 18
-Last activity: 2026-04-06 -- Phase 18 Plan 01 complete
+Plan: 3 of 4 (Plan 01 complete)
+Status: Ready to execute
+Last activity: 2026-04-06
 
 Progress: [██░░░░░░░░] 25%
 
@@ -61,6 +61,8 @@ Decisions are logged in PROJECT.md Key Decisions table. See milestone archives f
 - Floor texture cache `.repeat` mutation fix (`.clone()`) is first task of Phase 20 — prerequisite for all texture catalog work
 - `copyWallSide` must use `JSON.parse(JSON.stringify(...))` for deep clone — prevents shared object reference bugs
 - `selectTool.ts` hit-test extension for `placedCustomElements` is first task of Phase 19
+- [Phase 18]: Paint branch in WallMesh placed before color branch to prevent fall-through (Pitfall 3)
+- [Phase 18]: getLimeWashPattern cached at module scope in fabricSync.ts to prevent flicker on Fabric redraws
 
 ### Pending Todos
 
@@ -78,8 +80,8 @@ Known technical prerequisites per phase:
 
 ## Session Continuity
 
-Last session: 2026-04-06T00:45:00.000Z
-Stopped at: Completed 18-01-PLAN.md
-Resume file: .planning/phases/18-color-paint-system/18-01-SUMMARY.md
+Last session: 2026-04-06T00:33:11.855Z
+Stopped at: Completed 18-02-PLAN.md
+Resume file: None
 
 Next step: Execute 18-02-PLAN.md (paint rendering in 2D/3D)
