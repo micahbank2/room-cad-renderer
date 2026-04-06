@@ -6,6 +6,8 @@ import { FRAME_PRESETS } from "@/types/framedArt";
 import { useWainscotStyleStore } from "@/stores/wainscotStyleStore";
 import { renderWainscotStyle } from "./wainscotStyles";
 import type { WainscotStyleItem } from "@/types/wainscotStyle";
+import { resolvePaintHex } from "@/lib/colorUtils";
+import { usePaintStore } from "@/stores/paintStore";
 
 interface Props {
   wall: WallSegment;
@@ -40,6 +42,7 @@ function getWallpaperTexture(dataUrl: string): THREE.Texture {
 
 export default function WallMesh({ wall, isSelected }: Props) {
   const wainscotStyles = useWainscotStyleStore((s) => s.items);
+  const customColors = usePaintStore((s) => s.customColors);
   const { position, rotation, dimensions } = useMemo(() => {
     const len = wallLength(wall);
     const midX = (wall.start.x + wall.end.x) / 2;
@@ -91,6 +94,24 @@ export default function WallMesh({ wall, isSelected }: Props) {
   // Build a wallpaper overlay plane for one face (null if no wallpaper on that side)
   const renderWallpaperOverlay = (wp: Wallpaper | undefined, key: string) => {
     if (!wp) return null;
+
+    // kind="paint" branch — must come before kind="color" to avoid fall-through
+    if (wp.kind === "paint" && wp.paintId) {
+      const hex = resolvePaintHex(wp.paintId, customColors);
+      const roughness = wp.limeWash ? 0.95 : 0.85;
+      return (
+        <mesh key={key} position={[0, 0, thickness / 2 + bandOffset / 2]}>
+          <planeGeometry args={[length, height]} />
+          <meshStandardMaterial
+            color={hex}
+            roughness={roughness}
+            metalness={0}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      );
+    }
+
     let tex: THREE.Texture | null = null;
     if (wp.kind === "pattern" && wp.imageUrl) {
       tex = getWallpaperTexture(wp.imageUrl);
