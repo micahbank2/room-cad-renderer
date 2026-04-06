@@ -2,7 +2,7 @@ import * as fabric from "fabric";
 import { useCADStore, getActiveRoomDoc } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { snapPoint, distance, closestPointOnWall, formatFeet } from "@/lib/geometry";
-import type { Point, WallSegment, PlacedProduct } from "@/types/cad";
+import type { Point, WallSegment, PlacedProduct, PlacedCustomElement, CustomElement } from "@/types/cad";
 import type { Product } from "@/types/product";
 import { effectiveDimensions } from "@/types/product";
 import { hitTestHandle, snapAngle, angleFromCenterToPointer } from "../rotationHandle";
@@ -126,6 +126,25 @@ function hitTestStore(
       feetPos.y <= pp.position.y + halfD
     ) {
       return { id: pp.id, type: "product" };
+    }
+  }
+
+  // Check placed custom elements (POLISH-01) — same AABB as products
+  const customElements = (doc as any).placedCustomElements ?? {};
+  const catalog = (useCADStore.getState() as any).customElements ?? {};
+  for (const pce of Object.values(customElements) as PlacedCustomElement[]) {
+    const el = catalog[pce.customElementId] as CustomElement | undefined;
+    if (!el) continue;
+    const sc = pce.sizeScale ?? 1;
+    const halfW = (el.width * sc) / 2;
+    const halfD = (el.depth * sc) / 2;
+    if (
+      feetPos.x >= pce.position.x - halfW &&
+      feetPos.x <= pce.position.x + halfW &&
+      feetPos.y >= pce.position.y - halfD &&
+      feetPos.y <= pce.position.y + halfD
+    ) {
+      return { id: pce.id, type: "product" as const };
     }
   }
 
@@ -314,6 +333,39 @@ export function activateSelectTool(
           return;
         }
       }
+      // Custom element handles (POLISH-01) — mirror product handles
+      const pce = (getActiveRoomDoc()?.placedCustomElements ?? {})[selId];
+      if (pce) {
+        const customCatalog = (useCADStore.getState() as any).customElements ?? {};
+        const el = customCatalog[pce.customElementId] as CustomElement | undefined;
+        if (el) {
+          const sc = pce.sizeScale ?? 1;
+          const w = el.width * sc;
+          const d = el.depth * sc;
+          // Rotation handle
+          if (hitTestHandle(feet, pce as unknown as PlacedProduct, d)) {
+            state.dragging = true;
+            state.dragId = selId;
+            state.dragType = "rotate";
+            state.rotateInitialAngle = pce.rotation;
+            useCADStore.getState().rotateCustomElement(selId, pce.rotation);
+            return;
+          }
+          // Resize handles
+          if (hitTestResizeHandle(feet, pce as unknown as PlacedProduct, w, d)) {
+            state.dragging = true;
+            state.dragId = selId;
+            state.dragType = "product-resize";
+            state.resizeInitialScale = pce.sizeScale ?? 1;
+            const dx = feet.x - pce.position.x;
+            const dy = feet.y - pce.position.y;
+            state.resizeInitialDiagFt = Math.sqrt(dx * dx + dy * dy);
+            useCADStore.getState().resizeCustomElement(selId, state.resizeInitialScale);
+            return;
+          }
+        }
+      }
+
       // Wall handles (EDIT-12 rotate + EDIT-15 endpoints + EDIT-16 thickness)
       const wall = (getActiveRoomDoc()?.walls ?? {})[selId];
       if (wall) {
@@ -386,10 +438,12 @@ export function activateSelectTool(
 
       if (hit.type === "product") {
         const pp = (getActiveRoomDoc()?.placedProducts ?? {})[hit.id];
-        if (pp) {
+        const pce = (getActiveRoomDoc()?.placedCustomElements ?? {})[hit.id];
+        const pos = pp?.position ?? pce?.position;
+        if (pos) {
           state.dragOffsetFeet = {
-            x: feet.x - pp.position.x,
-            y: feet.y - pp.position.y,
+            x: feet.x - pos.x,
+            y: feet.y - pos.y,
           };
         }
       } else if (hit.type === "wall") {
@@ -414,29 +468,52 @@ export function activateSelectTool(
 
     if (state.dragType === "rotate") {
       const pp = (getActiveRoomDoc()?.placedProducts ?? {})[state.dragId];
-      if (!pp) return;
-      const raw = angleFromCenterToPointer(pp.position, feet);
+      const pce = (getActiveRoomDoc()?.placedCustomElements ?? {})[state.dragId];
+      const target = pp || pce;
+      if (!target) return;
+      const raw = angleFromCenterToPointer(target.position, feet);
       const shiftHeld = (opt.e as MouseEvent).shiftKey === true;
       const next = snapAngle(raw, shiftHeld);
-      useCADStore.getState().rotateProductNoHistory(state.dragId, next);
+      if (pp) {
+        useCADStore.getState().rotateProductNoHistory(state.dragId, next);
+      } else {
+        useCADStore.getState().rotateCustomElementNoHistory(state.dragId, next);
+      }
       return;
     }
 
     if (state.dragType === "product-resize") {
       const pp = (getActiveRoomDoc()?.placedProducts ?? {})[state.dragId];
-      if (!pp || state.resizeInitialDiagFt == null || state.resizeInitialScale == null) return;
-      const dx = feet.x - pp.position.x;
-      const dy = feet.y - pp.position.y;
+      const pce2 = (getActiveRoomDoc()?.placedCustomElements ?? {})[state.dragId];
+      const target2 = pp || pce2;
+      if (!target2 || state.resizeInitialDiagFt == null || state.resizeInitialScale == null) return;
+      const dx = feet.x - target2.position.x;
+      const dy = feet.y - target2.position.y;
       const currentDiag = Math.sqrt(dx * dx + dy * dy);
       if (state.resizeInitialDiagFt < 1e-6) return;
       const ratio = currentDiag / state.resizeInitialDiagFt;
       const newScale = Math.max(0.1, Math.min(10, state.resizeInitialScale * ratio));
-      useCADStore.getState().resizeProductNoHistory(state.dragId, newScale);
-      // Update live size tag
-      const prod = _productLibrary.find((p) => p.id === pp.productId);
-      const dims = effectiveDimensions(prod, newScale);
-      const updatedPp = (getActiveRoomDoc()?.placedProducts ?? {})[state.dragId];
-      if (updatedPp) updateSizeTag(fc, updatedPp, dims.width, dims.depth, scale, origin);
+      if (pp) {
+        useCADStore.getState().resizeProductNoHistory(state.dragId, newScale);
+        // Update live size tag for products
+        const prod = _productLibrary.find((p) => p.id === pp.productId);
+        const dims = effectiveDimensions(prod, newScale);
+        const updatedPp = (getActiveRoomDoc()?.placedProducts ?? {})[state.dragId];
+        if (updatedPp) updateSizeTag(fc, updatedPp, dims.width, dims.depth, scale, origin);
+      } else {
+        useCADStore.getState().resizeCustomElementNoHistory(state.dragId, newScale);
+        // Update live size tag for custom elements
+        const customCatalog2 = (useCADStore.getState() as any).customElements ?? {};
+        const el2 = customCatalog2[pce2.customElementId] as CustomElement | undefined;
+        if (el2) {
+          const updatedPce = (getActiveRoomDoc()?.placedCustomElements ?? {})[state.dragId];
+          if (updatedPce) {
+            const w2 = el2.width * newScale;
+            const d2 = el2.depth * newScale;
+            updateSizeTag(fc, updatedPce as unknown as PlacedProduct, w2, d2, scale, origin);
+          }
+        }
+      }
       return;
     }
 
@@ -552,7 +629,12 @@ export function activateSelectTool(
         : { x: targetX, y: targetY };
 
     if (state.dragType === "product") {
-      useCADStore.getState().moveProduct(state.dragId, snapped);
+      const pp3 = (getActiveRoomDoc()?.placedProducts ?? {})[state.dragId];
+      if (pp3) {
+        useCADStore.getState().moveProduct(state.dragId, snapped);
+      } else {
+        useCADStore.getState().moveCustomElement(state.dragId, snapped);
+      }
     } else if (state.dragType === "wall") {
       const wall = (getActiveRoomDoc()?.walls ?? {})[state.dragId];
       if (wall) {
