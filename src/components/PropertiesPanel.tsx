@@ -39,16 +39,16 @@ export default function PropertiesPanel({ productLibrary }: Props) {
     return (
       <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto glass-panel rounded-sm p-4 space-y-3">
         <h3 className="font-mono text-[11px] text-text-ghost tracking-widest">
-          BULK_ACTIONS
+          BULK ACTIONS
         </h3>
         <div className="font-mono text-[11px] text-accent-light">
-          {totalCount} ITEMS_SELECTED
+          {totalCount} ITEMS SELECTED
           {wallIds.length > 0 && ` (${wallIds.length} WALLS)`}
         </div>
 
         {wallIds.length > 0 && (
           <div className="space-y-2 border-t border-outline-variant/20 pt-2">
-            <div className="font-mono text-[11px] text-text-dim">PAINT_ALL_WALLS</div>
+            <div className="font-mono text-[11px] text-text-dim">PAINT ALL WALLS</div>
             <div className="flex items-center gap-2">
               <input
                 type="color"
@@ -63,7 +63,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
                 className="w-8 h-7 bg-transparent border border-outline-variant/30 rounded-sm cursor-pointer"
               />
               <span className="font-mono text-[11px] text-text-ghost">
-                APPLIES_TO_BOTH_SIDES
+                APPLIES TO BOTH SIDES
               </span>
             </div>
           </div>
@@ -73,7 +73,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
           onClick={handleDelete}
           className="w-full font-mono text-[11px] text-error tracking-widest py-1 border border-error/30 rounded-sm hover:bg-error/10"
         >
-          DELETE_ALL ({totalCount})
+          DELETE ALL ({totalCount})
         </button>
       </div>
     );
@@ -90,7 +90,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
       {ceiling && (
         <div className="space-y-2">
           <div className="font-mono text-xs text-accent-light">
-            CEILING_{ceiling.id.slice(-4).toUpperCase()}
+            CEILING {ceiling.id.slice(-4).toUpperCase()}
           </div>
           <div className="space-y-1.5">
             <Row label="HEIGHT" value={`${ceiling.height.toFixed(1)} FT`} />
@@ -103,7 +103,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
       {wall && (
         <div className="space-y-2">
           <div className="font-mono text-xs text-accent-light">
-            WALL_SEGMENT_{wall.id.slice(-4).toUpperCase()}
+            WALL SEGMENT {wall.id.slice(-4).toUpperCase()}
           </div>
           <div className="space-y-1.5">
             <Row label="LENGTH" value={formatFeet(wallLength(wall))} />
@@ -131,7 +131,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
         return (
           <div className="space-y-2">
             <div className="font-mono text-xs text-accent-light">
-              {product?.name?.toUpperCase().replace(/\s/g, "_") ?? "PRODUCT"}
+              {product?.name?.toUpperCase() ?? "PRODUCT"}
             </div>
             {product && (
               <div className="space-y-1.5">
@@ -160,7 +160,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
             {libProduct && !hasDimensions(libProduct) && (
               <div className="space-y-1.5 pt-2 border-t border-outline-variant/20">
                 <span className="font-mono text-[11px] text-text-ghost tracking-wider">
-                  SET_DIMENSIONS (FT)
+                  SET DIMENSIONS (FT)
                 </span>
                 <div className="grid grid-cols-3 gap-1">
                   {(["width", "depth", "height"] as const).map((axis) => (
@@ -189,7 +189,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
         onClick={handleDelete}
         className="w-full py-1.5 rounded-sm font-mono text-[11px] tracking-widest bg-red-900/30 text-red-400 border border-red-900/40 hover:bg-red-900/50 transition-colors"
       >
-        DELETE_ELEMENT
+        DELETE ELEMENT
       </button>
     </div>
   );

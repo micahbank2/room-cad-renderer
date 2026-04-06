@@ -94,7 +94,7 @@ export default function WallSurfacePanel() {
   return (
     <div className="space-y-3 p-3 border-t border-outline-variant/20">
       <h3 className="font-mono text-[10px] text-accent-light tracking-widest uppercase">
-        WALL_SURFACE
+        WALL SURFACE
       </h3>
 
       {/* Side toggle (Phase 17) */}
@@ -109,7 +109,7 @@ export default function WallSurfacePanel() {
                 : "border-outline-variant/30 text-text-dim"
             }`}
           >
-            SIDE_{s}
+            SIDE {s}
           </button>
         ))}
       </div>
@@ -120,7 +120,7 @@ export default function WallSurfacePanel() {
         }}
         className="w-full font-mono text-[11px] text-accent-light hover:text-accent tracking-widest py-2 border border-accent/20 rounded-sm hover:bg-accent/10"
       >
-        COPY_TO_SIDE_{activeSide === "A" ? "B" : "A"}
+        COPY TO SIDE {activeSide === "A" ? "B" : "A"}
       </button>
 
       {/* Wallpaper */}
@@ -137,7 +137,7 @@ export default function WallSurfacePanel() {
             onClick={() => wallpaperFileRef.current?.click()}
             className="flex-1 font-mono text-[11px] text-text-dim hover:text-accent-light tracking-widest uppercase px-2 py-1 border border-outline-variant/30 rounded-sm"
           >
-            UPLOAD_PATTERN
+            UPLOAD PATTERN
           </button>
           {wp && (
             <button
@@ -169,7 +169,7 @@ export default function WallSurfacePanel() {
               className="w-3 h-3 accent-accent rounded-none"
             />
             <span className="font-mono text-[11px] text-text-dim tracking-wider">
-              TILE_PATTERN {(wp.scaleFt ?? 0) > 0 ? `(${wp.scaleFt}ft)` : "(stretch)"}
+              TILE PATTERN {(wp.scaleFt ?? 0) > 0 ? `(${wp.scaleFt}ft)` : "(stretch)"}
             </span>
           </label>
         )}
@@ -202,7 +202,7 @@ export default function WallSurfacePanel() {
           <div className="ml-5 mt-1 space-y-1">
             {wainscotStyles.length === 0 ? (
               <div className="font-mono text-[8px] text-text-ghost">
-                CREATE_STYLE_IN_LIBRARY_FIRST
+                CREATE STYLE IN LIBRARY FIRST
               </div>
             ) : (
               <select
@@ -221,7 +221,7 @@ export default function WallSurfacePanel() {
                 }}
                 className="w-full font-mono text-[11px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-1 py-0.5 rounded-sm"
               >
-                <option value="">(LEGACY_DEFAULT)</option>
+                <option value="">(LEGACY DEFAULT)</option>
                 {wainscotStyles.map((it) => (
                   <option key={it.id} value={it.id}>
                     {it.name.toUpperCase()} · {STYLE_META[it.style].label}
@@ -244,7 +244,7 @@ export default function WallSurfacePanel() {
             }
             className="w-3 h-3 accent-accent rounded-none"
           />
-          <span className="font-mono text-[11px] text-text-dim tracking-wider">CROWN_MOLDING</span>
+          <span className="font-mono text-[11px] text-text-dim tracking-wider">CROWN MOLDING</span>
         </label>
         {crown?.enabled && (
           <div className="ml-5 mt-1 flex items-center gap-2">
@@ -276,7 +276,7 @@ export default function WallSurfacePanel() {
       <div>
         <div className="flex items-center justify-between mb-1">
           <span className="font-mono text-[11px] text-text-dim tracking-wider">
-            WALL_ART ({artItems.length})
+            WALL ART ({artItems.length})
           </span>
           <div className="flex items-center gap-2">
             <button
@@ -297,7 +297,7 @@ export default function WallSurfacePanel() {
           <div className="bg-obsidian-high rounded-sm p-2 mb-1 max-h-40 overflow-y-auto">
             {framedArtItems.length === 0 ? (
               <div className="font-mono text-[11px] text-text-ghost text-center py-1">
-                ART_LIBRARY_EMPTY
+                ART LIBRARY EMPTY
               </div>
             ) : (
               <ul className="space-y-1">
@@ -345,12 +345,17 @@ export default function WallSurfacePanel() {
                     <input
                       type="color"
                       value={a.frameColorOverride ?? FRAME_PRESETS[a.frameStyle].color}
-                      onChange={(e) =>
+                      onFocus={() =>
                         useCADStore.getState().updateWallArt(wall.id, a.id, {
+                          frameColorOverride: a.frameColorOverride ?? FRAME_PRESETS[a.frameStyle].color,
+                        })
+                      }
+                      onChange={(e) =>
+                        useCADStore.getState().updateWallArtNoHistory(wall.id, a.id, {
                           frameColorOverride: e.target.value,
                         })
                       }
-                      title="FRAME_COLOR_OVERRIDE"
+                      title="FRAME COLOR OVERRIDE"
                       className="w-5 h-4 bg-transparent border border-outline-variant/30 rounded-sm cursor-pointer shrink-0"
                     />
                   )}

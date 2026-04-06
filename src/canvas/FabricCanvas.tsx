@@ -23,6 +23,9 @@ import { activateWindowTool, deactivateWindowTool } from "./tools/windowTool";
 import { activateCeilingTool, deactivateCeilingTool } from "./tools/ceilingTool";
 import { attachDragDropHandlers } from "./dragDrop";
 import { computeLabelPx, hitTestDimLabel, validateInput } from "./dimensionEditor";
+import { closestPointOnWall, distance } from "@/lib/geometry";
+import { WainscotPopover } from "@/components/WainscotPopover";
+import type { WallSide } from "@/types/cad";
 import type { Product } from "@/types/product";
 
 interface Props {
@@ -68,6 +71,8 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const fcRef = useRef<fabric.Canvas | null>(null);
   const [editingWallId, setEditingWallId] = useState<string | null>(null);
   const [pendingValue, setPendingValue] = useState<string>("");
+  const [wainscotEditWallId, setWainscotEditWallId] = useState<string | null>(null);
+  const [wainscotEditSide, setWainscotEditSide] = useState<WallSide>("A");
 
   const room = useActiveRoom() ?? { width: 20, length: 16, wallHeight: 8 };
   const walls = useActiveWalls();
@@ -220,6 +225,27 @@ export default function FabricCanvas({ productLibrary }: Props) {
           return;
         }
       }
+
+      // Wainscot inline edit (POLISH-02)
+      const feetX = (pointer.x - origin.x) / scale;
+      const feetY = (pointer.y - origin.y) / scale;
+      const feetPos = { x: feetX, y: feetY };
+      for (const wall of Object.values(storeWalls)) {
+        const { point: closest } = closestPointOnWall(wall, feetPos);
+        const d = distance(closest, feetPos);
+        if (d < 0.5 && wall.wainscoting) {
+          const sideA = wall.wainscoting.A?.enabled;
+          const sideB = wall.wainscoting.B?.enabled;
+          if (sideA || sideB) {
+            const side: WallSide = (sideA && sideB)
+              ? useUIStore.getState().activeWallSide
+              : sideA ? "A" : "B";
+            setWainscotEditWallId(wall.id);
+            setWainscotEditSide(side);
+            return;
+          }
+        }
+      }
     };
     fc.on("mouse:dblclick", onDblClick as any);
     return () => { fc.off("mouse:dblclick", onDblClick as any); };
@@ -362,6 +388,26 @@ export default function FabricCanvas({ productLibrary }: Props) {
     }
   }
 
+  let wainscotOverlayStyle: React.CSSProperties | null = null;
+  if (wainscotEditWallId) {
+    const wall = getActiveRoomDoc()?.walls[wainscotEditWallId];
+    const wrapper = wrapperRef.current;
+    if (wall && wrapper) {
+      const rect = wrapper.getBoundingClientRect();
+      const { userZoom, panOffset } = useUIStore.getState();
+      const { scale, origin } = getViewTransform(
+        room.width, room.length, rect.width, rect.height, userZoom, panOffset
+      );
+      const label = computeLabelPx(wall, scale, origin);
+      wainscotOverlayStyle = {
+        position: "absolute",
+        left: label.x - 90,
+        top: label.y + 16,
+        zIndex: 20,
+      };
+    }
+  }
+
   function commitEdit() {
     if (!editingWallId) return;
     const parsed = validateInput(pendingValue);
@@ -394,6 +440,14 @@ export default function FabricCanvas({ productLibrary }: Props) {
           style={overlayStyle}
           className="font-mono text-[11px] bg-obsidian-high text-accent-light border border-accent px-1 outline-none"
           data-testid="dimension-edit-input"
+        />
+      )}
+      {wainscotOverlayStyle && wainscotEditWallId && (
+        <WainscotPopover
+          wallId={wainscotEditWallId}
+          side={wainscotEditSide}
+          style={wainscotOverlayStyle}
+          onClose={() => setWainscotEditWallId(null)}
         />
       )}
     </div>

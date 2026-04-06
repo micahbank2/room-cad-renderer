@@ -11,7 +11,7 @@ export default function SidebarProductPicker() {
   return (
     <div>
       <h3 className="font-mono text-[10px] text-text-ghost tracking-widest uppercase mb-2">
-        PRODUCT_LIBRARY
+        PRODUCT LIBRARY
       </h3>
       <input
         type="text"
@@ -23,7 +23,7 @@ export default function SidebarProductPicker() {
       <div className="space-y-1 max-h-64 overflow-y-auto" data-testid="picker-list">
         {filtered.length === 0 && (
           <div className="font-mono text-[9px] text-text-ghost py-2 text-center">
-            {products.length === 0 ? "NO_PRODUCTS_YET" : "NO_MATCHES"}
+            {products.length === 0 ? "NO PRODUCTS YET" : "NO MATCHES"}
           </div>
         )}
         {filtered.map((p) => (
@@ -47,7 +47,7 @@ export default function SidebarProductPicker() {
               <div className="w-8 h-8 bg-obsidian-high rounded-sm shrink-0" />
             )}
             <span className="font-mono text-[10px] text-text-dim truncate">
-              {p.name.toUpperCase().replace(/\s/g, "_")}
+              {p.name.toUpperCase()}
             </span>
           </div>
         ))}

@@ -176,7 +176,7 @@ export default function ThreeViewport({ productLibrary }: Props) {
           className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2 font-mono text-[10px] tracking-widest text-text-dim bg-obsidian-deepest/80 backdrop-blur-sm border border-outline-variant/20 rounded-sm pointer-events-none transition-opacity duration-500"
           style={{ opacity: showToast ? 1 : 0 }}
         >
-          WALK_MODE · WASD to move · Mouse to look · ESC to exit
+          WALK MODE · WASD to move · Mouse to look · ESC to exit
         </div>
       )}
     </div>

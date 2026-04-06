@@ -37,7 +37,7 @@ export default function WelcomeScreen({ onStart }: Props) {
       {/* Minimal top bar — just the brand */}
       <header className="h-14 bg-obsidian-deepest flex items-center px-6 ghost-border border-0 border-b">
         <span className="font-display font-bold text-accent text-sm tracking-[0.1em]">
-          OBSIDIAN_CAD
+          OBSIDIAN CAD
         </span>
       </header>
 
@@ -45,7 +45,7 @@ export default function WelcomeScreen({ onStart }: Props) {
       <div className="flex-1 flex flex-col items-center justify-center px-8">
         <div className="max-w-2xl text-center">
           <h1 className="font-display font-bold text-5xl text-text-primary tracking-tight mb-4 leading-tight">
-            DESIGN_YOUR_SPACE
+            DESIGN YOUR SPACE
           </h1>
           <p className="text-text-dim text-sm leading-relaxed max-w-lg mx-auto mb-10">
             Start by creating a new floor plan from a template, or upload a reference
@@ -63,7 +63,7 @@ export default function WelcomeScreen({ onStart }: Props) {
                 add_box
               </span>
               <h3 className="font-mono text-xs text-text-primary tracking-widest mb-2 group-hover:text-accent-light transition-colors">
-                CREATE_FLOOR_PLAN
+                CREATE FLOOR PLAN
               </h3>
               <p className="text-[11px] text-text-ghost leading-relaxed">
                 Start with a blank room or one of four pre-drawn templates.
@@ -79,7 +79,7 @@ export default function WelcomeScreen({ onStart }: Props) {
                 upload_file
               </span>
               <h3 className="font-mono text-xs text-text-primary tracking-widest mb-2 group-hover:text-accent-light transition-colors">
-                UPLOAD_FLOOR_PLAN
+                UPLOAD FLOOR PLAN
               </h3>
               <p className="text-[11px] text-text-ghost leading-relaxed">
                 Drop an image of an existing plan and trace walls on top of it.
@@ -105,7 +105,7 @@ export default function WelcomeScreen({ onStart }: Props) {
         <div className="flex items-center gap-1.5">
           <div className="w-1.5 h-1.5 rounded-full bg-success" />
           <span className="font-mono text-[9px] text-text-ghost tracking-widest">
-            SYSTEM_STATUS: READY
+            SYSTEM STATUS: READY
           </span>
         </div>
       </div>

@@ -76,8 +76,8 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
   };
 
   const templates: { id: RoomTemplateId; title: string; sub: string; icon: string }[] = [
-    { id: "BLANK", title: "BLANK_ROOM", sub: "Draw walls from scratch", icon: "grid_view" },
-    { id: "LIVING_ROOM", title: "LIVING_ROOM", sub: "16 × 20 ft perimeter", icon: "weekend" },
+    { id: "BLANK", title: "BLANK ROOM", sub: "Draw walls from scratch", icon: "grid_view" },
+    { id: "LIVING_ROOM", title: "LIVING ROOM", sub: "16 × 20 ft perimeter", icon: "weekend" },
     { id: "BEDROOM", title: "BEDROOM", sub: "12 × 14 ft perimeter", icon: "bed" },
     { id: "KITCHEN", title: "KITCHEN", sub: "10 × 12 ft perimeter", icon: "kitchen" },
   ];
@@ -95,7 +95,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
       >
         <div className="flex items-center justify-between px-5 py-3 border-b border-outline-variant/20">
           <h2 className="font-mono text-sm text-text-primary tracking-widest uppercase">
-            Choose_A_Template
+            Choose A Template
           </h2>
           <button
             onClick={onClose}
@@ -133,7 +133,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
                   upload_file
                 </span>
                 <h3 className="font-mono text-[11px] text-text-primary tracking-widest mb-1 group-hover:text-accent-light transition-colors">
-                  UPLOAD_IMAGE
+                  UPLOAD IMAGE
                 </h3>
                 <p className="font-mono text-[10px] text-text-ghost leading-relaxed">
                   Use an existing plan as a tracing reference.
@@ -147,7 +147,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
                   image_not_supported
                 </span>
                 <h3 className="font-mono text-[11px] text-text-primary tracking-widest mb-1 group-hover:text-accent-light transition-colors">
-                  REMOVE_IMAGE
+                  REMOVE IMAGE
                 </h3>
                 <p className="font-mono text-[10px] text-text-ghost leading-relaxed">
                   Clear the current tracing background.
@@ -169,7 +169,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
         />
         <div className="px-5 pb-4">
           <p className="font-mono text-[9px] text-text-ghost tracking-wider">
-            ESC_TO_CLOSE
+            ESC TO CLOSE
           </p>
         </div>
       </div>

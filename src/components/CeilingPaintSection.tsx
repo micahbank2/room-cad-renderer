@@ -33,7 +33,7 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
           hasMaterial ? "text-accent-light" : "text-text-ghost",
         ].join(" ")}
       >
-        SURFACE_MATERIAL
+        SURFACE MATERIAL
       </div>
 
       <SurfaceMaterialPicker
@@ -51,7 +51,7 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
             onClick={() => setCeilingSurfaceMaterial(ceilingId, undefined)}
             className="font-mono text-[10px] text-text-ghost hover:text-text-primary tracking-widest uppercase py-1"
           >
-            CLEAR_MATERIAL
+            CLEAR MATERIAL
           </button>
         </div>
       )}
@@ -66,14 +66,14 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
           !hasMaterial && ceiling.paintId ? "text-accent-light" : "text-text-ghost",
         ].join(" ")}
       >
-        CEILING_PAINT
+        CEILING PAINT
       </div>
 
       <div className={hasMaterial ? "opacity-40 pointer-events-none" : undefined}>
         {hasMaterial && (
           <div className="mb-1">
             <span className="font-mono text-[8px] text-text-ghost tracking-wider italic">
-              OVERRIDDEN_BY_MATERIAL
+              OVERRIDDEN BY MATERIAL
             </span>
           </div>
         )}
@@ -93,7 +93,7 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
             className="accent-accent"
           />
           <span className="font-mono text-[9px] tracking-widest uppercase text-text-dim">
-            LIME_WASH_FINISH
+            LIME WASH FINISH
           </span>
         </label>
       </div>

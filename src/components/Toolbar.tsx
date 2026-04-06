@@ -39,7 +39,7 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
         className="font-display font-bold text-accent text-sm tracking-[0.1em] mr-6 hover:text-accent-light transition-colors"
         title="Back to home"
       >
-        OBSIDIAN_CAD
+        OBSIDIAN CAD
       </button>
 
       {/* View tabs */}
@@ -51,12 +51,12 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
               className="flex items-center gap-1.5 font-mono text-[10px] tracking-widest px-3 py-1 text-text-dim hover:text-accent-light transition-colors duration-150"
             >
               <span className="material-symbols-outlined text-[14px]">grid_view</span>
-              FLOOR_PLAN
+              FLOOR PLAN
             </button>
           </Tooltip>
         )}
         {(["2d", "3d", "library", "split"] as const).map((mode) => {
-          const labels = { "2d": "2D_PLAN", "3d": "3D_VIEW", library: "LIBRARY", split: "SPLIT" };
+          const labels = { "2d": "2D PLAN", "3d": "3D VIEW", library: "LIBRARY", split: "SPLIT" };
           return (
             <button
               key={mode}

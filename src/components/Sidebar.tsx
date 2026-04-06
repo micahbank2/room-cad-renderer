@@ -61,24 +61,24 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
         <button
           onClick={toggleSidebar}
           className="font-mono text-base text-text-ghost hover:text-text-primary px-1"
-          title="COLLAPSE_SIDEBAR"
+          title="COLLAPSE SIDEBAR"
         >
           &#x25C0;
         </button>
       </div>
 
       {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        <CollapsibleSection label="ROOM_CONFIG">
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
+        <CollapsibleSection label="ROOM CONFIG">
           <RoomSettings />
         </CollapsibleSection>
 
-        <CollapsibleSection label="SYSTEM_STATS" defaultOpen={false}>
+        <CollapsibleSection label="SYSTEM STATS" defaultOpen={false}>
           <div className="space-y-1.5">
             <div className="flex justify-between">
               <span className="font-mono text-[10px] text-text-dim">AREA</span>
               <span className="font-mono text-[10px] text-accent-light">
-                {(room.width * room.length).toFixed(0)} SQ_FT
+                {(room.width * room.length).toFixed(0)} SQ FT
               </span>
             </div>
             <div className="flex justify-between">
@@ -106,7 +106,7 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
           </div>
         </CollapsibleSection>
 
-        <CollapsibleSection label="FLOOR_MATERIAL">
+        <CollapsibleSection label="FLOOR MATERIAL">
           <FloorMaterialPicker />
         </CollapsibleSection>
 
@@ -117,9 +117,9 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
             className="w-full px-2 py-1 text-[10px]"
           >
             <option value={0}>OFF</option>
-            <option value={0.25}>3_INCH</option>
-            <option value={0.5}>6_INCH</option>
-            <option value={1}>1_FOOT</option>
+            <option value={0.25}>3 INCH</option>
+            <option value={0.5}>6 INCH</option>
+            <option value={1}>1 FOOT</option>
           </select>
         </CollapsibleSection>
 
@@ -132,7 +132,7 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
         {/* Wainscoting Style Library (Phase 16) — has its own internal header */}
         <WainscotLibrary />
 
-        <CollapsibleSection label="PRODUCT_LIBRARY">
+        <CollapsibleSection label="PRODUCT LIBRARY">
           <SidebarProductPicker />
         </CollapsibleSection>
       </div>

@@ -168,7 +168,7 @@ export default function App() {
           <button
             onClick={toggleSidebar}
             className="absolute left-2 top-2 z-20 w-8 h-8 bg-obsidian-low rounded-sm border border-outline-variant/30 flex items-center justify-center hover:bg-obsidian-mid"
-            title="SHOW_SIDEBAR"
+            title="SHOW SIDEBAR"
           >
             <span className="font-mono text-[10px] text-text-dim">&#9776;</span>
           </button>
@@ -194,7 +194,7 @@ export default function App() {
                 <h4 className="font-mono text-[9px] text-text-ghost tracking-widest mb-2">
                   MATERIALS
                 </h4>
-                {["NATURAL_OAK", "BRUSHED_STEEL", "CONCRETE", "FABRIC"].map((mat) => (
+                {["NATURAL OAK", "BRUSHED STEEL", "CONCRETE", "FABRIC"].map((mat) => (
                   <label key={mat} className="flex items-center gap-2 py-0.5 cursor-pointer">
                     <input type="checkbox" className="w-3 h-3 accent-accent rounded-none" />
                     <span className="font-mono text-[10px] text-text-dim">{mat}</span>
@@ -203,7 +203,7 @@ export default function App() {
               </div>
               <div className="pt-2">
                 <span className="font-mono text-[9px] text-text-ghost tracking-widest">
-                  RECENT_IMPORTS
+                  RECENT IMPORTS
                 </span>
               </div>
             </aside>
@@ -239,7 +239,7 @@ export default function App() {
                   fallback={
                     <div className="w-full h-full bg-obsidian-deepest flex items-center justify-center">
                       <span className="font-mono text-[10px] text-text-ghost tracking-widest animate-pulse">
-                        BUILDING_SCENE...
+                        BUILDING SCENE...
                       </span>
                     </div>
                   }

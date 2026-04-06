@@ -217,7 +217,7 @@ function CoachMark({
           ))}
         </div>
         <span className="font-mono text-[9px] text-text-ghost tracking-widest">
-          {stepIndex + 1}_OF_{totalSteps}
+          {stepIndex + 1} OF {totalSteps}
         </span>
       </div>
 
@@ -235,7 +235,7 @@ function CoachMark({
           onClick={onSkip}
           className="font-mono text-[10px] tracking-widest text-text-ghost hover:text-text-primary transition-colors"
         >
-          SKIP_TOUR
+          SKIP TOUR
         </button>
         <div className="flex items-center gap-2">
           {!isFirst && (
@@ -250,7 +250,7 @@ function CoachMark({
             onClick={onNext}
             className="font-mono text-[10px] tracking-widest px-3 py-1 border border-accent text-accent hover:bg-accent/10 transition-colors rounded-sm"
           >
-            {isLast ? "GOT_IT" : "NEXT"}
+            {isLast ? "GOT IT" : "NEXT"}
           </button>
         </div>
       </div>

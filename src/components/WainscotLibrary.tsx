@@ -59,7 +59,7 @@ export default function WainscotLibrary() {
     <div>
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-mono text-[10px] text-text-ghost tracking-widest uppercase">
-          WAINSCOT_LIBRARY
+          WAINSCOT LIBRARY
         </h3>
         <button
           onClick={() => setCreating((v) => !v)}
@@ -113,23 +113,23 @@ export default function WainscotLibrary() {
           {meta.knobs.length > 0 && (
             <div className="grid grid-cols-2 gap-1">
               {meta.knobs.includes("panelWidth") && (
-                <NumberKnob label="PANEL_W" value={draft.panelWidth ?? 1.5} step={0.25} min={0.5} max={4}
+                <NumberKnob label="PANEL W" value={draft.panelWidth ?? 1.5} step={0.25} min={0.5} max={4}
                   onChange={(v) => setDraft({ ...draft, panelWidth: v })} />
               )}
               {meta.knobs.includes("stileWidth") && (
-                <NumberKnob label="STILE_W" value={draft.stileWidth ?? 0.33} step={0.08} min={0.08} max={1}
+                <NumberKnob label="STILE W" value={draft.stileWidth ?? 0.33} step={0.08} min={0.08} max={1}
                   onChange={(v) => setDraft({ ...draft, stileWidth: v })} />
               )}
               {meta.knobs.includes("plankWidth") && (
-                <NumberKnob label="PLANK_W" value={draft.plankWidth ?? 0.25} step={0.08} min={0.08} max={1}
+                <NumberKnob label="PLANK W" value={draft.plankWidth ?? 0.25} step={0.08} min={0.08} max={1}
                   onChange={(v) => setDraft({ ...draft, plankWidth: v })} />
               )}
               {meta.knobs.includes("battenWidth") && (
-                <NumberKnob label="BATTEN_W" value={draft.battenWidth ?? 0.33} step={0.08} min={0.08} max={0.75}
+                <NumberKnob label="BATTEN W" value={draft.battenWidth ?? 0.33} step={0.08} min={0.08} max={0.75}
                   onChange={(v) => setDraft({ ...draft, battenWidth: v })} />
               )}
               {meta.knobs.includes("plankHeight") && (
-                <NumberKnob label="PLANK_H" value={draft.plankHeight ?? 0.5} step={0.08} min={0.17} max={1}
+                <NumberKnob label="PLANK H" value={draft.plankHeight ?? 0.5} step={0.08} min={0.17} max={1}
                   onChange={(v) => setDraft({ ...draft, plankHeight: v })} />
               )}
               {meta.knobs.includes("gridRows") && (
@@ -147,7 +147,7 @@ export default function WainscotLibrary() {
           <Suspense
             fallback={
               <div className="w-full aspect-video bg-obsidian-base rounded-sm border border-outline-variant/30 grid place-items-center">
-                <span className="font-mono text-[11px] text-text-ghost">LOADING_PREVIEW...</span>
+                <span className="font-mono text-[11px] text-text-ghost">LOADING PREVIEW...</span>
               </div>
             }
           >
@@ -159,14 +159,14 @@ export default function WainscotLibrary() {
             disabled={!draft.name.trim()}
             className="w-full font-mono text-[10px] tracking-widest py-1 bg-accent text-white rounded-sm hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
           >
-            SAVE_TO_LIBRARY
+            SAVE TO LIBRARY
           </button>
         </div>
       )}
 
       {items.length === 0 ? (
         <div className="font-mono text-[11px] text-text-ghost text-center py-2">
-          NO_WAINSCOT_STYLES_YET
+          NO WAINSCOT STYLES YET
         </div>
       ) : (
         <ul className="space-y-1">
@@ -175,7 +175,7 @@ export default function WainscotLibrary() {
               key={it.id}
               className="bg-obsidian-high rounded-sm px-2 py-1.5"
               onDoubleClick={() => setEditingId(it.id)}
-              title="DOUBLE_CLICK_TO_EDIT"
+              title="DOUBLE CLICK TO EDIT"
             >
               {editingId === it.id ? (
                 <div className="space-y-1 w-full">

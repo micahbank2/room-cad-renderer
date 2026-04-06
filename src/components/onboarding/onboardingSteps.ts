@@ -49,7 +49,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     id: "done",
     target: "",
     title: "You're ready",
-    body: "Draw a room, upload a product, switch to 3D_VIEW, and press E to walk through. Everything auto-saves.",
+    body: "Draw a room, upload a product, switch to 3D VIEW, and press E to walk through. Everything auto-saves.",
     placement: "center",
   },
 ];

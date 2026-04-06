@@ -24,7 +24,7 @@ export default function HelpSearch({ query, onQueryChange, onSelect }: Props) {
           type="text"
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
-          placeholder="SEARCH_HELP..."
+          placeholder="SEARCH HELP..."
           className="w-full font-mono text-[10px] tracking-wider text-text-primary placeholder:text-text-ghost bg-obsidian-high border border-outline-variant/30 pl-7 pr-2 py-1.5 rounded-sm focus:outline-none focus:border-accent/50"
         />
         {hasQuery && (
@@ -42,7 +42,7 @@ export default function HelpSearch({ query, onQueryChange, onSelect }: Props) {
         <div className="mt-2 max-h-[380px] overflow-y-auto border border-outline-variant/20 rounded-sm bg-obsidian-base">
           {results.length === 0 ? (
             <div className="px-3 py-4 font-mono text-[10px] text-text-ghost text-center">
-              NO_RESULTS
+              NO RESULTS
             </div>
           ) : (
             <ul>

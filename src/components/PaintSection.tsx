@@ -47,7 +47,7 @@ export default function PaintSection({ wallId, side, currentWallpaper }: Props) 
           className="accent-accent"
         />
         <span className="font-mono text-[9px] tracking-widest uppercase text-text-dim">
-          LIME_WASH_FINISH
+          LIME WASH FINISH
         </span>
       </label>
 
@@ -61,7 +61,7 @@ export default function PaintSection({ wallId, side, currentWallpaper }: Props) 
         disabled={currentWallpaper?.kind !== "paint" || !currentWallpaper?.paintId}
         className="w-full py-2 border border-outline-variant/30 text-text-dim font-mono text-[9px] tracking-widest uppercase hover:border-accent/50 hover:text-accent-light disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        APPLY_TO_ALL_WALLS
+        APPLY TO ALL WALLS
       </button>
     </div>
   );

@@ -7,10 +7,10 @@ export interface HelpSectionMeta {
 }
 
 export const HELP_SECTIONS: HelpSectionMeta[] = [
-  { id: "getting-started", label: "GETTING_STARTED", icon: "flag" },
+  { id: "getting-started", label: "GETTING STARTED", icon: "flag" },
   { id: "shortcuts", label: "SHORTCUTS", icon: "keyboard" },
-  { id: "library", label: "LIBRARY_&_2D", icon: "grid_view" },
-  { id: "3d", label: "3D_&_WALK_&_ROOMS", icon: "view_in_ar" },
+  { id: "library", label: "LIBRARY & 2D", icon: "grid_view" },
+  { id: "3d", label: "3D & WALK & ROOMS", icon: "view_in_ar" },
 ];
 
 export interface Shortcut {
@@ -109,13 +109,13 @@ export function GettingStartedContent() {
         <li>Draw walls with <Kbd>W</Kbd>, add doors with <Kbd>D</Kbd>, windows with <Kbd>N</Kbd></li>
         <li>Upload products to your library (Pinterest screenshots work great)</li>
         <li>Drag products from the sidebar onto the 2D canvas</li>
-        <li>Switch to <em className="text-accent-light not-italic">3D_VIEW</em> to see it rendered</li>
+        <li>Switch to <em className="text-accent-light not-italic">3D VIEW</em> to see it rendered</li>
         <li>Press <Kbd>E</Kbd> to walk through at eye level</li>
       </OL>
 
       <H2 id="help-h-first-room">Your First Room</H2>
       <P>
-        Set the room dimensions in the sidebar under <em className="text-accent-light not-italic">ROOM_CONFIG</em>.
+        Set the room dimensions in the sidebar under <em className="text-accent-light not-italic">ROOM CONFIG</em>.
         The default is 12×14 ft. Walls snap to a 6-inch grid by default — change
         the snap increment in the sidebar under <em className="text-accent-light not-italic">SNAP</em>.
       </P>
@@ -194,7 +194,7 @@ export function ProductLibraryContent() {
       <H2 id="help-h-uploading">Uploading Products</H2>
       <P>
         Click <em className="text-accent-light not-italic">LIBRARY</em> in the
-        toolbar, then <em className="text-accent-light not-italic">ADD_PRODUCT</em>.
+        toolbar, then <em className="text-accent-light not-italic">ADD PRODUCT</em>.
         Drop an image, give it a name, pick a category, enter dimensions (width
         × depth × height in feet). Products you add appear in every project —
         the library is global.
@@ -202,7 +202,7 @@ export function ProductLibraryContent() {
 
       <H2 id="help-h-skipping-dims">Skipping Dimensions</H2>
       <P>
-        Check <em className="text-accent-light not-italic">SKIP_DIMENSIONS</em>{" "}
+        Check <em className="text-accent-light not-italic">SKIP DIMENSIONS</em>{" "}
         if you just want to see a product in the space without pinning down
         exact sizes. Products without dimensions render as a placeholder dashed
         box at a default size — you can edit dimensions later in the{" "}
@@ -236,7 +236,7 @@ export function ProductLibraryContent() {
       <P>
         Adjust the snap increment in the sidebar under{" "}
         <em className="text-accent-light not-italic">SNAP</em> — options are
-        OFF, 3_INCH, 6_INCH, and 1_FOOT. Toggle the grid on/off under{" "}
+        OFF, 3 INCH, 6 INCH, and 1 FOOT. Toggle the grid on/off under{" "}
         <em className="text-accent-light not-italic">LAYERS</em>.
       </P>
     </div>
@@ -250,8 +250,8 @@ export function ThreeDContent() {
 
       <H2 id="help-h-views">View Modes</H2>
       <UL>
-        <li><em className="text-accent-light not-italic">2D_PLAN</em> — top-down editable floor plan</li>
-        <li><em className="text-accent-light not-italic">3D_VIEW</em> — rendered 3D scene with products</li>
+        <li><em className="text-accent-light not-italic">2D PLAN</em> — top-down editable floor plan</li>
+        <li><em className="text-accent-light not-italic">3D VIEW</em> — rendered 3D scene with products</li>
         <li><em className="text-accent-light not-italic">SPLIT</em> — 2D and 3D side-by-side</li>
         <li><em className="text-accent-light not-italic">LIBRARY</em> — browse and manage your products</li>
       </UL>

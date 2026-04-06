@@ -255,28 +255,75 @@ export function renderWalls(
       y: origin.y + c.y * scale,
     }));
 
-    // Resolve wall fill: kind="paint" on Side A takes precedence
-    let wallFill = WALL_FILL;
+    // Resolve per-side paint fills
     const wpA = wall.wallpaper?.A;
-    if (wpA?.kind === "paint" && wpA.paintId) {
-      wallFill = resolvePaintHex(wpA.paintId, customColors);
+    const wpB = wall.wallpaper?.B;
+    const fillA = wpA?.kind === "paint" && wpA.paintId
+      ? resolvePaintHex(wpA.paintId, customColors)
+      : null;
+    const fillB = wpB?.kind === "paint" && wpB.paintId
+      ? resolvePaintHex(wpB.paintId, customColors)
+      : null;
+
+    const hasSidePaint = fillA || fillB;
+
+    if (hasSidePaint) {
+      // Split wall into two half-thickness polygons along the centerline.
+      // corners = [startLeft, startRight, endRight, endLeft]
+      // Side A = left half (startLeft→midStart→midEnd→endLeft)
+      // Side B = right half (midStart→startRight→endRight→midEnd)
+      const [sL, sR, eR, eL] = points;
+      const midStart = { x: (sL.x + sR.x) / 2, y: (sL.y + sR.y) / 2 };
+      const midEnd = { x: (eL.x + eR.x) / 2, y: (eL.y + eR.y) / 2 };
+
+      // Side A half (left side of wall)
+      fc.add(new fabric.Polygon([sL, midStart, midEnd, eL], {
+        fill: fillA ?? WALL_FILL,
+        stroke: undefined,
+        strokeWidth: 0,
+        selectable: false,
+        evented: false,
+        data: { type: "wall-side", wallId: wall.id, side: "A" },
+      }));
+
+      // Side B half (right side of wall)
+      fc.add(new fabric.Polygon([midStart, sR, eR, midEnd], {
+        fill: fillB ?? WALL_FILL,
+        stroke: undefined,
+        strokeWidth: 0,
+        selectable: false,
+        evented: false,
+        data: { type: "wall-side", wallId: wall.id, side: "B" },
+      }));
+
+      // Outline stroke on top of the split halves
+      fc.add(new fabric.Polygon(points, {
+        fill: "transparent",
+        stroke: isSelected ? WALL_SELECTED_STROKE : WALL_STROKE,
+        strokeWidth: isSelected ? 2 : 1,
+        selectable: false,
+        evented: false,
+        data: { type: "wall", wallId: wall.id },
+      }));
+    } else {
+      // No per-side paint — single solid polygon
+      fc.add(new fabric.Polygon(points, {
+        fill: WALL_FILL,
+        stroke: isSelected ? WALL_SELECTED_STROKE : WALL_STROKE,
+        strokeWidth: isSelected ? 2 : 1,
+        selectable: false,
+        evented: false,
+        data: { type: "wall", wallId: wall.id },
+      }));
     }
 
-    const polygon = new fabric.Polygon(points, {
-      fill: wallFill,
-      stroke: isSelected ? WALL_SELECTED_STROKE : WALL_STROKE,
-      strokeWidth: isSelected ? 2 : 1,
-      selectable: false, // selection handled by tool
-      evented: false,
-      data: { type: "wall", wallId: wall.id },
-    });
-
-    fc.add(polygon);
-
-    // Lime wash stipple overlay for painted walls
+    // Lime wash stipple overlay for painted walls (Side A)
     if (wpA?.kind === "paint" && wpA.limeWash) {
+      const [sL, , , eL] = points;
+      const midStart = { x: (points[0].x + points[1].x) / 2, y: (points[0].y + points[1].y) / 2 };
+      const midEnd = { x: (points[3].x + points[2].x) / 2, y: (points[3].y + points[2].y) / 2 };
       fc.add(
-        new fabric.Polygon([...points], {
+        new fabric.Polygon(hasSidePaint ? [sL, midStart, midEnd, eL] : [...points], {
           fill: getLimeWashPattern(),
           opacity: 0.2,
           stroke: undefined,
@@ -284,6 +331,24 @@ export function renderWalls(
           selectable: false,
           evented: false,
           data: { type: "wall-limewash", wallId: wall.id },
+        }),
+      );
+    }
+
+    // Lime wash stipple overlay for Side B
+    if (wpB?.kind === "paint" && wpB.limeWash && hasSidePaint) {
+      const [, sR, eR] = points;
+      const midStart = { x: (points[0].x + points[1].x) / 2, y: (points[0].y + points[1].y) / 2 };
+      const midEnd = { x: (points[3].x + points[2].x) / 2, y: (points[3].y + points[2].y) / 2 };
+      fc.add(
+        new fabric.Polygon([midStart, sR, eR, midEnd], {
+          fill: getLimeWashPattern(),
+          opacity: 0.2,
+          stroke: undefined,
+          strokeWidth: 0,
+          selectable: false,
+          evented: false,
+          data: { type: "wall-limewash-b", wallId: wall.id },
         }),
       );
     }
@@ -774,7 +839,7 @@ export function renderProducts(
     });
 
     // Name label
-    const labelText = orphan ? "MISSING_PRODUCT" : product!.name;
+    const labelText = orphan ? "MISSING PRODUCT" : product!.name;
     const nameLabel = new fabric.FabricText(labelText, {
       fontSize: 10,
       fontFamily: "Inter, system-ui, sans-serif",

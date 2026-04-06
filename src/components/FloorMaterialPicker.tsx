@@ -60,7 +60,7 @@ export default function FloorMaterialPicker() {
   return (
     <div>
       <h3 className="font-mono text-[10px] text-text-ghost tracking-widest uppercase mb-2">
-        FLOOR_MATERIAL
+        FLOOR MATERIAL
       </h3>
 
       {/* Preset swatch grid */}
@@ -75,7 +75,7 @@ export default function FloorMaterialPicker() {
         onClick={() => fileInputRef.current?.click()}
         className="w-full font-mono text-[10px] text-text-ghost hover:text-text-primary tracking-widest uppercase py-1 border border-outline-variant/20 rounded-sm mt-2"
       >
-        {isCustom ? "CUSTOM_IMAGE" : "UPLOAD_IMAGE..."}
+        {isCustom ? "CUSTOM IMAGE" : "UPLOAD IMAGE..."}
       </button>
 
       {/* Color swatch preview */}
@@ -131,7 +131,7 @@ export default function FloorMaterialPicker() {
             onClick={() => setFloorMaterial(undefined)}
             className="w-full font-mono text-[9px] text-text-ghost hover:text-text-primary tracking-widest uppercase py-1 mt-1"
           >
-            RESET_TO_DEFAULT
+            RESET TO DEFAULT
           </button>
         </div>
       )}

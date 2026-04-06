@@ -65,7 +65,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between p-5 pb-4">
           <h2 className="font-mono text-sm text-text-primary tracking-widest">
-            ADD_PRODUCT
+            ADD PRODUCT
           </h2>
           <button
             onClick={onClose}
@@ -131,13 +131,13 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
             <div className="flex-1 space-y-3">
               <label className="block space-y-1">
                 <span className="font-mono text-[9px] text-text-ghost tracking-wider">
-                  PRODUCT_NAME
+                  PRODUCT NAME
                 </span>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="E.G. 'EAMES_CHAIR_L.01'"
+                  placeholder="E.G. 'EAMES CHAIR L.01'"
                   className="w-full px-3 py-2 text-xs"
                   required
                 />
@@ -173,7 +173,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                       className="w-3 h-3 accent-accent"
                     />
                     <span className="font-mono text-[8px] text-text-ghost tracking-wider">
-                      SKIP_DIMENSIONS
+                      SKIP DIMENSIONS
                     </span>
                   </label>
                 </div>
@@ -222,13 +222,13 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
 
               <label className="block space-y-1">
                 <span className="font-mono text-[9px] text-text-ghost tracking-wider">
-                  MATERIAL_FINISH
+                  MATERIAL FINISH
                 </span>
                 <input
                   type="text"
                   value={material}
                   onChange={(e) => setMaterial(e.target.value)}
-                  placeholder="E.G. BRUSHED_STEEL"
+                  placeholder="E.G. BRUSHED STEEL"
                   className="w-full px-3 py-2 text-xs"
                 />
               </label>
@@ -249,7 +249,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
               disabled={!name}
               className="font-mono text-[10px] tracking-widest px-5 py-2 bg-accent text-white rounded-sm hover:opacity-90 active:scale-95 disabled:opacity-30 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
             >
-              ADD_TO_REGISTRY
+              ADD TO REGISTRY
             </button>
           </div>
         </form>
