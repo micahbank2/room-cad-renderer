@@ -77,7 +77,9 @@ Plans:
   2. User can change wainscot style from the popover and see the 3D view update immediately
   3. User can change wainscot height from the popover and see the 3D geometry reflect the new height
   4. Popover dismisses on click-outside or Escape without leaving stale UI
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 22-01-PLAN.md — WainscotPopover component + FabricCanvas dblclick integration
 **UI hint**: yes
 
 ### Phase 23: Label Cleanup
@@ -99,5 +101,5 @@ Phases execute in numeric order: 21 → 22 → 23
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 21. Deferred Feature Verification | v1.4 | 1/1 | Complete   | 2026-04-06 |
-| 22. Wainscot Inline Edit | v1.4 | 0/TBD | Not started | - |
+| 22. Wainscot Inline Edit | v1.4 | 0/1 | Planning complete | - |
 | 23. Label Cleanup | v1.4 | 0/TBD | Not started | - |
