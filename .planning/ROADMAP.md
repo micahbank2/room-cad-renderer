@@ -6,6 +6,7 @@
 - ✅ **v1.1 UX Fixes & Polish** — Phases 6–10 (shipped 2026-04-05) — see [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 - ✅ **v1.2 New Element Types** — Phases 11–17 (shipped 2026-04-05) — see [milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md)
 - ✅ **v1.3 Color, Polish & Materials** — Phases 18–20 (shipped 2026-04-06) — see [milestones/v1.3-ROADMAP.md](milestones/v1.3-ROADMAP.md)
+- 🚧 **v1.4 Polish & Tech Debt** — Phases 21–23 (in progress)
 
 ---
 
@@ -38,3 +39,63 @@
 3 phases, 11 plans, 12/16 requirements. Full paint system (132 F&B + custom hex + lime wash), custom element edit handles, multi-select + bulk paint, collapsible sidebars, unified surface material catalog. See [milestones/v1.3-ROADMAP.md](milestones/v1.3-ROADMAP.md).
 
 </details>
+
+---
+
+### 🚧 v1.4 Polish & Tech Debt (In Progress)
+
+**Milestone Goal:** Close all deferred v1.3 verification gaps and clean up UI label formatting. Every feature that landed as code in v1.3 works end-to-end, and every user-facing label reads cleanly without underscores.
+
+## Phases
+
+- [ ] **Phase 21: Deferred Feature Verification** - Verify copy-side, frame override, and sidebar scroll features shipped in v1.3
+- [ ] **Phase 22: Wainscot Inline Edit** - Build double-click inline edit for wainscot style and height
+- [ ] **Phase 23: Label Cleanup** - Remove all underscores from user-facing labels
+
+## Phase Details
+
+### Phase 21: Deferred Feature Verification
+**Goal**: Users can use copy-side, frame color override, and sidebar scroll features that shipped as code in v1.3 without bugs or dead paths
+**Depends on**: Nothing (first phase of v1.4)
+**Requirements**: POLISH-03, POLISH-04, POLISH-06
+**Success Criteria** (what must be TRUE):
+  1. User can click a "copy to other side" button on any wall with SIDE A treatments and see those treatments replicated to SIDE B
+  2. User can select a placed wall art piece and change its frame color independently from the default frame style
+  3. User can expand every sidebar section simultaneously and scroll the full panel without any content clipping or overflow hiding
+  4. Frame color changes do not flood undo history (each picker interaction produces at most one undo entry)
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 22: Wainscot Inline Edit
+**Goal**: Users can double-click a wainscoted wall and edit its wainscot style and height in place without navigating to a separate panel
+**Depends on**: Phase 21
+**Requirements**: POLISH-02
+**Success Criteria** (what must be TRUE):
+  1. User can double-click a wall with wainscoting in the 2D canvas and see an inline popover with style and height controls
+  2. User can change wainscot style from the popover and see the 3D view update immediately
+  3. User can change wainscot height from the popover and see the 3D geometry reflect the new height
+  4. Popover dismisses on click-outside or Escape without leaving stale UI
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 23: Label Cleanup
+**Goal**: Every user-facing label in the app displays clean spaces instead of underscores while preserving ALL CAPS convention and leaving code identifiers untouched
+**Depends on**: Phase 22
+**Requirements**: LABEL-01, LABEL-02
+**Success Criteria** (what must be TRUE):
+  1. All static labels in toolbar, sidebar, status bar, and modal headers display spaces instead of underscores (e.g., "SIDE A" not "SIDE_A", "FLOOR PLAN" not "FLOOR_PLAN")
+  2. All dynamically generated labels (product names, wall segment IDs, material names) display with spaces via updated .replace() transforms
+  3. No code identifiers, CSS class names, data attributes, or store keys are affected by the label changes
+**Plans**: TBD
+**UI hint**: yes
+
+## Progress
+
+**Execution Order:**
+Phases execute in numeric order: 21 → 22 → 23
+
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 21. Deferred Feature Verification | v1.4 | 0/TBD | Not started | - |
+| 22. Wainscot Inline Edit | v1.4 | 0/TBD | Not started | - |
+| 23. Label Cleanup | v1.4 | 0/TBD | Not started | - |

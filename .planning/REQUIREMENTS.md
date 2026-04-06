@@ -54,18 +54,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| POLISH-02 | TBD | Pending |
-| POLISH-03 | TBD | Pending |
-| POLISH-04 | TBD | Pending |
-| POLISH-06 | TBD | Pending |
-| LABEL-01 | TBD | Pending |
-| LABEL-02 | TBD | Pending |
+| POLISH-02 | Phase 22 | Pending |
+| POLISH-03 | Phase 21 | Pending |
+| POLISH-04 | Phase 21 | Pending |
+| POLISH-06 | Phase 21 | Pending |
+| LABEL-01 | Phase 23 | Pending |
+| LABEL-02 | Phase 23 | Pending |
 
 **Coverage:**
 - v1.4 requirements: 6 total
-- Mapped to phases: 0
-- Unmapped: 6 ⚠️
+- Mapped to phases: 6
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-06*
-*Last updated: 2026-04-06 after initial definition*
+*Last updated: 2026-04-06 after roadmap creation*
