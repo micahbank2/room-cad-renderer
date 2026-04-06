@@ -839,7 +839,7 @@ export function renderProducts(
     });
 
     // Name label
-    const labelText = orphan ? "MISSING_PRODUCT" : product!.name;
+    const labelText = orphan ? "MISSING PRODUCT" : product!.name;
     const nameLabel = new fabric.FabricText(labelText, {
       fontSize: 10,
       fontFamily: "Inter, system-ui, sans-serif",

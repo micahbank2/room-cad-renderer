@@ -47,7 +47,7 @@ export default function SidebarProductPicker() {
               <div className="w-8 h-8 bg-obsidian-high rounded-sm shrink-0" />
             )}
             <span className="font-mono text-[10px] text-text-dim truncate">
-              {p.name.toUpperCase().replace(/\s/g, "_")}
+              {p.name.toUpperCase()}
             </span>
           </div>
         ))}

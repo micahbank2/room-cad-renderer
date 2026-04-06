@@ -156,7 +156,7 @@ export default function ProductLibrary({
                 {/* Info */}
                 <div className="p-3 space-y-1">
                   <div className="font-mono text-xs text-text-primary font-medium tracking-wide truncate">
-                    {p.name.toUpperCase().replace(/\s/g, "_")}
+                    {p.name.toUpperCase()}
                   </div>
                   <div className="font-mono text-[10px] text-text-ghost">
                     {hasDimensions(p)

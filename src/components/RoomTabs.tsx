@@ -29,7 +29,7 @@ export default function RoomTabs({ onAddClick }: Props) {
     >
       {roomList.map((room) => {
         const isActive = room.id === activeRoomId;
-        const label = room.name.toUpperCase().replace(/\s/g, "_");
+        const label = room.name.toUpperCase();
         return (
           <div
             key={room.id}

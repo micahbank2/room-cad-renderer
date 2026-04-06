@@ -131,7 +131,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
         return (
           <div className="space-y-2">
             <div className="font-mono text-xs text-accent-light">
-              {product?.name?.toUpperCase().replace(/\s/g, "_") ?? "PRODUCT"}
+              {product?.name?.toUpperCase() ?? "PRODUCT"}
             </div>
             {product && (
               <div className="space-y-1.5">

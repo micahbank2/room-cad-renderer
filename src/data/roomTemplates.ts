@@ -35,7 +35,7 @@ function perimeterWalls(w: number, l: number, h: number): Record<string, WallSeg
 export const ROOM_TEMPLATES: Record<RoomTemplateId, RoomTemplate> = {
   LIVING_ROOM: {
     id: "LIVING_ROOM",
-    label: "LIVING_ROOM · 16 × 20 ft",
+    label: "LIVING ROOM · 16 × 20 ft",
     room: { width: 16, length: 20, wallHeight: 9 },
     makeWalls: () => perimeterWalls(16, 20, 9),
   },
