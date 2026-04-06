@@ -90,7 +90,9 @@ Plans:
   1. All static labels in toolbar, sidebar, status bar, and modal headers display spaces instead of underscores (e.g., "SIDE A" not "SIDE_A", "FLOOR PLAN" not "FLOOR_PLAN")
   2. All dynamically generated labels (product names, wall segment IDs, material names) display with spaces via updated .replace() transforms
   3. No code identifiers, CSS class names, data attributes, or store keys are affected by the label changes
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 23-01-PLAN.md — Remove all underscore labels (dynamic transforms + static labels + visual verify)
 **UI hint**: yes
 
 ## Progress
@@ -102,4 +104,4 @@ Phases execute in numeric order: 21 → 22 → 23
 |-------|-----------|----------------|--------|-----------|
 | 21. Deferred Feature Verification | v1.4 | 1/1 | Complete   | 2026-04-06 |
 | 22. Wainscot Inline Edit | v1.4 | 0/1 | Planning complete | - |
-| 23. Label Cleanup | v1.4 | 0/TBD | Not started | - |
+| 23. Label Cleanup | v1.4 | 0/1 | Planning complete | - |
