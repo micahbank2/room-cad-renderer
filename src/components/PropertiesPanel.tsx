@@ -26,12 +26,60 @@ export default function PropertiesPanel({ productLibrary }: Props) {
   const pp = id ? placedProducts[id] : undefined;
   const ceiling = id ? ceilings[id] : undefined;
 
-  if (!wall && !pp && !ceiling) return null;
-
   function handleDelete() {
     removeSelected(selectedIds);
     clearSelection();
   }
+
+  // Multi-selection bulk actions (POLISH-05)
+  if (selectedIds.length > 1) {
+    const wallIds = selectedIds.filter((id) => !!walls[id]);
+    const totalCount = selectedIds.length;
+
+    return (
+      <div className="absolute right-3 top-3 z-10 w-60 glass-panel rounded-sm p-4 space-y-3">
+        <h3 className="font-mono text-[10px] text-text-ghost tracking-widest">
+          BULK_ACTIONS
+        </h3>
+        <div className="font-mono text-[10px] text-accent-light">
+          {totalCount} ITEMS_SELECTED
+          {wallIds.length > 0 && ` (${wallIds.length} WALLS)`}
+        </div>
+
+        {wallIds.length > 0 && (
+          <div className="space-y-2 border-t border-outline-variant/20 pt-2">
+            <div className="font-mono text-[9px] text-text-dim">PAINT_ALL_WALLS</div>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                defaultValue="#f8f5ef"
+                onChange={(e) => {
+                  const color = e.target.value;
+                  for (const wId of wallIds) {
+                    useCADStore.getState().setWallpaper(wId, "A", { kind: "color", color });
+                    useCADStore.getState().setWallpaper(wId, "B", { kind: "color", color });
+                  }
+                }}
+                className="w-8 h-7 bg-transparent border border-outline-variant/30 rounded-sm cursor-pointer"
+              />
+              <span className="font-mono text-[8px] text-text-ghost">
+                APPLIES_TO_BOTH_SIDES
+              </span>
+            </div>
+          </div>
+        )}
+
+        <button
+          onClick={handleDelete}
+          className="w-full font-mono text-[9px] text-error tracking-widest py-1 border border-error/30 rounded-sm hover:bg-error/10"
+        >
+          DELETE_ALL ({totalCount})
+        </button>
+      </div>
+    );
+  }
+
+  if (!wall && !pp && !ceiling) return null;
 
   return (
     <div className="absolute right-3 top-3 z-10 w-60 glass-panel rounded-sm p-4 space-y-3">
