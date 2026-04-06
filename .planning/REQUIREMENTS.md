@@ -28,9 +28,9 @@ Requirements for milestone v1.3 — Color, Polish & Materials. Each maps to road
 
 ### Advanced Materials
 
-- [ ] **MAT-01**: User can pick floor and ceiling materials from a single unified surface material catalog
-- [ ] **MAT-02**: User can apply ceiling texture presets (plaster, wood plank, concrete, painted drywall)
-- [ ] **MAT-03**: Existing floor presets continue working without breaking saved projects (additive migration)
+- [x] **MAT-01**: User can pick floor and ceiling materials from a single unified surface material catalog
+- [x] **MAT-02**: User can apply ceiling texture presets (plaster, wood plank, concrete, painted drywall)
+- [x] **MAT-03**: Existing floor presets continue working without breaking saved projects (additive migration)
 
 ## Future Requirements
 
@@ -74,9 +74,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | POLISH-04 | Phase 19 | Pending |
 | POLISH-05 | Phase 19 | Complete |
 | POLISH-06 | Phase 19 | Pending |
-| MAT-01 | Phase 20 | Pending |
-| MAT-02 | Phase 20 | Pending |
-| MAT-03 | Phase 20 | Pending |
+| MAT-01 | Phase 20 | Complete |
+| MAT-02 | Phase 20 | Complete |
+| MAT-03 | Phase 20 | Complete |
 
 **Coverage:**
 - v1.3 requirements: 16 total
