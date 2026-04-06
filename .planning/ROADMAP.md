@@ -67,7 +67,10 @@ Plans:
   1. User can open a single "Surface Materials" picker for either floor or ceiling and see all texture presets in one catalog (plaster, wood plank, concrete, painted drywall for ceilings; existing 8 floor presets)
   2. User can apply a ceiling texture preset and the 3D ceiling renders the texture consistently — no tile scale corruption when multiple rooms are open in split view
   3. All existing projects load without errors; floor material selections saved before v1.3 continue working without any migration step
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 20-01-PLAN.md — Data foundation: unified surface material catalog, floor texture clone fix, cadStore ceiling material action, CeilingMesh resolution
+- [ ] 20-02-PLAN.md — UI: SurfaceMaterialPicker component, CeilingPaintSection material integration, FloorMaterialPicker swatch grid
 **UI hint**: yes
 
 ## Progress
@@ -76,7 +79,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 18. Color & Paint System | 4/4 | Complete    | 2026-04-06 |
 | 19. v1.2 Polish Pass | 4/5 | Complete    | 2026-04-06 |
-| 20. Advanced Materials | 0/? | Not started | - |
+| 20. Advanced Materials | 0/2 | Not started | - |
 
 ---
 
