@@ -203,6 +203,7 @@ export default function WallMesh({ wall, isSelected }: Props) {
           const frameW = preset?.width ?? 0;
           const frameD = preset?.depth ?? 0;
           const baseZ = thickness / 2 + bandOffset * 2;
+          const frameColor = art.frameColorOverride ?? preset?.color ?? "#ffffff";
 
           if (!preset || art.frameStyle === "none" || frameW === 0) {
             return (
@@ -236,19 +237,19 @@ export default function WallMesh({ wall, isSelected }: Props) {
               </mesh>
               <mesh position={[0, art.height / 2 - frameW / 2, frameCenterZ]} castShadow>
                 <boxGeometry args={[art.width, frameW, frameD]} />
-                <meshStandardMaterial color={preset.color} roughness={0.4} metalness={0.2} />
+                <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.2} />
               </mesh>
               <mesh position={[0, -(art.height / 2 - frameW / 2), frameCenterZ]} castShadow>
                 <boxGeometry args={[art.width, frameW, frameD]} />
-                <meshStandardMaterial color={preset.color} roughness={0.4} metalness={0.2} />
+                <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.2} />
               </mesh>
               <mesh position={[-(art.width / 2 - frameW / 2), 0, frameCenterZ]} castShadow>
                 <boxGeometry args={[frameW, innerH, frameD]} />
-                <meshStandardMaterial color={preset.color} roughness={0.4} metalness={0.2} />
+                <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.2} />
               </mesh>
               <mesh position={[art.width / 2 - frameW / 2, 0, frameCenterZ]} castShadow>
                 <boxGeometry args={[frameW, innerH, frameD]} />
-                <meshStandardMaterial color={preset.color} roughness={0.4} metalness={0.2} />
+                <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.2} />
               </mesh>
             </group>
           );

@@ -62,6 +62,9 @@ export interface WallArt {
   frameStyle?: import("./framedArt").FrameStyle;
   /** Which face of the wall the art hangs on (Phase 17). Defaults to "A". */
   side?: WallSide;
+  /** Per-placement frame color hex override (POLISH-04). When set, overrides
+   *  the library frameStyle's default color for this specific placement. */
+  frameColorOverride?: string;
 }
 
 export interface Opening {

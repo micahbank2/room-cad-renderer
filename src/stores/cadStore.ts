@@ -80,6 +80,7 @@ interface CADState {
   addCustomPaint: (item: Omit<PaintColor, "id" | "source">) => string;
   removeCustomPaint: (id: string) => void;
   applyPaintToAllWalls: (paintId: string, side: WallSide) => void;
+  copyWallSide: (wallId: string, from: WallSide, to: WallSide) => void;
 
   // NEW: room-management actions
   addRoom: (name: string, templateId?: RoomTemplateId) => string;
@@ -750,6 +751,48 @@ export const useCADStore = create<CADState>()((set) => ({
         const root = s as any;
         const recent: string[] = root.recentPaints ?? [];
         root.recentPaints = [paintId, ...recent.filter((id: string) => id !== paintId)].slice(0, 8);
+      })
+    ),
+
+  copyWallSide: (wallId, from, to) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc || !doc.walls[wallId]) return;
+        pushHistory(s);
+        const wall = doc.walls[wallId];
+        // Copy wallpaper
+        if (!wall.wallpaper) wall.wallpaper = {};
+        if (wall.wallpaper[from]) {
+          wall.wallpaper[to] = JSON.parse(JSON.stringify(wall.wallpaper[from]));
+        } else {
+          delete wall.wallpaper[to];
+        }
+        // Copy wainscoting
+        if (!wall.wainscoting) wall.wainscoting = {};
+        if (wall.wainscoting[from]) {
+          wall.wainscoting[to] = JSON.parse(JSON.stringify(wall.wainscoting[from]));
+        } else {
+          delete wall.wainscoting[to];
+        }
+        // Copy crown molding
+        if (!wall.crownMolding) wall.crownMolding = {};
+        if (wall.crownMolding[from]) {
+          wall.crownMolding[to] = JSON.parse(JSON.stringify(wall.crownMolding[from]));
+        } else {
+          delete wall.crownMolding[to];
+        }
+        // Copy wall art — deep clone each item, flip side to target
+        const fromArt = (wall.wallArt ?? []).filter((a) => (a.side ?? "A") === from);
+        // Remove existing target-side art
+        wall.wallArt = (wall.wallArt ?? []).filter((a) => (a.side ?? "A") !== to);
+        // Clone from-side art with new IDs and target side
+        for (const art of fromArt) {
+          const clone = JSON.parse(JSON.stringify(art));
+          clone.id = `wa_${Math.random().toString(36).slice(2, 10)}`;
+          clone.side = to;
+          wall.wallArt!.push(clone);
+        }
       })
     ),
 
