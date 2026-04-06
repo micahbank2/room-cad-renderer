@@ -66,6 +66,10 @@ interface CADState {
   placeCustomElement: (customElementId: string, position: Point) => string;
   moveCustomElement: (id: string, position: Point) => void;
   removePlacedCustomElement: (id: string) => void;
+  rotateCustomElement: (id: string, angle: number) => void;
+  rotateCustomElementNoHistory: (id: string, angle: number) => void;
+  resizeCustomElement: (id: string, scale: number) => void;
+  resizeCustomElementNoHistory: (id: string, scale: number) => void;
   removeProduct: (id: string) => void;
   removeSelected: (ids: string[]) => void;
   undo: () => void;
@@ -602,6 +606,44 @@ export const useCADStore = create<CADState>()((set) => ({
       })
     ),
 
+  rotateCustomElement: (id, angle) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.placedCustomElements?.[id]) return;
+        pushHistory(s);
+        doc.placedCustomElements[id].rotation = angle;
+      })
+    ),
+
+  rotateCustomElementNoHistory: (id, angle) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.placedCustomElements?.[id]) return;
+        doc.placedCustomElements[id].rotation = angle;
+      })
+    ),
+
+  resizeCustomElement: (id, scale) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.placedCustomElements?.[id]) return;
+        pushHistory(s);
+        doc.placedCustomElements[id].sizeScale = Math.max(0.1, Math.min(10, scale));
+      })
+    ),
+
+  resizeCustomElementNoHistory: (id, scale) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.placedCustomElements?.[id]) return;
+        doc.placedCustomElements[id].sizeScale = Math.max(0.1, Math.min(10, scale));
+      })
+    ),
+
   removeProduct: (id) =>
     set(
       produce((s: CADState) => {
@@ -622,6 +664,8 @@ export const useCADStore = create<CADState>()((set) => ({
         for (const id of ids) {
           delete doc.walls[id];
           delete doc.placedProducts[id];
+          if (doc.placedCustomElements) delete doc.placedCustomElements[id];
+          if (doc.ceilings) delete doc.ceilings[id];
         }
       })
     ),
