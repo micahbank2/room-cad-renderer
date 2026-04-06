@@ -66,7 +66,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 18. Color & Paint System | 3/4 | In Progress|  |
+| 18. Color & Paint System | 3/4 | Complete    | 2026-04-06 |
 | 19. v1.2 Polish Pass | 0/? | Not started | - |
 | 20. Advanced Materials | 0/? | Not started | - |
 
