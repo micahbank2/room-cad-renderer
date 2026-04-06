@@ -42,12 +42,13 @@ Plans:
 ### Phase 19: v1.2 Polish Pass
 **Goal**: Every placed element can be edited in place, and common wall treatment workflows require half as many clicks
 **Depends on**: Phase 18 (proceeds after paint system; independent in type dependencies)
-**Requirements**: POLISH-01, POLISH-02, POLISH-03, POLISH-04
+**Requirements**: POLISH-01, POLISH-02, POLISH-03, POLISH-04, POLISH-05
 **Success Criteria** (what must be TRUE):
   1. User can click a placed custom element and drag, rotate, or resize it via visible handles — identical behavior to placed products
   2. User can double-click a wainscoting style in the library panel and edit its name, height, or color without opening a separate dialog
   3. User can click a single "Copy to Side B" button on a wall's SIDE_A treatment panel and all treatments (wallpaper, wainscoting, art, crown) instantly appear on SIDE_B
   4. User can select any placed framed art piece and override just its frame color from the properties panel without changing the library entry
+  5. User can Cmd+click to multi-select walls/elements in 2D and apply bulk actions (e.g. paint all selected walls one color)
 **Plans**: TBD
 **UI hint**: yes
 
