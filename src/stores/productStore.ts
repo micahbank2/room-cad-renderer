@@ -5,6 +5,13 @@ import type { Product } from "@/types/product";
 
 const PRODUCTS_KEY = "room-cad-products";
 
+/** Persist the full products list to IndexedDB. Logs errors instead of swallowing. */
+function persistProducts(products: Product[]): void {
+  set(PRODUCTS_KEY, products).catch((err) => {
+    console.error("[productStore] Failed to persist products to IndexedDB:", err);
+  });
+}
+
 interface ProductState {
   products: Product[];
   loaded: boolean;
@@ -14,11 +21,13 @@ interface ProductState {
   updateProduct: (id: string, changes: Partial<Product>) => void;
 }
 
-export const useProductStore = create<ProductState>()((setState) => ({
+export const useProductStore = create<ProductState>()((setState, getState) => ({
   products: [],
   loaded: false,
 
   load: async () => {
+    // Guard against double-load (React 18 strict mode)
+    if (getState().loaded) return;
     const stored = await get<Product[]>(PRODUCTS_KEY);
     if (stored && Array.isArray(stored)) {
       // Migrate legacy records: coerce non-number dims to null (LIB-04 schema change)
@@ -35,33 +44,32 @@ export const useProductStore = create<ProductState>()((setState) => ({
     }
   },
 
-  addProduct: (p) =>
+  addProduct: (p) => {
     setState(
       produce((s: ProductState) => {
         s.products.push(p);
       })
-    ),
+    );
+    // Explicit persist — don't rely solely on subscription
+    persistProducts(getState().products);
+  },
 
-  removeProduct: (id) =>
+  removeProduct: (id) => {
     setState(
       produce((s: ProductState) => {
         s.products = s.products.filter((x) => x.id !== id);
       })
-    ),
+    );
+    persistProducts(getState().products);
+  },
 
-  updateProduct: (id, changes) =>
+  updateProduct: (id, changes) => {
     setState(
       produce((s: ProductState) => {
         const prod = s.products.find((x) => x.id === id);
         if (prod) Object.assign(prod, changes);
       })
-    ),
+    );
+    persistProducts(getState().products);
+  },
 }));
-
-// Persist to IndexedDB on every products-reference change, but only AFTER load() completes
-// (prevents the initial empty-state render from overwriting saved data — Pitfall 3)
-useProductStore.subscribe((state, prev) => {
-  if (state.loaded && state.products !== prev.products) {
-    set(PRODUCTS_KEY, state.products).catch(() => {});
-  }
-});
