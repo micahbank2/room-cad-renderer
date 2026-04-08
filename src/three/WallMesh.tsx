@@ -273,16 +273,16 @@ export default function WallMesh({ wall, isSelected }: Props) {
         />
       </mesh>
 
-      {/* Side A — positive Z face */}
+      {/* Side B — positive Z face (matches +perp / right side in 2D) */}
       <group>
-        {renderWallpaperOverlay(wall.wallpaper?.A, "wp-A")}
-        {renderSideDecor(wall.wainscoting?.A, wall.crownMolding?.A, artA)}
-      </group>
-
-      {/* Side B — flip 180° around Y so decor lands on -Z face */}
-      <group rotation={[0, Math.PI, 0]}>
         {renderWallpaperOverlay(wall.wallpaper?.B, "wp-B")}
         {renderSideDecor(wall.wainscoting?.B, wall.crownMolding?.B, artB)}
+      </group>
+
+      {/* Side A — flip 180° around Y to -Z face (matches -perp / left side in 2D) */}
+      <group rotation={[0, Math.PI, 0]}>
+        {renderWallpaperOverlay(wall.wallpaper?.A, "wp-A")}
+        {renderSideDecor(wall.wainscoting?.A, wall.crownMolding?.A, artA)}
       </group>
     </group>
   );

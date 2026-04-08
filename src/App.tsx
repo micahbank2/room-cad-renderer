@@ -1,7 +1,8 @@
 import { useState, useEffect, lazy, Suspense } from "react";
-import type { ToolType } from "@/types/cad";
+import type { ToolType, WallSegment, PlacedProduct } from "@/types/cad";
 import { useUIStore } from "@/stores/uiStore";
-import { useCADStore, useActiveWalls } from "@/stores/cadStore";
+import { useCADStore, useActiveWalls, getActiveRoomDoc } from "@/stores/cadStore";
+import { uid } from "@/lib/geometry";
 import { useProductStore } from "@/stores/productStore";
 import { useFramedArtStore } from "@/stores/framedArtStore";
 import { useWainscotStyleStore } from "@/stores/wainscotStyleStore";
@@ -28,6 +29,10 @@ import FabricCanvas from "@/canvas/FabricCanvas";
 const ThreeViewport = lazy(() => import("@/three/ThreeViewport"));
 
 type ViewMode = "2d" | "3d" | "split" | "library";
+
+// Clipboard for copy/paste (module-level, not React state)
+let _clipboard: { walls: WallSegment[]; products: PlacedProduct[] } | null = null;
+const PASTE_OFFSET = 1; // feet offset on each paste
 
 export default function App() {
   const [viewMode, setViewMode] = useState<ViewMode>("2d");
@@ -126,6 +131,81 @@ export default function App() {
       // D-03: 'e' toggles camera mode in 3D/split views
       if (e.key.toLowerCase() === "e" && (viewMode === "3d" || viewMode === "split")) {
         useUIStore.getState().toggleCameraMode();
+      }
+      // Copy (Ctrl/Cmd+C) — copy selected walls and products to clipboard
+      if (e.key.toLowerCase() === "c" && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
+        const selectedIds = useUIStore.getState().selectedIds;
+        if (selectedIds.length === 0) return;
+        const doc = getActiveRoomDoc();
+        if (!doc) return;
+        const walls: WallSegment[] = [];
+        const products: PlacedProduct[] = [];
+        for (const id of selectedIds) {
+          if (doc.walls[id]) walls.push(JSON.parse(JSON.stringify(doc.walls[id])));
+          if (doc.placedProducts[id]) products.push(JSON.parse(JSON.stringify(doc.placedProducts[id])));
+        }
+        if (walls.length > 0 || products.length > 0) {
+          _clipboard = { walls, products };
+          e.preventDefault();
+        }
+        return;
+      }
+      // Paste (Ctrl/Cmd+V) — paste clipboard items with offset and new IDs
+      if (e.key.toLowerCase() === "v" && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
+        if (!_clipboard) return;
+        e.preventDefault();
+        const store = useCADStore.getState();
+        const newIds: string[] = [];
+        for (const w of _clipboard.walls) {
+          const newId = `wall_${uid()}`;
+          store.addWall(
+            { x: w.start.x + PASTE_OFFSET, y: w.start.y + PASTE_OFFSET },
+            { x: w.end.x + PASTE_OFFSET, y: w.end.y + PASTE_OFFSET },
+          );
+          // addWall creates a basic wall; apply remaining properties
+          const doc = getActiveRoomDoc();
+          if (doc) {
+            // Find the most recently added wall (last key)
+            const allIds = Object.keys(doc.walls);
+            const latestId = allIds[allIds.length - 1];
+            if (latestId) {
+              store.updateWall(latestId, {
+                thickness: w.thickness,
+                height: w.height,
+                openings: w.openings.map((o) => ({ ...o, id: `op_${uid()}` })),
+                wallpaper: w.wallpaper ? JSON.parse(JSON.stringify(w.wallpaper)) : undefined,
+                wainscoting: w.wainscoting ? JSON.parse(JSON.stringify(w.wainscoting)) : undefined,
+                crownMolding: w.crownMolding ? JSON.parse(JSON.stringify(w.crownMolding)) : undefined,
+                wallArt: w.wallArt?.map((a) => ({ ...a, id: `art_${uid()}` })),
+              });
+              newIds.push(latestId);
+            }
+          }
+        }
+        for (const p of _clipboard.products) {
+          const newId = store.placeProduct(p.productId, {
+            x: p.position.x + PASTE_OFFSET,
+            y: p.position.y + PASTE_OFFSET,
+          });
+          if (p.rotation) store.rotateProduct(newId, p.rotation);
+          if (p.sizeScale) store.resizeProduct(newId, p.sizeScale);
+          newIds.push(newId);
+        }
+        // Select the pasted items
+        if (newIds.length > 0) useUIStore.getState().select(newIds);
+        // Offset clipboard for next paste
+        _clipboard = {
+          walls: _clipboard.walls.map((w) => ({
+            ...w,
+            start: { x: w.start.x + PASTE_OFFSET, y: w.start.y + PASTE_OFFSET },
+            end: { x: w.end.x + PASTE_OFFSET, y: w.end.y + PASTE_OFFSET },
+          })),
+          products: _clipboard.products.map((p) => ({
+            ...p,
+            position: { x: p.position.x + PASTE_OFFSET, y: p.position.y + PASTE_OFFSET },
+          })),
+        };
+        return;
       }
       // D-10: Ctrl/Cmd+Tab cycles active room forward
       if (e.key === "Tab" && (e.ctrlKey || e.metaKey)) {

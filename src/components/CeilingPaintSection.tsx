@@ -69,11 +69,11 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
         CEILING PAINT
       </div>
 
-      <div className={hasMaterial ? "opacity-40 pointer-events-none" : undefined}>
+      <div className={hasMaterial ? "opacity-60" : undefined}>
         {hasMaterial && (
           <div className="mb-1">
             <span className="font-mono text-[8px] text-text-ghost tracking-wider italic">
-              OVERRIDDEN BY MATERIAL
+              SELECT PAINT TO REPLACE MATERIAL
             </span>
           </div>
         )}

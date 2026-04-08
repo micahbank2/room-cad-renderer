@@ -27,6 +27,7 @@ import { wallLength } from "@/lib/geometry";
 type DragType =
   | "wall"
   | "product"
+  | "ceiling"
   | "rotate"
   | "wall-rotate"
   | "product-resize"
@@ -441,19 +442,21 @@ export function activateSelectTool(
 
       useUIStore.getState().select([hit.id]);
 
-      // Ceilings are not draggable — just select, no drag state
-      if (hit.type === "ceiling") {
-        state.dragging = false;
-        state.dragId = null;
-        state.dragType = null;
-        return;
-      }
-
       state.dragging = true;
       state.dragId = hit.id;
-      state.dragType = hit.type as "wall" | "product";
+      state.dragType = hit.type as "wall" | "product" | "ceiling";
 
-      if (hit.type === "product") {
+      if (hit.type === "ceiling") {
+        const ceiling = (getActiveRoomDoc()?.ceilings ?? {})[hit.id];
+        if (ceiling && ceiling.points.length > 0) {
+          // Compute centroid as drag anchor
+          const cx = ceiling.points.reduce((s, p) => s + p.x, 0) / ceiling.points.length;
+          const cy = ceiling.points.reduce((s, p) => s + p.y, 0) / ceiling.points.length;
+          state.dragOffsetFeet = { x: feet.x - cx, y: feet.y - cy };
+          // Push one history entry at drag start
+          useCADStore.getState().updateCeiling(hit.id, {});
+        }
+      } else if (hit.type === "product") {
         const pp = (getActiveRoomDoc()?.placedProducts ?? {})[hit.id];
         const pce = (getActiveRoomDoc()?.placedCustomElements ?? {})[hit.id];
         const pos = pp?.position ?? pce?.position;
@@ -645,7 +648,17 @@ export function activateSelectTool(
         ? snapPoint({ x: targetX, y: targetY }, gridSnap)
         : { x: targetX, y: targetY };
 
-    if (state.dragType === "product") {
+    if (state.dragType === "ceiling") {
+      const ceiling = (getActiveRoomDoc()?.ceilings ?? {})[state.dragId];
+      if (ceiling && ceiling.points.length > 0) {
+        const cx = ceiling.points.reduce((s, p) => s + p.x, 0) / ceiling.points.length;
+        const cy = ceiling.points.reduce((s, p) => s + p.y, 0) / ceiling.points.length;
+        const dx = snapped.x - cx;
+        const dy = snapped.y - cy;
+        const newPoints = ceiling.points.map((p) => ({ x: p.x + dx, y: p.y + dy }));
+        useCADStore.getState().updateCeilingNoHistory(state.dragId, { points: newPoints });
+      }
+    } else if (state.dragType === "product") {
       const pp3 = (getActiveRoomDoc()?.placedProducts ?? {})[state.dragId];
       if (pp3) {
         useCADStore.getState().moveProduct(state.dragId, snapped);

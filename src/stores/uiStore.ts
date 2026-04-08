@@ -20,6 +20,8 @@ interface UIState {
   userZoom: number; // 1.0 = auto-fit, 2.0 = 2x, etc.
   panOffset: { x: number; y: number }; // pixel offset applied on top of auto-fit origin
   activeWallSide: WallSide; // which face of the selected wall is being edited (Phase 17)
+  /** When set, 3D viewport should animate camera to face this wall side. */
+  wallSideCameraTarget: { wallId: string; side: WallSide; seq: number } | null;
   showSidebar: boolean;
 
   setTool: (tool: ToolType) => void;
@@ -41,6 +43,8 @@ interface UIState {
   zoomAt: (cursor: { x: number; y: number }, factor: number, baseFit: { scale: number; origin: { x: number; y: number } }) => void;
   resetView: () => void;
   setActiveWallSide: (side: WallSide) => void;
+  focusWallSide: (wallId: string, side: WallSide) => void;
+  clearWallSideCameraTarget: () => void;
   toggleSidebar: () => void;
 }
 
@@ -60,6 +64,7 @@ export const useUIStore = create<UIState>()((set) => ({
   userZoom: 1,
   panOffset: { x: 0, y: 0 },
   activeWallSide: "A",
+  wallSideCameraTarget: null,
   showSidebar: true,
 
   setTool: (tool) => set({ activeTool: tool, selectedIds: [] }),
@@ -124,5 +129,11 @@ export const useUIStore = create<UIState>()((set) => ({
     }),
   resetView: () => set({ userZoom: 1, panOffset: { x: 0, y: 0 } }),
   setActiveWallSide: (side) => set({ activeWallSide: side }),
+  focusWallSide: (wallId, side) =>
+    set((s) => ({
+      activeWallSide: side,
+      wallSideCameraTarget: { wallId, side, seq: (s.wallSideCameraTarget?.seq ?? 0) + 1 },
+    })),
+  clearWallSideCameraTarget: () => set({ wallSideCameraTarget: null }),
   toggleSidebar: () => set((s) => ({ showSidebar: !s.showSidebar })),
 }));

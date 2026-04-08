@@ -51,6 +51,7 @@ interface CADState {
   setFloorPlanImage: (dataUrl: string | undefined) => void;
   addCeiling: (points: Point[], height: number, material?: string) => string;
   updateCeiling: (id: string, changes: Partial<Ceiling>) => void;
+  updateCeilingNoHistory: (id: string, changes: Partial<Ceiling>) => void;
   removeCeiling: (id: string) => void;
   setFloorMaterial: (material: FloorMaterial | undefined) => void;
   setWallpaper: (wallId: string, side: WallSide, wallpaper: Wallpaper | undefined) => void;
@@ -85,6 +86,7 @@ interface CADState {
   removeCustomPaint: (id: string) => void;
   applyPaintToAllWalls: (paintId: string, side: WallSide) => void;
   copyWallSide: (wallId: string, from: WallSide, to: WallSide) => void;
+  swapWallSides: (wallId: string) => void;
 
   // NEW: room-management actions
   addRoom: (name: string, templateId?: RoomTemplateId) => string;
@@ -410,6 +412,15 @@ export const useCADStore = create<CADState>()((set) => ({
           const recent: string[] = root.recentPaints ?? [];
           root.recentPaints = [changes.paintId, ...recent.filter((id: string) => id !== changes.paintId)].slice(0, 8);
         }
+      })
+    ),
+
+  updateCeilingNoHistory: (id, changes) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc || !doc.ceilings || !doc.ceilings[id]) return;
+        Object.assign(doc.ceilings[id], changes);
       })
     ),
 
@@ -824,6 +835,49 @@ export const useCADStore = create<CADState>()((set) => ({
           clone.id = `wa_${Math.random().toString(36).slice(2, 10)}`;
           clone.side = to;
           wall.wallArt!.push(clone);
+        }
+      })
+    ),
+
+  swapWallSides: (wallId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc || !doc.walls[wallId]) return;
+        pushHistory(s);
+        const wall = doc.walls[wallId];
+        // Swap wallpaper A <-> B
+        if (wall.wallpaper) {
+          const tmp = wall.wallpaper.A;
+          wall.wallpaper.A = wall.wallpaper.B;
+          wall.wallpaper.B = tmp;
+          if (!wall.wallpaper.A) delete wall.wallpaper.A;
+          if (!wall.wallpaper.B) delete wall.wallpaper.B;
+          if (!wall.wallpaper.A && !wall.wallpaper.B) delete wall.wallpaper;
+        }
+        // Swap wainscoting A <-> B
+        if (wall.wainscoting) {
+          const tmp = wall.wainscoting.A;
+          wall.wainscoting.A = wall.wainscoting.B;
+          wall.wainscoting.B = tmp;
+          if (!wall.wainscoting.A) delete wall.wainscoting.A;
+          if (!wall.wainscoting.B) delete wall.wainscoting.B;
+          if (!wall.wainscoting.A && !wall.wainscoting.B) delete wall.wainscoting;
+        }
+        // Swap crown molding A <-> B
+        if (wall.crownMolding) {
+          const tmp = wall.crownMolding.A;
+          wall.crownMolding.A = wall.crownMolding.B;
+          wall.crownMolding.B = tmp;
+          if (!wall.crownMolding.A) delete wall.crownMolding.A;
+          if (!wall.crownMolding.B) delete wall.crownMolding.B;
+          if (!wall.crownMolding.A && !wall.crownMolding.B) delete wall.crownMolding;
+        }
+        // Swap wall art sides
+        if (wall.wallArt) {
+          for (const art of wall.wallArt) {
+            art.side = (art.side ?? "A") === "A" ? "B" : "A";
+          }
         }
       })
     ),

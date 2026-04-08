@@ -1,10 +1,11 @@
 import * as THREE from "three";
 import { Suspense, useRef, useEffect, useState } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Environment, PointerLockControls } from "@react-three/drei";
 import { useActiveRoom, useActiveRoomDoc, useActiveWalls, useActivePlacedProducts, useActiveCeilings, useActivePlacedCustomElements, useCustomElements } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import type { Product } from "@/types/product";
+import { angle as wallAngleRad } from "@/lib/geometry";
 import WallMesh from "./WallMesh";
 import ProductMesh from "./ProductMesh";
 import CeilingMesh from "./CeilingMesh";
@@ -29,6 +30,7 @@ function Scene({ productLibrary }: Props) {
   const floorMaterial = activeDoc?.floorMaterial;
   const selectedIds = useUIStore((s) => s.selectedIds);
   const cameraMode = useUIStore((s) => s.cameraMode);
+  const wallSideCameraTarget = useUIStore((s) => s.wallSideCameraTarget);
 
   const halfW = room.width / 2;
   const halfL = room.length / 2;
@@ -40,6 +42,9 @@ function Scene({ productLibrary }: Props) {
   const orbitTargetRef = useRef<[number, number, number]>([halfW, room.wallHeight / 3, halfL]);
   const orbitControlsRef = useRef<any>(null);
 
+  // Camera animation target (smooth lerp)
+  const cameraAnimTarget = useRef<{ pos: THREE.Vector3; look: THREE.Vector3 } | null>(null);
+
   // 05.1 fix: restore saved camera position when returning to orbit mode
   useEffect(() => {
     if (cameraMode !== "orbit") return;
@@ -49,6 +54,53 @@ function Scene({ productLibrary }: Props) {
     ctrl.object.position.set(x, y, z);
     ctrl.update();
   }, [cameraMode]);
+
+  // MIC-35: animate camera to face selected wall side
+  useEffect(() => {
+    if (!wallSideCameraTarget || cameraMode !== "orbit") return;
+    const wall = walls[wallSideCameraTarget.wallId];
+    if (!wall) return;
+    // Wall center in 3D (x = 2D x, z = 2D y, y = height/2)
+    const cx = (wall.start.x + wall.end.x) / 2;
+    const cz = (wall.start.y + wall.end.y) / 2;
+    const cy = wall.height / 2;
+    // Wall perpendicular in 2D: rotate direction 90° CCW
+    const a = wallAngleRad(wall.start, wall.end);
+    const perpAngle = a + Math.PI / 2;
+    // Side A = left (-perp), Side B = right (+perp)
+    // Camera should be on the chosen side, looking at the wall
+    const sign = wallSideCameraTarget.side === "A" ? -1 : 1;
+    const dist = 8; // feet back from wall
+    const nx = Math.cos(perpAngle) * sign;
+    const nz = Math.sin(perpAngle) * sign;
+    // Camera position: wall center + normal * distance (in 3D coords: x→x, y→up, z→z)
+    const camPos = new THREE.Vector3(cx + nx * dist, cy + 2, cz + nz * dist);
+    const lookAt = new THREE.Vector3(cx, cy, cz);
+    cameraAnimTarget.current = { pos: camPos, look: lookAt };
+    useUIStore.getState().clearWallSideCameraTarget();
+  }, [wallSideCameraTarget, walls, cameraMode]);
+
+  // Smooth camera animation via useFrame
+  useFrame(() => {
+    if (!cameraAnimTarget.current) return;
+    const ctrl = orbitControlsRef.current;
+    if (!ctrl?.object) return;
+    const { pos, look } = cameraAnimTarget.current;
+    const cam = ctrl.object as THREE.Camera;
+    const speed = 0.08;
+    cam.position.lerp(pos, speed);
+    ctrl.target.lerp(look, speed);
+    ctrl.update();
+    // Stop when close enough
+    if (cam.position.distanceTo(pos) < 0.05) {
+      cam.position.copy(pos);
+      ctrl.target.copy(look);
+      ctrl.update();
+      orbitPosRef.current = [pos.x, pos.y, pos.z];
+      orbitTargetRef.current = [look.x, look.y, look.z];
+      cameraAnimTarget.current = null;
+    }
+  });
 
   return (
     <>

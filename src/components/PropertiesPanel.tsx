@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useCADStore, useActiveWalls, useActivePlacedProducts, useActiveCeilings } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useProductStore } from "@/stores/productStore";
@@ -17,6 +18,8 @@ export default function PropertiesPanel({ productLibrary }: Props) {
   const placedProducts = useActivePlacedProducts();
   const ceilings = useActiveCeilings();
   const removeSelected = useCADStore((s) => s.removeSelected);
+  const resizeWallByLabel = useCADStore((s) => s.resizeWallByLabel);
+  const updateWall = useCADStore((s) => s.updateWall);
   const clearSelection = useUIStore((s) => s.clearSelection);
   const updateProduct = useProductStore((s) => s.updateProduct);
   const storeProducts = useProductStore((s) => s.products);
@@ -106,9 +109,28 @@ export default function PropertiesPanel({ productLibrary }: Props) {
             WALL SEGMENT {wall.id.slice(-4).toUpperCase()}
           </div>
           <div className="space-y-1.5">
-            <Row label="LENGTH" value={formatFeet(wallLength(wall))} />
-            <Row label="THICKNESS" value={formatFeet(wall.thickness)} />
-            <Row label="HEIGHT" value={formatFeet(wall.height)} />
+            <EditableRow
+              label="LENGTH"
+              value={wallLength(wall)}
+              suffix="FT"
+              onCommit={(v) => resizeWallByLabel(wall.id, v)}
+              min={0.5}
+            />
+            <EditableRow
+              label="THICKNESS"
+              value={wall.thickness}
+              suffix="FT"
+              onCommit={(v) => updateWall(wall.id, { thickness: v })}
+              min={0.1}
+              step={0.1}
+            />
+            <EditableRow
+              label="HEIGHT"
+              value={wall.height}
+              suffix="FT"
+              onCommit={(v) => updateWall(wall.id, { height: v })}
+              min={1}
+            />
             <Row
               label="START"
               value={`${wall.start.x.toFixed(1)}, ${wall.start.y.toFixed(1)}`}
@@ -200,6 +222,69 @@ function Row({ label, value }: { label: string; value: string }) {
     <div className="flex justify-between items-center">
       <span className="font-mono text-[11px] text-text-ghost tracking-wider">{label}</span>
       <span className="font-mono text-[11px] text-accent-light">{value}</span>
+    </div>
+  );
+}
+
+function EditableRow({
+  label,
+  value,
+  suffix,
+  onCommit,
+  min = 0,
+  step = 0.25,
+}: {
+  label: string;
+  value: number;
+  suffix: string;
+  onCommit: (v: number) => void;
+  min?: number;
+  step?: number;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+
+  function startEdit() {
+    setDraft(value.toFixed(2));
+    setEditing(true);
+  }
+
+  function commit() {
+    setEditing(false);
+    const v = parseFloat(draft);
+    if (!isNaN(v) && v >= min && v !== value) {
+      onCommit(v);
+    }
+  }
+
+  if (editing) {
+    return (
+      <div className="flex justify-between items-center">
+        <span className="font-mono text-[11px] text-text-ghost tracking-wider">{label}</span>
+        <input
+          autoFocus
+          type="number"
+          step={step}
+          min={min}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") commit();
+            if (e.key === "Escape") setEditing(false);
+          }}
+          className="w-20 px-1 py-0.5 text-right font-mono text-[11px] text-accent-light bg-obsidian-deepest border border-accent/30 rounded-sm outline-none"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex justify-between items-center group cursor-pointer" onClick={startEdit}>
+      <span className="font-mono text-[11px] text-text-ghost tracking-wider">{label}</span>
+      <span className="font-mono text-[11px] text-accent-light group-hover:underline">
+        {formatFeet(value)} {suffix && <span className="text-text-ghost">{suffix}</span>}
+      </span>
     </div>
   );
 }
