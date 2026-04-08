@@ -1,6 +1,8 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useCADStore } from "@/stores/cadStore";
+import { useProjectStore } from "@/stores/projectStore";
 import { defaultSnapshot } from "@/lib/snapshotMigration";
+import { listProjects, loadProject, type SavedProject } from "@/lib/serialization";
 import TemplatePickerDialog from "./TemplatePickerDialog";
 
 interface Props {
@@ -9,12 +11,28 @@ interface Props {
 
 export default function WelcomeScreen({ onStart }: Props) {
   const [showTemplates, setShowTemplates] = useState(false);
+  const [showProjects, setShowProjects] = useState(false);
+  const [projects, setProjects] = useState<SavedProject[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const loadSnapshot = useCADStore((s) => s.loadSnapshot);
   const setFloorPlanImage = useCADStore((s) => s.setFloorPlanImage);
+  const setActive = useProjectStore((s) => s.setActive);
+
+  useEffect(() => {
+    listProjects().then(setProjects);
+  }, []);
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleOpenProject = async (project: SavedProject) => {
+    const full = await loadProject(project.id);
+    if (full) {
+      loadSnapshot(full.snapshot);
+      setActive(full.id, full.name);
+      onStart();
+    }
   };
 
   const handleFile = (file: File) => {
@@ -85,7 +103,55 @@ export default function WelcomeScreen({ onStart }: Props) {
                 Drop an image of an existing plan and trace walls on top of it.
               </p>
             </button>
+
+            {/* Open existing project */}
+            {projects.length > 0 && (
+              <button
+                onClick={() => setShowProjects((v) => !v)}
+                className="w-72 bg-obsidian-low border border-outline-variant/10 hover:border-accent/40 rounded-sm p-6 text-left transition-all group"
+              >
+                <span className="material-symbols-outlined text-[28px] text-accent mb-3 block">
+                  folder_open
+                </span>
+                <h3 className="font-mono text-xs text-text-primary tracking-widest mb-2 group-hover:text-accent-light transition-colors">
+                  OPEN PROJECT
+                </h3>
+                <p className="text-[11px] text-text-ghost leading-relaxed">
+                  Resume a previously saved project from your library.
+                </p>
+              </button>
+            )}
           </div>
+
+          {/* Saved project list */}
+          {showProjects && projects.length > 0 && (
+            <div className="mt-6 w-full max-w-2xl">
+              <div className="bg-obsidian-low border border-outline-variant/10 rounded-sm p-4 space-y-2">
+                <h4 className="font-mono text-[9px] text-text-ghost tracking-widest mb-3">
+                  SAVED PROJECTS
+                </h4>
+                {projects.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => handleOpenProject(p)}
+                    className="w-full flex items-center justify-between p-3 rounded-sm border border-outline-variant/10 hover:border-accent/40 bg-obsidian-base transition-all group text-left"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="font-mono text-xs text-text-primary tracking-wide group-hover:text-accent-light transition-colors truncate">
+                        {p.name.toUpperCase().replace(/\s/g, "_")}
+                      </div>
+                      <div className="font-mono text-[10px] text-text-ghost mt-0.5">
+                        {new Date(p.updatedAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <span className="material-symbols-outlined text-[18px] text-text-ghost group-hover:text-accent transition-colors ml-3">
+                      arrow_forward
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <input
             ref={fileInputRef}
             type="file"
