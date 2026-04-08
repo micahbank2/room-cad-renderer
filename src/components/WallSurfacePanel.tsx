@@ -15,6 +15,7 @@ export default function WallSurfacePanel() {
   const walls = useActiveWalls();
   const activeSide = useUIStore((s) => s.activeWallSide);
   const setActiveSide = useUIStore((s) => s.setActiveWallSide);
+  const focusWallSide = useUIStore((s) => s.focusWallSide);
   const setWallpaper = useCADStore((s) => s.setWallpaper);
   const toggleWainscoting = useCADStore((s) => s.toggleWainscoting);
   const toggleCrownMolding = useCADStore((s) => s.toggleCrownMolding);
@@ -136,7 +137,7 @@ export default function WallSurfacePanel() {
         {(["A", "B"] as const).map((s) => (
           <button
             key={s}
-            onClick={() => setActiveSide(s)}
+            onClick={() => focusWallSide(wall.id, s)}
             className={`flex-1 font-mono text-[11px] tracking-widest py-2 rounded-sm border ${
               activeSide === s
                 ? "border-accent text-accent-light bg-accent/10"
