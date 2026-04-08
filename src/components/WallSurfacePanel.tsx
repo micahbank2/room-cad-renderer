@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import { useCADStore, useActiveWalls } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
+import { angle } from "@/lib/geometry";
 import { useFramedArtStore } from "@/stores/framedArtStore";
 import { useWainscotStyleStore } from "@/stores/wainscotStyleStore";
 import type { Wallpaper } from "@/types/cad";
@@ -20,11 +21,44 @@ export default function WallSurfacePanel() {
   const addWallArt = useCADStore((s) => s.addWallArt);
   const removeWallArt = useCADStore((s) => s.removeWallArt);
   const copyWallSide = useCADStore((s) => s.copyWallSide);
+  const swapWallSides = useCADStore((s) => s.swapWallSides);
   const wallpaperFileRef = useRef<HTMLInputElement>(null);
   const artFileRef = useRef<HTMLInputElement>(null);
   const framedArtItems = useFramedArtStore((s) => s.items);
   const wainscotStyles = useWainscotStyleStore((s) => s.items);
   const [showLibrary, setShowLibrary] = useState(false);
+
+  // Detect which side faces the room interior (centroid of all wall endpoints)
+  const interiorSide = useMemo(() => {
+    if (selectedIds.length !== 1) return null;
+    const w = walls[selectedIds[0]];
+    if (!w) return null;
+    const allWalls = Object.values(walls);
+    if (allWalls.length < 2) return null;
+    // Room centroid = average of all wall midpoints
+    let cx = 0, cy = 0;
+    for (const ww of allWalls) {
+      cx += (ww.start.x + ww.end.x) / 2;
+      cy += (ww.start.y + ww.end.y) / 2;
+    }
+    cx /= allWalls.length;
+    cy /= allWalls.length;
+    // Wall perpendicular (Side A direction = left of start→end)
+    const a = angle(w.start, w.end);
+    const perpAngle = a + Math.PI / 2;
+    const perpX = Math.cos(perpAngle);
+    const perpY = Math.sin(perpAngle);
+    // Wall midpoint
+    const mx = (w.start.x + w.end.x) / 2;
+    const my = (w.start.y + w.end.y) / 2;
+    // Side A is in the -perp direction (left), Side B is +perp (right)
+    // Check which direction the centroid is relative to the wall
+    const toCentroidX = cx - mx;
+    const toCentroidY = cy - my;
+    const dot = toCentroidX * perpX + toCentroidY * perpY;
+    // dot < 0 → centroid is on Side A (left), dot > 0 → centroid is on Side B (right)
+    return dot < 0 ? "A" as const : "B" as const;
+  }, [selectedIds, walls]);
 
   if (selectedIds.length !== 1) return null;
   const wall = walls[selectedIds[0]];
@@ -110,18 +144,29 @@ export default function WallSurfacePanel() {
             }`}
           >
             SIDE {s}
+            {interiorSide === s && (
+              <span className="text-[8px] text-success ml-1">INTERIOR</span>
+            )}
           </button>
         ))}
       </div>
-      <button
-        onClick={() => {
-          const target = activeSide === "A" ? "B" : "A";
-          copyWallSide(wall.id, activeSide, target);
-        }}
-        className="w-full font-mono text-[11px] text-accent-light hover:text-accent tracking-widest py-2 border border-accent/20 rounded-sm hover:bg-accent/10"
-      >
-        COPY TO SIDE {activeSide === "A" ? "B" : "A"}
-      </button>
+      <div className="flex gap-1">
+        <button
+          onClick={() => swapWallSides(wall.id)}
+          className="flex-1 font-mono text-[11px] text-text-dim hover:text-accent tracking-widest py-1.5 border border-outline-variant/30 rounded-sm hover:bg-accent/10"
+        >
+          SWAP A/B
+        </button>
+        <button
+          onClick={() => {
+            const target = activeSide === "A" ? "B" : "A";
+            copyWallSide(wall.id, activeSide, target);
+          }}
+          className="flex-1 font-mono text-[11px] text-accent-light hover:text-accent tracking-widest py-1.5 border border-accent/20 rounded-sm hover:bg-accent/10"
+        >
+          COPY TO {activeSide === "A" ? "B" : "A"}
+        </button>
+      </div>
 
       {/* Wallpaper */}
       <div>
