@@ -51,6 +51,7 @@ interface CADState {
   setFloorPlanImage: (dataUrl: string | undefined) => void;
   addCeiling: (points: Point[], height: number, material?: string) => string;
   updateCeiling: (id: string, changes: Partial<Ceiling>) => void;
+  updateCeilingNoHistory: (id: string, changes: Partial<Ceiling>) => void;
   removeCeiling: (id: string) => void;
   setFloorMaterial: (material: FloorMaterial | undefined) => void;
   setWallpaper: (wallId: string, side: WallSide, wallpaper: Wallpaper | undefined) => void;
@@ -410,6 +411,15 @@ export const useCADStore = create<CADState>()((set) => ({
           const recent: string[] = root.recentPaints ?? [];
           root.recentPaints = [changes.paintId, ...recent.filter((id: string) => id !== changes.paintId)].slice(0, 8);
         }
+      })
+    ),
+
+  updateCeilingNoHistory: (id, changes) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc || !doc.ceilings || !doc.ceilings[id]) return;
+        Object.assign(doc.ceilings[id], changes);
       })
     ),
 
