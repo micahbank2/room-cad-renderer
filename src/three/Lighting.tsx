@@ -1,13 +1,13 @@
 export default function Lighting() {
   return (
     <>
-      {/* Ambient fill */}
-      <ambientLight intensity={0.4} color="#f0f0ff" />
+      {/* Ambient fill — neutral warm to avoid blue cast on white walls */}
+      <ambientLight intensity={0.5} color="#fff8f0" />
 
       {/* Main directional (sun-like) */}
       <directionalLight
         position={[10, 15, 8]}
-        intensity={1.2}
+        intensity={1.0}
         castShadow
         shadow-mapSize-width={4096}
         shadow-mapSize-height={4096}
@@ -20,11 +20,11 @@ export default function Lighting() {
         shadow-bias={-0.001}
       />
 
-      {/* Fill light from opposite side */}
-      <directionalLight position={[-8, 10, -6]} intensity={0.3} color="#e0e8ff" />
+      {/* Fill light from opposite side — warm neutral */}
+      <directionalLight position={[-8, 10, -6]} intensity={0.3} color="#f5f0e8" />
 
-      {/* Soft hemisphere for sky/ground bounce */}
-      <hemisphereLight args={["#b1e1ff", "#e8d5b0", 0.4]} />
+      {/* Soft hemisphere for sky/ground bounce — neutral */}
+      <hemisphereLight args={["#faf8f5", "#e8d5b0", 0.35]} />
     </>
   );
 }
