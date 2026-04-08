@@ -6,7 +6,7 @@
 - ✅ **v1.1 UX Fixes & Polish** — Phases 6–10 (shipped 2026-04-05) — see [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md)
 - ✅ **v1.2 New Element Types** — Phases 11–17 (shipped 2026-04-05) — see [milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md)
 - ✅ **v1.3 Color, Polish & Materials** — Phases 18–20 (shipped 2026-04-06) — see [milestones/v1.3-ROADMAP.md](milestones/v1.3-ROADMAP.md)
-- 🚧 **v1.4 Polish & Tech Debt** — Phases 21–23 (in progress)
+- ✅ **v1.4 Polish & Tech Debt** — Phases 21–23 (shipped 2026-04-08)
 
 ---
 
@@ -42,15 +42,15 @@
 
 ---
 
-### 🚧 v1.4 Polish & Tech Debt (In Progress)
+### ✅ v1.4 Polish & Tech Debt — SHIPPED 2026-04-08
 
 **Milestone Goal:** Close all deferred v1.3 verification gaps and clean up UI label formatting. Every feature that landed as code in v1.3 works end-to-end, and every user-facing label reads cleanly without underscores.
 
 ## Phases
 
 - [x] **Phase 21: Deferred Feature Verification** - Verify copy-side, frame override, and sidebar scroll features shipped in v1.3 (completed 2026-04-06)
-- [ ] **Phase 22: Wainscot Inline Edit** - Build double-click inline edit for wainscot style and height
-- [ ] **Phase 23: Label Cleanup** - Remove all underscores from user-facing labels
+- [x] **Phase 22: Wainscot Inline Edit** - Build double-click inline edit for wainscot style and height (completed 2026-04-08)
+- [x] **Phase 23: Label Cleanup** - Remove all underscores from user-facing labels (completed 2026-04-08)
 
 ## Phase Details
 
@@ -79,7 +79,7 @@ Plans:
   4. Popover dismisses on click-outside or Escape without leaving stale UI
 **Plans**: 1 plan
 Plans:
-- [ ] 22-01-PLAN.md — WainscotPopover component + FabricCanvas dblclick integration
+- [x] 22-01-PLAN.md — WainscotPopover component + FabricCanvas dblclick integration
 **UI hint**: yes
 
 ### Phase 23: Label Cleanup
@@ -92,7 +92,7 @@ Plans:
   3. No code identifiers, CSS class names, data attributes, or store keys are affected by the label changes
 **Plans**: 1 plan
 Plans:
-- [ ] 23-01-PLAN.md — Remove all underscore labels (dynamic transforms + static labels + visual verify)
+- [x] 23-01-PLAN.md — Remove all underscore labels (dynamic transforms + static labels + visual verify)
 **UI hint**: yes
 
 ## Progress
@@ -103,5 +103,5 @@ Phases execute in numeric order: 21 → 22 → 23
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 21. Deferred Feature Verification | v1.4 | 1/1 | Complete   | 2026-04-06 |
-| 22. Wainscot Inline Edit | v1.4 | 0/1 | Planning complete | - |
-| 23. Label Cleanup | v1.4 | 0/1 | Planning complete | - |
+| 22. Wainscot Inline Edit | v1.4 | 1/1 | Complete | 2026-04-08 |
+| 23. Label Cleanup | v1.4 | 1/1 | Complete | 2026-04-08 |
