@@ -23,6 +23,7 @@ import {
   projectOntoWall,
 } from "../openingEditHandles";
 import { wallLength } from "@/lib/geometry";
+import { pxToFeet } from "./toolUtils";
 
 type DragType =
   | "wall"
@@ -73,17 +74,6 @@ const state: SelectState = {
   openingInitialWidth: null,
   openingInitialPointerOffset: null,
 };
-
-function pxToFeet(
-  px: { x: number; y: number },
-  origin: { x: number; y: number },
-  scale: number
-): Point {
-  return {
-    x: (px.x - origin.x) / scale,
-    y: (px.y - origin.y) / scale,
-  };
-}
 
 /**
  * Ray-casting point-in-polygon test for ceiling selection.
