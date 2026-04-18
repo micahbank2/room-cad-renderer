@@ -55,9 +55,8 @@ function expectLeakFree(activate: Activator, cycles = 10) {
   fc.dispose();
 }
 
-// Skipped in Wave 0 because tools don't yet return cleanup fn.
-// Wave 2 flips `describe.skip` → `describe` once all 6 tools return `() => void`.
-describe.skip("tool cleanup — no listener leaks (Wave 2 enables)", () => {
+// Wave 2 enabled this suite once all 6 tools return `() => void`.
+describe("tool cleanup — no listener leaks", () => {
   test("doorTool activate/cleanup cycle stays leak-free", () => {
     expectLeakFree(activateDoorTool as Activator);
   });
