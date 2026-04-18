@@ -27,10 +27,21 @@ created: 2026-04-17
 
 ### Pre-Existing Failure Baseline
 
-Phase 24 must NOT introduce any new test failures. The 6 pre-existing failures below are treated as baseline and must remain the SAME tests failing at phase verification. (Capture exact names in Wave 0 before any refactor commits.)
+Phase 24 must NOT introduce any new test failures. The 6 pre-existing failures below are treated as baseline and must remain the SAME tests failing at phase verification.
 
-- [ ] **Wave 0 task:** Run `npm test 2>&1 | tail -80` and record the 6 failing test names here
-- [ ] Pre-existing failures DO NOT include any test file that imports from `src/canvas/tools/` (confirmed via grep in research)
+Captured 2026-04-17 from `npm test` on branch `claude/friendly-merkle-8005fb` before any refactor commits:
+
+1. `tests/AddProductModal.test.tsx > AddProductModal Skip Dimensions (LIB-04) > renders SKIP_DIMENSIONS checkbox`
+2. `tests/AddProductModal.test.tsx > AddProductModal Skip Dimensions (LIB-04) > submit with skipDims=true calls onAdd with null dims`
+3. `tests/AddProductModal.test.tsx > AddProductModal Skip Dimensions (LIB-04) > submit with skipDims=false calls onAdd with numeric dims`
+4. `tests/SidebarProductPicker.test.tsx > SidebarProductPicker (LIB-05) > typing 'eames' filters to Eames product (case-insensitive)`
+5. `tests/SidebarProductPicker.test.tsx > SidebarProductPicker (LIB-05) > dragstart sets effectAllowed to copy`
+6. `tests/productStore.test.ts > productStore (LIB-03) > before load() resolves, mutating products does NOT trigger set() (guards empty-state overwrite)`
+
+Summary line observed: `Tests  6 failed | 162 passed | 3 todo (171)` — 3 test files contain failures (`AddProductModal.test.tsx`, `SidebarProductPicker.test.tsx`, `productStore.test.ts`), all in product-library code unrelated to `src/canvas/tools/`.
+
+- [x] **Wave 0 task:** baseline recorded
+- [x] Pre-existing failures DO NOT include any test file that imports from `src/canvas/tools/` (confirmed via `grep -l "canvas/tools" tests/*.ts tests/*.tsx` returning zero matches)
 
 ---
 
