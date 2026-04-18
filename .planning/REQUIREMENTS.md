@@ -24,12 +24,12 @@
 
 ### Tool Architecture (TOOL)
 
-- [ ] **TOOL-01**: Tool cleanup uses type-safe pattern (no `as any` on Fabric canvas instance)
+- [x] **TOOL-01**: Tool cleanup uses type-safe pattern (no `as any` on Fabric canvas instance)
   - **Source:** [#53](https://github.com/micahbank2/room-cad-renderer/issues/53)
   - **Verifiable:** Zero `as any` casts on Fabric canvas. No event listener leaks during rapid tool switching. Existing tool behavior unchanged.
   - **Files:** `src/canvas/tools/wallTool.ts:117`, `selectTool.ts:190`, `doorTool.ts:78`, `windowTool.ts:77`, `productTool.ts:60`
 
-- [ ] **TOOL-02**: Tool state held in closures, not module-level singletons
+- [x] **TOOL-02**: Tool state held in closures, not module-level singletons
   - **Source:** [#54](https://github.com/micahbank2/room-cad-renderer/issues/54)
   - **Verifiable:** No `const state = {...}` at module scope in any tool file. Two parallel tool activations don't bleed state. Existing tool behavior unchanged.
   - **Files:** `src/canvas/tools/wallTool.ts:7-13`, `selectTool.ts:8-20`, `productTool.ts:8`

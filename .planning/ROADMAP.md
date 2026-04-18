@@ -76,7 +76,7 @@
 **Plans**: 4 plans
   - [x] 24-01-wave0-scaffolding-PLAN.md — Create toolUtils.ts + toolCleanup.test.ts scaffold; capture pre-existing test-failure baseline
   - [x] 24-02-wave1-consolidate-helpers-PLAN.md — All 6 tools import pxToFeet from toolUtils; door/window import findClosestWall (TOOL-03)
-  - [ ] 24-03-wave2-cleanup-pattern-PLAN.md — Cleanup-fn return pattern + closure state in all 6 tools; FabricCanvas.tsx dispatch update; un-skip leak tests (TOOL-01, TOOL-02)
+  - [x] 24-03-wave2-cleanup-pattern-PLAN.md — Cleanup-fn return pattern + closure state in all 6 tools; FabricCanvas.tsx dispatch update; un-skip leak tests (TOOL-01, TOOL-02)
   - [ ] 24-04-wave3-verification-PLAN.md — Final automated gate + D-13 manual smoke + docs update (ROADMAP, CLAUDE.md)
 
 ### Phase 25: Canvas & Store Performance
@@ -116,7 +116,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 24. Tool Architecture Refactor | 2/4 | In Progress|  |
+| 24. Tool Architecture Refactor | 3/4 | In Progress|  |
 | 25. Canvas & Store Performance | 0/? | Not started | - |
 | 26. Bug Sweep | 0/? | Not started | - |
 | 27. Upgrade Tracking | 0/? | Not started | - |
