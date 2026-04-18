@@ -2,6 +2,50 @@
 
 *A living document updated after each milestone. Lessons feed forward into future planning.*
 
+## Milestone: v1.4 — Polish & Tech Debt
+
+**Shipped:** 2026-04-08 (archived 2026-04-18)
+**Phases:** 3 | **Plans:** 3
+
+### What Was Built
+- All 4 deferred v1.3 polish requirements verified and fixed (POLISH-02/03/04/06)
+- `WainscotPopover` component + FabricCanvas dblclick integration for inline wainscot editing on 2D canvas
+- `updateWallArtNoHistory` store action + onFocus/onChange color picker pattern producing clean single-undo entries
+- Sidebar scroll fix via `min-h-0` on flex-1 overflow container
+- Label cleanup: ~125 static labels + 4 dynamic transforms across 30+ files, code identifiers preserved
+- 10 Jess Feedback bugs fixed in parallel via PR #39 (user-testing regressions from v1.3)
+
+### What Worked
+- **Phase sizing was right** — each phase scoped to one cohesive concern (verification, inline edit, labels) unlike v1.3's over-broad Phase 19
+- **Three-commit split for label cleanup** — dynamic transforms → static labels → surface materials. Each commit independently revertable, easier to review
+- **Extending existing dblclick useEffect** instead of adding a second one avoided handler collision with dimension-label editor (reuse beats parallel handlers)
+- **Color picker onFocus pattern** — realized React `onChange` fires like native events so `onBlur` misses initial state. `onFocus` captures one snapshot per interaction
+- **Parallel bug fix PR** (#39) alongside planned phases — 10 regression fixes landed without blocking the milestone plan
+
+### What Was Inefficient
+- **Phases 22 and 23 shipped without generating SUMMARY.md files** — code merged, artifacts skipped. Required 2026-04-17 retrofit from git history during milestone audit. Root cause: running work through direct execution instead of `/gsd:execute-phase` for the final phases
+- **REQUIREMENTS.md traceability drifted from shipped state** — POLISH-02, LABEL-01, LABEL-02 stayed `[ ]` Pending even after PRs merged. Milestone PR #40 updated roadmap checkboxes but missed requirements table
+- **No VERIFICATION.md for any v1.4 phase** — integration checker ended up substituting, but that's a fallback, not a target pattern
+- **CLI-generated MILESTONES.md entry was too thin** — had to manually rewrite to match the richer v1.3/v1.2/v1.1 entry style. The auto-generated 3-bullet version loses the stats, git range, and per-requirement traceability
+
+### Patterns Established
+- **Canvas inline editor pattern** — Fabric dblclick → hit test → React overlay state → popover component → store action → 2D/3D re-render. Matches EDIT-06 dimension editor; now a reusable template
+- **Color picker NoHistory pattern** — `onFocus` calls history-pushing action, `onChange` calls NoHistory variant. Reusable for any continuous-input (slider, range, etc.)
+- **Display-vs-identifier separation** (Obsidian CAD convention) — spaces in display text, underscores only in code keys/CSS classes/test IDs/data attrs. Locked as naming rule
+
+### Key Lessons
+- **SUMMARY.md must be generated at execute-time, not retrofit** — the retrofit path works but loses granularity (task timings, deviation notes, issues encountered) that only exist in-the-moment
+- **Traceability tables rot silently** — when marking milestone checkboxes in ROADMAP.md, always update REQUIREMENTS.md traceability in the same commit
+- **Audit trail debt is real** — `/gsd:audit-milestone` surfaces it, but the cost of fixing later > cost of doing it at execute-time. Worth stricter gates before declaring a milestone shipped
+- **Integration checker is a decent substitute but not equivalent to VERIFICATION.md** — it confirms wiring but doesn't capture the per-requirement evidence tables that formal verification provides
+
+### Cost Observations
+- Model mix: primarily sonnet for execution, opus for planning/audit
+- Retrofit session (2026-04-17): 1 audit + 2 SUMMARY writes + REQUIREMENTS reconciliation + archival
+- Notable: The PR #39 Jess Feedback sweep was cheaper than expected because all 10 bugs had narrow blast radius — parallel inline fixes beat sequential phase planning for regression-class work
+
+---
+
 ## Milestone: v1.3 — Color, Polish & Materials
 
 **Shipped:** 2026-04-06

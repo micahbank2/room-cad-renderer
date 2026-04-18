@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.4
-milestone_name: Polish & Tech Debt
-status: planning
-stopped_at: Completed 21-01-PLAN.md
-last_updated: "2026-04-06T15:19:56.159Z"
-last_activity: 2026-04-06 — Roadmap created for v1.4 milestone
+milestone: null
+milestone_name: null
+status: between_milestones
+stopped_at: v1.4 milestone archived 2026-04-18
+last_updated: "2026-04-18T00:00:00.000Z"
+last_activity: 2026-04-18
 progress:
-  total_phases: 3
-  completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
   percent: 0
 ---
 
@@ -18,66 +18,46 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-06)
+See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 21 — Deferred Feature Verification
+**Current focus:** Planning next milestone — v1.5 TBD
 
 ## Current Position
 
-Phase: 21 of 23 (Deferred Feature Verification)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-04-06 — Roadmap created for v1.4 milestone
+No active milestone. v1.4 Polish & Tech Debt shipped 2026-04-08 and archived 2026-04-18.
 
-Progress: [░░░░░░░░░░] 0%
-
-## Performance Metrics
-
-**Velocity:**
-
-- Total plans completed: 0 (v1.4)
-- Average duration: -
-- Total execution time: 0 hours
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| - | - | - | - |
-
-**Recent Trend:**
-
-- Last 5 plans: -
-- Trend: -
-
-*Updated after each plan completion*
-| Phase 21 P01 | 2min | 2 tasks | 4 files |
+Run `/gsd:new-milestone` to start v1.5 planning. Backlog candidates:
+- High: async product images in 2D canvas, auto-save with debounce
+- Medium: GLTF/OBJ model support, camera presets, editable dimension labels
+- Low: user-uploaded PBR textures, design system redesign, backend + auth, advanced 3D
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+Full log in PROJECT.md Key Decisions table. Recent v1.4 decisions:
 
-- [v1.3]: Deferred POLISH-02/03/04/06 to v1.4 — code landed but not verified end-to-end
-- [v1.4]: Phase order: verification first (21), wainscot edit second (22), label cleanup last (23) to avoid merge conflicts
-- [v1.4]: Zero new dependencies — react-colorful already installed for frame color picker, Zustand copyWallSide action exists
-- [Phase 21]: Used onFocus history push + onChange NoHistory for color picker inputs (established as codebase pattern)
+- Canvas inline editor pattern (Fabric dblclick → hit test → React overlay → store action) established — reusable template beyond wainscot
+- Color picker NoHistory pattern (onFocus push history, onChange NoHistory) — reusable for any continuous input
+- Display-vs-identifier separation in Obsidian CAD theme: spaces in display, underscores only in code keys/CSS/test IDs — locked convention
 
 ### Pending Todos
 
-None yet.
+None.
 
-### Blockers/Concerns
+### Open Blockers/Concerns
 
-- Frame color picker may flood undo history — needs updateWallArtNoHistory pattern (Phase 21)
-- Underscore removal must NOT touch code identifiers, CSS classes, data-testid — only display labels (Phase 23)
-- ~15 component files + 4 dynamic .replace() call sites affected by label cleanup
+None.
+
+### Known Gaps Carried Forward
+
+- No VERIFICATION.md files for v1.4 phases (integration-checker substituted)
+- No VALIDATION.md (Nyquist) for v1.4 phases
+- Phase 22/23 SUMMARY.md files were retrofit from git history, not generated at execute-time
 
 ## Session Continuity
 
-Last session: 2026-04-06T15:19:56.157Z
-Stopped at: Completed 21-01-PLAN.md
+Last session: 2026-04-18 — v1.4 milestone retrofit + archival
+Stopped at: v1.4 archived; ready for v1.5 planning
 Resume file: None

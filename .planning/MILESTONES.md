@@ -1,5 +1,39 @@
 # Milestones — Room CAD Renderer
 
+## v1.4 — Polish & Tech Debt ✅
+
+**Shipped:** 2026-04-08 (archived 2026-04-18)
+**Timeline:** 2026-04-06 → 2026-04-08 (~2 days)
+**Phases:** 3 (21, 22, 23) — 3 plans
+**Files changed:** ~40 | **LOC:** ~13,987 TypeScript
+**Git range:** `0596cef` (feat 21-01) → `b330315` (fix 23 surface labels)
+**Tag:** `v1.4`
+
+**Delivered:** All deferred v1.3 verification gaps closed and every user-facing underscore label cleaned up. Jessica can double-click a wainscoted wall in the 2D canvas to edit its style and height inline, her color picker interactions produce clean single-undo entries, and the sidebar scrolls smoothly when every section is expanded. Every label in the app reads cleanly with spaces — code identifiers left untouched.
+
+**Key accomplishments:**
+
+1. **Undo-history fix** — `updateWallArtNoHistory` cadStore action + onFocus/onChange color picker pattern producing at most one undo entry per interaction (POLISH-04)
+2. **Sidebar scroll fix** — `min-h-0` on flex-1 overflow container lets every section be expanded simultaneously without clipping (POLISH-06)
+3. **Wainscot inline edit** — `WainscotPopover` component + FabricCanvas dblclick integration so users edit wainscot style/height directly on canvas, matching EDIT-06 dimension-label precedent. Single useEffect shared with dimension-label handler (no collision) (POLISH-02)
+4. **Copy wall side verification** — `copyWallSide` action tested end-to-end with 3 new unit tests (POLISH-03)
+5. **Label cleanup** — 4 dynamic `.replace(/\s/g, "_")` transforms removed, ~125 static underscore labels replaced across 30+ files, surface material display labels fixed. Display/identifier separation established as Obsidian CAD convention (LABEL-01, LABEL-02)
+6. **Jess Feedback bug sweep (PR #39)** — 10 bugs found during v1.3 user testing fixed in parallel: welcome screen "Open Existing Project" option, wall dimensions editable after placement, ceilings draggable after placement, ceiling paint picker usable after material selection, product persistence to IndexedDB, wall Side A/B alignment between 2D and 3D
+
+### Known Gaps (Accepted)
+
+- **VERIFICATION.md artifacts** — not generated for phases 21, 22, 23. Integration checker (2026-04-17) substitutes for formal verification; all 6 requirements confirmed wired end-to-end.
+- **VALIDATION.md (Nyquist)** — not generated for any v1.4 phase. Low priority.
+- Phase 22 and 23 SUMMARY.md files were retrofit on 2026-04-17 from git history (see [v1.4-MILESTONE-AUDIT.md](milestones/v1.4-MILESTONE-AUDIT.md))
+
+**Archives:**
+
+- [v1.4-ROADMAP.md](milestones/v1.4-ROADMAP.md) — full phase breakdown
+- [v1.4-REQUIREMENTS.md](milestones/v1.4-REQUIREMENTS.md) — 6/6 requirements validated
+- [v1.4-MILESTONE-AUDIT.md](milestones/v1.4-MILESTONE-AUDIT.md) — 3-source cross-reference audit with integration verification
+
+---
+
 ## v1.3 — Color, Polish & Materials ✅
 
 **Shipped:** 2026-04-06
@@ -23,6 +57,7 @@
 ### Known Gaps
 
 Accepted as tech debt for v1.4:
+
 - **POLISH-02**: Wainscot library inline edit (code landed but not verified end-to-end)
 - **POLISH-03**: Copy SIDE_A treatments to SIDE_B (copyWallSide action exists, UI button landed but not verified)
 - **POLISH-04**: Per-placement frame color override (frameColorOverride type + picker landed but not verified)
