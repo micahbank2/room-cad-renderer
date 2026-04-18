@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
-milestone: null
-milestone_name: null
-status: between_milestones
-stopped_at: v1.4 milestone archived 2026-04-18
-last_updated: "2026-04-18T00:00:00.000Z"
-last_activity: 2026-04-18
+milestone: v1.5
+milestone_name: Performance & Tech Debt
+status: planning
+stopped_at: defining requirements for v1.5
+last_updated: "2026-04-17T00:00:00.000Z"
+last_activity: 2026-04-17
 progress:
   total_phases: 0
   completed_phases: 0
@@ -18,19 +18,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-18)
+See: .planning/PROJECT.md (updated 2026-04-17)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Planning next milestone — v1.5 TBD
+**Current focus:** v1.5 — Performance & Tech Debt (no user-visible new features)
 
 ## Current Position
 
-No active milestone. v1.4 Polish & Tech Debt shipped 2026-04-08 and archived 2026-04-18.
-
-Run `/gsd:new-milestone` to start v1.5 planning. Backlog candidates:
-- High: async product images in 2D canvas, auto-save with debounce
-- Medium: GLTF/OBJ model support, camera presets, editable dimension labels
-- Low: user-uploaded PBR textures, design system redesign, backend + auth, advanced 3D
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements for v1.5 Performance & Tech Debt
+Last activity: 2026-04-17 — Milestone v1.5 started, 8 issues filed (#42, #43, #51-56)
 
 ## Accumulated Context
 
@@ -58,6 +56,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-18 — v1.4 milestone retrofit + archival
-Stopped at: v1.4 archived; ready for v1.5 planning
+Last session: 2026-04-17 — v1.5 milestone planning started
+Stopped at: Defining requirements; awaiting REQUIREMENTS.md + ROADMAP.md generation
 Resume file: None
