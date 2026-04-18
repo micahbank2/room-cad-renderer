@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance & Tech Debt
 status: executing
-stopped_at: Completed 24-01-wave0-scaffolding-PLAN.md
-last_updated: "2026-04-18T03:02:52.881Z"
+stopped_at: Completed 24-02-wave1-consolidate-helpers-PLAN.md
+last_updated: "2026-04-18T03:08:20.674Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 ## Current Position
 
 Phase: 24 (tool-architecture-refactor) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-04-18
 
@@ -41,6 +41,7 @@ Full log in PROJECT.md Key Decisions table. Recent v1.4 decisions:
 - Color picker NoHistory pattern (onFocus push history, onChange NoHistory) — reusable for any continuous input
 - Display-vs-identifier separation in Obsidian CAD theme: spaces in display, underscores only in code keys/CSS/test IDs — locked convention
 - [Phase 24]: Wave 0 scaffolding landed: toolUtils.ts (pxToFeet, findClosestWall with required minWallLength, WALL_SNAP_THRESHOLD_FT) + skipped toolCleanup.test.ts + 6-test baseline captured in VALIDATION.md
+- [Phase 24-tool-architecture-refactor]: [Phase 24 Wave 1]: All 6 canvas tool files now import pxToFeet + findClosestWall from ./toolUtils — 107 net lines of duplicated helpers deleted; (fc as any) casts and module-level state intentionally preserved for Wave 2
 
 ### Pending Todos
 
@@ -58,6 +59,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-18T03:02:52.879Z
-Stopped at: Completed 24-01-wave0-scaffolding-PLAN.md
+Last session: 2026-04-18T03:08:20.671Z
+Stopped at: Completed 24-02-wave1-consolidate-helpers-PLAN.md
 Resume file: None
