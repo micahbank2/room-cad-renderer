@@ -34,7 +34,7 @@
   - **Verifiable:** No `const state = {...}` at module scope in any tool file. Two parallel tool activations don't bleed state. Existing tool behavior unchanged.
   - **Files:** `src/canvas/tools/wallTool.ts:7-13`, `selectTool.ts:8-20`, `productTool.ts:8`
 
-- [ ] **TOOL-03**: `pxToFeet` and `findClosestWall` extracted to shared `toolUtils.ts`
+- [x] **TOOL-03**: `pxToFeet` and `findClosestWall` extracted to shared `toolUtils.ts`
   - **Source:** [#55](https://github.com/micahbank2/room-cad-renderer/issues/55)
   - **Verifiable:** Zero duplicated implementations across 5 tool files. All tools take consistent `gridSnap` behavior on hover/click. All 115 tests pass.
   - **Files:** All 5 files under `src/canvas/tools/`, new `src/canvas/tools/toolUtils.ts`

@@ -74,7 +74,7 @@
   4. Rapid tool switching (select → wall → door → window → product → ceiling, 10x fast) produces no event listener leaks (Chrome DevTools memory snapshot confirms stable listener count; automated `tests/toolCleanup.test.ts` guard)
   5. Full test suite passes with same failure set as baseline (171 tests total; 165 passing pre-refactor → 171 passing post-refactor including 6 new listener-leak cases; 6 pre-existing unrelated failures unchanged — baseline recorded in 24-VALIDATION.md)
 **Plans**: 4 plans
-  - [ ] 24-01-wave0-scaffolding-PLAN.md — Create toolUtils.ts + toolCleanup.test.ts scaffold; capture pre-existing test-failure baseline
+  - [x] 24-01-wave0-scaffolding-PLAN.md — Create toolUtils.ts + toolCleanup.test.ts scaffold; capture pre-existing test-failure baseline
   - [ ] 24-02-wave1-consolidate-helpers-PLAN.md — All 6 tools import pxToFeet from toolUtils; door/window import findClosestWall (TOOL-03)
   - [ ] 24-03-wave2-cleanup-pattern-PLAN.md — Cleanup-fn return pattern + closure state in all 6 tools; FabricCanvas.tsx dispatch update; un-skip leak tests (TOOL-01, TOOL-02)
   - [ ] 24-04-wave3-verification-PLAN.md — Final automated gate + D-13 manual smoke + docs update (ROADMAP, CLAUDE.md)
@@ -116,7 +116,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 24. Tool Architecture Refactor | 0/? | Not started | - |
+| 24. Tool Architecture Refactor | 1/4 | In Progress|  |
 | 25. Canvas & Store Performance | 0/? | Not started | - |
 | 26. Bug Sweep | 0/? | Not started | - |
 | 27. Upgrade Tracking | 0/? | Not started | - |
