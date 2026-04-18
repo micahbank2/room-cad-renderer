@@ -70,10 +70,14 @@
 **Success Criteria** (what must be TRUE):
   1. `ripgrep "(fc as any)" src/canvas/tools/` returns zero matches
   2. No `const state = {...}` declarations at module scope in any tool file — all mutable tool state lives inside the activate closure
-  3. A single `src/canvas/tools/toolUtils.ts` exists and all 5 tool files import `pxToFeet` and `findClosestWall` from it — zero local duplicates
-  4. Rapid tool switching (select → wall → door → window → product, 10x fast) produces no event listener leaks (Chrome DevTools memory snapshot confirms stable listener count)
-  5. All 115 tests pass with no behavioral regressions
-**Plans**: TBD
+  3. A single `src/canvas/tools/toolUtils.ts` exists and all 6 tool files import `pxToFeet` from it (door/window additionally import `findClosestWall`) — zero local duplicates (updated from 5 to 6 per phase-24 D-02; v1.4 added ceilingTool after the requirement was written)
+  4. Rapid tool switching (select → wall → door → window → product → ceiling, 10x fast) produces no event listener leaks (Chrome DevTools memory snapshot confirms stable listener count; automated `tests/toolCleanup.test.ts` guard)
+  5. Full test suite passes with same failure set as baseline (171 tests total; 165 passing pre-refactor → 171 passing post-refactor including 6 new listener-leak cases; 6 pre-existing unrelated failures unchanged — baseline recorded in 24-VALIDATION.md)
+**Plans**: 4 plans
+  - [ ] 24-01-wave0-scaffolding-PLAN.md — Create toolUtils.ts + toolCleanup.test.ts scaffold; capture pre-existing test-failure baseline
+  - [ ] 24-02-wave1-consolidate-helpers-PLAN.md — All 6 tools import pxToFeet from toolUtils; door/window import findClosestWall (TOOL-03)
+  - [ ] 24-03-wave2-cleanup-pattern-PLAN.md — Cleanup-fn return pattern + closure state in all 6 tools; FabricCanvas.tsx dispatch update; un-skip leak tests (TOOL-01, TOOL-02)
+  - [ ] 24-04-wave3-verification-PLAN.md — Final automated gate + D-13 manual smoke + docs update (ROADMAP, CLAUDE.md)
 
 ### Phase 25: Canvas & Store Performance
 **Goal**: Dragging in a complex scene sustains 60fps and cadStore undo snapshots are measurably faster
