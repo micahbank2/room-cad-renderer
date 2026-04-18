@@ -24,11 +24,23 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 See `.planning/ROADMAP.md` for links to each milestone archive.
 
-## Current Milestone
+## Current Milestone: v1.5 Performance & Tech Debt
 
-None active. Next milestone TBD — candidates in backlog (async product images in 2D canvas, auto-save with debounce, GLTF/OBJ model support, camera presets, editable dimension labels, PBR texture uploads, backend with authentication, design system redesign).
+**Goal:** Make the app feel smoother as scenes grow and close the highest-friction tech debt and bug debt before adding more features.
 
-Run `/gsd:new-milestone` to plan v1.5.
+**Target items:**
+- Canvas full-redraw → incremental updates (perf)
+- `JSON.parse(JSON.stringify())` → `structuredClone()` in cadStore snapshots (perf)
+- Tool cleanup off `(fc as any).__xToolCleanup` pattern (type-safety)
+- Tool state from module-level singletons → closures (multi-canvas safety)
+- Extract `pxToFeet` + `findClosestWall` to shared `toolUtils.ts` (DRY)
+- R3F v9 / React 19 upgrade tracking
+- Bug: 2D async product image rendering (#42)
+- Bug: Ceiling preset-id path (#43)
+
+**Source issues:** [#42](https://github.com/micahbank2/room-cad-renderer/issues/42), [#43](https://github.com/micahbank2/room-cad-renderer/issues/43), [#51](https://github.com/micahbank2/room-cad-renderer/issues/51), [#52](https://github.com/micahbank2/room-cad-renderer/issues/52), [#53](https://github.com/micahbank2/room-cad-renderer/issues/53), [#54](https://github.com/micahbank2/room-cad-renderer/issues/54), [#55](https://github.com/micahbank2/room-cad-renderer/issues/55), [#56](https://github.com/micahbank2/room-cad-renderer/issues/56)
+
+**Success criteria:** Identical UX, measurably better perf (60fps drag at 50 walls / 30 products), zero `as any` casts on Fabric instances, both bugs verified end-to-end.
 
 ## Target User
 
@@ -123,7 +135,16 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 
 ### Active
 
-No active milestone. See `.planning/ROADMAP.md` for status.
+**v1.5 Milestone — Performance & Tech Debt** (in planning)
+
+- [ ] **PERF-01**: Canvas redraw uses incremental updates instead of full clear
+- [ ] **PERF-02**: cadStore snapshots use `structuredClone()` instead of JSON roundtrip
+- [ ] **TOOL-01**: Tool cleanup uses type-safe pattern (no `as any` on Fabric instance)
+- [ ] **TOOL-02**: Tool state held in closures, not module-level singletons
+- [ ] **TOOL-03**: `pxToFeet` + `findClosestWall` extracted to shared `toolUtils.ts`
+- [ ] **TRACK-01**: R3F v9 / React 19 upgrade path documented and tracked
+- [ ] **FIX-01**: Product images render in 2D canvas (async load)
+- [ ] **FIX-02**: Ceiling preset materials apply correctly in `CeilingMesh`
 
 ### Out of Scope
 
@@ -191,4 +212,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-18 after v1.4 milestone completion*
+*Last updated: 2026-04-17 — v1.5 Performance & Tech Debt milestone started*
