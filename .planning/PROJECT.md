@@ -12,7 +12,9 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
-**v1.3 shipped 2026-04-06.** Full paint system (132 Farrow & Ball + custom hex), lime wash finish, bulk painting via multi-select, custom element edit handles, collapsible sidebars, unified surface material catalog. 12/16 requirements shipped; 4 polish items (wainscot inline edit, copy-side, frame override, sidebar verification) landed as code but deferred formal verification to v1.4.
+**v1.4 shipped 2026-04-08.** All 6 deferred v1.3 verification gaps closed: wainscot inline edit via `WainscotPopover` + FabricCanvas dblclick, frame color override with single-undo pattern, sidebar scroll fix via `min-h-0`, copy-side action verified with unit tests. Label cleanup removed ~125 underscores from user-facing display text across 30+ files while preserving code identifiers (Obsidian CAD display/identifier separation convention established). Plus 10 Jess Feedback bugs fixed in parallel via PR #39 (welcome screen, wall/ceiling drag, product persistence, wall side alignment).
+
+**v1.3 shipped 2026-04-06.** Full paint system (132 Farrow & Ball + custom hex), lime wash finish, bulk painting via multi-select, custom element edit handles, collapsible sidebars, unified surface material catalog. 12/16 requirements shipped; 4 polish items deferred to and completed in v1.4.
 
 **v1.2 shipped 2026-04-05.** 29 requirements across 7 phases. Ceilings, floor materials, wallpaper, wall art, wainscoting, crown molding, custom element builder, framed art library, 7 wainscoting styles, per-side wall treatments.
 
@@ -22,16 +24,11 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 See `.planning/ROADMAP.md` for links to each milestone archive.
 
-## Current Milestone: v1.4 Polish & Tech Debt
+## Current Milestone
 
-**Goal:** Close all deferred v1.3 verification gaps and clean up UI label formatting.
+None active. Next milestone TBD — candidates in backlog (async product images in 2D canvas, auto-save with debounce, GLTF/OBJ model support, camera presets, editable dimension labels, PBR texture uploads, backend with authentication, design system redesign).
 
-**Target features:**
-- Wainscot inline edit — double-click to change style/height in place (POLISH-02)
-- Copy wall treatment to opposite side (POLISH-03)
-- Frame style override per wall art piece (POLISH-04)
-- Sidebar scroll verification — ensure all panels scroll correctly (POLISH-06)
-- Remove all underscores from UI labels (UI cleanup)
+Run `/gsd:new-milestone` to plan v1.5.
 
 ## Target User
 
@@ -44,7 +41,7 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - Jessica wants HER products in HER rooms at the right scale
 - "Feel the space" matters as much as "does it fit"
 - Desktop-first (laptop/monitor). iPad is future wishlist, not v1.
-- Codebase is ~13,300 LOC TypeScript across React 18 + Fabric.js + Three.js + Zustand
+- Codebase is ~13,987 LOC TypeScript across React 18 + Fabric.js + Three.js + Zustand (as of v1.4)
 
 ## Requirements
 
@@ -113,11 +110,20 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - ✓ Cmd+click multi-select + bulk paint (POLISH-05, Phase 19)
 - ✓ Unified surface material catalog — floor + ceiling swatch picker (MAT-01/02/03, Phase 20)
 
-*Deferred to v1.4: POLISH-02 (wainscot inline edit), POLISH-03 (copy side), POLISH-04 (frame override), POLISH-06 (sidebar scroll verification)*
+*Deferred to v1.4 and completed there: POLISH-02, POLISH-03, POLISH-04, POLISH-06*
+
+**v1.4 Milestone (2026-04-08) — 6 shipped requirements:**
+
+- ✓ Wainscot inline edit via WainscotPopover on 2D canvas (POLISH-02, Phase 22)
+- ✓ Copy wall treatments SIDE_A → SIDE_B with one click (POLISH-03, Phase 21)
+- ✓ Frame color override per wall art placement with single-undo pattern (POLISH-04, Phase 21)
+- ✓ Sidebar scrolls all sections when expanded (POLISH-06, Phase 21)
+- ✓ All user-facing labels display spaces instead of underscores (LABEL-01, Phase 23)
+- ✓ Dynamic label transforms use space-preserving format (LABEL-02, Phase 23)
 
 ### Active
 
-v1.4 requirements — see `.planning/REQUIREMENTS.md`
+No active milestone. See `.planning/ROADMAP.md` for status.
 
 ### Out of Scope
 
@@ -150,6 +156,10 @@ v1.4 requirements — see `.planning/REQUIREMENTS.md`
 | Floor texture clone pattern | Clone cached texture, share source — independent repeat per consumer. | ✓ Good — split-view safe |
 | Paint mutual exclusion (paintId clears surfaceMaterialId) | Single material state per ceiling, no ambiguous combos. | ✓ Good — clean UX |
 | CollapsibleSection as file-scoped component | Only Sidebar uses it, no need for shared component. | ✓ Good — minimal surface area |
+| onFocus history push + onChange NoHistory for color pickers | React onChange fires like native event — onBlur misses initial state; onFocus captures one snapshot per interaction. | ✓ Good — pattern reusable for any continuous input |
+| Extend existing dblclick useEffect for wainscot popover (shared with dim-label editor) | Avoids handler collision; dim-label hit test returns early, wainscot check only runs when no label hit. | ✓ Good — canvas inline editor pattern established |
+| Display-vs-identifier separation in Obsidian CAD theme | Display text gets spaces (ALL CAPS preserved); underscores reserved for code keys, CSS classes, test IDs, data attrs. | ✓ Locked convention |
+| Integration checker substitutes for VERIFICATION.md when retrofit | Audit trail completeness not worth rebuilding if code is wired correctly and the agent-level check passes. | — Pending — use sparingly; prefer formal verification at execute-time |
 
 ## Tech Stack (Current)
 
@@ -181,4 +191,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-06 after v1.4 milestone start*
+*Last updated: 2026-04-18 after v1.4 milestone completion*
