@@ -91,13 +91,11 @@ From PROJECT.md:
 
 | Requirement | Issue | Phase | Status |
 |-------------|-------|-------|--------|
-| PERF-01 | #51 | TBD | Pending |
-| PERF-02 | #52 | TBD | Pending |
-| TOOL-01 | #53 | TBD | Pending |
-| TOOL-02 | #54 | TBD | Pending |
-| TOOL-03 | #55 | TBD | Pending |
-| TRACK-01 | #56 | TBD | Pending |
-| FIX-01 | #42 | TBD | Pending |
-| FIX-02 | #43 | TBD | Pending |
-
-*Phase column filled by roadmapper.*
+| PERF-01 | #51 | Phase 25 | Pending |
+| PERF-02 | #52 | Phase 25 | Pending |
+| TOOL-01 | #53 | Phase 24 | Pending |
+| TOOL-02 | #54 | Phase 24 | Pending |
+| TOOL-03 | #55 | Phase 24 | Pending |
+| TRACK-01 | #56 | Phase 27 | Pending |
+| FIX-01 | #42 | Phase 26 | Pending |
+| FIX-02 | #43 | Phase 26 | Pending |
