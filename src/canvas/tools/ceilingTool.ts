@@ -2,6 +2,7 @@ import * as fabric from "fabric";
 import { useCADStore, getActiveRoomDoc } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { snapPoint } from "@/lib/geometry";
+import { pxToFeet } from "./toolUtils";
 import type { Point } from "@/types/cad";
 
 interface CeilingToolState {
@@ -17,17 +18,6 @@ const state: CeilingToolState = {
   vertexMarkers: [],
   closingEdge: null,
 };
-
-function pxToFeet(
-  px: { x: number; y: number },
-  origin: { x: number; y: number },
-  scale: number,
-): Point {
-  return {
-    x: (px.x - origin.x) / scale,
-    y: (px.y - origin.y) / scale,
-  };
-}
 
 /** Hit-test if pointer is close to the first vertex — user is trying to close. */
 function nearFirstVertex(feet: Point, first: Point, scale: number): boolean {

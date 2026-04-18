@@ -2,7 +2,7 @@ import * as fabric from "fabric";
 import { useCADStore } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { snapPoint } from "@/lib/geometry";
-import type { Point } from "@/types/cad";
+import { pxToFeet } from "./toolUtils";
 
 /** Currently selected product ID from the library to place */
 let pendingProductId: string | null = null;
@@ -13,17 +13,6 @@ export function setPendingProduct(productId: string | null) {
 
 export function getPendingProduct(): string | null {
   return pendingProductId;
-}
-
-function pxToFeet(
-  px: { x: number; y: number },
-  origin: { x: number; y: number },
-  scale: number
-): Point {
-  return {
-    x: (px.x - origin.x) / scale,
-    y: (px.y - origin.y) / scale,
-  };
 }
 
 export function activateProductTool(

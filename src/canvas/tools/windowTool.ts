@@ -1,46 +1,13 @@
 import * as fabric from "fabric";
-import { useCADStore, getActiveRoomDoc } from "@/stores/cadStore";
+import { useCADStore } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
-import { closestPointOnWall, distance, wallLength, angle as wallAngle } from "@/lib/geometry";
-import type { Point, WallSegment } from "@/types/cad";
+import { wallLength, angle as wallAngle } from "@/lib/geometry";
+import { pxToFeet, findClosestWall } from "./toolUtils";
+import type { WallSegment } from "@/types/cad";
 
-const SNAP_THRESHOLD = 0.5;
 const WINDOW_WIDTH = 3;
 
 let previewPolygon: fabric.Polygon | null = null;
-
-function pxToFeet(
-  px: { x: number; y: number },
-  origin: { x: number; y: number },
-  scale: number
-): Point {
-  return {
-    x: (px.x - origin.x) / scale,
-    y: (px.y - origin.y) / scale,
-  };
-}
-
-function findClosestWall(
-  feetPos: Point
-): { wall: WallSegment; offset: number } | null {
-  const walls = getActiveRoomDoc()?.walls ?? {};
-  let best: { wall: WallSegment; offset: number; dist: number } | null = null;
-
-  for (const wall of Object.values(walls)) {
-    const len = wallLength(wall);
-    // Skip walls too short to fit the window
-    if (len < WINDOW_WIDTH) continue;
-    const { point, t } = closestPointOnWall(wall, feetPos);
-    const d = distance(point, feetPos);
-    const offset = t * len;
-
-    if (d < SNAP_THRESHOLD && (!best || d < best.dist)) {
-      best = { wall, offset, dist: d };
-    }
-  }
-
-  return best ? { wall: best.wall, offset: best.offset } : null;
-}
 
 function updatePreview(
   fc: fabric.Canvas,
@@ -115,14 +82,14 @@ export function activateWindowTool(
   const onMouseMove = (opt: fabric.TEvent) => {
     const pointer = fc.getViewportPoint(opt.e);
     const feet = pxToFeet(pointer, origin, scale);
-    const hit = findClosestWall(feet);
+    const hit = findClosestWall(feet, WINDOW_WIDTH);
     updatePreview(fc, hit, scale, origin);
   };
 
   const onMouseDown = (opt: fabric.TEvent) => {
     const pointer = fc.getViewportPoint(opt.e);
     const feet = pxToFeet(pointer, origin, scale);
-    const hit = findClosestWall(feet);
+    const hit = findClosestWall(feet, WINDOW_WIDTH);
 
     if (hit) {
       const len = wallLength(hit.wall);
