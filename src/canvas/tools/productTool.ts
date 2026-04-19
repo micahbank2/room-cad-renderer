@@ -2,37 +2,22 @@ import * as fabric from "fabric";
 import { useCADStore } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { snapPoint } from "@/lib/geometry";
-import type { Point } from "@/types/cad";
+import { pxToFeet } from "./toolUtils";
 
-/** Currently selected product ID from the library to place */
+/** Currently selected product ID from the library to place. Module-scoped
+ *  per D-07 — this is the toolbar → tool bridge (public API), not
+ *  per-activation state. */
 let pendingProductId: string | null = null;
 
 export function setPendingProduct(productId: string | null) {
   pendingProductId = productId;
 }
 
-export function getPendingProduct(): string | null {
-  return pendingProductId;
-}
-
-function pxToFeet(
-  px: { x: number; y: number },
-  origin: { x: number; y: number },
-  scale: number
-): Point {
-  return {
-    x: (px.x - origin.x) / scale,
-    y: (px.y - origin.y) / scale,
-  };
-}
-
 export function activateProductTool(
   fc: fabric.Canvas,
   scale: number,
-  origin: { x: number; y: number }
-) {
-  deactivateProductTool(fc);
-
+  origin: { x: number; y: number },
+): () => void {
   const onMouseDown = (opt: fabric.TEvent) => {
     if (!pendingProductId) return;
 
@@ -57,16 +42,8 @@ export function activateProductTool(
   fc.on("mouse:down", onMouseDown);
   document.addEventListener("keydown", onKeyDown);
 
-  (fc as any).__productToolCleanup = () => {
+  return () => {
     fc.off("mouse:down", onMouseDown);
     document.removeEventListener("keydown", onKeyDown);
   };
-}
-
-export function deactivateProductTool(fc: fabric.Canvas) {
-  const cleanupFn = (fc as any).__productToolCleanup;
-  if (cleanupFn) {
-    cleanupFn();
-    delete (fc as any).__productToolCleanup;
-  }
 }

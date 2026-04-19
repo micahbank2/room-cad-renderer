@@ -15,12 +15,12 @@ import { useUIStore } from "@/stores/uiStore";
 import { drawGrid } from "./grid";
 import { drawRoomDimensions } from "./dimensions";
 import { renderWalls, renderProducts, renderCeilings, renderCustomElements } from "./fabricSync";
-import { activateWallTool, deactivateWallTool } from "./tools/wallTool";
-import { activateSelectTool, deactivateSelectTool, setSelectToolProductLibrary } from "./tools/selectTool";
-import { activateProductTool, deactivateProductTool } from "./tools/productTool";
-import { activateDoorTool, deactivateDoorTool } from "./tools/doorTool";
-import { activateWindowTool, deactivateWindowTool } from "./tools/windowTool";
-import { activateCeilingTool, deactivateCeilingTool } from "./tools/ceilingTool";
+import { activateWallTool } from "./tools/wallTool";
+import { activateSelectTool, setSelectToolProductLibrary } from "./tools/selectTool";
+import { activateProductTool } from "./tools/productTool";
+import { activateDoorTool } from "./tools/doorTool";
+import { activateWindowTool } from "./tools/windowTool";
+import { activateCeilingTool } from "./tools/ceilingTool";
 import { attachDragDropHandlers } from "./dragDrop";
 import { computeLabelPx, hitTestDimLabel, validateInput } from "./dimensionEditor";
 import { closestPointOnWall, distance } from "@/lib/geometry";
@@ -69,6 +69,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const canvasElRef = useRef<HTMLCanvasElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const fcRef = useRef<fabric.Canvas | null>(null);
+  const toolCleanupRef = useRef<(() => void) | null>(null);
   const [editingWallId, setEditingWallId] = useState<string | null>(null);
   const [pendingValue, setPendingValue] = useState<string>("");
   const [wainscotEditWallId, setWainscotEditWallId] = useState<string | null>(null);
@@ -157,8 +158,8 @@ export default function FabricCanvas({ productLibrary }: Props) {
     fc.renderAll();
 
     // Re-activate current tool with new scale/origin
-    deactivateAllTools(fc);
-    activateCurrentTool(fc, activeTool, scale, origin);
+    toolCleanupRef.current?.();
+    toolCleanupRef.current = activateCurrentTool(fc, activeTool, scale, origin);
   }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog]);
 
   // Init canvas
@@ -195,7 +196,8 @@ export default function FabricCanvas({ productLibrary }: Props) {
       detachDragDrop();
       window.removeEventListener("resize", onResize);
       ro.disconnect();
-      deactivateAllTools(fc);
+      toolCleanupRef.current?.();
+      toolCleanupRef.current = null;
       fc.dispose();
       fcRef.current = null;
     };
@@ -462,39 +464,19 @@ function isInput(target: EventTarget | null): boolean {
   );
 }
 
-function deactivateAllTools(fc: fabric.Canvas) {
-  deactivateSelectTool(fc);
-  deactivateWallTool(fc);
-  deactivateProductTool(fc);
-  deactivateDoorTool(fc);
-  deactivateWindowTool(fc);
-  deactivateCeilingTool(fc);
-}
-
 function activateCurrentTool(
   fc: fabric.Canvas,
   tool: string,
   scale: number,
   origin: { x: number; y: number }
-) {
+): (() => void) | null {
   switch (tool) {
-    case "select":
-      activateSelectTool(fc, scale, origin);
-      break;
-    case "wall":
-      activateWallTool(fc, scale, origin);
-      break;
-    case "product":
-      activateProductTool(fc, scale, origin);
-      break;
-    case "door":
-      activateDoorTool(fc, scale, origin);
-      break;
-    case "window":
-      activateWindowTool(fc, scale, origin);
-      break;
-    case "ceiling":
-      activateCeilingTool(fc, scale, origin);
-      break;
+    case "select":  return activateSelectTool(fc, scale, origin);
+    case "wall":    return activateWallTool(fc, scale, origin);
+    case "product": return activateProductTool(fc, scale, origin);
+    case "door":    return activateDoorTool(fc, scale, origin);
+    case "window":  return activateWindowTool(fc, scale, origin);
+    case "ceiling": return activateCeilingTool(fc, scale, origin);
+    default:        return null;
   }
 }

@@ -88,7 +88,7 @@ Walls are defined by start/end points in feet with configurable thickness. They'
 - 3D: `THREE.ExtrudeGeometry` from a shape with holes for openings
 
 ### Tool System
-Each tool (select, wall, door, window, product) attaches/detaches event handlers on the Fabric canvas. Tools are activated via `activateXTool(fc, scale, origin)` and cleaned up via `deactivateXTool(fc)`. The `FabricCanvas` component manages tool lifecycle on every redraw.
+Each tool (select, wall, door, window, product, ceiling) attaches event handlers on the Fabric canvas. Tools are activated via `activateXTool(fc, scale, origin)`, which **returns a `() => void` cleanup function**. `FabricCanvas.tsx` stores the returned cleanup fn in a `useRef<(() => void) | null>` (`toolCleanupRef`) and invokes it on tool switch + unmount. Per-activation mutable state lives inside the `activate()` closure as `let` bindings — no module-level `const state` objects. Shared helpers (`pxToFeet`, `findClosestWall`) live in `src/canvas/tools/toolUtils.ts`.
 
 ### Undo/Redo
 Zustand store keeps `past[]` and `future[]` arrays of `CADSnapshot` objects (room + walls + placedProducts). Max 50 history entries. Every mutation pushes a snapshot before applying changes.
@@ -105,7 +105,7 @@ Zustand store keeps `past[]` and `future[]` arrays of `CADSnapshot` objects (roo
 
 4. **Hit testing**: Select tool uses store data (not Fabric `containsPoint`) — checks distance to walls via `closestPointOnWall()`, AABB for products.
 
-5. **Tool cleanup pattern**: Each tool stores its cleanup function on `(fc as any).__xToolCleanup` and the deactivate function calls it.
+5. **Tool cleanup pattern**: Each tool's `activateXTool(fc, scale, origin)` function returns a `cleanup: () => void` callback. `FabricCanvas.tsx` holds the returned cleanup fn in a `useRef` and invokes it on tool switch + unmount. Mutable tool state lives in the activate() closure — no module-level singletons. Intentional exceptions (D-07 public-API bridges): `productTool.pendingProductId` + `setPendingProduct()` (toolbar → tool bridge) and `selectTool._productLibrary` + `setSelectToolProductLibrary()` (productLibrary injection). Shared helpers in `src/canvas/tools/toolUtils.ts`.
 
 6. **View modes**: App supports "2d", "3d", "split". Split uses `w-1/2` containers. FabricCanvas uses ResizeObserver to handle layout changes.
 
@@ -345,9 +345,9 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 - Purpose: Serializable slice of cadStore (`room + walls + placedProducts`) used for undo history, project save/load, and new-project initialization
 - Examples: `src/types/cad.ts`, `src/lib/serialization.ts`, `src/stores/cadStore.ts`
 - Pattern: Plain object, deep-cloned via `JSON.parse(JSON.stringify(...))` for history; `idb-keyval` for persistence
-- Purpose: Encapsulates all interaction logic for one drawing mode (wall, door, window, product, select)
+- Purpose: Encapsulates all interaction logic for one drawing mode (wall, door, window, product, ceiling, select)
 - Examples: `src/canvas/tools/wallTool.ts`, `src/canvas/tools/selectTool.ts`
-- Pattern: `activate*(fc, scale, origin)` attaches Fabric event listeners and stores cleanup function on `fc.__*ToolCleanup`. `deactivate*()` reads and calls that function. Tools read store state via `useCADStore.getState()` / `useUIStore.getState()` (outside React) and write via store actions.
+- Pattern: `activate*(fc, scale, origin)` attaches Fabric + document event listeners inside a closure and returns a `() => void` cleanup fn that detaches them and clears preview objects. `FabricCanvas.tsx` stores the returned cleanup in `toolCleanupRef = useRef<(() => void) | null>` and invokes it on tool switch + unmount. Tools read store state via `useCADStore.getState()` / `useUIStore.getState()` (outside React) and write via store actions. Shared coordinate helpers (`pxToFeet`, `findClosestWall`) live in `src/canvas/tools/toolUtils.ts`.
 - Purpose: Maps real-world foot coordinates to canvas pixels
 - Pattern: Computed in `FabricCanvas.redraw()` as `scale = min((canvasW - padding) / roomW, (canvasH - padding) / roomH)` and `origin = center offset`. Passed to every render function and every tool activation. 3D viewport uses coordinates directly (Three.js world units = feet).
 - Purpose: Represents a cut-out in a wall segment

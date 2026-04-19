@@ -2,29 +2,15 @@ import * as fabric from "fabric";
 import { useCADStore, getActiveRoomDoc } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { snapPoint, constrainOrthogonal, distance, formatFeet } from "@/lib/geometry";
+import { pxToFeet } from "./toolUtils";
 import type { Point } from "@/types/cad";
-
-interface WallToolState {
-  startPoint: Point | null;
-  previewLine: fabric.Line | null;
-  startMarker: fabric.Circle | null;
-  endpointHighlight: fabric.Circle | null;
-  lengthLabel: fabric.Group | null;
-}
-
-const state: WallToolState = {
-  startPoint: null,
-  previewLine: null,
-  startMarker: null,
-  endpointHighlight: null,
-  lengthLabel: null,
-};
 
 /** Snap threshold in feet — if cursor is within this distance of an existing
  *  wall endpoint, snap to that endpoint instead of to the grid. */
 const ENDPOINT_SNAP_THRESHOLD_FT = 0.75;
 
-/** Find the nearest wall endpoint within threshold, or null. */
+/** Find the nearest wall endpoint within threshold, or null.
+ *  Pure helper — no closure state access — stays at module scope per D-08. */
 function findNearestEndpoint(cursor: Point, excludeStart: Point | null): Point | null {
   const walls = getActiveRoomDoc()?.walls ?? {};
   let best: { point: Point; dist: number } | null = null;
@@ -45,40 +31,54 @@ function findNearestEndpoint(cursor: Point, excludeStart: Point | null): Point |
   return best ? best.point : null;
 }
 
-function pxToFeet(
-  px: { x: number; y: number },
-  origin: { x: number; y: number },
-  scale: number
-): Point {
-  return {
-    x: (px.x - origin.x) / scale,
-    y: (px.y - origin.y) / scale,
-  };
-}
-
 export function activateWallTool(
   fc: fabric.Canvas,
   scale: number,
-  origin: { x: number; y: number }
-) {
-  cleanup(fc);
+  origin: { x: number; y: number },
+): () => void {
+  let startPoint: Point | null = null;
+  let previewLine: fabric.Line | null = null;
+  let startMarker: fabric.Circle | null = null;
+  let endpointHighlight: fabric.Circle | null = null;
+  let lengthLabel: fabric.Group | null = null;
+
+  const clearPreview = () => {
+    if (previewLine) {
+      fc.remove(previewLine);
+      previewLine = null;
+    }
+    if (startMarker) {
+      fc.remove(startMarker);
+      startMarker = null;
+    }
+    if (endpointHighlight) {
+      fc.remove(endpointHighlight);
+      endpointHighlight = null;
+    }
+    if (lengthLabel) {
+      fc.remove(lengthLabel);
+      lengthLabel = null;
+    }
+    startPoint = null;
+    fc.renderAll();
+  };
 
   const onMouseDown = (opt: fabric.TEvent) => {
     const pointer = fc.getViewportPoint(opt.e);
     const gridSnap = useUIStore.getState().gridSnap;
     const feet = pxToFeet(pointer, origin, scale);
     // Endpoint snap beats grid snap
-    const endpoint = findNearestEndpoint(feet, state.startPoint);
+    const endpoint = findNearestEndpoint(feet, startPoint);
     const snapped = endpoint
       ? endpoint
       : gridSnap > 0 ? snapPoint(feet, gridSnap) : feet;
 
-    if (!state.startPoint) {
+    if (!startPoint) {
       // First click: set start
-      state.startPoint = snapped;
+      startPoint = snapped;
 
       // Visual marker at start
-      state.startMarker = new fabric.Circle({
+      startMarker = new fabric.Circle({
         left: origin.x + snapped.x * scale,
         top: origin.y + snapped.y * scale,
         radius: 4,
@@ -88,7 +88,7 @@ export function activateWallTool(
         selectable: false,
         evented: false,
       });
-      fc.add(state.startMarker);
+      fc.add(startMarker);
       fc.renderAll();
     } else {
       // Second click: complete wall
@@ -96,11 +96,11 @@ export function activateWallTool(
 
       // Orthogonal constraint if shift held
       if (opt.e instanceof MouseEvent && opt.e.shiftKey) {
-        endPoint = constrainOrthogonal(state.startPoint, endPoint);
+        endPoint = constrainOrthogonal(startPoint, endPoint);
       }
 
-      useCADStore.getState().addWall(state.startPoint, endPoint);
-      cleanup(fc);
+      useCADStore.getState().addWall(startPoint, endPoint);
+      clearPreview();
       // Auto-revert to Select after placing (EDIT-11)
       useUIStore.getState().setTool("select");
     }
@@ -113,14 +113,14 @@ export function activateWallTool(
 
     // Check if cursor is near an existing endpoint — show highlight
     // (works even before the first click, to help users start walls at existing endpoints)
-    const endpoint = findNearestEndpoint(feet, state.startPoint);
+    const endpoint = findNearestEndpoint(feet, startPoint);
     if (endpoint) {
       const hx = origin.x + endpoint.x * scale;
       const hy = origin.y + endpoint.y * scale;
-      if (state.endpointHighlight) {
-        state.endpointHighlight.set({ left: hx, top: hy });
+      if (endpointHighlight) {
+        endpointHighlight.set({ left: hx, top: hy });
       } else {
-        state.endpointHighlight = new fabric.Circle({
+        endpointHighlight = new fabric.Circle({
           left: hx,
           top: hy,
           radius: 7,
@@ -132,14 +132,14 @@ export function activateWallTool(
           selectable: false,
           evented: false,
         });
-        fc.add(state.endpointHighlight);
+        fc.add(endpointHighlight);
       }
-    } else if (state.endpointHighlight) {
-      fc.remove(state.endpointHighlight);
-      state.endpointHighlight = null;
+    } else if (endpointHighlight) {
+      fc.remove(endpointHighlight);
+      endpointHighlight = null;
     }
 
-    if (!state.startPoint) {
+    if (!startPoint) {
       fc.renderAll();
       return;
     }
@@ -150,35 +150,35 @@ export function activateWallTool(
       : gridSnap > 0 ? snapPoint(feet, gridSnap) : feet;
 
     if (opt.e instanceof MouseEvent && opt.e.shiftKey) {
-      snapped = constrainOrthogonal(state.startPoint, snapped);
+      snapped = constrainOrthogonal(startPoint, snapped);
     }
 
-    const sx = origin.x + state.startPoint.x * scale;
-    const sy = origin.y + state.startPoint.y * scale;
+    const sx = origin.x + startPoint.x * scale;
+    const sy = origin.y + startPoint.y * scale;
     const ex = origin.x + snapped.x * scale;
     const ey = origin.y + snapped.y * scale;
 
-    if (state.previewLine) {
-      state.previewLine.set({ x1: sx, y1: sy, x2: ex, y2: ey });
+    if (previewLine) {
+      previewLine.set({ x1: sx, y1: sy, x2: ex, y2: ey });
     } else {
-      state.previewLine = new fabric.Line([sx, sy, ex, ey], {
+      previewLine = new fabric.Line([sx, sy, ex, ey], {
         stroke: "#7c5bf0",
         strokeWidth: 2,
         strokeDashArray: [6, 4],
         selectable: false,
         evented: false,
       });
-      fc.add(state.previewLine);
+      fc.add(previewLine);
     }
 
     // Live length label at the midpoint of the preview line (EDIT-13)
-    const lenFt = distance(state.startPoint, snapped);
+    const lenFt = distance(startPoint, snapped);
     const labelText = formatFeet(lenFt);
     const mx = (sx + ex) / 2;
     const my = (sy + ey) / 2;
-    if (state.lengthLabel) {
-      state.lengthLabel.set({ left: mx, top: my });
-      const textObj = state.lengthLabel.item(1) as fabric.Text;
+    if (lengthLabel) {
+      lengthLabel.set({ left: mx, top: my });
+      const textObj = lengthLabel.item(1) as fabric.Text;
       if (textObj) textObj.set({ text: labelText });
     } else {
       const bg = new fabric.Rect({
@@ -199,7 +199,7 @@ export function activateWallTool(
         originX: "center",
         originY: "center",
       });
-      state.lengthLabel = new fabric.Group([bg, text], {
+      lengthLabel = new fabric.Group([bg, text], {
         left: mx,
         top: my,
         originX: "center",
@@ -207,7 +207,7 @@ export function activateWallTool(
         selectable: false,
         evented: false,
       });
-      fc.add(state.lengthLabel);
+      fc.add(lengthLabel);
     }
 
     fc.renderAll();
@@ -215,7 +215,7 @@ export function activateWallTool(
 
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "Escape") {
-      cleanup(fc);
+      clearPreview();
     }
   };
 
@@ -223,40 +223,10 @@ export function activateWallTool(
   fc.on("mouse:move", onMouseMove);
   document.addEventListener("keydown", onKeyDown);
 
-  // Store cleanup refs
-  (fc as any).__wallToolCleanup = () => {
+  return () => {
     fc.off("mouse:down", onMouseDown);
     fc.off("mouse:move", onMouseMove);
     document.removeEventListener("keydown", onKeyDown);
-    cleanup(fc);
+    clearPreview();
   };
-}
-
-function cleanup(fc: fabric.Canvas) {
-  if (state.previewLine) {
-    fc.remove(state.previewLine);
-    state.previewLine = null;
-  }
-  if (state.startMarker) {
-    fc.remove(state.startMarker);
-    state.startMarker = null;
-  }
-  if (state.endpointHighlight) {
-    fc.remove(state.endpointHighlight);
-    state.endpointHighlight = null;
-  }
-  if (state.lengthLabel) {
-    fc.remove(state.lengthLabel);
-    state.lengthLabel = null;
-  }
-  state.startPoint = null;
-  fc.renderAll();
-}
-
-export function deactivateWallTool(fc: fabric.Canvas) {
-  const cleanupFn = (fc as any).__wallToolCleanup;
-  if (cleanupFn) {
-    cleanupFn();
-    delete (fc as any).__wallToolCleanup;
-  }
 }
