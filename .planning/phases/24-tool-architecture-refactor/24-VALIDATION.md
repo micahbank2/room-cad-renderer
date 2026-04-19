@@ -69,7 +69,7 @@ Summary line observed: `Tests  6 failed | 162 passed | 3 todo (171)` — 3 test 
 | 24-03-03 | 03 | 2 | TOOL-02 | grep guard | `! grep -E "^const state " src/canvas/tools/*.ts` (excludes productTool.pendingProductId / selectTool._productLibrary) | ✅ repo shell | ✅ green |
 | 24-03-04 | 03 | 2 | TOOL-01/02 | integration | `npm test -- toolCleanup.test.ts` (leak guard) | ✅ Wave 0 | ✅ green |
 | 24-04-01 | 04 | 3 | — | full suite | `npm test` — assert baseline (168/177 pass, same 6 failing names) | ✅ existing | ✅ green |
-| 24-04-02 | 04 | 3 | — | manual | D-13 rapid tool-switch Chrome DevTools smoke (script below) | ✅ repo shell | ⬜ pending (awaiting user sign-off) |
+| 24-04-02 | 04 | 3 | — | manual | D-13 rapid tool-switch Chrome DevTools smoke (script below) | ✅ repo shell | ✅ green (user-approved 2026-04-18) |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -129,4 +129,12 @@ Summary line observed: `Tests  6 failed | 162 passed | 3 todo (171)` — 3 test 
 
 **Note on test counts:** Plan template mentioned "171 passed" but that was a pre-Wave-0 planning estimate. Actual delta: 162 pre-refactor passing + 6 new toolCleanup cases = **168 passing post-refactor**. Total is 177 (171 + 6 new test cases added). The 6 skipped Wave-0 scaffolding tests became active passing tests in Wave 2. This is captured in Wave 2 SUMMARY as the intended outcome.
 
-**Manual D-13 smoke:** awaiting user sign-off (Wave 3 Task 2 human-verify checkpoint).
+**Manual D-13 smoke:** ✅ PASSED — user-approved 2026-04-18 after executing all 8 steps of the D-13 rapid tool-switch script. No behavioral regressions, no listener leaks observed after 10 rapid V→W→D→N→P→V→W→D→N→P cycles. Drawing, placement, selection, dragging, undo/redo, and delete all behaved identically to pre-refactor.
+
+---
+
+## Phase 24 Sign-Off
+
+- **Automated gate:** ✅ ALL GREEN (recorded 2026-04-17, commit `2fbeb16`)
+- **Manual D-13 smoke:** ✅ USER-APPROVED 2026-04-18
+- **Phase status:** VERIFIED — all 5 roadmap success criteria + all 3 TOOL requirements met, zero regressions, zero new failures.
