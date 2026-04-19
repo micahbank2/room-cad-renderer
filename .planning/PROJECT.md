@@ -12,6 +12,8 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
+**Phase 24 (Tool Architecture Refactor) shipped 2026-04-19.** First phase of v1.5 complete — 18 `(fc as any).__xToolCleanup` casts eliminated, all 6 tools converted to cleanup-fn return pattern with closure state, `pxToFeet` + `findClosestWall` consolidated into `src/canvas/tools/toolUtils.ts` (107 lines of duplication deleted). Added `tests/toolCleanup.test.ts` with 6 listener-leak regression cases. Test baseline maintained at 168 passing (+6 new), same 6 pre-existing failures unrelated to tools. D-13 manual smoke user-approved.
+
 **v1.4 shipped 2026-04-08.** All 6 deferred v1.3 verification gaps closed: wainscot inline edit via `WainscotPopover` + FabricCanvas dblclick, frame color override with single-undo pattern, sidebar scroll fix via `min-h-0`, copy-side action verified with unit tests. Label cleanup removed ~125 underscores from user-facing display text across 30+ files while preserving code identifiers (Obsidian CAD display/identifier separation convention established). Plus 10 Jess Feedback bugs fixed in parallel via PR #39 (welcome screen, wall/ceiling drag, product persistence, wall side alignment).
 
 **v1.3 shipped 2026-04-06.** Full paint system (132 Farrow & Ball + custom hex), lime wash finish, bulk painting via multi-select, custom element edit handles, collapsible sidebars, unified surface material catalog. 12/16 requirements shipped; 4 polish items deferred to and completed in v1.4.
@@ -133,15 +135,18 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - ✓ All user-facing labels display spaces instead of underscores (LABEL-01, Phase 23)
 - ✓ Dynamic label transforms use space-preserving format (LABEL-02, Phase 23)
 
+**v1.5 Milestone (in progress) — Phase 24 shipped 2026-04-19:**
+
+- ✓ Tool cleanup uses type-safe pattern (no `(fc as any).__xToolCleanup` — activate returns cleanup fn, held in useRef) (TOOL-01, Phase 24)
+- ✓ Tool state held in closures, not module-level singletons (3 wrapper interfaces dissolved) (TOOL-02, Phase 24)
+- ✓ `pxToFeet` + `findClosestWall` extracted to shared `src/canvas/tools/toolUtils.ts` (6 duplicates consolidated) (TOOL-03, Phase 24)
+
 ### Active
 
-**v1.5 Milestone — Performance & Tech Debt** (in planning)
+**v1.5 Milestone — Performance & Tech Debt** (Phase 24 shipped; 25-27 pending)
 
 - [ ] **PERF-01**: Canvas redraw uses incremental updates instead of full clear
 - [ ] **PERF-02**: cadStore snapshots use `structuredClone()` instead of JSON roundtrip
-- [ ] **TOOL-01**: Tool cleanup uses type-safe pattern (no `as any` on Fabric instance)
-- [ ] **TOOL-02**: Tool state held in closures, not module-level singletons
-- [ ] **TOOL-03**: `pxToFeet` + `findClosestWall` extracted to shared `toolUtils.ts`
 - [ ] **TRACK-01**: R3F v9 / React 19 upgrade path documented and tracked
 - [ ] **FIX-01**: Product images render in 2D canvas (async load)
 - [ ] **FIX-02**: Ceiling preset materials apply correctly in `CeilingMesh`
@@ -212,4 +217,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-17 — v1.5 Performance & Tech Debt milestone started*
+*Last updated: 2026-04-19 — Phase 24 (Tool Architecture Refactor) complete, 3/8 v1.5 requirements shipped*
