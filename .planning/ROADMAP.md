@@ -77,7 +77,7 @@
   - [x] 24-01-wave0-scaffolding-PLAN.md — Create toolUtils.ts + toolCleanup.test.ts scaffold; capture pre-existing test-failure baseline
   - [x] 24-02-wave1-consolidate-helpers-PLAN.md — All 6 tools import pxToFeet from toolUtils; door/window import findClosestWall (TOOL-03)
   - [x] 24-03-wave2-cleanup-pattern-PLAN.md — Cleanup-fn return pattern + closure state in all 6 tools; FabricCanvas.tsx dispatch update; un-skip leak tests (TOOL-01, TOOL-02)
-  - [ ] 24-04-wave3-verification-PLAN.md — Final automated gate + D-13 manual smoke + docs update (ROADMAP, CLAUDE.md)
+  - [x] 24-04-wave3-verification-PLAN.md — Final automated gate + D-13 manual smoke + docs update (ROADMAP, CLAUDE.md)
 
 ### Phase 25: Canvas & Store Performance
 **Goal**: Dragging in a complex scene sustains 60fps and cadStore undo snapshots are measurably faster
@@ -116,7 +116,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 24. Tool Architecture Refactor | 4/4 | Complete | 2026-04-18 |
+| 24. Tool Architecture Refactor | 4/4 | Complete   | 2026-04-19 |
 | 25. Canvas & Store Performance | 0/? | Not started | - |
 | 26. Bug Sweep | 0/? | Not started | - |
 | 27. Upgrade Tracking | 0/? | Not started | - |
