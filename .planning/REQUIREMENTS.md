@@ -10,8 +10,8 @@
 
 ### Auto-Save (SAVE)
 
-- [ ] **SAVE-05** — CAD scene auto-saves within ~2s of the last edit (walls, products, rooms, materials). Debounced so continuous drag does not cause save spam. Source: [#44](https://github.com/micahbank2/room-cad-renderer/issues/44).
-- [ ] **SAVE-06** — Toolbar shows `SAVING...` during an in-flight save and `SAVED` briefly after, using the v1.1 SAVE-04 save-status surface. Source: [#44](https://github.com/micahbank2/room-cad-renderer/issues/44).
+- [x] **SAVE-05** — CAD scene auto-saves within ~2s of the last edit (walls, products, rooms, materials). Debounced so continuous drag does not cause save spam. Source: [#44](https://github.com/micahbank2/room-cad-renderer/issues/44).
+- [x] **SAVE-06** — Toolbar shows `SAVING...` during an in-flight save and `SAVED` briefly after, using the v1.1 SAVE-04 save-status surface. Source: [#44](https://github.com/micahbank2/room-cad-renderer/issues/44).
 
 ### Editable Dimension Labels (EDIT)
 
