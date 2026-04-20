@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance & Tech Debt
 status: executing
-stopped_at: Completed 25-01-wave1-structured-clone-PLAN.md
-last_updated: "2026-04-20T03:08:05.618Z"
+stopped_at: Completed 25-02-wave2-drag-fast-path-PLAN.md
+last_updated: "2026-04-20T03:18:43.460Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 8
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 ## Current Position
 
 Phase: 25 (canvas-store-performance) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-04-20
 
@@ -47,6 +47,7 @@ Full log in PROJECT.md Key Decisions table. Recent v1.4 decisions:
 - [Phase 24-tool-architecture-refactor]: [Phase 24 closed]: Wave 3 verification complete — automated gate green (2fbeb16), D-13 manual smoke user-approved 2026-04-18, ROADMAP Phase 24 marked [x] + Progress Table 4/4 Complete, CLAUDE.md cleanup-fn pattern docs updated (zero __xToolCleanup refs remain). All 3 TOOL requirements verified.
 - [Phase 25-canvas-store-performance]: Phase 25 Wave 0: 7 RED/GREEN contract tests landed + dev-only window.__cadSeed/__cadBench helpers (gated by import.meta.env.DEV, tree-shaken from prod bundle). Source-level test guards adopted over jsdom runtime simulation.
 - [Phase 25-canvas-store-performance]: Wave 1: cadStore.snapshot() migrated to structuredClone with toPlain(isDraft/current) helper — Immer draft Proxies are not structuredClone-able; current() normalizes before clone. Dev-gated > 2ms timing sampler added (tree-shaken in prod). PERF-02 code landed.
+- [Phase 25-canvas-store-performance]: Wave 2: Drag fast path landed for 4 D-03 operations (product move incl. custom, wall move, wall endpoint, product rotation). renderOnAddRemove off, mouse:move mutates fabric obj + requestRenderAll only, mouse:up commits one store action, cleanup reverts in-flight drags. 173 -> 176 passing (+3 Wave 0 RED gates flipped: renderOnAddRemove, fast-path no-clear, drag-interrupt revert).
 
 ### Pending Todos
 
@@ -64,6 +65,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-20T03:08:05.615Z
-Stopped at: Completed 25-01-wave1-structured-clone-PLAN.md
+Last session: 2026-04-20T03:18:43.458Z
+Stopped at: Completed 25-02-wave2-drag-fast-path-PLAN.md
 Resume file: None
