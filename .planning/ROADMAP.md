@@ -89,7 +89,11 @@
   3. Snapshot timing measured before/after: ≥2x improvement at 50 walls / 30 products (logged to console in dev mode)
   4. Undo/redo still produces single history entries for completed drag mutations — no regression in history boundary behavior
   5. All 115 tests pass with identical visual output
-**Plans**: TBD
+**Plans**: 4 plans
+  - [ ] 25-00-wave0-validation-scaffolding-PLAN.md — 7 RED contract tests + window.__cadSeed/__cadBench dev helpers
+  - [ ] 25-01-wave1-structured-clone-PLAN.md — snapshot() uses structuredClone + dev-gated timing (PERF-02)
+  - [ ] 25-02-wave2-drag-fast-path-PLAN.md — drag fast path for 4 ops + renderOnAddRemove: false (PERF-01)
+  - [ ] 25-03-wave3-verification-PLAN.md — Chrome trace + bench ratio + ROADMAP update
 
 ### Phase 26: Bug Sweep
 **Goal**: Product thumbnails appear in 2D canvas after placement and ceiling preset materials render correctly in 3D
