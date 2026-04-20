@@ -26,17 +26,24 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 See `.planning/ROADMAP.md` for links to each milestone archive.
 
-## Next Milestone Goals
+## Current Milestone: v1.6 Editing UX
 
-v1.6 not yet scoped. Candidate directions based on current user feedback and backlog:
-- Drag-to-resize UX (GH #60)
-- WOOD_PLANK PBR realism enhancement (GH #61)
-- Editable dimension labels (double-click on canvas)
-- Camera presets (eye-level, top-down)
-- Auto-save debounce tuning
-- GLTF/OBJ model loading (if Jessica's workflow demands it)
+**Goal:** Close the daily-workflow gaps in 2D editing — Jessica can size walls precisely, resize without menus, snap intelligently, rename placed items, and never lose work.
 
-Run `/gsd:new-milestone` to define v1.6 requirements.
+**Target features (5 GH issues):**
+- #44 Auto-save with debounce (status indicator in chrome)
+- #46 Editable dimension labels (double-click label → type length)
+- #60 Drag-to-resize products and walls
+- #17 Smart snapping (walls, object edges, auto-center)
+- #50 Per-placement label override for custom elements
+
+**Key context:**
+- #44 existed as SAVE-02 in v1.0 — this milestone tightens/completes the UX surface (status indicator, debounce behavior) that #44 still calls out
+- #60 + #17 overlap heavily — both rework interactive 2D-canvas behavior; likely co-located in one phase
+- #46 has precedent in v1.4 wainscot inline-edit (shared dblclick `useEffect` pattern)
+- #50 is a small tack-on; pair with a related phase
+
+Not in v1.6: #22 measurement/annotation (heavier — own milestone), #48 design redesign (blocked on mockups), #56 R3F v9 (deferred per D-02), 3D realism, library overhaul, materials engine, cloud sync, docs guides.
 
 ## Target User
 
@@ -142,7 +149,7 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 
 ### Active
 
-None. Next milestone not yet scoped — run `/gsd:new-milestone` to define v1.6.
+v1.6 Editing UX — requirements being defined. Target issues: #44, #46, #60, #17, #50.
 
 ### Out of Scope
 
@@ -215,4 +222,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-20 after v1.5 milestone — 7/8 requirements complete (PERF-02 speedup partial, accepted as tech debt)*
+*Last updated: 2026-04-20 — v1.6 Editing UX scoping started (5 GH issues: #44, #46, #60, #17, #50)*
