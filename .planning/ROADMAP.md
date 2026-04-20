@@ -91,7 +91,7 @@
   5. All 115 tests pass with identical visual output
 **Plans**: 4 plans
   - [x] 25-00-wave0-validation-scaffolding-PLAN.md — 7 RED contract tests + window.__cadSeed/__cadBench dev helpers
-  - [ ] 25-01-wave1-structured-clone-PLAN.md — snapshot() uses structuredClone + dev-gated timing (PERF-02)
+  - [x] 25-01-wave1-structured-clone-PLAN.md — snapshot() uses structuredClone + dev-gated timing (PERF-02)
   - [ ] 25-02-wave2-drag-fast-path-PLAN.md — drag fast path for 4 ops + renderOnAddRemove: false (PERF-01)
   - [ ] 25-03-wave3-verification-PLAN.md — Chrome trace + bench ratio + ROADMAP update
 
@@ -121,6 +121,6 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 24. Tool Architecture Refactor | 4/4 | Complete    | 2026-04-19 |
-| 25. Canvas & Store Performance | 1/4 | In Progress|  |
+| 25. Canvas & Store Performance | 2/4 | In Progress|  |
 | 26. Bug Sweep | 0/? | Not started | - |
 | 27. Upgrade Tracking | 0/? | Not started | - |
