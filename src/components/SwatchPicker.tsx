@@ -24,7 +24,10 @@ const HUE_CHIP_COLORS: Record<string, string> = {
 
 export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
   const customColors = usePaintStore((s) => s.customColors);
-  const recentPaints: string[] = useCADStore((s) => (s as any).recentPaints ?? []);
+  // Select raw state slice — return stable reference (undefined) when absent to avoid
+  // re-triggering render on every store snapshot (React 18 "getSnapshot should be cached").
+  const recentPaintsRaw = useCADStore((s) => (s as any).recentPaints as string[] | undefined);
+  const recentPaints: string[] = recentPaintsRaw ?? [];
   const addCustomPaint = useCADStore((s) => s.addCustomPaint);
   const removeCustomPaint = useCADStore((s) => s.removeCustomPaint);
 

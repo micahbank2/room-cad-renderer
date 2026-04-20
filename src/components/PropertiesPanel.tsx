@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { flushSync } from "react-dom";
 import { useCADStore, useActiveWalls, useActivePlacedProducts, useActiveCeilings } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useProductStore } from "@/stores/productStore";
 import { formatFeet, wallLength } from "@/lib/geometry";
+import { validateInput } from "@/canvas/dimensionEditor";
 import type { Product } from "@/types/product";
 import { hasDimensions } from "@/types/product";
 import WallSurfacePanel from "./WallSurfacePanel";
@@ -115,6 +117,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
               suffix="FT"
               onCommit={(v) => resizeWallByLabel(wall.id, v)}
               min={0.5}
+              parser={validateInput}
             />
             <EditableRow
               label="THICKNESS"
@@ -233,6 +236,7 @@ function EditableRow({
   onCommit,
   min = 0,
   step = 0.25,
+  parser,
 }: {
   label: string;
   value: number;
@@ -240,21 +244,35 @@ function EditableRow({
   onCommit: (v: number) => void;
   min?: number;
   step?: number;
+  parser?: (raw: string) => number | null;
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
 
   function startEdit() {
-    setDraft(value.toFixed(2));
-    setEditing(true);
+    // flushSync so the <input> is in the DOM synchronously after click —
+    // keeps inline-edit deterministic for tests and consistent with the
+    // wainscot popover precedent.
+    flushSync(() => {
+      setDraft(value.toFixed(2));
+      setEditing(true);
+    });
   }
 
   function commit() {
     setEditing(false);
-    const v = parseFloat(draft);
-    if (!isNaN(v) && v >= min && v !== value) {
-      onCommit(v);
+    // D-05a: when parser supplied, use it; otherwise preserve parseFloat behavior
+    const parsed = parser ? parser(draft) : parseFloat(draft);
+    // Silent cancel on null/NaN/non-finite (D-06a)
+    if (parsed === null || parsed === undefined || !isFinite(parsed as number)) {
+      return;
     }
+    const v = parsed as number;
+    // Existing min guard
+    if (v < min) return;
+    // RESEARCH Pitfall #2: no-op guard — suppress commits within float-drift tolerance
+    if (Math.abs(v - value) <= 1e-6) return;
+    onCommit(v);
   }
 
   if (editing) {
@@ -263,7 +281,7 @@ function EditableRow({
         <span className="font-mono text-[11px] text-text-ghost tracking-wider">{label}</span>
         <input
           autoFocus
-          type="number"
+          type={parser ? "text" : "number"}
           step={step}
           min={min}
           value={draft}
