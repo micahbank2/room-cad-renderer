@@ -41,7 +41,7 @@
 
 ### Tracking (TRACK)
 
-- [ ] **TRACK-01**: R3F v9 / React 19 upgrade path documented and tracked
+- [x] **TRACK-01**: R3F v9 / React 19 upgrade path documented and tracked
   - **Source:** [#56](https://github.com/micahbank2/room-cad-renderer/issues/56)
   - **Verifiable:** Upgrade plan written into a README/notes block (not yet executed — blocked on R3F v9 stable). Issue #56 stays open as the tracking artifact.
   - **Files:** `package.json` notes, `.planning/codebase/CONCERNS.md` update

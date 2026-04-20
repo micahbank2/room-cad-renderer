@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance & Tech Debt
-status: Phase closed; ready for Phase 27 (Upgrade Tracking)
-stopped_at: Phase 27 context gathered
-last_updated: "2026-04-20T17:47:51.410Z"
+status: Phase 27 in progress (plan 01 of 3 complete; Wave 2 unblocked)
+stopped_at: Completed 27-01-PLAN.md
+last_updated: "2026-04-20T18:07:08.513Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 12
-  completed_plans: 12
+  total_plans: 15
+  completed_plans: 13
 ---
 
 # Project State
@@ -20,16 +20,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-17)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 26 — bug-sweep
+**Current focus:** Phase 27 — upgrade-tracking (Wave 1 complete)
 
 ## Current Position
 
 Phase: 27
-Plan: Not started
-Status: Phase closed; ready for Phase 27 (Upgrade Tracking)
+Plan: 02 (next — Wave 2, unblocked by 27-01)
+Status: Phase 27 in progress (plan 01 of 3 complete; Wave 2 unblocked)
 Last activity: 2026-04-20
 
-[===============] 75% (3/4 v1.5 phases complete; Phase 26 plans 4/4 done)
+[█████████░] 87% (13/15 v1.5 plans complete; Phase 27 plans 1/3 done)
 
 ## Accumulated Context
 
@@ -54,6 +54,7 @@ Full log in PROJECT.md Key Decisions table. Recent v1.4 decisions:
 - [Phase 26-bug-sweep]: FIX-01: React tick state (productImageTick) in FabricCanvas bumped by renderProducts onImageReady callback — forces Group rebuild on async image load without touching productImageCache.ts (D-02) or fabric internals (D-03 first-paint correctness)
 - [Phase 26]: FIX-02 closed as Outcome A (Pitfall 3 perception-only). PLASTER #f0ebe0 vs PAINTED_DRYWALL #f5f5f5 differ by ~3 L* points — below JND. Production code path verified correct end-to-end; 4 store-integration regression guards added.
 - [Phase 26-bug-sweep]: Phase 26 closed — FIX-01 fixed (Group rebuild via onImageReady/React tick); FIX-02 closed as Outcome A (perception-only, regression guards added). GitHub #42 and #43 closed per D-14. Full suite 191 passing (6 pre-existing unrelated failures unchanged). D-10 + D-12 user-approved 2026-04-20. Backlog: #60 (drag-to-resize UX), #61 (WOOD_PLANK PBR realism) filed during smoke session.
+- [Phase 27-upgrade-tracking]: Plan 27-01: Appended `## R3F v9 / React 19 Upgrade` section to CONCERNS.md — documents current pins, locked target majors (^9.0.0 R3F / ^10.0.0 drei / ^19.0.0 React), sequence phrase `R3F v9 → drei v10 → React 19`, affected files, canonical citations, and links issue #56 as persistent tracker. Wave 2 (plans 27-02 + 27-03) now unblocked.
 
 ### Pending Todos
 
@@ -71,6 +72,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-20T17:47:51.407Z
-Stopped at: Phase 27 context gathered
-Resume file: .planning/phases/27-upgrade-tracking/27-CONTEXT.md
+Last session: 2026-04-20T18:06:19.170Z
+Stopped at: Completed 27-01-PLAN.md
+Resume file: None
