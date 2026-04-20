@@ -7,7 +7,7 @@
 - ✅ **v1.2 New Element Types** — Phases 11–17 (shipped 2026-04-05) — see [milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md)
 - ✅ **v1.3 Color, Polish & Materials** — Phases 18–20 (shipped 2026-04-06) — see [milestones/v1.3-ROADMAP.md](milestones/v1.3-ROADMAP.md)
 - ✅ **v1.4 Polish & Tech Debt** — Phases 21–23 (shipped 2026-04-08) — see [milestones/v1.4-ROADMAP.md](milestones/v1.4-ROADMAP.md)
-- 🔄 **v1.5 Performance & Tech Debt** — Phases 24–27 (in progress)
+- ✅ **v1.5 Performance & Tech Debt** — Phases 24–27 (completed 2026-04-20)
 
 ---
 
@@ -59,7 +59,7 @@
 - [x] **Phase 24: Tool Architecture Refactor** — Eliminate `as any` casts, move state to closures, extract shared utilities (shipped 2026-04-18)
 - [x] **Phase 25: Canvas & Store Performance** — Incremental canvas updates, faster cadStore snapshots (completed 2026-04-20)
 - [x] **Phase 26: Bug Sweep** — Fix async product images in 2D canvas and ceiling preset material path (completed 2026-04-20)
-- [ ] **Phase 27: Upgrade Tracking** — Document R3F v9 / React 19 upgrade path
+- [x] **Phase 27: Upgrade Tracking** — Document R3F v9 / React 19 upgrade path (completed 2026-04-20)
 
 ### Phase Details
 
@@ -118,7 +118,10 @@
   1. `.planning/codebase/CONCERNS.md` contains an R3F v9 / React 19 section with: current pinned versions, known blockers (hook errors with React 19), and the upgrade sequence (R3F v9 → drei v10 → React 19)
   2. GitHub issue #56 is updated with the documented upgrade plan and stays open as the tracking artifact
   3. No version bumps are made in `package.json` — this phase is documentation only
-**Plans**: TBD
+**Plans**: 3 plans
+  - [x] 27-01-PLAN.md — Append new `## R3F v9 / React 19 Upgrade` section to CONCERNS.md with target versions, sequence, blockers, per-package breaking changes, affected files, citations (TRACK-01)
+  - [x] 27-02-PLAN.md — Rewrite existing "React 18 downgrade" Tech Debt bullet in CONCERNS.md as a short pointer to the new section (TRACK-01)
+  - [x] 27-03-PLAN.md — Post comment on GitHub issue #56 summarizing the documented upgrade plan; issue stays OPEN (TRACK-01)
 
 ### Progress Table
 
@@ -127,4 +130,4 @@
 | 24. Tool Architecture Refactor | 4/4 | Complete    | 2026-04-19 |
 | 25. Canvas & Store Performance | 4/4 | Complete    | 2026-04-20 |
 | 26. Bug Sweep | 4/4 | Complete    | 2026-04-20 |
-| 27. Upgrade Tracking | 0/? | Not started | - |
+| 27. Upgrade Tracking | 3/3 | Complete    | 2026-04-20 |

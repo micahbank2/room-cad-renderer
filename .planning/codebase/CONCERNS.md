@@ -5,10 +5,10 @@
 ## Tech Debt
 
 **React 18 downgrade (was React 19):**
-- Issue: React was pinned to `^18.3.1` to maintain compatibility with `@react-three/fiber` v8 and `@react-three/drei` v9, which do not fully support React 19. This is an explicit constraint, not an oversight.
+- Issue: React is pinned to `^18.3.1` because `@react-three/fiber` v8 and `@react-three/drei` v9 had hook errors with React 19 at the time the pin was set.
 - Files: `package.json`
-- Impact: Cannot use React 19 features (server components, improved `use()` hook, improved transitions). Will need to track R3F's React 19 support timeline.
-- Fix approach: Upgrade to `@react-three/fiber` v9 (when stable) before bumping React to 19.
+- Impact: Cannot use React 19 features (improved `use()` hook, improved transitions, ref cleanup functions).
+- Fix approach: see § R3F v9 / React 19 Upgrade below for the full upgrade plan (target versions, sequence, affected files, citations). Tracked in [issue #56](https://github.com/micahbank2/room-cad-renderer/issues/56).
 
 **Tool cleanup stored as arbitrary property on Fabric canvas instance:**
 - Issue: Each tool stores its cleanup function on the Fabric canvas instance via `(fc as any).__xToolCleanup`. This bypasses TypeScript's type system entirely and pollutes a third-party object.
@@ -87,6 +87,111 @@
 - Files: `src/App.tsx` (lines 100-130)
 - Impact: The library view sidebar is entirely cosmetic — filtering only works via the search input in the main `ProductLibrary` component.
 - Fix approach: Wire checkboxes to state and pass selected filters as props to `ProductLibrary`, or remove the sidebar entirely until the feature is implemented.
+
+## R3F v9 / React 19 Upgrade
+
+This section documents the deferred upgrade from the current React 18 + R3F v8 + drei v9 stack to React 19 + R3F v9 + drei v10. Per phase 27 decisions (D-01 through D-04), this is a tracking/documentation artifact only — execution is deferred to a future phase when timing aligns. No `package.json` or `src/` changes are made in phase 27.
+
+### Current State
+
+The codebase is pinned to React 18 with R3F v8 and drei v9 because R3F v8 / drei v9 do not support React 19. The original downgrade (captured in the Tech Debt "React 18 downgrade" bullet above) was driven by hook errors with React 19 under the v8/v9 matrix.
+
+Current pinned versions (verified from `package.json` on 2026-04-20):
+
+| Package | Current |
+|---------|---------|
+| `react` | `^18.3.1` |
+| `react-dom` | `^18.3.1` |
+| `@types/react` | `^18.3.18` |
+| `@types/react-dom` | `^18.3.5` |
+| `@react-three/fiber` | `^8.17.14` |
+| `@react-three/drei` | `^9.122.0` |
+| `three` | `^0.183.2` |
+| `@types/three` | `^0.183.1` |
+
+### Target Versions
+
+Target pinned versions (per D-02, locked):
+
+| Package | Target |
+|---------|--------|
+| `react` | `^19.0.0` |
+| `react-dom` | `^19.0.0` |
+| `@types/react` | `^19.0.0` |
+| `@types/react-dom` | `^19.0.0` |
+| `@react-three/fiber` | `^9.0.0` |
+| `@react-three/drei` | `^10.0.0` |
+| `three` | unchanged (`^0.183.2`) |
+| `@types/three` | unchanged (`^0.183.1`) |
+
+Latest stables verified during research (2026-04-20): R3F 9.6.0, drei 10.7.7, React 19.2.x. Pin to the major ranges above per D-02 — do not pin to specific minors in `package.json`.
+
+### Upgrade Sequence
+
+Locked conceptual sequence: `R3F v9 → drei v10 → React 19`.
+
+This is the conceptual dependency ordering: R3F v9 is the gatekeeper because drei v10 peer-requires R3F v9, and React 19 is peer-required by both R3F v9 and drei v10. In practice a single-PR `npm install` covers all four peer-deps at once (per RESEARCH.md §6 Option A). Example install command:
+
+```
+npm install react@^19 react-dom@^19 @react-three/fiber@^9 @react-three/drei@^10 @types/react@^19 @types/react-dom@^19
+```
+
+Do not stage the four bumps across separate PRs — intermediate peer-dep states are invalid (e.g., drei v10 + R3F v8 will not resolve).
+
+### Known Blockers
+
+- The original blocker was **hook errors with React 19** on the v8/v9 matrix — this is the same language used in the existing Tech Debt "React 18 downgrade" bullet above. That blocker is resolved at the upstream level by R3F v9 + drei v10 + React 19 all being GA stable as of 2026-04-20.
+- Upstream status as of 2026-04-20: R3F v9 stable, drei v10 stable, React 19 GA. The blocker is resolved at the ecosystem level; execution of this upgrade is deferred to a future phase based on scheduling, not on ecosystem readiness.
+- React 19.2 reconciler nuance: pin React 19.2.x at execution time to match the tested R3F v9 compatibility matrix (per RESEARCH.md §4). Avoid leading edge pre-releases.
+
+### Per-Package Breaking Changes (Summary)
+
+**R3F v9:**
+- JSX namespace augmentation deprecated — use the exported `ThreeElements` type for JSX-intrinsic element typing instead of relying on global JSX namespace merging.
+- Strict Mode double-render verification is needed for any `useFrame` imperative code to ensure effects are idempotent.
+- Affected in this codebase: `src/three/ThreeViewport.tsx` and `src/three/WalkCameraController.tsx` import sites, plus all `src/three/*Mesh.tsx` files that use JSX intrinsics (`<mesh>`, `<group>`, `<boxGeometry>`, etc.).
+
+**drei v10:**
+- Manual `ContextBridge` component removed — not used in this codebase.
+- Peer-requires `@react-three/fiber@^9` and React 19 — drives the single-PR upgrade pattern above.
+- Existing drei component APIs used here (`OrbitControls`, `Environment`, `PointerLockControls`) are unchanged for our usage patterns.
+
+**React 19:**
+- `forwardRef` is deprecated in favor of ref as a prop — not used anywhere in `src/`.
+- Removed APIs: string refs, `ReactDOM.render`, PropTypes, `defaultProps` on function components — none used in `src/`.
+- Automatic batching unchanged from React 18.
+- Ref cleanup functions are a new capability — opportunity for simplification, not a breaking change.
+
+### Affected Files (at execution time — NOT modified in Phase 27)
+
+Per RESEARCH.md §1 and §2, the following files will need review/changes when the upgrade executes:
+
+- `src/three/ThreeViewport.tsx` — direct R3F + drei imports; `OrbitControls` ref typing update; Strict Mode audit on the camera-restore `useEffect`.
+- `src/three/WalkCameraController.tsx` — direct R3F imports (`useFrame`, `useThree`); smoke-test only, no known API surface break.
+- All `src/three/*Mesh.tsx` files — JSX intrinsics to be typed under the `ThreeElements` type import instead of global JSX namespace.
+- `tsconfig.json` — may need `"types": ["@react-three/fiber"]` per the v9 types resolution pattern.
+- `package.json` — version bumps for react, react-dom, @react-three/fiber, @react-three/drei, @types/react, @types/react-dom.
+
+### Acceptance Criteria (for future execution phase)
+
+Mirroring the acceptance block on GitHub issue #56:
+
+- 3D viewport renders without errors on load.
+- Walk mode (PointerLock) works — camera movement, pointer capture, escape handling.
+- Orbit camera works — pan, zoom, rotate.
+- Textures load on `ProductMesh` (existing async texture pathway intact).
+- All tests pass (once test coverage lands per Test Coverage Gaps section below).
+- No React hook errors in the browser console during navigation, tool switching, or 3D view interaction.
+
+### Citations
+
+- R3F v9 Migration Guide: [r3f.docs.pmnd.rs/tutorials/v9-migration-guide](https://r3f.docs.pmnd.rs/tutorials/v9-migration-guide)
+- React 19 release blog: [react.dev/blog/2024/12/05/react-19](https://react.dev/blog/2024/12/05/react-19)
+- drei releases: [github.com/pmndrs/drei/releases](https://github.com/pmndrs/drei/releases)
+
+### Tracking
+
+GitHub [issue #56](https://github.com/micahbank2/room-cad-renderer/issues/56) is the persistent external tracking artifact for this upgrade and will stay OPEN until execution lands. This `CONCERNS.md` section is the in-repo mirror of that tracking state.
 
 ## Known Bugs
 
