@@ -338,6 +338,82 @@ subscription-driven redraw.
 
 ---
 
+## Hotfix #2 (2026-04-20) — Tool-Switch Revert Regression
+
+Hotfix #1 restored the ability to drag objects, but introduced a second
+regression in the D-06 revert-on-tool-switch contract. Pressing any
+other tool key (W/D/N) mid-drag should have immediately reverted the
+in-flight drag — instead the fabric object stayed where the user moved
+it and the drag committed permanently on mouse:up. This silently
+violated the "no commit on aborted drag" guarantee.
+
+### Root Cause
+
+`FabricCanvas.redraw()`'s drag-active short-circuit was too coarse. It
+returned early whenever `isSelectToolDragActive()` was true, regardless
+of WHY the redraw was running. Zustand subscribes synchronously, so
+both `selectedIds` changes (must short-circuit to keep drag alive) and
+`activeTool` changes (must run cleanup to revert drag) fired the same
+redraw path. Post-hotfix-#1, the short-circuit caught both, preventing
+`toolCleanupRef.current?.()` from ever running on tool switch.
+
+### Fix
+
+Added `shouldSkipRedrawDuringDrag({ activeToolChanged })` to
+`selectTool.ts` as the single source of truth for the predicate.
+`FabricCanvas.tsx` tracks the previous `activeTool` via a `useRef` and
+passes `activeToolChanged` to the helper. The helper returns `true`
+only when drag is live AND the tool did not change — preserving
+Hotfix #1 behavior for selectedIds-triggered redraws, while allowing
+activeTool-triggered redraws to proceed so cleanup runs and the drag
+reverts via the existing D-06 revert logic.
+
+### Regression Test
+
+Third case added to `tests/dragIntegration.test.ts` —
+"tool-switch during drag reverts the in-flight drag". Drives
+selectTool through a realistic drag then sets `useUIStore.setState({
+activeTool: "wall" })`. A test-local subscription mirrors
+`FabricCanvas.redraw()` using the SAME `shouldSkipRedrawDuringDrag`
+helper (single-source-of-truth), so the test accurately reproduces
+production. Asserts fabric obj reverted, store unchanged, history did
+NOT grow, `isSelectToolDragActive()` returns false, and late mouse:up
+is a no-op.
+
+**Verified RED on pre-hotfix-2 code** by temporarily stubbing the
+helper to ignore `activeToolChanged` — the "toolSwitchCleanupFired to
+be 1" assertion fails because the coarse short-circuit blocks cleanup
+from firing. Passes GREEN with the differentiated helper.
+
+### Files Modified
+
+- `src/canvas/tools/selectTool.ts` — added `shouldSkipRedrawDuringDrag({ activeToolChanged })` helper (single source of truth for the redraw short-circuit predicate).
+- `src/canvas/FabricCanvas.tsx` — imports the new helper; replaces raw `isSelectToolDragActive()` check with `shouldSkipRedrawDuringDrag({ activeToolChanged })`; tracks previous activeTool via `prevActiveToolRef` (useRef<ToolType | null>) and updates it at end of redraw.
+- `tests/dragIntegration.test.ts` — third test case added for the tool-switch revert contract; imports the shared helper with fallback for pre-hotfix code.
+
+### Baseline + Delta
+
+| Metric      | Post Hotfix #1 | Post Hotfix #2 | Delta |
+| ----------- | -------------- | -------------- | ----- |
+| Total tests | 187            | 188            | +1    |
+| Passing     | 178            | 179            | +1    |
+| Failing     | 6              | 6              | 0     |
+| Todo        | 3              | 3              | 0     |
+
+Pre-existing 6 failures unchanged (3× AddProductModal, 2× SidebarProductPicker, 1× productStore). Build + tsc clean.
+
+### Task Commits
+
+- **Hotfix #2 fix:** `fix(25-02): restore tool-switch drag revert broken by hotfix #1`
+- **Hotfix #2 test:** `test(25-02): add tool-switch-reverts-drag regression test case`
+- **Hotfix #2 docs:** `docs(25-02): document hotfix #2 in SUMMARY`
+
+### Phase 25 Status
+
+Wave 3 verification still in progress. PERF-01 / PERF-02 remain open. Hotfix #2 does not alter any D-01..D-06 architectural decisions — the fast-path architecture is intact; the fix restores the D-06 revert contract that hotfix #1 inadvertently broke.
+
+---
+
 ## Self-Check: PASSED
 
 File existence:
