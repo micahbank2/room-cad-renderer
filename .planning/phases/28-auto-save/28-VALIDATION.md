@@ -41,14 +41,14 @@ created: 2026-04-20
 
 | Task ID  | Plan | Wave | Requirement     | Test Type           | Automated Command                                                              | File Exists         | Status   |
 |----------|------|------|-----------------|---------------------|--------------------------------------------------------------------------------|---------------------|----------|
-| 28-01-T1 | 01   | 0    | SAVE-05,SAVE-06 | infra               | `npx vitest run tests/useAutoSave.test.ts --reporter=dot`                      | creates Wave 0      | planned  |
-| 28-01-T2 | 01   | 0    | SAVE-05,SAVE-06 | unit (stubs)        | `npx vitest run tests/useAutoSave.test.ts --reporter=dot`                      | extends existing    | planned  |
-| 28-01-T3 | 01   | 0    | SAVE-05         | integration (stubs) | `npx vitest run tests/App.restore.test.tsx --reporter=dot`                     | creates Wave 0      | planned  |
-| 28-02-T1 | 02   | 1    | SAVE-06         | unit + typecheck    | `npx vitest run tests/useAutoSave.test.ts && npx tsc --noEmit`                 | yes (from Plan 01)  | planned  |
-| 28-02-T2 | 02   | 1    | SAVE-05,SAVE-06 | unit                | `npx vitest run tests/useAutoSave.test.ts --reporter=dot`                      | yes (from Plan 01)  | planned  |
-| 28-03-T1 | 03   | 2    | SAVE-05         | typecheck           | `npx tsc --noEmit`                                                             | n/a (source only)   | planned  |
-| 28-03-T2 | 03   | 2    | SAVE-05         | unit                | `npx vitest run tests/useAutoSave.test.ts --reporter=dot`                      | yes (from Plan 01)  | planned  |
-| 28-03-T3 | 03   | 2    | SAVE-05         | integration         | `npx vitest run tests/App.restore.test.tsx --reporter=dot`                     | yes (from Plan 01)  | planned  |
+| 28-01-T1 | 01   | 0    | SAVE-05,SAVE-06 | infra               | `npx vitest run tests/useAutoSave.test.ts`                                     | Created Wave 0      | shipped  |
+| 28-01-T2 | 01   | 0    | SAVE-05,SAVE-06 | unit (stubs)        | `npx vitest run tests/useAutoSave.test.ts`                                     | Extended Wave 0     | shipped  |
+| 28-01-T3 | 01   | 0    | SAVE-05         | integration (stubs) | `npx vitest run tests/App.restore.test.tsx`                                    | Created Wave 0      | shipped  |
+| 28-02-T1 | 02   | 1    | SAVE-06         | unit                | `npx vitest run tests/useAutoSave.test.ts -t "failed"`                         | yes                 | shipped  |
+| 28-02-T2 | 02   | 1    | SAVE-05,SAVE-06 | unit                | `npx vitest run tests/useAutoSave.test.ts`                                     | yes                 | shipped  |
+| 28-03-T1 | 03   | 2    | SAVE-05         | typecheck           | `npx tsc --noEmit`                                                             | yes                 | shipped  |
+| 28-03-T2 | 03   | 2    | SAVE-05         | unit                | `npx vitest run tests/useAutoSave.test.ts`                                     | yes                 | shipped  |
+| 28-03-T3 | 03   | 2    | SAVE-05         | integration         | `npx vitest run tests/App.restore.test.tsx`                                    | yes                 | shipped  |
 | 28-04-T1 | 04   | 3    | SAVE-05,SAVE-06 | doc                 | `grep -c "28-01-T\|28-02-T\|28-03-T" .planning/phases/28-auto-save/28-VALIDATION.md` | yes (this file)     | planned  |
 | 28-04-T2 | 04   | 3    | SAVE-05,SAVE-06 | full suite          | `npx vitest run --reporter=dot`                                                | n/a                 | planned  |
 | 28-04-T3 | 04   | 3    | SAVE-05,SAVE-06 | manual (checkpoint) | see `## Manual-Only Verifications` below                                       | n/a                 | planned  |
