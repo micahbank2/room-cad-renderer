@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Editing UX
-status: executing
-stopped_at: Completed 29-04-PLAN.md (final verification gate, phase 29 signed off)
-last_updated: "2026-04-20T22:16:15.656Z"
+status: verifying
+stopped_at: Completed 30-04-PLAN.md — Phase 30 smart-snapping complete
+last_updated: "2026-04-20T23:12:14.384Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
-  completed_phases: 2
-  total_plans: 9
-  completed_plans: 9
+  completed_phases: 3
+  total_plans: 13
+  completed_plans: 13
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 29 — editable-dim-labels
+**Current focus:** Phase 30 — smart-snapping
 
 ## Current Position
 
 Milestone: v1.6 Editing UX
-Phase: 30
+Phase: 31
 Plan: Not started
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-20
 
 [░░░░░░░░░░] 0% (0/4 phases complete)
@@ -47,6 +47,12 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 29]: Used three-branch ordered regex for feet+inches parser; 'first match wins' cleanly rejects ambiguous forms like '12 6' while accepting liberal spellings.
 - [Phase 29]: Added window.__openDimensionEditor(wallId) test driver to bypass jsdom+fabric hit-test fragility (Plan 01 explicitly sanctioned this pattern).
 - [Phase 29]: Phase 29 Plan 04: Final gate passed — 37/37 Phase 29 tests green, tsc clean (only pre-existing baseUrl deprecation), human-verify auto-approved, nyquist_compliant flipped true. Phase 29 signed off.
+- [Phase 30-smart-snapping]: Plan 30-01 locks SNAP-01/02/03 via 29 red test assertions across unit+Fabric+RTL layers; Plan 03 driver contract (window.__driveSnap / __getSnapGuides) documented in test headers
+- [Phase 30-smart-snapping]: Midpoint snap targets require both center.x and center.y within tolerance — preserves "centered on this wall" semantics of midpoint-dot guide
+- [Phase 30-smart-snapping]: Diagonal walls contribute endpoint X/Y targets only in v1 (full perpendicular-projection snap deferred)
+- [Phase 30]: Wall-endpoint drag path deliberately untouched per D-08b (Phase 31 owns smart snap for wall endpoints)
+- [Phase 30]: productTool driver auto-seeds default test product when pendingProductId is unset (gated by import.meta.env.MODE === test)
+- [Phase 30-smart-snapping]: Plan 04 gate signed off — nyquist_compliant true, full suite green, Alt/Option documented in CLAUDE.md; perceptual items persisted to 30-HUMAN-UAT.md
 
 ### Pending Todos
 
@@ -65,6 +71,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-20T22:12:04.690Z
-Stopped at: Completed 29-04-PLAN.md (final verification gate, phase 29 signed off)
+Last session: 2026-04-20T23:09:19.399Z
+Stopped at: Completed 30-04-PLAN.md — Phase 30 smart-snapping complete
 Resume file: None

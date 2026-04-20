@@ -123,6 +123,7 @@ Zustand store keeps `past[]` and `future[]` arrays of `CADSnapshot` objects (roo
 | Ctrl+Shift+Z | Redo |
 | Delete/Backspace | Delete selected |
 | Shift (held) | Orthogonal constraint while drawing walls |
+| Alt/Option (held) | Disable smart snap during drag/placement (grid snap still applies) |
 | Escape | Cancel current tool action |
 
 ---
