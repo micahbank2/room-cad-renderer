@@ -78,16 +78,16 @@ Open GH issues not in v1.6:
 
 | REQ-ID | Issue | Phase |
 |--------|-------|-------|
-| SAVE-05 | #44 | Pending |
-| SAVE-06 | #44 | Pending |
-| EDIT-20 | #46 | Pending |
-| EDIT-21 | #46 | Pending |
-| EDIT-22 | #60 | Pending |
-| EDIT-23 | #60 | Pending |
-| EDIT-24 | #60 | Pending |
-| SNAP-01 | #17 | Pending |
-| SNAP-02 | #17 | Pending |
-| SNAP-03 | #17 | Pending |
-| CUSTOM-06 | #50 | Pending |
+| SAVE-05 | #44 | Phase 28 |
+| SAVE-06 | #44 | Phase 28 |
+| EDIT-20 | #46 | Phase 29 |
+| EDIT-21 | #46 | Phase 29 |
+| EDIT-22 | #60 | Phase 31 |
+| EDIT-23 | #60 | Phase 31 |
+| EDIT-24 | #60 | Phase 31 |
+| SNAP-01 | #17 | Phase 30 |
+| SNAP-02 | #17 | Phase 30 |
+| SNAP-03 | #17 | Phase 30 |
+| CUSTOM-06 | #50 | Phase 31 |
 
-*Filled in by roadmapper after phase breakdown.*
+*Updated by roadmapper 2026-04-20.*
