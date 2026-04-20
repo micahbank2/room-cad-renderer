@@ -30,7 +30,7 @@ import { activateWindowTool } from "./tools/windowTool";
 import { activateCeilingTool } from "./tools/ceilingTool";
 import { attachDragDropHandlers } from "./dragDrop";
 import { computeLabelPx, hitTestDimLabel, validateInput } from "./dimensionEditor";
-import { closestPointOnWall, distance } from "@/lib/geometry";
+import { closestPointOnWall, distance, formatFeet } from "@/lib/geometry";
 import { WainscotPopover } from "@/components/WainscotPopover";
 import type { WallSide } from "@/types/cad";
 import type { Product } from "@/types/product";
@@ -275,7 +275,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
           const currentLen = Math.sqrt(
             (wall.end.x - wall.start.x) ** 2 + (wall.end.y - wall.start.y) ** 2
           );
-          setPendingValue(currentLen.toFixed(2));
+          setPendingValue(formatFeet(currentLen));
           setEditingWallId(wall.id);
           return;
         }
@@ -304,6 +304,23 @@ export default function FabricCanvas({ productLibrary }: Props) {
     };
     fc.on("mouse:dblclick", onDblClick as any);
     return () => { fc.off("mouse:dblclick", onDblClick as any); };
+  }, []);
+
+  // Test-only driver: expose a hook for RTL to open the dimension edit overlay
+  // for a given wall id, bypassing fabric's dblclick which is fragile in jsdom
+  // (getBoundingClientRect → 0 in jsdom, so label hit-test never resolves).
+  // Plan 01 explicitly sanctioned this driver; see tests/dimensionOverlay.test.tsx.
+  useEffect(() => {
+    (window as any).__openDimensionEditor = (wallId: string) => {
+      const wall = getActiveRoomDoc()?.walls[wallId];
+      if (!wall) return;
+      const currentLen = Math.sqrt(
+        (wall.end.x - wall.start.x) ** 2 + (wall.end.y - wall.start.y) ** 2
+      );
+      setPendingValue(formatFeet(currentLen));
+      setEditingWallId(wallId);
+    };
+    return () => { delete (window as any).__openDimensionEditor; };
   }, []);
 
   // Redraw on state changes
@@ -443,9 +460,9 @@ export default function FabricCanvas({ productLibrary }: Props) {
       const label = computeLabelPx(wall, scale, origin);
       overlayStyle = {
         position: "absolute",
-        left: label.x - 32,
+        left: label.x - 48,
         top: label.y - 10,
-        width: 64,
+        width: 96,
         height: 20,
         zIndex: 10,
       };
@@ -494,6 +511,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
         <input
           type="text"
           autoFocus
+          onFocus={(e) => e.currentTarget.select()}
           value={pendingValue}
           onChange={(e) => setPendingValue(e.target.value)}
           onBlur={commitEdit}

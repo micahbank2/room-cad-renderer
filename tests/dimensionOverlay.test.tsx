@@ -51,18 +51,12 @@ function seedOneWall(lengthFt = 12.5) {
  * If fabric isn't fully initialized in jsdom this will throw; the test
  * assertion that follows will then fail — still a valid Wave 0 red state.
  */
-function openOverlayForWall(container: HTMLElement) {
-  // Midpoint in feet = (6.25, 0); scale+origin depend on room fit math.
-  // For this red stub we just directly set the editing state via state mutation,
-  // then trust Plan 02 to either expose a driver or wire the overlay cleanly.
-  // The input is rendered only when `editingWallId` is set on the component,
-  // which is local React state — inaccessible from here. So we dispatch a
-  // double-click on the canvas element and hope fabric routes it.
-  const canvasEl = container.querySelector("canvas");
-  if (!canvasEl) return;
-  // Best-effort: fire a native dblclick. Plan 02 should add a testing hook
-  // (ref, data-attr, or exported driver) if this proves too fragile.
-  fireEvent.dblClick(canvasEl, { clientX: 100, clientY: 100 });
+function openOverlayForWall(_container: HTMLElement) {
+  // Plan 02 exposed `window.__openDimensionEditor(wallId)` as the driver —
+  // fabric's native dblclick path depends on getBoundingClientRect, which
+  // returns 0 in jsdom and never resolves the label hit-test.
+  const hook = (window as any).__openDimensionEditor;
+  if (typeof hook === "function") hook(WALL_ID);
 }
 
 describe("Dimension label overlay (Phase 29)", () => {
