@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance & Tech Debt
-status: Phase 27 in progress (plan 01 of 3 complete; Wave 2 unblocked)
+status: executing
 stopped_at: Completed 27-01-PLAN.md
-last_updated: "2026-04-20T18:07:08.513Z"
+last_updated: "2026-04-20T18:09:04.043Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 15
-  completed_plans: 13
+  completed_plans: 14
 ---
 
 # Project State
@@ -55,6 +55,7 @@ Full log in PROJECT.md Key Decisions table. Recent v1.4 decisions:
 - [Phase 26]: FIX-02 closed as Outcome A (Pitfall 3 perception-only). PLASTER #f0ebe0 vs PAINTED_DRYWALL #f5f5f5 differ by ~3 L* points — below JND. Production code path verified correct end-to-end; 4 store-integration regression guards added.
 - [Phase 26-bug-sweep]: Phase 26 closed — FIX-01 fixed (Group rebuild via onImageReady/React tick); FIX-02 closed as Outcome A (perception-only, regression guards added). GitHub #42 and #43 closed per D-14. Full suite 191 passing (6 pre-existing unrelated failures unchanged). D-10 + D-12 user-approved 2026-04-20. Backlog: #60 (drag-to-resize UX), #61 (WOOD_PLANK PBR realism) filed during smoke session.
 - [Phase 27-upgrade-tracking]: Plan 27-01: Appended `## R3F v9 / React 19 Upgrade` section to CONCERNS.md — documents current pins, locked target majors (^9.0.0 R3F / ^10.0.0 drei / ^19.0.0 React), sequence phrase `R3F v9 → drei v10 → React 19`, affected files, canonical citations, and links issue #56 as persistent tracker. Wave 2 (plans 27-02 + 27-03) now unblocked.
+- [Phase 27-upgrade-tracking]: Tech Debt React 18 bullet rewritten as pointer to the new § R3F v9 / React 19 Upgrade section; duplicated fix content removed; issue #56 linked inline
 
 ### Pending Todos
 
