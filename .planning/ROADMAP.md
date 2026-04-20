@@ -129,6 +129,6 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 28. Auto-Save | 5/5 | Complete    | 2026-04-20 |
-| 29. Editable Dimension Labels | 1/4 | In Progress|  |
+| 29. Editable Dimension Labels | 2/4 | In Progress|  |
 | 30. Smart Snapping | 0/? | Not started | - |
 | 31. Drag-to-Resize + Label Override | 0/? | Not started | - |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Editing UX
 status: executing
-stopped_at: Completed 29-01-PLAN.md
-last_updated: "2026-04-20T21:55:47.570Z"
+stopped_at: Completed 29-02-PLAN.md (parser + overlay polish)
+last_updated: "2026-04-20T22:00:01.178Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 9
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 Milestone: v1.6 Editing UX
 Phase: 29 (editable-dim-labels) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-04-20
 
@@ -44,6 +44,8 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 28-auto-save]: Phase 28 Plan 04: Signed VALIDATION.md (nyquist_compliant true, wave_0_complete true); full vitest 201/6pre-existing/3todo; Phase 28 stubs 10/10 green; manual smoke auto-approved per orchestrator auto-mode, deferred to HUMAN-UAT
 - [Phase 28]: Option A: inline failed branch in ToolbarSaveStatus; leave orphaned SaveIndicator.tsx for follow-up cleanup
 - [Phase 29]: Wave 0 red stubs (4 test files) locked parser grammar, overlay UX, PropertiesPanel LENGTH, and EDIT-21 single-undo guard
+- [Phase 29]: Used three-branch ordered regex for feet+inches parser; 'first match wins' cleanly rejects ambiguous forms like '12 6' while accepting liberal spellings.
+- [Phase 29]: Added window.__openDimensionEditor(wallId) test driver to bypass jsdom+fabric hit-test fragility (Plan 01 explicitly sanctioned this pattern).
 
 ### Pending Todos
 
@@ -62,6 +64,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-20T21:55:47.568Z
-Stopped at: Completed 29-01-PLAN.md
+Last session: 2026-04-20T21:59:54.179Z
+Stopped at: Completed 29-02-PLAN.md (parser + overlay polish)
 Resume file: None

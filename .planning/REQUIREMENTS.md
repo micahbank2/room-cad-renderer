@@ -15,7 +15,7 @@
 
 ### Editable Dimension Labels (EDIT)
 
-- [ ] **EDIT-20** — Double-clicking a wall dimension label opens a feet+inches input in place. Enter commits; Escape cancels; the wall resizes from its start point along its existing angle. Source: [#46](https://github.com/micahbank2/room-cad-renderer/issues/46).
+- [x] **EDIT-20** — Double-clicking a wall dimension label opens a feet+inches input in place. Enter commits; Escape cancels; the wall resizes from its start point along its existing angle. Source: [#46](https://github.com/micahbank2/room-cad-renderer/issues/46).
 - [x] **EDIT-21** — Each dimension-label edit produces exactly one undo/redo entry. Source: [#46](https://github.com/micahbank2/room-cad-renderer/issues/46).
 
 ### Drag-to-Resize (EDIT)
