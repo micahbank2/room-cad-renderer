@@ -5,10 +5,10 @@
 ## Tech Debt
 
 **React 18 downgrade (was React 19):**
-- Issue: React was pinned to `^18.3.1` to maintain compatibility with `@react-three/fiber` v8 and `@react-three/drei` v9, which do not fully support React 19. This is an explicit constraint, not an oversight.
+- Issue: React is pinned to `^18.3.1` because `@react-three/fiber` v8 and `@react-three/drei` v9 had hook errors with React 19 at the time the pin was set.
 - Files: `package.json`
-- Impact: Cannot use React 19 features (server components, improved `use()` hook, improved transitions). Will need to track R3F's React 19 support timeline.
-- Fix approach: Upgrade to `@react-three/fiber` v9 (when stable) before bumping React to 19.
+- Impact: Cannot use React 19 features (improved `use()` hook, improved transitions, ref cleanup functions).
+- Fix approach: see § R3F v9 / React 19 Upgrade below for the full upgrade plan (target versions, sequence, affected files, citations). Tracked in [issue #56](https://github.com/micahbank2/room-cad-renderer/issues/56).
 
 **Tool cleanup stored as arbitrary property on Fabric canvas instance:**
 - Issue: Each tool stores its cleanup function on the Fabric canvas instance via `(fc as any).__xToolCleanup`. This bypasses TypeScript's type system entirely and pollutes a third-party object.
