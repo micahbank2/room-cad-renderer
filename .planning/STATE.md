@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Editing UX
 status: executing
-stopped_at: Phase 30 context gathered
-last_updated: "2026-04-20T22:24:39.509Z"
+stopped_at: Completed 30-01-PLAN.md (red test stubs for smart snapping)
+last_updated: "2026-04-20T22:46:45.326Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 13
+  completed_plans: 10
 ---
 
 # Project State
@@ -20,13 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 29 — editable-dim-labels
+**Current focus:** Phase 30 — smart-snapping
 
 ## Current Position
 
 Milestone: v1.6 Editing UX
-Phase: 30
-Plan: Not started
+Phase: 30 (smart-snapping) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
 Last activity: 2026-04-20
 
@@ -47,6 +47,7 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 29]: Used three-branch ordered regex for feet+inches parser; 'first match wins' cleanly rejects ambiguous forms like '12 6' while accepting liberal spellings.
 - [Phase 29]: Added window.__openDimensionEditor(wallId) test driver to bypass jsdom+fabric hit-test fragility (Plan 01 explicitly sanctioned this pattern).
 - [Phase 29]: Phase 29 Plan 04: Final gate passed — 37/37 Phase 29 tests green, tsc clean (only pre-existing baseUrl deprecation), human-verify auto-approved, nyquist_compliant flipped true. Phase 29 signed off.
+- [Phase 30-smart-snapping]: Plan 30-01 locks SNAP-01/02/03 via 29 red test assertions across unit+Fabric+RTL layers; Plan 03 driver contract (window.__driveSnap / __getSnapGuides) documented in test headers
 
 ### Pending Todos
 
@@ -65,6 +66,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-20T22:24:39.507Z
-Stopped at: Phase 30 context gathered
-Resume file: .planning/phases/30-smart-snapping/30-CONTEXT.md
+Last session: 2026-04-20T22:46:39.752Z
+Stopped at: Completed 30-01-PLAN.md (red test stubs for smart snapping)
+Resume file: None
