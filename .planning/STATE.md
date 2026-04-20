@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Editing UX
-status: planning
-stopped_at: Phase 28 context gathered
-last_updated: "2026-04-20T19:02:13.020Z"
-last_activity: 2026-04-20 — Roadmap created, 4 phases (28–31), 11 requirements mapped
+status: executing
+stopped_at: Completed 28-01-PLAN.md (TDD scaffolding); Plan 02 ready to execute
+last_updated: "2026-04-20T20:07:37.565Z"
+last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 4
+  completed_plans: 1
 ---
 
 # Project State
@@ -20,15 +20,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** v1.6 Editing UX — close the daily-workflow gaps in 2D editing (auto-save polish, editable dim labels, drag-to-resize, smart snapping, per-placement overrides).
+**Current focus:** Phase 28 — auto-save
 
 ## Current Position
 
 Milestone: v1.6 Editing UX
-Phase: 28 (Auto-Save) — not started
-Plan: —
-Status: Roadmap created; ready to plan Phase 28
-Last activity: 2026-04-20 — Roadmap created, 4 phases (28–31), 11 requirements mapped
+Phase: 28 (auto-save) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-04-20
 
 [░░░░░░░░░░] 0% (0/4 phases complete)
 
@@ -37,6 +37,8 @@ Last activity: 2026-04-20 — Roadmap created, 4 phases (28–31), 11 requiremen
 ### Decisions
 
 Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarized in `.planning/RETROSPECTIVE.md § v1.5`.
+
+- [Phase 28]: Phase 28 Plan 01: Created Wave 0 TDD red stubs (6 useAutoSave + 4 App.restore) for SAVE-05/SAVE-06; 6 fail describing Plan 02/03 behavior, 7 pass
 
 ### Pending Todos
 
@@ -55,6 +57,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-20T19:02:13.017Z
-Stopped at: Phase 28 context gathered
-Resume file: .planning/phases/28-auto-save/28-CONTEXT.md
+Last session: 2026-04-20T20:07:37.561Z
+Stopped at: Completed 28-01-PLAN.md (TDD scaffolding); Plan 02 ready to execute
+Resume file: None
