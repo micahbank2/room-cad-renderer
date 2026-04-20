@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance & Tech Debt
 status: executing
-stopped_at: Completed 26-00-wave0-red-tests-PLAN.md
-last_updated: "2026-04-20T16:52:41.949Z"
+stopped_at: Completed 26-01-fix01-product-image-rebuild-PLAN.md
+last_updated: "2026-04-20T16:56:59.846Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 12
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 ## Current Position
 
 Phase: 26 (bug-sweep) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-04-20
 
@@ -51,6 +51,7 @@ Full log in PROJECT.md Key Decisions table. Recent v1.4 decisions:
 - [Phase 25-canvas-store-performance]: Wave 3 verification bundle assembled. PERF-01 MET (Chrome trace ~99.9% clean frames over 47.7s drag). PERF-02 D-07 contract MET (zero JSON.parse in snapshot body) but ≥2× speedup target NOT MET — measured 0.80× ratio (1.25× slower) at 50W/30P, honestly documented. Root cause: V8's JSON fast path + Immer-draft toPlain() overhead. User-visible impact zero (<0.3ms/call at 200W/100P). Two hotfixes landed during Part D smoke: Hotfix #1 (drag-survives-selection, _dragActive flag) + Hotfix #2 (tool-switch-reverts-drag, shouldSkipRedrawDuringDrag predicate). 176 -> 179 passing (+3 jsdom regression tests in tests/dragIntegration.test.ts).
 - [Phase 26-bug-sweep]: FIX-01 RED confirmed Pitfall 1 (Group rebuild missing on cache onReady). Plan 26-01 must rebuild Group on image load.
 - [Phase 26-bug-sweep]: FIX-02 Pitfall 4 ruled out (structuredClone preserves surfaceMaterialId). Plan 26-02 must target UI wiring or visual perception, not persistence.
+- [Phase 26-bug-sweep]: FIX-01: React tick state (productImageTick) in FabricCanvas bumped by renderProducts onImageReady callback — forces Group rebuild on async image load without touching productImageCache.ts (D-02) or fabric internals (D-03 first-paint correctness)
 
 ### Pending Todos
 
@@ -68,6 +69,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-20T16:52:41.946Z
-Stopped at: Completed 26-00-wave0-red-tests-PLAN.md
+Last session: 2026-04-20T16:56:49.192Z
+Stopped at: Completed 26-01-fix01-product-image-rebuild-PLAN.md
 Resume file: None
