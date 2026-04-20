@@ -66,7 +66,7 @@
 
 ### Phases
 
-- [ ] **Phase 28: Auto-Save** — CAD scene saves itself; toolbar shows SAVING/SAVED status
+- [x] **Phase 28: Auto-Save** — CAD scene saves itself; toolbar shows SAVING/SAVED status (completed 2026-04-20)
 - [ ] **Phase 29: Editable Dimension Labels** — double-click any wall label to type a new length
 - [ ] **Phase 30: Smart Snapping** — edges snap to walls and objects; auto-center on midpoints; guides appear on snap
 - [ ] **Phase 31: Drag-to-Resize + Label Override** — drag handles resize products and walls; custom elements can be renamed per placement
@@ -128,7 +128,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 28. Auto-Save | 3/4 | In Progress|  |
+| 28. Auto-Save | 4/4 | Complete   | 2026-04-20 |
 | 29. Editable Dimension Labels | 0/? | Not started | - |
 | 30. Smart Snapping | 0/? | Not started | - |
 | 31. Drag-to-Resize + Label Override | 0/? | Not started | - |
