@@ -97,5 +97,5 @@ From PROJECT.md:
 | TOOL-02 | #54 | Phase 24 | Pending |
 | TOOL-03 | #55 | Phase 24 | Pending |
 | TRACK-01 | #56 | Phase 27 | Pending |
-| FIX-01 | #42 | Phase 26 | Pending |
-| FIX-02 | #43 | Phase 26 | Pending |
+| FIX-01 | #42 | Phase 26 | Complete |
+| FIX-02 | #43 | Phase 26 | Complete — closed as perception-only (Outcome A); regression guards added (see 26-02 SUMMARY) |

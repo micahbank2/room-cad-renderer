@@ -58,7 +58,7 @@
 
 - [x] **Phase 24: Tool Architecture Refactor** — Eliminate `as any` casts, move state to closures, extract shared utilities (shipped 2026-04-18)
 - [x] **Phase 25: Canvas & Store Performance** — Incremental canvas updates, faster cadStore snapshots (completed 2026-04-20)
-- [ ] **Phase 26: Bug Sweep** — Fix async product images in 2D canvas and ceiling preset material path
+- [x] **Phase 26: Bug Sweep** — Fix async product images in 2D canvas and ceiling preset material path (completed 2026-04-20)
 - [ ] **Phase 27: Upgrade Tracking** — Document R3F v9 / React 19 upgrade path
 
 ### Phase Details
@@ -107,8 +107,8 @@
 **Plans**: 4 plans
   - [x] 26-00-wave0-red-tests-PLAN.md — RED/baseline tests for FIX-01 (fabricSync image) and FIX-02 (ceiling surfaceMaterialId round-trip)
   - [x] 26-01-fix01-product-image-rebuild-PLAN.md — Rebuild product Group on async image load (FIX-01)
-  - [x] 26-02-fix02-ceiling-preset-material-PLAN.md — Diagnose & fix ceiling preset render/persist bug, FloorMesh parity (FIX-02)
-  - [ ] 26-03-wave3-verification-and-closeout-PLAN.md — Full suite + D-10/D-12 manual smoke + GitHub #42/#43 close-out
+  - [x] 26-02-fix02-ceiling-preset-material-PLAN.md — Diagnose & close ceiling preset bug (Outcome A — perception-only; regression guards added) (FIX-02)
+  - [x] 26-03-wave3-verification-and-closeout-PLAN.md — Full suite + D-10/D-12 manual smoke + GitHub #42/#43 close-out
 
 ### Phase 27: Upgrade Tracking
 **Goal**: R3F v9 / React 19 upgrade path is documented and the blocking issue is tracked so it can be executed when R3F v9 stabilizes
@@ -126,5 +126,5 @@
 |-------|----------------|--------|-----------|
 | 24. Tool Architecture Refactor | 4/4 | Complete    | 2026-04-19 |
 | 25. Canvas & Store Performance | 4/4 | Complete    | 2026-04-20 |
-| 26. Bug Sweep | 3/4 | In Progress|  |
+| 26. Bug Sweep | 4/4 | Complete    | 2026-04-20 |
 | 27. Upgrade Tracking | 0/? | Not started | - |
