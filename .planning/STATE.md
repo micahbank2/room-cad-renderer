@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Editing UX
 status: executing
-stopped_at: Completed 30-02-PLAN.md
-last_updated: "2026-04-20T22:53:06.760Z"
+stopped_at: Completed 30-03-PLAN.md
+last_updated: "2026-04-20T23:05:16.733Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 13
-  completed_plans: 11
+  completed_plans: 12
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 Milestone: v1.6 Editing UX
 Phase: 30 (smart-snapping) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-04-20
 
@@ -50,6 +50,8 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 30-smart-snapping]: Plan 30-01 locks SNAP-01/02/03 via 29 red test assertions across unit+Fabric+RTL layers; Plan 03 driver contract (window.__driveSnap / __getSnapGuides) documented in test headers
 - [Phase 30-smart-snapping]: Midpoint snap targets require both center.x and center.y within tolerance — preserves "centered on this wall" semantics of midpoint-dot guide
 - [Phase 30-smart-snapping]: Diagonal walls contribute endpoint X/Y targets only in v1 (full perpendicular-projection snap deferred)
+- [Phase 30]: Wall-endpoint drag path deliberately untouched per D-08b (Phase 31 owns smart snap for wall endpoints)
+- [Phase 30]: productTool driver auto-seeds default test product when pendingProductId is unset (gated by import.meta.env.MODE === test)
 
 ### Pending Todos
 
@@ -68,6 +70,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-20T22:53:01.508Z
-Stopped at: Completed 30-02-PLAN.md
+Last session: 2026-04-20T23:05:16.731Z
+Stopped at: Completed 30-03-PLAN.md
 Resume file: None

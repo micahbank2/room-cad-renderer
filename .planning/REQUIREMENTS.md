@@ -28,7 +28,7 @@
 
 - [x] **SNAP-01** — While placing or dragging an object, its edges snap to the edges of nearby walls and other objects within a small pixel tolerance. Source: [#17](https://github.com/micahbank2/room-cad-renderer/issues/17).
 - [x] **SNAP-02** — Dragging an object near the midpoint of a wall auto-centers it on that wall. Source: [#17](https://github.com/micahbank2/room-cad-renderer/issues/17).
-- [ ] **SNAP-03** — When a snap engages, a visible guide (line, tick, or highlight) indicates which edge or axis snapped. Source: [#17](https://github.com/micahbank2/room-cad-renderer/issues/17).
+- [x] **SNAP-03** — When a snap engages, a visible guide (line, tick, or highlight) indicates which edge or axis snapped. Source: [#17](https://github.com/micahbank2/room-cad-renderer/issues/17).
 
 ### Per-Placement Label Override (CUSTOM)
 
