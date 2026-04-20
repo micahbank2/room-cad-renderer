@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance & Tech Debt
-status: executing
-stopped_at: Completed 27-01-PLAN.md
-last_updated: "2026-04-20T18:09:04.043Z"
+status: milestone-complete
+stopped_at: Completed 27-03-PLAN.md (Phase 27 done; v1.5 milestone complete)
+last_updated: "2026-04-20T18:11:29.000Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 15
-  completed_plans: 14
+  completed_plans: 15
 ---
 
 # Project State
@@ -20,16 +20,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-17)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 27 — upgrade-tracking (Wave 1 complete)
+**Current focus:** v1.5 Performance & Tech Debt milestone complete — all 4 phases (24, 25, 26, 27) shipped.
 
 ## Current Position
 
-Phase: 27
-Plan: 02 (next — Wave 2, unblocked by 27-01)
-Status: Phase 27 in progress (plan 01 of 3 complete; Wave 2 unblocked)
+Phase: 27 (complete)
+Plan: — (v1.5 milestone complete; next milestone not yet scoped)
+Status: v1.5 milestone complete — all 15 plans across 4 phases done
 Last activity: 2026-04-20
 
-[█████████░] 87% (13/15 v1.5 plans complete; Phase 27 plans 1/3 done)
+[██████████] 100% (15/15 v1.5 plans complete; 4/4 phases complete)
 
 ## Accumulated Context
 
@@ -56,6 +56,7 @@ Full log in PROJECT.md Key Decisions table. Recent v1.4 decisions:
 - [Phase 26-bug-sweep]: Phase 26 closed — FIX-01 fixed (Group rebuild via onImageReady/React tick); FIX-02 closed as Outcome A (perception-only, regression guards added). GitHub #42 and #43 closed per D-14. Full suite 191 passing (6 pre-existing unrelated failures unchanged). D-10 + D-12 user-approved 2026-04-20. Backlog: #60 (drag-to-resize UX), #61 (WOOD_PLANK PBR realism) filed during smoke session.
 - [Phase 27-upgrade-tracking]: Plan 27-01: Appended `## R3F v9 / React 19 Upgrade` section to CONCERNS.md — documents current pins, locked target majors (^9.0.0 R3F / ^10.0.0 drei / ^19.0.0 React), sequence phrase `R3F v9 → drei v10 → React 19`, affected files, canonical citations, and links issue #56 as persistent tracker. Wave 2 (plans 27-02 + 27-03) now unblocked.
 - [Phase 27-upgrade-tracking]: Tech Debt React 18 bullet rewritten as pointer to the new § R3F v9 / React 19 Upgrade section; duplicated fix content removed; issue #56 linked inline
+- [Phase 27-upgrade-tracking]: Plan 27-03: Dated upgrade-plan comment posted on GH issue #56 (issuecomment-4283199813) linking to CONCERNS.md § R3F v9 / React 19 Upgrade; issue state OPEN, milestone/labels/assignees unchanged, zero repo files modified (D-05..D-08 all honored). TRACK-01 acceptance #2 satisfied. Phase 27 complete → v1.5 milestone closed (4/4 phases, 15/15 plans).
 
 ### Pending Todos
 
@@ -73,6 +74,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-20T18:06:19.170Z
-Stopped at: Completed 27-01-PLAN.md
+Last session: 2026-04-20T18:11:29.000Z
+Stopped at: Completed 27-03-PLAN.md (Phase 27 done; v1.5 milestone complete)
 Resume file: None
