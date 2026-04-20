@@ -85,6 +85,11 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const [pendingValue, setPendingValue] = useState<string>("");
   const [wainscotEditWallId, setWainscotEditWallId] = useState<string | null>(null);
   const [wainscotEditSide, setWainscotEditSide] = useState<WallSide>("A");
+  // FIX-01: bumping this tick forces redraw() to re-execute (and rebuild the
+  // product Group) when an async product image finishes loading. Without this,
+  // fc.renderAll() inside the image cache onReady only repaints the existing
+  // (image-less) Group — the Group is never rebuilt with the FabricImage child.
+  const [productImageTick, setProductImageTick] = useState(0);
 
   const room = useActiveRoom() ?? { width: 20, length: 16, wallHeight: 8 };
   const walls = useActiveWalls();
@@ -179,8 +184,19 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // 3. Walls
     renderWalls(fc, walls, scale, origin, selectedIds);
 
-    // 4. Products
-    renderProducts(fc, placedProducts, productLibrary, scale, origin, selectedIds);
+    // 4. Products — onImageReady bumps the tick so this redraw re-runs once
+    // the async image load populates the cache, rebuilding the product Group
+    // with the FabricImage child (FIX-01). Functional setState avoids stale
+    // closures when multiple products finish loading concurrently (D-03).
+    renderProducts(
+      fc,
+      placedProducts,
+      productLibrary,
+      scale,
+      origin,
+      selectedIds,
+      () => setProductImageTick((t) => t + 1),
+    );
 
     // 5. Ceilings (translucent overlays)
     renderCeilings(fc, ceilings, scale, origin, selectedIds);
@@ -196,7 +212,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // Hotfix #2 — record the tool we just activated so the next redraw can
     // tell whether activeTool changed (affects the drag short-circuit above).
     prevActiveToolRef.current = activeTool as ToolType;
-  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog]);
+  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog, productImageTick]);
 
   // Init canvas
   useEffect(() => {

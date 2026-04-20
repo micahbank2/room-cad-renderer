@@ -803,7 +803,8 @@ export function renderProducts(
   productLibrary: Product[],
   scale: number,
   origin: { x: number; y: number },
-  selectedIds: string[]
+  selectedIds: string[],
+  onImageReady?: () => void,
 ) {
   for (const pp of Object.values(placedProducts)) {
     const product = productLibrary.find((p) => p.id === pp.productId);
@@ -867,7 +868,13 @@ export function renderProducts(
 
     // Async image loading via cache — only for real products with images
     if (!showPlaceholder && product!.imageUrl) {
-      const cachedImg = getCachedImage(product!.id, product!.imageUrl, () => fc.renderAll());
+      const cachedImg = getCachedImage(product!.id, product!.imageUrl, () => {
+        // fc.renderAll() repaints existing objects; onImageReady signals the
+        // caller (FabricCanvas) to re-invoke renderProducts so the Group
+        // rebuilds and includes the newly-cached FabricImage child (FIX-01).
+        fc.renderAll();
+        onImageReady?.();
+      });
       if (cachedImg) {
         const fImg = new fabric.FabricImage(cachedImg, {
           scaleX: pw / cachedImg.naturalWidth,

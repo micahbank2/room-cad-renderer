@@ -65,21 +65,34 @@ describe("renderProducts async image load (FIX-01)", () => {
       },
     };
 
+    // Simulate what FabricCanvas.redraw() does: on each pass, clear the canvas
+    // and re-invoke renderProducts. The onImageReady callback stands in for
+    // the React tick state change that triggers the next redraw.
+    let tick = 0;
+    const doRender = () => {
+      fc.clear();
+      renderProducts(
+        fc,
+        placedProducts as never,
+        productLibrary as never,
+        20,
+        { x: 0, y: 0 },
+        [],
+        () => {
+          tick++;
+          doRender();
+        }
+      );
+    };
+
     // First render — image cache miss, Group built WITHOUT FabricImage
-    renderProducts(
-      fc,
-      placedProducts as never,
-      productLibrary as never,
-      20,
-      { x: 0, y: 0 },
-      []
-    );
+    doRender();
 
-    // Wait for MockImage onload → cache onReady → fc.renderAll()
-    await new Promise((r) => setTimeout(r, 20));
+    // Wait for MockImage onload → cache onReady → onImageReady → re-render
+    await new Promise((r) => setTimeout(r, 30));
 
-    // Assertion: the product Group MUST now contain a FabricImage child.
-    // RED — Pitfall 1 from 26-RESEARCH.md: fc.renderAll() alone does not rebuild the Group.
+    // Assertion: the product Group MUST now contain a FabricImage child
+    // because the onImageReady callback triggered a Group rebuild.
     const group = fc.getObjects().find(
       (o: fabric.Object) => {
         const data = (o as { data?: { type?: string; placedProductId?: string } }).data;
@@ -92,5 +105,6 @@ describe("renderProducts async image load (FIX-01)", () => {
       .getObjects()
       .some((child: fabric.Object) => child instanceof fabric.FabricImage);
     expect(hasImage).toBe(true);
+    expect(tick).toBeGreaterThanOrEqual(1);
   });
 });
