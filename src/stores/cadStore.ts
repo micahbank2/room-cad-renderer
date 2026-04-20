@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { produce } from "immer";
+import { produce, current, isDraft } from "immer";
 import type {
   Room,
   WallSegment,
@@ -95,22 +95,40 @@ interface CADState {
   switchRoom: (id: string) => void;
 }
 
+// `snapshot` runs inside Immer `produce` blocks (via `pushHistory`), so the
+// incoming slices are draft Proxies. `structuredClone` throws DataCloneError
+// on Proxies, so we normalize via Immer `current(...)` first. `current` on a
+// non-draft is a no-op; this keeps the helper safe for direct calls too.
+function toPlain<T>(value: T): T {
+  return isDraft(value) ? (current(value as object) as T) : value;
+}
+
 function snapshot(state: CADState): CADSnapshot {
   const root = state as any;
-  return {
+  const t0 = import.meta.env.DEV ? performance.now() : 0;
+  const snap: CADSnapshot = {
     version: 2,
-    rooms: JSON.parse(JSON.stringify(state.rooms)),
+    rooms: structuredClone(toPlain(state.rooms)),
     activeRoomId: state.activeRoomId,
     ...(root.customElements
-      ? { customElements: JSON.parse(JSON.stringify(root.customElements)) }
+      ? { customElements: structuredClone(toPlain(root.customElements)) }
       : {}),
     ...(root.customPaints
-      ? { customPaints: JSON.parse(JSON.stringify(root.customPaints)) }
+      ? { customPaints: structuredClone(toPlain(root.customPaints)) }
       : {}),
     ...(root.recentPaints
       ? { recentPaints: [...root.recentPaints] }
       : {}),
   };
+  if (import.meta.env.DEV) {
+    const dt = performance.now() - t0;
+    // Sampled logging: only surface snapshots that could matter for perf.
+    if (dt > 2) {
+      // eslint-disable-next-line no-console
+      console.log(`[cadStore] snapshot ${dt.toFixed(2)}ms`);
+    }
+  }
+  return snap;
 }
 
 function pushHistory(state: CADState): void {
