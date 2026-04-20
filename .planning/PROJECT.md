@@ -12,9 +12,7 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
-**Phase 25 (Canvas & Store Performance) shipped 2026-04-20.** Drag fast-path landed: `renderOnAddRemove: false`, mouse:move mutates only the Fabric object, single store commit on mouse:up. DevTools trace over 47.7s of active dragging shows ~99.9% clean frames (2-3 jank out of ~2,800). `snapshot()` migrated to `structuredClone(toPlain(...))` per D-07 — Immer-draft unwrap necessary, and the measured result is ~1.25× *slower* than JSON roundtrip at 50-200 walls (absolute <0.3ms, non-user-visible). Two runtime hotfixes caught by manual smoke: H1 (selectedIds redraw destroyed drag) and H2 (tool-switch revert broken by H1) both landed with jsdom regression tests in `tests/dragIntegration.test.ts`. Test baseline 168 → 179 passing (+11 new tests across Wave 0 scaffolding + hotfix regression suites). Same 6 pre-existing failures unrelated to Phase 25 footprint.
-
-**Phase 24 (Tool Architecture Refactor) shipped 2026-04-19.** First phase of v1.5 complete — 18 `(fc as any).__xToolCleanup` casts eliminated, all 6 tools converted to cleanup-fn return pattern with closure state, `pxToFeet` + `findClosestWall` consolidated into `src/canvas/tools/toolUtils.ts` (107 lines of duplication deleted). Added `tests/toolCleanup.test.ts` with 6 listener-leak regression cases. Test baseline maintained at 168 passing (+6 new), same 6 pre-existing failures unrelated to tools. D-13 manual smoke user-approved.
+**v1.5 Performance & Tech Debt shipped 2026-04-20.** 4 phases, 15 plans. Tool architecture refactored (18 `(fc as any).__xToolCleanup` casts eliminated, closure state across all 6 tools, shared `toolUtils.ts`). Drag fast-path landed (`renderOnAddRemove: false`, mid-drag Fabric-only mutation, single commit on mouse:up — DevTools ~99.9% clean frames over 47.7s). `cadStore.snapshot()` migrated to `structuredClone(toPlain(...))` — D-07 contract met; ≥2× speedup target missed at tested scales (~1.25× slower due to Immer-draft unwrap) but absolute latency <0.3ms, non-user-visible (accepted as tech debt). Both bugs fixed: product thumbnail async render (#42 closed) and ceiling preset material closed as perception-only Outcome A with regression guards (#43 closed). R3F v9 / React 19 upgrade documented in `.planning/codebase/CONCERNS.md` and tracked on GH #56 (execution deferred until R3F v9 stabilizes). Test baseline grew 168 → 191 passing; same 6 pre-existing failures unrelated.
 
 **v1.4 shipped 2026-04-08.** All 6 deferred v1.3 verification gaps closed: wainscot inline edit via `WainscotPopover` + FabricCanvas dblclick, frame color override with single-undo pattern, sidebar scroll fix via `min-h-0`, copy-side action verified with unit tests. Label cleanup removed ~125 underscores from user-facing display text across 30+ files while preserving code identifiers (Obsidian CAD display/identifier separation convention established). Plus 10 Jess Feedback bugs fixed in parallel via PR #39 (welcome screen, wall/ceiling drag, product persistence, wall side alignment).
 
@@ -28,23 +26,17 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 See `.planning/ROADMAP.md` for links to each milestone archive.
 
-## Current Milestone: v1.5 Performance & Tech Debt
+## Next Milestone Goals
 
-**Goal:** Make the app feel smoother as scenes grow and close the highest-friction tech debt and bug debt before adding more features.
+v1.6 not yet scoped. Candidate directions based on current user feedback and backlog:
+- Drag-to-resize UX (GH #60)
+- WOOD_PLANK PBR realism enhancement (GH #61)
+- Editable dimension labels (double-click on canvas)
+- Camera presets (eye-level, top-down)
+- Auto-save debounce tuning
+- GLTF/OBJ model loading (if Jessica's workflow demands it)
 
-**Target items:**
-- Canvas full-redraw → incremental updates (perf)
-- `JSON.parse(JSON.stringify())` → `structuredClone()` in cadStore snapshots (perf)
-- Tool cleanup off `(fc as any).__xToolCleanup` pattern (type-safety)
-- Tool state from module-level singletons → closures (multi-canvas safety)
-- Extract `pxToFeet` + `findClosestWall` to shared `toolUtils.ts` (DRY)
-- R3F v9 / React 19 upgrade tracking
-- Bug: 2D async product image rendering (#42)
-- Bug: Ceiling preset-id path (#43)
-
-**Source issues:** [#42](https://github.com/micahbank2/room-cad-renderer/issues/42), [#43](https://github.com/micahbank2/room-cad-renderer/issues/43), [#51](https://github.com/micahbank2/room-cad-renderer/issues/51), [#52](https://github.com/micahbank2/room-cad-renderer/issues/52), [#53](https://github.com/micahbank2/room-cad-renderer/issues/53), [#54](https://github.com/micahbank2/room-cad-renderer/issues/54), [#55](https://github.com/micahbank2/room-cad-renderer/issues/55), [#56](https://github.com/micahbank2/room-cad-renderer/issues/56)
-
-**Success criteria:** Identical UX, measurably better perf (60fps drag at 50 walls / 30 products), zero `as any` casts on Fabric instances, both bugs verified end-to-end.
+Run `/gsd:new-milestone` to define v1.6 requirements.
 
 ## Target User
 
@@ -57,7 +49,7 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - Jessica wants HER products in HER rooms at the right scale
 - "Feel the space" matters as much as "does it fit"
 - Desktop-first (laptop/monitor). iPad is future wishlist, not v1.
-- Codebase is ~13,987 LOC TypeScript across React 18 + Fabric.js + Three.js + Zustand (as of v1.4)
+- Codebase is ~14,355 LOC TypeScript across React 18 + Fabric.js + Three.js + Zustand (as of v1.5)
 
 ## Requirements
 
@@ -137,21 +129,20 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - ✓ All user-facing labels display spaces instead of underscores (LABEL-01, Phase 23)
 - ✓ Dynamic label transforms use space-preserving format (LABEL-02, Phase 23)
 
-**v1.5 Milestone (in progress) — Phase 24 shipped 2026-04-19, Phase 25 shipped 2026-04-20:**
+**v1.5 Milestone (shipped 2026-04-20) — 7 complete, 1 partial:**
 
 - ✓ Tool cleanup uses type-safe pattern (no `(fc as any).__xToolCleanup` — activate returns cleanup fn, held in useRef) (TOOL-01, Phase 24)
 - ✓ Tool state held in closures, not module-level singletons (3 wrapper interfaces dissolved) (TOOL-02, Phase 24)
 - ✓ `pxToFeet` + `findClosestWall` extracted to shared `src/canvas/tools/toolUtils.ts` (6 duplicates consolidated) (TOOL-03, Phase 24)
 - ✓ Drag fast-path: mouse:move mutates Fabric object only, single store commit on mouse:up (`renderOnAddRemove: false`) — DevTools trace shows ~99.9% clean frames during drag (PERF-01, Phase 25)
-- ✓ `cadStore.snapshot()` uses `structuredClone(toPlain(...))` per D-07 contract — 0 `JSON.parse(JSON.stringify)` remain (PERF-02, Phase 25) **Note:** ≥2× speedup target not met at tested scales (actually ~1.25× slower due to Immer draft unwrap cost), but absolute latency <0.3ms — never user-visible. See `.planning/phases/25-canvas-store-performance/25-VERIFICATION.md`.
+- ⚠ `cadStore.snapshot()` uses `structuredClone(toPlain(...))` per D-07 contract — 0 `JSON.parse(JSON.stringify)` remain (PERF-02, Phase 25) **Partial:** ≥2× speedup target not met at tested scales (~1.25× slower due to Immer draft unwrap cost), absolute latency <0.3ms — never user-visible. See `milestones/v1.5-MILESTONE-AUDIT.md` and `.planning/phases/25-canvas-store-performance/25-VERIFICATION.md`.
+- ✓ Product thumbnails render in 2D canvas on async image load via `productImageTick` + Group rebuild (FIX-01 / #42, Phase 26)
+- ✓ Ceiling preset material bug closed as Outcome A — perception-only (PLASTER vs PAINTED_DRYWALL below JND); 4 regression guards locked the round-trip (FIX-02 / #43, Phase 26)
+- ✓ R3F v9 / React 19 upgrade path documented in `.planning/codebase/CONCERNS.md § R3F v9 / React 19 Upgrade` and tracked on GH #56 (TRACK-01, Phase 27) — execution deferred until R3F v9 stabilizes
 
 ### Active
 
-**v1.5 Milestone — Performance & Tech Debt** (Phase 24 + 25 shipped; 26-27 pending)
-
-- [ ] **TRACK-01**: R3F v9 / React 19 upgrade path documented and tracked
-- [ ] **FIX-01**: Product images render in 2D canvas (async load)
-- [ ] **FIX-02**: Ceiling preset materials apply correctly in `CeilingMesh`
+None. Next milestone not yet scoped — run `/gsd:new-milestone` to define v1.6.
 
 ### Out of Scope
 
@@ -188,6 +179,11 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 | Extend existing dblclick useEffect for wainscot popover (shared with dim-label editor) | Avoids handler collision; dim-label hit test returns early, wainscot check only runs when no label hit. | ✓ Good — canvas inline editor pattern established |
 | Display-vs-identifier separation in Obsidian CAD theme | Display text gets spaces (ALL CAPS preserved); underscores reserved for code keys, CSS classes, test IDs, data attrs. | ✓ Locked convention |
 | Integration checker substitutes for VERIFICATION.md when retrofit | Audit trail completeness not worth rebuilding if code is wired correctly and the agent-level check passes. | — Pending — use sparingly; prefer formal verification at execute-time |
+| Closure-scoped tool state (v1.5, Phase 24) | Module-level singletons risked cross-canvas bleed; closures make per-activation state the default. Public-API bridges (pendingProductId, _productLibrary) intentionally kept module-scoped per D-07. | ✓ Good — 3 wrapper interfaces dissolved; leak-regression tests lock behavior |
+| Drag fast-path bypasses store mid-drag (v1.5, Phase 25, D-01..D-06) | Per-frame store commits blew 60fps at realistic scene sizes; Fabric-only mutation + single mouseup commit keeps undo/redo behavior and paints clean frames. | ✓ Good — ~99.9% clean frames over 47.7s drag, single undo entry per op |
+| `structuredClone(toPlain(...))` snapshots (v1.5, Phase 25, D-07) | Cleaner than JSON roundtrip semantically (handles Dates, Maps in principle) and standards-aligned. Immer drafts require `current()`-normalization before clone. | ⚠ Partial — contract met, ≥2× speedup target missed (~1.25× slower at 50W/30P). Absolute latency <0.3ms — not user-visible. Accepted tech debt. |
+| FIX-02 closed as perception-only Outcome A (v1.5, Phase 26) | End-to-end code path verified correct; PLASTER #f0ebe0 vs PAINTED_DRYWALL #f5f5f5 differ ~3 L* — below JND. Regression guards added to lock the store setter → snapshot → JSON round-trip contract. | ✓ Good — GH #43 closed, 4 new tests |
+| R3F v9 / React 19 upgrade: document now, execute later (v1.5, Phase 27, D-02) | Target majors locked (^9 R3F, ^10 drei, ^19 React); upgrade is documentation-only until R3F v9 stabilizes out of beta. | ✓ Good — CONCERNS.md single source of truth, GH #56 as persistent tracker |
 
 ## Tech Stack (Current)
 
@@ -197,7 +193,7 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - Zustand v5 + Immer (cadStore + uiStore + productStore + projectStore, undo/redo, auto-save)
 - Tailwind CSS v4 (styling, Obsidian CAD theme inline in index.css)
 - idb-keyval (IndexedDB persistence — projects + product library)
-- Vitest + jsdom + @testing-library (115 tests + 3 todo)
+- Vitest + jsdom + @testing-library (191 passing tests + 3 todo; 6 pre-existing unrelated failures)
 - IBM Plex Mono + Space Grotesk + Inter (typography)
 - Material Symbols Outlined (icons)
 
@@ -219,4 +215,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-20 — Phase 25 (Canvas & Store Performance) complete, 5/8 v1.5 requirements shipped*
+*Last updated: 2026-04-20 after v1.5 milestone — 7/8 requirements complete (PERF-02 speedup partial, accepted as tech debt)*

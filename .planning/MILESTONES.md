@@ -1,5 +1,34 @@
 # Milestones — Room CAD Renderer
 
+## v1.5 — Performance & Tech Debt ✅
+
+**Shipped:** 2026-04-20
+**Timeline:** 2026-04-17 → 2026-04-20 (~3 days)
+**Phases:** 4 (24, 25, 26, 27) — 15 plans — 31 tasks
+**Files changed:** 18 source files (+2,322 / −826 LOC) | **LOC:** ~14,355 TypeScript
+**Git range:** `38002c5` (Phase 24 Wave 0) → `6d9dafc` (v1.5 milestone audit)
+**Tag:** `v1.5`
+
+**Delivered:** Interactions feel smoother at realistic scene sizes — drag a product through 50 walls / 30 products and DevTools traces ~99.9% clean frames over 47+ seconds of active dragging. Canvas tool code is type-safe (zero `(fc as any)` casts), state-isolated in closures, and DRY (shared `toolUtils.ts`). Product thumbnails now appear in the 2D canvas the instant their image finishes loading, and the R3F v9 / React 19 upgrade path is documented end-to-end so the upgrade can be executed when upstream stabilizes.
+
+**Key accomplishments:**
+
+1. **Tool architecture refactor (Phase 24)** — 18 `(fc as any).__xToolCleanup` casts eliminated, all 6 tools converted to `() => void` cleanup-fn return pattern with per-activation closure state, `pxToFeet` + `findClosestWall` consolidated into `src/canvas/tools/toolUtils.ts` (107 duplicated lines deleted). 6 new listener-leak regression tests in `tests/toolCleanup.test.ts` lock the behavior. (TOOL-01/02/03)
+2. **Drag fast-path (Phase 25, PERF-01)** — `renderOnAddRemove: false`, 4 drag operations (product move incl. custom, wall move, wall endpoint, product rotation) mutate Fabric only mid-drag and commit exactly once on `mouse:up`; tool-switch mid-drag reverts cleanly. DevTools trace: ~99.9% clean frames over 47.7s continuous drag at 50W/30P.
+3. **structuredClone snapshots (Phase 25, PERF-02)** — `cadStore.snapshot()` migrated from 3× `JSON.parse(JSON.stringify(...))` to `structuredClone(toPlain(...))` with Immer-draft normalization + dev-gated `>2ms` timing sampler. D-07 contract met; undo/redo semantics byte-for-byte identical.
+4. **Product thumbnail async-render fix (Phase 26, FIX-01)** — `productImageCache.onReady` now bumps a React tick that triggers a product Group rebuild via `renderProducts`, so thumbnails appear within one render cycle of the image load without touching cache internals. Closes GH #42.
+5. **Ceiling preset material resolved (Phase 26, FIX-02)** — closed as **Outcome A (perception-only)**: PLASTER `#f0ebe0` vs PAINTED_DRYWALL `#f5f5f5` differ ~3 L* (below Just-Noticeable-Difference). End-to-end code path verified correct; 4 store-integration regression guards added to lock the `setSurfaceMaterialId` → snapshot → JSON round-trip. Closes GH #43.
+6. **R3F v9 / React 19 upgrade tracking (Phase 27, TRACK-01)** — 105-line `## R3F v9 / React 19 Upgrade` section appended to `.planning/codebase/CONCERNS.md` with pinned versions, target majors (`^9.0.0` R3F / `^10.0.0` drei / `^19.0.0` React), upgrade sequence, upstream blocker status, affected files, citations. `React 18 downgrade` Tech Debt bullet rewritten as a pointer. GH #56 updated with dated upgrade-plan comment; issue stays OPEN as persistent tracker.
+7. **Test baseline growth** — 168 passing → 191 passing (+23 new tests: 6 listener-leak, 7 Wave-0 contracts for PERF, 3 drag-integration for hotfixes, 4 ceiling-material persistence, 3 product-image onReady). Same 6 pre-existing unrelated failures throughout.
+
+### Known Gaps (Accepted)
+
+- **PERF-02 speedup target missed** — D-07 contract met (zero `JSON.parse(JSON.stringify)` in snapshot body) but the ≥2× speedup goal was not achieved at the tested scales. Measured 0.80× ratio (≈1.25× slower) at 50 walls / 30 products. Root cause: V8's JSON fast path is highly optimized, and Immer-draft `toPlain()` unwrap adds overhead. Absolute latency remains <0.3ms/call even at 200W/100P — **never user-visible**. Accepted as tech debt; documented in `milestones/v1.5-MILESTONE-AUDIT.md` and `phases/25-canvas-store-performance/25-VERIFICATION.md`. No plan to revisit unless snapshot cost becomes user-visible at future scene sizes.
+- **R3F v9 / React 19 execution deferred** — documentation shipped in v1.5 (TRACK-01 complete); the upgrade itself is deferred until R3F v9 exits beta per D-02. Tracked on GH #56.
+- **Traceability table drift (cosmetic)** — archive `milestones/v1.5-REQUIREMENTS.md` preserves "Pending" strings in the Traceability table for TOOL-01/02/03 and TRACK-01 even though all have `[x]` checkboxes and passed VERIFICATION.md. Audit called this out; no functional impact.
+
+---
+
 ## v1.4 — Polish & Tech Debt ✅
 
 **Shipped:** 2026-04-08 (archived 2026-04-18)
