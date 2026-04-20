@@ -971,3 +971,83 @@ export function getActiveRoomDoc(): RoomDoc | undefined {
 export function resetCADStoreForTests(): void {
   useCADStore.setState(initialState() as Partial<CADState>);
 }
+
+// ─────────────────────────────────────────────────────────────────────
+// Dev-only perf helpers (D-09, D-11) — stripped from production builds
+// by Vite tree-shaking of the `import.meta.env.DEV` branch.
+//
+// window.__cadSeed(wallCount, productCount)
+//   Seeds the active room with N walls + M placed products for the
+//   canonical 50/30 benchmark scene. Walls arranged in a grid; products
+//   arranged in a grid inside the room. Resets past/future so bench
+//   timings aren't distorted by pre-existing history.
+//
+// window.__cadBench(iterations)
+//   Runs snapshot() N times on the current state, returns { mean, p95,
+//   samples } in milliseconds. Used by D-10 evidence bundle to prove
+//   PERF-02 (snapshot ≥2× faster at 50W/30P).
+// ─────────────────────────────────────────────────────────────────────
+if (import.meta.env.DEV) {
+  (window as unknown as Record<string, unknown>).__cadSeed = (
+    wallCount = 50,
+    productCount = 30,
+  ) => {
+    const store = useCADStore.getState();
+    const doc = store.activeRoomId ? store.rooms[store.activeRoomId] : undefined;
+    if (!doc) return { walls: 0, products: 0, error: "no active room" };
+    // Reset past/future so bench timings aren't distorted by old history
+    useCADStore.setState({ past: [], future: [] } as Partial<CADState>);
+    // Seed walls + products via direct mutation (dev-only; bypasses history).
+    useCADStore.setState(
+      produce((s: CADState) => {
+        const d = s.activeRoomId ? s.rooms[s.activeRoomId] : undefined;
+        if (!d) return;
+        for (let i = 0; i < wallCount; i++) {
+          const id = `wall_seed_${i}`;
+          const x = (i % 10) * 1.5;
+          const y = Math.floor(i / 10) * 1.5;
+          d.walls[id] = {
+            id,
+            start: { x, y },
+            end: { x: x + 1, y },
+            thickness: 0.5,
+            height: d.room.wallHeight,
+            openings: [],
+          };
+        }
+        for (let i = 0; i < productCount; i++) {
+          const id = `pp_seed_${i}`;
+          const x = 2 + (i % 6) * 2;
+          const y = 2 + Math.floor(i / 6) * 2;
+          d.placedProducts[id] = {
+            id,
+            productId: "seed_product",
+            position: { x, y },
+            rotation: 0,
+          } as PlacedProduct;
+        }
+      }) as (s: CADState) => void,
+    );
+    return { walls: wallCount, products: productCount };
+  };
+
+  (window as unknown as Record<string, unknown>).__cadBench = (
+    iterations = 100,
+  ) => {
+    const state = useCADStore.getState();
+    const samples: number[] = [];
+    for (let i = 0; i < iterations; i++) {
+      const t0 = performance.now();
+      snapshot(state);
+      samples.push(performance.now() - t0);
+    }
+    samples.sort((a, b) => a - b);
+    const mean = samples.reduce((s, x) => s + x, 0) / samples.length;
+    const p95 = samples[Math.floor(samples.length * 0.95)];
+    // eslint-disable-next-line no-console
+    console.log(
+      `[__cadBench] n=${iterations} mean=${mean.toFixed(2)}ms p95=${p95.toFixed(2)}ms`,
+    );
+    return { mean, p95, samples };
+  };
+}
