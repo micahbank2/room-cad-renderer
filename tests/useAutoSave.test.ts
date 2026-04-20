@@ -3,6 +3,7 @@ import { renderHook } from "@testing-library/react";
 
 vi.mock("@/lib/serialization", () => ({
   saveProject: vi.fn().mockResolvedValue(undefined),
+  setLastProjectId: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { useAutoSave, DEBOUNCE_MS, FADE_MS } from "@/hooks/useAutoSave";

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useCADStore } from "@/stores/cadStore";
 import { useProjectStore } from "@/stores/projectStore";
-import { saveProject } from "@/lib/serialization";
+import { saveProject, setLastProjectId } from "@/lib/serialization";
 import { uid } from "@/lib/geometry";
 
 export const DEBOUNCE_MS = 2000;
@@ -32,6 +32,11 @@ export function useAutoSave(): void {
             activeRoomId: st.activeRoomId,
             ...(st.customElements ? { customElements: st.customElements } : {}),
           });
+          // D-02b: write last-active pointer after successful project write,
+          // before the SAVED status flip. If this fails, the catch branch
+          // fires and surfaces SAVE_FAILED (pointer mismatch = Jessica's
+          // reload won't restore, so treat as failed).
+          await setLastProjectId(id);
           useProjectStore.getState().setSaveStatus("saved");
           if (fadeTimer) clearTimeout(fadeTimer);
           fadeTimer = setTimeout(() => {
