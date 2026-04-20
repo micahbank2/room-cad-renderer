@@ -57,7 +57,7 @@
 ### Phases
 
 - [x] **Phase 24: Tool Architecture Refactor** — Eliminate `as any` casts, move state to closures, extract shared utilities (shipped 2026-04-18)
-- [ ] **Phase 25: Canvas & Store Performance** — Incremental canvas updates, faster cadStore snapshots
+- [x] **Phase 25: Canvas & Store Performance** — Incremental canvas updates, faster cadStore snapshots (completed 2026-04-20)
 - [ ] **Phase 26: Bug Sweep** — Fix async product images in 2D canvas and ceiling preset material path
 - [ ] **Phase 27: Upgrade Tracking** — Document R3F v9 / React 19 upgrade path
 
@@ -121,6 +121,6 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 24. Tool Architecture Refactor | 4/4 | Complete    | 2026-04-19 |
-| 25. Canvas & Store Performance | 4/4 | In Progress|  |
+| 25. Canvas & Store Performance | 4/4 | Complete    | 2026-04-20 |
 | 26. Bug Sweep | 0/? | Not started | - |
 | 27. Upgrade Tracking | 0/? | Not started | - |
