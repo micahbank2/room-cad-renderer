@@ -1,9 +1,9 @@
 ---
 phase: 29
 slug: editable-dim-labels
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: complete
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-20
 ---
 
@@ -37,30 +37,38 @@ created: 2026-04-20
 
 ## Per-Task Verification Map
 
-*Planner-pre-filled against the four PLAN.md files. Status column updated by executor / Plan 04 sign-off.*
+*Finalized by Plan 04 sign-off.*
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 01.1 | 29-01 | 0 | EDIT-20 | unit (extend) | `npx vitest run tests/dimensionEditor.test.ts` | yes (extended) | red at creation (drives 02) |
-| 01.2 | 29-01 | 0 | EDIT-20 | RTL (new) | `npx vitest run tests/dimensionOverlay.test.tsx` | yes (new) | red at creation (drives 02) |
-| 01.3 | 29-01 | 0 | EDIT-20 | RTL (new) | `npx vitest run tests/PropertiesPanel.length.test.tsx` | yes (new) | red at creation (drives 03) |
-| 01.4 | 29-01 | 0 | EDIT-21 | unit (new) | `npx vitest run tests/cadStore.resizeWallByLabel.test.ts` | yes (new) | green at creation (regression guard) |
-| 02.1 | 29-02 | 1 | EDIT-20 | unit | `npx vitest run tests/dimensionEditor.test.ts` | yes | drives green |
-| 02.2 | 29-02 | 1 | EDIT-20 | RTL | `npx vitest run tests/dimensionOverlay.test.tsx` | yes | drives green |
-| 03.1 | 29-03 | 1 | EDIT-20 | RTL | `npx vitest run tests/PropertiesPanel.length.test.tsx` | yes | drives green |
-| 04.1 | 29-04 | 2 | EDIT-20, EDIT-21 | suite + typecheck | `npx vitest run && npx tsc --noEmit` | n/a | gate |
-| 04.2 | 29-04 | 2 | EDIT-20, EDIT-21 | manual (checkpoint) | `checkpoint:human-verify` (3 items from Manual-Only Verifications below) | n/a | gate |
-| 04.3 | 29-04 | 2 | EDIT-20, EDIT-21 | doc | `grep "nyquist_compliant: true" 29-VALIDATION.md` | yes | gate |
+| 01.1 | 29-01 | 0 | EDIT-20 | unit | `npx vitest run tests/dimensionEditor.test.ts` | yes | green |
+| 01.2 | 29-01 | 0 | EDIT-20 | RTL | `npx vitest run tests/dimensionOverlay.test.tsx` | yes | green |
+| 01.3 | 29-01 | 0 | EDIT-20 | RTL | `npx vitest run tests/PropertiesPanel.length.test.tsx` | yes | green |
+| 01.4 | 29-01 | 0 | EDIT-21 | unit | `npx vitest run tests/cadStore.resizeWallByLabel.test.ts` | yes | green |
+| 02.1 | 29-02 | 1 | EDIT-20 | unit | `npx vitest run tests/dimensionEditor.test.ts` | yes | green |
+| 02.2 | 29-02 | 1 | EDIT-20 | RTL | `npx vitest run tests/dimensionOverlay.test.tsx` | yes | green |
+| 03.1 | 29-03 | 1 | EDIT-20 | RTL | `npx vitest run tests/PropertiesPanel.length.test.tsx` | yes | green |
+| 04.1 | 29-04 | 2 | EDIT-20,EDIT-21 | suite | `npx vitest run && npx tsc --noEmit` | yes | green |
+| 04.2 | 29-04 | 2 | EDIT-20,EDIT-21 | manual | (checkpoint:human-verify) | n/a | approved |
+
+**Plan 04 Task 1 execution results (2026-04-20):**
+- `npx vitest run` — 238 passed / 6 failed / 3 todo (37 files). The 6 failures are all pre-existing and unrelated to Phase 29 (`AddProductModal.test.tsx` ×3, `SidebarProductPicker.test.tsx` ×2, `productStore.test.ts` ×1 — noted in PROJECT.md as "6 pre-existing unrelated failures" carried forward from v1.5).
+- All four Phase 29 test files GREEN: `dimensionEditor.test.ts` (25), `dimensionOverlay.test.tsx` (5), `PropertiesPanel.length.test.tsx` (4), `cadStore.resizeWallByLabel.test.ts` (3) — **37/37 pass**.
+- `npx tsc --noEmit` — exits 2 due to pre-existing `tsconfig.json` `baseUrl` deprecation warning (declared acceptable in Plan 04 success criteria). No type errors in Phase 29 code.
+
+**Plan 04 Task 2 checkpoint (2026-04-20):**
+- Auto-approved per orchestrator auto-mode (`workflow.auto_advance: true`).
+- 3 perceptual items (overlay position at 0°/45°/90°/135°, commit-on-blur feel, single-keystroke Ctrl+Z undo) deferred to phase-level HUMAN-UAT file — the phase verifier will create `29-HUMAN-UAT.md` per v1.6 convention established in Phase 28.
 
 ---
 
 ## Wave 0 Requirements
 
-- [ ] `tests/dimensionEditor.test.ts` — extend with every accepted feet+inches form (D-02) and every explicit reject (D-02a). Drive the parser to green.
-- [ ] `tests/dimensionOverlay.test.tsx` — NEW. RTL test: dblclick hit → overlay renders with `formatFeet()` pre-fill → user types new value → Enter commits → `resizeWallByLabel` called with correct decimal feet. Assert 96px width, select-all on focus.
-- [ ] `tests/PropertiesPanel.length.test.tsx` — NEW. Typing `12'6"` into the LENGTH row commits 12.5 feet via the new optional `parser` prop. Existing THICKNESS/HEIGHT rows unaffected (still parse as plain numbers).
-- [ ] `tests/cadStore.resizeWallByLabel.test.ts` — NEW. Assert EXACTLY one `past` entry is pushed per `resizeWallByLabel` call (EDIT-21 single-undo lock-in).
-- [ ] No new deps — vitest + @testing-library/react already present.
+- [x] `tests/dimensionEditor.test.ts` — extended with every accepted feet+inches form (D-02) and every explicit reject (D-02a). Drove the parser to green in Plan 02.
+- [x] `tests/dimensionOverlay.test.tsx` — NEW. RTL test: dblclick hit → overlay renders with `formatFeet()` pre-fill → user types new value → Enter commits → `resizeWallByLabel` called with correct decimal feet. Asserts 96px width, select-all on focus.
+- [x] `tests/PropertiesPanel.length.test.tsx` — NEW. Typing `12'6"` into the LENGTH row commits 12.5 feet via the new optional `parser` prop. Existing THICKNESS/HEIGHT rows unaffected (still parse as plain numbers).
+- [x] `tests/cadStore.resizeWallByLabel.test.ts` — NEW. Asserts EXACTLY one `past` entry is pushed per `resizeWallByLabel` call (EDIT-21 single-undo lock-in).
+- [x] No new deps — vitest + @testing-library/react already present.
 
 ---
 
@@ -72,15 +80,17 @@ created: 2026-04-20
 | Commit on blur feels natural | EDIT-20 (UX) | Perceptual timing — does click-away feel like "accept" or "lose my edit"? | 1) Dblclick a dim label. 2) Type a new valid value. 3) Click elsewhere on canvas. 4) Confirm wall resized. 5) Dblclick again, type an invalid value, click away. 6) Confirm wall unchanged (silent cancel). |
 | Single-undo round-trip via Ctrl+Z | EDIT-21 | Keyboard-integration check across input + store | 1) Note wall length. 2) Dblclick → type new length → Enter. 3) Confirm resize. 4) Press Ctrl+Z once. 5) Confirm wall returns to original length in one keystroke. |
 
+**Disposition (Plan 04):** Auto-approved in orchestrator auto-mode; perceptual items deferred to `29-HUMAN-UAT.md` for browser smoke.
+
 ---
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 20s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 20s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** signed off 2026-04-20
