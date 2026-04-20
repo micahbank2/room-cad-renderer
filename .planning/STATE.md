@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Editing UX
-status: verifying
-stopped_at: Phase 29 context gathered
-last_updated: "2026-04-20T21:38:29.433Z"
+status: executing
+stopped_at: Completed 29-01-PLAN.md
+last_updated: "2026-04-20T21:55:47.570Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 9
+  completed_plans: 6
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 28 — auto-save
+**Current focus:** Phase 29 — editable-dim-labels
 
 ## Current Position
 
 Milestone: v1.6 Editing UX
-Phase: 29
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 29 (editable-dim-labels) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
 Last activity: 2026-04-20
 
 [░░░░░░░░░░] 0% (0/4 phases complete)
@@ -43,6 +43,7 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 28-auto-save]: Phase 28 Plan 03: Pointer-based silent restore (D-02/D-02a/D-02b) — single write site in useAutoSave, mount-time read in App.tsx; all 4 App.restore red stubs green; SAVE-05 reload-restore closed
 - [Phase 28-auto-save]: Phase 28 Plan 04: Signed VALIDATION.md (nyquist_compliant true, wave_0_complete true); full vitest 201/6pre-existing/3todo; Phase 28 stubs 10/10 green; manual smoke auto-approved per orchestrator auto-mode, deferred to HUMAN-UAT
 - [Phase 28]: Option A: inline failed branch in ToolbarSaveStatus; leave orphaned SaveIndicator.tsx for follow-up cleanup
+- [Phase 29]: Wave 0 red stubs (4 test files) locked parser grammar, overlay UX, PropertiesPanel LENGTH, and EDIT-21 single-undo guard
 
 ### Pending Todos
 
@@ -61,6 +62,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-20T21:38:29.426Z
-Stopped at: Phase 29 context gathered
-Resume file: .planning/phases/29-editable-dim-labels/29-CONTEXT.md
+Last session: 2026-04-20T21:55:47.568Z
+Stopped at: Completed 29-01-PLAN.md
+Resume file: None
