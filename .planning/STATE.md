@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Editing UX
 status: verifying
-stopped_at: Completed 28-04-PLAN.md (validation sign-off); Phase 28 closed — ready for phase verifier
-last_updated: "2026-04-20T20:18:58.602Z"
+stopped_at: Completed 28-05-PLAN.md (SAVE_FAILED UI gap closure)
+last_updated: "2026-04-20T21:08:45.502Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 5
+  completed_plans: 5
 ---
 
 # Project State
@@ -42,6 +42,7 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 28-auto-save]: Phase 28 Plan 02: Extended SaveStatus with 'failed', added try/catch + rename trigger to useAutoSave; 6 red stubs green, Phase 25 drag fast-path filter preserved, no ui-store watching
 - [Phase 28-auto-save]: Phase 28 Plan 03: Pointer-based silent restore (D-02/D-02a/D-02b) — single write site in useAutoSave, mount-time read in App.tsx; all 4 App.restore red stubs green; SAVE-05 reload-restore closed
 - [Phase 28-auto-save]: Phase 28 Plan 04: Signed VALIDATION.md (nyquist_compliant true, wave_0_complete true); full vitest 201/6pre-existing/3todo; Phase 28 stubs 10/10 green; manual smoke auto-approved per orchestrator auto-mode, deferred to HUMAN-UAT
+- [Phase 28]: Option A: inline failed branch in ToolbarSaveStatus; leave orphaned SaveIndicator.tsx for follow-up cleanup
 
 ### Pending Todos
 
@@ -60,6 +61,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-20T20:18:58.600Z
-Stopped at: Completed 28-04-PLAN.md (validation sign-off); Phase 28 closed — ready for phase verifier
+Last session: 2026-04-20T21:08:45.499Z
+Stopped at: Completed 28-05-PLAN.md (SAVE_FAILED UI gap closure)
 Resume file: None
