@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance & Tech Debt
-status: verifying
-stopped_at: Phase 25 context gathered
-last_updated: "2026-04-19T23:22:10.553Z"
-last_activity: 2026-04-19
+status: executing
+stopped_at: Completed 25-00-wave0-validation-scaffolding-PLAN.md
+last_updated: "2026-04-20T03:00:44.164Z"
+last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 8
+  completed_plans: 5
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-17)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 24 — tool-architecture-refactor
+**Current focus:** Phase 25 — canvas-store-performance
 
 ## Current Position
 
-Phase: 25
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-04-19
+Phase: 25 (canvas-store-performance) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-04-20
 
 [==========] 0% (0/4 phases complete)
 
@@ -45,6 +45,7 @@ Full log in PROJECT.md Key Decisions table. Recent v1.4 decisions:
 - [Phase 24-tool-architecture-refactor]: Wave 2 atomic commit strategy — Tasks 1+2+3a as one refactor commit (85c21ae) + Task 3b as test-only commit (f8f26aa); per-tool commits would break build mid-bisect
 - [Phase 24-tool-architecture-refactor]: All 18 (fc as any).__xToolCleanup casts eliminated; 4 deferred as any casts in selectTool (on useCADStore/doc per D-10) and 3 in FabricCanvas (fabric event types per D-11) preserved
 - [Phase 24-tool-architecture-refactor]: [Phase 24 closed]: Wave 3 verification complete — automated gate green (2fbeb16), D-13 manual smoke user-approved 2026-04-18, ROADMAP Phase 24 marked [x] + Progress Table 4/4 Complete, CLAUDE.md cleanup-fn pattern docs updated (zero __xToolCleanup refs remain). All 3 TOOL requirements verified.
+- [Phase 25-canvas-store-performance]: Phase 25 Wave 0: 7 RED/GREEN contract tests landed + dev-only window.__cadSeed/__cadBench helpers (gated by import.meta.env.DEV, tree-shaken from prod bundle). Source-level test guards adopted over jsdom runtime simulation.
 
 ### Pending Todos
 
@@ -62,6 +63,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-19T23:22:10.551Z
-Stopped at: Phase 25 context gathered
-Resume file: .planning/phases/25-canvas-store-performance/25-CONTEXT.md
+Last session: 2026-04-20T03:00:44.161Z
+Stopped at: Completed 25-00-wave0-validation-scaffolding-PLAN.md
+Resume file: None
