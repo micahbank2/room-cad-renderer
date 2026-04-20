@@ -45,6 +45,7 @@ requirements-completed: []  # PERF-01 flips complete in Wave 3 after Chrome DevT
 # Metrics
 duration: 6min
 completed: 2026-04-20
+hotfix_applied: 2026-04-20
 ---
 
 # Phase 25 Plan 02: Wave 2 Drag Fast Path Summary
@@ -246,6 +247,94 @@ None.
   - Chrome DevTools Performance trace at 50W/30P showing zero >16.7ms frames during a 5-second drag.
   - `window.__cadBench(100)` before/after ratio for snapshot timing (PERF-02 from Wave 1).
   - Once both pieces of evidence are captured, REQUIREMENTS.md PERF-01 and PERF-02 flip from `[ ]` to `[x]` and the phase is closed.
+
+---
+
+## Hotfix (2026-04-20) — Drag Regression Post-Landing
+
+After the automated test suite confirmed 176/176 green, manual smoke testing
+exposed that the 4 fast-path drag types were broken at runtime. Clicking an
+object correctly selected it, but the object could not be dragged.
+
+### Root Cause
+
+`redraw()` in `src/canvas/FabricCanvas.tsx` had `selectedIds` in its
+`useCallback` dependency array. When `mouse:down` in `selectTool` called
+`useUIStore.getState().select([hit.id])`, the resulting zustand state
+change triggered the redraw effect synchronously. Redraw called `fc.clear()`
+and destroyed every Fabric object — including the one being dragged. A
+fresh `activateSelectTool` then ran against the cleared canvas, starting
+with `dragging=false`. The subsequent `mouse:move` hit its guard and
+no-op'd: no fabric mutation, no store commit, nothing moved.
+
+Wave 2's automated test suite did not catch this because `fabricSync.test.ts`
+and `toolCleanup.test.ts` run source-level assertions against the code shape
+(renderOnAddRemove value, cleanup revert keywords) rather than driving the
+selectTool end-to-end through real Fabric pointer events.
+
+### Fix
+
+Minimal intrusive change: add a module-level `_dragActive` flag in
+`selectTool.ts` (per D-07 public-API bridge convention). The flag is set
+to `true` in `mouse:down` BEFORE calling `select([hit.id])` so the
+subscription-driven redraw sees the flag on its synchronous fire. Flag is
+cleared at the top of `mouse:up` (before the commit store action fires,
+so the store-change-triggered redraw runs normally and paints the final
+selection highlight) and in the cleanup fn.
+
+`FabricCanvas.tsx`'s `redraw()` short-circuits when `isSelectToolDragActive()`
+returns `true`. A `markRedrawSkippedDueToDrag()` + `setSelectToolRedrawCallback()`
+bridge handles the bare-click case (click without drag movement): when
+`mouse:up` fires with no pending commit, the skipped redraw is flushed via
+the registered callback so the selection highlight still paints.
+
+### Regression Test
+
+`tests/dragIntegration.test.ts` (new file) drives selectTool end-to-end
+through real `fc.fire("mouse:down"|"mouse:move"|"mouse:up")` calls and
+mirrors `FabricCanvas`'s `useUIStore(s => s.selectedIds)` subscription
+with a test-local listener that calls `fc.clear()` + `renderProducts()`
+on selectedIds changes. The listener uses `isSelectToolDragActive()` to
+mirror the production guard.
+
+Two cases covered:
+1. **Full drag round-trip:** seed product at (5,5), mouse:down at (5,5),
+   mouse:move to (8,7), mouse:up. Asserts the Fabric object moved,
+   `placedProducts.pp_chair.position` reflects the new coords, and exactly
+   1 history entry was committed.
+2. **Bare click on empty canvas:** pre-selects a product, clicks far
+   outside any object. Asserts selection was cleared.
+
+Verified the first test **FAILS RED** on pre-hotfix code (the simulated
+subscription fires `fc.clear()` during the drag, tracked as
+`simulatedRedraws > 0`) and **PASSES GREEN** after the hotfix.
+
+### Files Modified
+
+- `src/canvas/tools/selectTool.ts` — `_dragActive` flag + `isSelectToolDragActive()` + redraw-callback bridge + `_redrawPending` flush logic; flag sync added to `onMouseDown` (before `select()`), `onMouseUp` (top), and cleanup fn.
+- `src/canvas/FabricCanvas.tsx` — imports new selectTool helpers; `redraw()` short-circuits when drag active; new effect registers `redraw` as the selectTool redraw callback.
+- `tests/dragIntegration.test.ts` — new regression test (2 cases).
+- `tests/setup.ts` — stubbed `setLineDash`/`getLineDash` on the jsdom canvas context to silence unhandled fabric paint errors during the drag integration tests.
+
+### Baseline + Delta
+
+| Metric      | Post Wave 2 | Post Hotfix | Delta |
+| ----------- | ----------- | ----------- | ----- |
+| Total tests | 185         | 187         | +2    |
+| Passing     | 176         | 178         | +2    |
+| Failing     | 6           | 6           | 0     |
+| Todo        | 3           | 3           | 0     |
+
+The 6 pre-existing failures (3× AddProductModal, 2× SidebarProductPicker,
+1× productStore) remain unchanged — outside Phase 25 footprint.
+
+### Phase 25 Status
+
+Wave 3 verification remains in progress. PERF-01 / PERF-02 requirements
+are not yet marked complete. The hotfix does not alter any of the D-01..D-06
+decisions — the fast-path architecture is intact; the fix just closes the
+synchronization gap between the selectTool's drag-start and FabricCanvas's
+subscription-driven redraw.
 
 ---
 
