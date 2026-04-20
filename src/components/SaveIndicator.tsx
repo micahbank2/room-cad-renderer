@@ -3,6 +3,16 @@ import { useProjectStore } from "@/stores/projectStore";
 export default function SaveIndicator() {
   const status = useProjectStore((s) => s.saveStatus);
   if (status === "idle") return null;
+  if (status === "failed") {
+    return (
+      <span
+        data-testid="save-indicator"
+        className="font-mono text-[9px] tracking-widest text-error transition-opacity duration-200"
+      >
+        SAVE_FAILED
+      </span>
+    );
+  }
   if (status === "saving") {
     return (
       <span
