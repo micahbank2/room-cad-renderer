@@ -19,10 +19,11 @@ import { activateWallTool } from "./tools/wallTool";
 import {
   activateSelectTool,
   setSelectToolProductLibrary,
-  isSelectToolDragActive,
+  shouldSkipRedrawDuringDrag,
   markRedrawSkippedDueToDrag,
   setSelectToolRedrawCallback,
 } from "./tools/selectTool";
+import type { ToolType } from "@/types/cad";
 import { activateProductTool } from "./tools/productTool";
 import { activateDoorTool } from "./tools/doorTool";
 import { activateWindowTool } from "./tools/windowTool";
@@ -76,6 +77,10 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const fcRef = useRef<fabric.Canvas | null>(null);
   const toolCleanupRef = useRef<(() => void) | null>(null);
+  // Hotfix #2 — track previous activeTool so redraw() can differentiate
+  // activeTool-triggered redraws (must run cleanup → revert in-flight drag)
+  // from selectedIds-triggered redraws (must short-circuit to keep drag alive).
+  const prevActiveToolRef = useRef<ToolType | null>(null);
   const [editingWallId, setEditingWallId] = useState<string | null>(null);
   const [pendingValue, setPendingValue] = useState<string>("");
   const [wainscotEditWallId, setWainscotEditWallId] = useState<string | null>(null);
@@ -106,7 +111,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
     const wrapper = wrapperRef.current;
     if (!fc || !wrapper) return;
 
-    // HOTFIX (Wave 2 drag regression): skip full redraws while selectTool is
+    // HOTFIX #1 (Wave 2 drag regression): skip full redraws while selectTool is
     // mid-drag. Otherwise the select()/clearSelection() calls on mouse:down
     // would update `selectedIds`, re-run this redraw, fc.clear() the canvas,
     // and destroy the very Fabric object being dragged — mouse:move then
@@ -114,7 +119,16 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // activation. The drag-end path (mouse:up in selectTool) clears the
     // flag and either a store-triggered redraw or a flushed pending
     // redraw paints the final selection highlight.
-    if (isSelectToolDragActive()) {
+    //
+    // HOTFIX #2 (tool-switch revert restoration): the short-circuit above
+    // was too coarse — it also fired when `activeTool` changed, blocking
+    // cleanup() from running and breaking D-06 revert-on-tool-switch.
+    // Differentiate: only short-circuit when the trigger was NOT a tool
+    // change. On tool change, allow the redraw to proceed so
+    // toolCleanupRef.current?.() runs and cleanup() reverts the in-flight
+    // drag (fabric transform restored, no store commit).
+    const activeToolChanged = prevActiveToolRef.current !== activeTool;
+    if (shouldSkipRedrawDuringDrag({ activeToolChanged })) {
       markRedrawSkippedDueToDrag();
       return;
     }
@@ -179,6 +193,9 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // Re-activate current tool with new scale/origin
     toolCleanupRef.current?.();
     toolCleanupRef.current = activateCurrentTool(fc, activeTool, scale, origin);
+    // Hotfix #2 — record the tool we just activated so the next redraw can
+    // tell whether activeTool changed (affects the drag short-circuit above).
+    prevActiveToolRef.current = activeTool as ToolType;
   }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog]);
 
   // Init canvas

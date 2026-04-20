@@ -151,6 +151,21 @@ export function isSelectToolDragActive(): boolean {
   return _dragActive;
 }
 
+/** Hotfix #2 (tool-switch revert). FabricCanvas.redraw() short-circuits on
+ *  selectedIds-triggered redraws while a drag is live — but must NOT
+ *  short-circuit on activeTool-triggered redraws, because the activeTool
+ *  change is the user signaling "abort this drag" and cleanup() must run
+ *  to revert the in-flight fabric transform (D-06 contract).
+ *
+ *  Single source of truth shared by FabricCanvas and the regression test.
+ *  Returns true iff the caller SHOULD skip the redraw (drag is live AND
+ *  the trigger was a non-tool change like selectedIds). */
+export function shouldSkipRedrawDuringDrag(
+  opts: { activeToolChanged: boolean },
+): boolean {
+  return _dragActive && !opts.activeToolChanged;
+}
+
 /** Set to true when a redraw was skipped because `_dragActive` was true.
  *  On mouse:up / cleanup the tool will invoke the registered redraw
  *  callback to catch up on the skipped refresh (so selection highlight +
