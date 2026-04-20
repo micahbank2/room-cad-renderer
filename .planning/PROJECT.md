@@ -12,6 +12,8 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
+**Phase 25 (Canvas & Store Performance) shipped 2026-04-20.** Drag fast-path landed: `renderOnAddRemove: false`, mouse:move mutates only the Fabric object, single store commit on mouse:up. DevTools trace over 47.7s of active dragging shows ~99.9% clean frames (2-3 jank out of ~2,800). `snapshot()` migrated to `structuredClone(toPlain(...))` per D-07 — Immer-draft unwrap necessary, and the measured result is ~1.25× *slower* than JSON roundtrip at 50-200 walls (absolute <0.3ms, non-user-visible). Two runtime hotfixes caught by manual smoke: H1 (selectedIds redraw destroyed drag) and H2 (tool-switch revert broken by H1) both landed with jsdom regression tests in `tests/dragIntegration.test.ts`. Test baseline 168 → 179 passing (+11 new tests across Wave 0 scaffolding + hotfix regression suites). Same 6 pre-existing failures unrelated to Phase 25 footprint.
+
 **Phase 24 (Tool Architecture Refactor) shipped 2026-04-19.** First phase of v1.5 complete — 18 `(fc as any).__xToolCleanup` casts eliminated, all 6 tools converted to cleanup-fn return pattern with closure state, `pxToFeet` + `findClosestWall` consolidated into `src/canvas/tools/toolUtils.ts` (107 lines of duplication deleted). Added `tests/toolCleanup.test.ts` with 6 listener-leak regression cases. Test baseline maintained at 168 passing (+6 new), same 6 pre-existing failures unrelated to tools. D-13 manual smoke user-approved.
 
 **v1.4 shipped 2026-04-08.** All 6 deferred v1.3 verification gaps closed: wainscot inline edit via `WainscotPopover` + FabricCanvas dblclick, frame color override with single-undo pattern, sidebar scroll fix via `min-h-0`, copy-side action verified with unit tests. Label cleanup removed ~125 underscores from user-facing display text across 30+ files while preserving code identifiers (Obsidian CAD display/identifier separation convention established). Plus 10 Jess Feedback bugs fixed in parallel via PR #39 (welcome screen, wall/ceiling drag, product persistence, wall side alignment).
@@ -135,18 +137,18 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - ✓ All user-facing labels display spaces instead of underscores (LABEL-01, Phase 23)
 - ✓ Dynamic label transforms use space-preserving format (LABEL-02, Phase 23)
 
-**v1.5 Milestone (in progress) — Phase 24 shipped 2026-04-19:**
+**v1.5 Milestone (in progress) — Phase 24 shipped 2026-04-19, Phase 25 shipped 2026-04-20:**
 
 - ✓ Tool cleanup uses type-safe pattern (no `(fc as any).__xToolCleanup` — activate returns cleanup fn, held in useRef) (TOOL-01, Phase 24)
 - ✓ Tool state held in closures, not module-level singletons (3 wrapper interfaces dissolved) (TOOL-02, Phase 24)
 - ✓ `pxToFeet` + `findClosestWall` extracted to shared `src/canvas/tools/toolUtils.ts` (6 duplicates consolidated) (TOOL-03, Phase 24)
+- ✓ Drag fast-path: mouse:move mutates Fabric object only, single store commit on mouse:up (`renderOnAddRemove: false`) — DevTools trace shows ~99.9% clean frames during drag (PERF-01, Phase 25)
+- ✓ `cadStore.snapshot()` uses `structuredClone(toPlain(...))` per D-07 contract — 0 `JSON.parse(JSON.stringify)` remain (PERF-02, Phase 25) **Note:** ≥2× speedup target not met at tested scales (actually ~1.25× slower due to Immer draft unwrap cost), but absolute latency <0.3ms — never user-visible. See `.planning/phases/25-canvas-store-performance/25-VERIFICATION.md`.
 
 ### Active
 
-**v1.5 Milestone — Performance & Tech Debt** (Phase 24 shipped; 25-27 pending)
+**v1.5 Milestone — Performance & Tech Debt** (Phase 24 + 25 shipped; 26-27 pending)
 
-- [ ] **PERF-01**: Canvas redraw uses incremental updates instead of full clear
-- [ ] **PERF-02**: cadStore snapshots use `structuredClone()` instead of JSON roundtrip
 - [ ] **TRACK-01**: R3F v9 / React 19 upgrade path documented and tracked
 - [ ] **FIX-01**: Product images render in 2D canvas (async load)
 - [ ] **FIX-02**: Ceiling preset materials apply correctly in `CeilingMesh`
@@ -217,4 +219,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-19 — Phase 24 (Tool Architecture Refactor) complete, 3/8 v1.5 requirements shipped*
+*Last updated: 2026-04-20 — Phase 25 (Canvas & Store Performance) complete, 5/8 v1.5 requirements shipped*
