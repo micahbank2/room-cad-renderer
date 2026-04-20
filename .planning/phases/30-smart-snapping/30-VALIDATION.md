@@ -37,11 +37,21 @@ created: 2026-04-20
 
 ## Per-Task Verification Map
 
-*Populated by planner after PLAN.md files are written.*
+*Populated by planner; `Status` flipped to `green`/`approved` by Plan 04 after execution.*
 
-| Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
-|---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| *(planner fills)* | | | | | | | |
+| Task ID   | Plan | Wave | Requirement         | Test Type    | Automated Command                                                                  | File Exists | Status  |
+|-----------|------|------|---------------------|--------------|------------------------------------------------------------------------------------|-------------|---------|
+| 30-01-T1  | 01   | 0    | SNAP-01, SNAP-02, SNAP-03 | unit (red → green in Plan 02) | `npx vitest run tests/snapEngine.test.ts`                                          | Plan 01 creates | pending |
+| 30-01-T2  | 01   | 0    | SNAP-03             | fabric-unit (red → green in Plan 02) | `npx vitest run tests/snapGuides.test.ts`                                          | Plan 01 creates | pending |
+| 30-01-T3  | 01   | 0    | SNAP-01, SNAP-02, SNAP-03 + D-07 | integration (red → green in Plan 03) | `npx vitest run tests/snapIntegration.test.tsx`                                    | Plan 01 creates | pending |
+| 30-02-T1  | 02   | 1    | SNAP-01, SNAP-02    | unit         | `npx vitest run tests/snapEngine.test.ts`                                          | Plan 02 creates | pending |
+| 30-02-T2  | 02   | 1    | SNAP-03             | fabric-unit  | `npx vitest run tests/snapGuides.test.ts`                                          | Plan 02 creates | pending |
+| 30-03-T1  | 03   | 2    | SNAP-01, SNAP-02, SNAP-03 + D-07 | integration  | `npx vitest run tests/snapIntegration.test.tsx tests/dragIntegration.test.ts tests/toolCleanup.test.ts` | Plan 03 edits   | pending |
+| 30-03-T2  | 03   | 2    | SNAP-01, SNAP-02, SNAP-03 + D-07 | integration  | `npx vitest run tests/snapIntegration.test.tsx tests/toolCleanup.test.ts`          | Plan 03 edits   | pending |
+| 30-04-T1  | 04   | 3    | all                 | suite-run + typecheck | `npx vitest run` and `npx tsc --noEmit`                                            | N/A             | pending |
+| 30-04-T2  | 04   | 3    | SNAP-01, SNAP-02, SNAP-03 + D-07 | manual (human-verify) | (see Manual-Only Verifications below)                                              | N/A             | pending |
+| 30-04-T3  | 04   | 3    | documentation       | grep-assert  | `grep -q "nyquist_compliant: true" .planning/phases/30-smart-snapping/30-VALIDATION.md` | Plan 04 edits | pending |
+| 30-04-T4  | 04   | 3    | documentation       | grep-assert  | `grep -E "Alt.*Option.*smart snap" CLAUDE.md`                                      | Plan 04 edits | pending |
 
 ---
 
