@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { computeLabelPx, hitTestDimLabel, validateInput } from "@/canvas/dimensionEditor";
+import { formatFeet } from "@/lib/geometry";
 import type { WallSegment } from "@/types/cad";
 
 function mkWall(start: {x:number;y:number}, end: {x:number;y:number}): WallSegment {
@@ -32,4 +33,43 @@ describe("dimension editor overlay", () => {
     expect(validateInput("3.5")).toBe(3.5);
     expect(validateInput("3.5ft")).toBe(3.5);
   });
+});
+
+describe("validateInput (D-02 feet+inches grammar)", () => {
+  it.each([
+    ["12'6\"",    12.5],
+    ["12' 6\"",   12.5],
+    ["12'-6\"",   12.5],
+    ["12'",       12],
+    ["6\"",       0.5],
+    ["12ft 6in",  12.5],
+    ["12 ft 6 in", 12.5],
+    ["12.5",      12.5],
+    ["12",        12],
+    ["12.5ft",    12.5],
+  ])("accepts %s -> %s ft", (input, expected) => {
+    expect(validateInput(input)).toBeCloseTo(expected as number, 5);
+  });
+
+  it.each([
+    "12 6",   // D-02a — two bare numbers no unit
+    "-5",     // negative
+    "0",      // zero (D-02b)
+    "0'0\"",  // zero composite (D-02b)
+    "abc",    // non-numeric
+    "",       // empty
+    "   ",    // whitespace only
+  ])("rejects %s", (input) => {
+    expect(validateInput(input)).toBeNull();
+  });
+
+  it.each([0.5, 1, 3.5, 10.25, 12.5])(
+    "round-trips formatFeet(%s) back to a close value",
+    (x) => {
+      const parsed = validateInput(formatFeet(x));
+      expect(parsed).not.toBeNull();
+      // formatFeet rounds to whole inches; tolerate 1/24 ft drift
+      expect(Math.abs((parsed as number) - x)).toBeLessThanOrEqual(1 / 24 + 1e-6);
+    }
+  );
 });
