@@ -4,7 +4,7 @@ milestone: v1.6
 milestone_name: Editing UX
 status: verifying
 stopped_at: Completed 30-04-PLAN.md — Phase 30 smart-snapping complete
-last_updated: "2026-04-20T23:09:19.401Z"
+last_updated: "2026-04-20T23:12:14.384Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 ## Current Position
 
 Milestone: v1.6 Editing UX
-Phase: 30 (smart-snapping) — EXECUTING
-Plan: 4 of 4
+Phase: 31
+Plan: Not started
 Status: Phase complete — ready for verification
 Last activity: 2026-04-20
 
