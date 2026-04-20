@@ -107,7 +107,7 @@
 **Plans**: 4 plans
   - [x] 26-00-wave0-red-tests-PLAN.md — RED/baseline tests for FIX-01 (fabricSync image) and FIX-02 (ceiling surfaceMaterialId round-trip)
   - [x] 26-01-fix01-product-image-rebuild-PLAN.md — Rebuild product Group on async image load (FIX-01)
-  - [ ] 26-02-fix02-ceiling-preset-material-PLAN.md — Diagnose & fix ceiling preset render/persist bug, FloorMesh parity (FIX-02)
+  - [x] 26-02-fix02-ceiling-preset-material-PLAN.md — Diagnose & fix ceiling preset render/persist bug, FloorMesh parity (FIX-02)
   - [ ] 26-03-wave3-verification-and-closeout-PLAN.md — Full suite + D-10/D-12 manual smoke + GitHub #42/#43 close-out
 
 ### Phase 27: Upgrade Tracking
@@ -126,5 +126,5 @@
 |-------|----------------|--------|-----------|
 | 24. Tool Architecture Refactor | 4/4 | Complete    | 2026-04-19 |
 | 25. Canvas & Store Performance | 4/4 | Complete    | 2026-04-20 |
-| 26. Bug Sweep | 2/4 | In Progress|  |
+| 26. Bug Sweep | 3/4 | In Progress|  |
 | 27. Upgrade Tracking | 0/? | Not started | - |
