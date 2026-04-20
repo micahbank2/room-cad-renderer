@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Editing UX
 status: executing
-stopped_at: Completed 28-02-PLAN.md (auto-save hardening); Plan 03 (silent restore) ready
-last_updated: "2026-04-20T20:10:40.776Z"
+stopped_at: Completed 28-03-PLAN.md (silent restore); Plan 04 (manual smoke verification) ready
+last_updated: "2026-04-20T20:15:16.871Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 Milestone: v1.6 Editing UX
 Phase: 28 (auto-save) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-04-20
 
@@ -40,6 +40,7 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 
 - [Phase 28]: Phase 28 Plan 01: Created Wave 0 TDD red stubs (6 useAutoSave + 4 App.restore) for SAVE-05/SAVE-06; 6 fail describing Plan 02/03 behavior, 7 pass
 - [Phase 28-auto-save]: Phase 28 Plan 02: Extended SaveStatus with 'failed', added try/catch + rename trigger to useAutoSave; 6 red stubs green, Phase 25 drag fast-path filter preserved, no ui-store watching
+- [Phase 28-auto-save]: Phase 28 Plan 03: Pointer-based silent restore (D-02/D-02a/D-02b) — single write site in useAutoSave, mount-time read in App.tsx; all 4 App.restore red stubs green; SAVE-05 reload-restore closed
 
 ### Pending Todos
 
@@ -58,6 +59,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-20T20:10:40.773Z
-Stopped at: Completed 28-02-PLAN.md (auto-save hardening); Plan 03 (silent restore) ready
+Last session: 2026-04-20T20:15:16.869Z
+Stopped at: Completed 28-03-PLAN.md (silent restore); Plan 04 (manual smoke verification) ready
 Resume file: None
