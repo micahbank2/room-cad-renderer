@@ -118,7 +118,10 @@
   1. `.planning/codebase/CONCERNS.md` contains an R3F v9 / React 19 section with: current pinned versions, known blockers (hook errors with React 19), and the upgrade sequence (R3F v9 → drei v10 → React 19)
   2. GitHub issue #56 is updated with the documented upgrade plan and stays open as the tracking artifact
   3. No version bumps are made in `package.json` — this phase is documentation only
-**Plans**: TBD
+**Plans**: 3 plans
+  - [ ] 27-01-PLAN.md — Append new `## R3F v9 / React 19 Upgrade` section to CONCERNS.md with target versions, sequence, blockers, per-package breaking changes, affected files, citations (TRACK-01)
+  - [ ] 27-02-PLAN.md — Rewrite existing "React 18 downgrade" Tech Debt bullet in CONCERNS.md as a short pointer to the new section (TRACK-01)
+  - [ ] 27-03-PLAN.md — Post comment on GitHub issue #56 summarizing the documented upgrade plan; issue stays OPEN (TRACK-01)
 
 ### Progress Table
 
@@ -127,4 +130,4 @@
 | 24. Tool Architecture Refactor | 4/4 | Complete    | 2026-04-19 |
 | 25. Canvas & Store Performance | 4/4 | Complete    | 2026-04-20 |
 | 26. Bug Sweep | 4/4 | Complete    | 2026-04-20 |
-| 27. Upgrade Tracking | 0/? | Not started | - |
+| 27. Upgrade Tracking | 0/3 | Not started | - |
