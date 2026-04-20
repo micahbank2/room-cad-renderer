@@ -169,6 +169,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
     const fc = new fabric.Canvas(canvasElRef.current, {
       selection: false,
       preserveObjectStacking: true,
+      renderOnAddRemove: false, // Phase 25 D-02 — paints coalesce through explicit requestRenderAll/renderAll
     });
     fcRef.current = fc;
 
