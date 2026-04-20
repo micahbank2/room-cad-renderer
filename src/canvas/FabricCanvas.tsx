@@ -16,7 +16,13 @@ import { drawGrid } from "./grid";
 import { drawRoomDimensions } from "./dimensions";
 import { renderWalls, renderProducts, renderCeilings, renderCustomElements } from "./fabricSync";
 import { activateWallTool } from "./tools/wallTool";
-import { activateSelectTool, setSelectToolProductLibrary } from "./tools/selectTool";
+import {
+  activateSelectTool,
+  setSelectToolProductLibrary,
+  isSelectToolDragActive,
+  markRedrawSkippedDueToDrag,
+  setSelectToolRedrawCallback,
+} from "./tools/selectTool";
 import { activateProductTool } from "./tools/productTool";
 import { activateDoorTool } from "./tools/doorTool";
 import { activateWindowTool } from "./tools/windowTool";
@@ -99,6 +105,19 @@ export default function FabricCanvas({ productLibrary }: Props) {
     const fc = fcRef.current;
     const wrapper = wrapperRef.current;
     if (!fc || !wrapper) return;
+
+    // HOTFIX (Wave 2 drag regression): skip full redraws while selectTool is
+    // mid-drag. Otherwise the select()/clearSelection() calls on mouse:down
+    // would update `selectedIds`, re-run this redraw, fc.clear() the canvas,
+    // and destroy the very Fabric object being dragged — mouse:move then
+    // no-ops because its guard uses stale closure state from a new tool
+    // activation. The drag-end path (mouse:up in selectTool) clears the
+    // flag and either a store-triggered redraw or a flushed pending
+    // redraw paints the final selection highlight.
+    if (isSelectToolDragActive()) {
+      markRedrawSkippedDueToDrag();
+      return;
+    }
 
     const rect = wrapper.getBoundingClientRect();
     const cW = rect.width;
@@ -257,6 +276,15 @@ export default function FabricCanvas({ productLibrary }: Props) {
   // Redraw on state changes
   useEffect(() => {
     redraw();
+  }, [redraw]);
+
+  // Register the redraw fn with selectTool so it can flush a skipped
+  // redraw on mouse:up (bare-click case — no store commit, no
+  // subscription-driven redraw, but selection highlight still needs
+  // to paint).
+  useEffect(() => {
+    setSelectToolRedrawCallback(() => redraw());
+    return () => setSelectToolRedrawCallback(null);
   }, [redraw]);
 
   // Scroll-wheel zoom + middle-drag pan (Phase 6 — NAV-01/02)

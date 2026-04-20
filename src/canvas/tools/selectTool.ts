@@ -140,6 +140,30 @@ export function setSelectToolProductLibrary(products: Product[]) {
   _productLibrary = products;
 }
 
+/** Module-level drag-in-progress flag. Set by the active selectTool instance
+ *  on mouse:down, cleared on mouse:up / cleanup. Read by FabricCanvas to
+ *  skip selection-triggered full redraws while a drag is live — otherwise
+ *  `select([hit.id])` on mouse:down would trigger redraw → fc.clear() →
+ *  destroy the Fabric object being dragged mid-gesture. Per D-07 this is
+ *  a public-API bridge (tool → component), not per-activation state. */
+let _dragActive = false;
+export function isSelectToolDragActive(): boolean {
+  return _dragActive;
+}
+
+/** Set to true when a redraw was skipped because `_dragActive` was true.
+ *  On mouse:up / cleanup the tool will invoke the registered redraw
+ *  callback to catch up on the skipped refresh (so selection highlight +
+ *  handles appear after a click that starts and ends without movement). */
+let _redrawPending = false;
+export function markRedrawSkippedDueToDrag(): void {
+  _redrawPending = true;
+}
+let _redrawCallback: (() => void) | null = null;
+export function setSelectToolRedrawCallback(cb: (() => void) | null): void {
+  _redrawCallback = cb;
+}
+
 export function activateSelectTool(
   fc: fabric.Canvas,
   scale: number,
@@ -584,6 +608,11 @@ export function activateSelectTool(
         return;
       }
 
+      // Set the drag-active flag BEFORE calling select() so the
+      // subscription-driven redraw (zustand fires listeners synchronously
+      // during the set() call) sees dragActive=true and skips clearing
+      // the canvas mid-gesture.
+      _dragActive = true;
       useUIStore.getState().select([hit.id]);
 
       dragging = true;
@@ -647,6 +676,11 @@ export function activateSelectTool(
       dragging = false;
       dragId = null;
     }
+    // Sync module-level drag-active flag so FabricCanvas can skip full
+    // redraws triggered by the select()/clearSelection() calls above while
+    // the drag is live. Otherwise a redraw between mouse:down and mouse:up
+    // would fc.clear() and destroy the Fabric object being dragged.
+    _dragActive = dragging;
   };
 
   const onMouseMove = (opt: fabric.TEvent) => {
@@ -876,6 +910,25 @@ export function activateSelectTool(
   };
 
   const onMouseUp = () => {
+    // Clear the drag-active flag BEFORE committing to the store so the
+    // redraw triggered by the commit runs normally and paints the final
+    // selection highlight + handles. If we cleared it after the commit,
+    // the subscription-triggered redraw would see _dragActive=true and
+    // no-op, leaving stale selection visuals.
+    _dragActive = false;
+    // Determine whether the commit below will trigger a store change (and
+    // therefore a subscription-driven redraw). For bare clicks (no drag
+    // movement) no commit fires, so we need to explicitly flush the
+    // redraw we skipped on mouse:down to repaint the selection highlight.
+    const willCommit = Boolean(dragPre && dragging && (
+      (dragPre.kind === "product" && lastDragFeetPos) ||
+      (dragPre.kind === "wall-move" && lastDragWallStart && lastDragWallEnd) ||
+      (dragPre.kind === "wall-endpoint" && lastDragWallStart && lastDragWallEnd) ||
+      (dragPre.kind === "product-rotate" && lastDragRotation != null)
+    ));
+    const hadPendingRedraw = _redrawPending;
+    _redrawPending = false;
+
     // D-04 fast-path commit: run exactly once per drag via the committing action.
     // This is the SINGLE history entry for the entire drag.
     if (dragPre && dragging) {
@@ -915,6 +968,7 @@ export function activateSelectTool(
       clearSizeTag();
     }
     dragging = false;
+    _dragActive = false;
     dragId = null;
     dragType = null;
     dragOffsetFeet = null;
@@ -934,6 +988,16 @@ export function activateSelectTool(
     lastDragRotation = null;
     lastDragWallStart = null;
     lastDragWallEnd = null;
+
+    // Flush a pending redraw for the bare-click case — when no commit
+    // fires (no move happened) the subscription won't re-trigger redraw,
+    // so we need to paint the selection highlight that we skipped on
+    // mouse:down. For committing drags, the store change itself triggers
+    // a redraw via the zustand subscription, so we only flush here when
+    // no commit will happen.
+    if (hadPendingRedraw && !willCommit && _redrawCallback) {
+      _redrawCallback();
+    }
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -1002,6 +1066,8 @@ export function activateSelectTool(
     lastDragRotation = null;
     lastDragWallStart = null;
     lastDragWallEnd = null;
+    _dragActive = false;
+    _redrawPending = false;
     fc.off("mouse:down", onMouseDown);
     fc.off("mouse:move", onMouseMove);
     fc.off("mouse:up", onMouseUp);
