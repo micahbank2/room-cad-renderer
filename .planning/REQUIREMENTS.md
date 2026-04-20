@@ -48,12 +48,12 @@
 
 ### Bug Fixes (FIX)
 
-- [ ] **FIX-01**: Product images render in 2D canvas (async load)
+- [x] **FIX-01**: Product images render in 2D canvas (async load)
   - **Source:** [#42](https://github.com/micahbank2/room-cad-renderer/issues/42)
   - **Verifiable:** Product thumbnails appear in 2D canvas after placement. No flicker on existing renders. Project reload shows images without re-trigger.
   - **Files:** `src/canvas/fabricSync.ts:155-168`
 
-- [ ] **FIX-02**: Ceiling preset materials apply correctly in `CeilingMesh`
+- [x] **FIX-02**: Ceiling preset materials apply correctly in `CeilingMesh`
   - **Source:** [#43](https://github.com/micahbank2/room-cad-renderer/issues/43)
   - **Verifiable:** Selecting a ceiling preset visibly changes the 3D ceiling material. Preset persists across reload. Hex color path still works.
   - **Files:** `src/three/CeilingMesh.tsx`, `src/lib/surfaceMaterials.ts`

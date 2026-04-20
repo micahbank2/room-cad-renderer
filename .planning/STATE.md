@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Performance & Tech Debt
-status: verifying
-stopped_at: Phase 26 context gathered
-last_updated: "2026-04-20T16:30:46.401Z"
+status: executing
+stopped_at: Completed 26-00-wave0-red-tests-PLAN.md
+last_updated: "2026-04-20T16:52:41.949Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 12
+  completed_plans: 9
 ---
 
 # Project State
@@ -20,13 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-17)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 25 — canvas-store-performance
+**Current focus:** Phase 26 — bug-sweep
 
 ## Current Position
 
-Phase: 26
-Plan: Not started
-Status: Plan 25-03 verification bundle assembled; Phase 25 ready for /gsd:verify-phase
+Phase: 26 (bug-sweep) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
 Last activity: 2026-04-20
 
 [==========] 25% (1/4 phases complete; Phase 25 plans 4/4 done, phase close-out pending)
@@ -49,6 +49,8 @@ Full log in PROJECT.md Key Decisions table. Recent v1.4 decisions:
 - [Phase 25-canvas-store-performance]: Wave 1: cadStore.snapshot() migrated to structuredClone with toPlain(isDraft/current) helper — Immer draft Proxies are not structuredClone-able; current() normalizes before clone. Dev-gated > 2ms timing sampler added (tree-shaken in prod). PERF-02 code landed.
 - [Phase 25-canvas-store-performance]: Wave 2: Drag fast path landed for 4 D-03 operations (product move incl. custom, wall move, wall endpoint, product rotation). renderOnAddRemove off, mouse:move mutates fabric obj + requestRenderAll only, mouse:up commits one store action, cleanup reverts in-flight drags. 173 -> 176 passing (+3 Wave 0 RED gates flipped: renderOnAddRemove, fast-path no-clear, drag-interrupt revert).
 - [Phase 25-canvas-store-performance]: Wave 3 verification bundle assembled. PERF-01 MET (Chrome trace ~99.9% clean frames over 47.7s drag). PERF-02 D-07 contract MET (zero JSON.parse in snapshot body) but ≥2× speedup target NOT MET — measured 0.80× ratio (1.25× slower) at 50W/30P, honestly documented. Root cause: V8's JSON fast path + Immer-draft toPlain() overhead. User-visible impact zero (<0.3ms/call at 200W/100P). Two hotfixes landed during Part D smoke: Hotfix #1 (drag-survives-selection, _dragActive flag) + Hotfix #2 (tool-switch-reverts-drag, shouldSkipRedrawDuringDrag predicate). 176 -> 179 passing (+3 jsdom regression tests in tests/dragIntegration.test.ts).
+- [Phase 26-bug-sweep]: FIX-01 RED confirmed Pitfall 1 (Group rebuild missing on cache onReady). Plan 26-01 must rebuild Group on image load.
+- [Phase 26-bug-sweep]: FIX-02 Pitfall 4 ruled out (structuredClone preserves surfaceMaterialId). Plan 26-02 must target UI wiring or visual perception, not persistence.
 
 ### Pending Todos
 
@@ -66,6 +68,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-20T16:30:46.398Z
-Stopped at: Phase 26 context gathered
-Resume file: .planning/phases/26-bug-sweep/26-CONTEXT.md
+Last session: 2026-04-20T16:52:41.946Z
+Stopped at: Completed 26-00-wave0-red-tests-PLAN.md
+Resume file: None
