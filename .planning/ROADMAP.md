@@ -104,7 +104,11 @@
   2. Project reload shows product images in 2D canvas without any re-trigger or user action
   3. Select a ceiling preset material in the ceiling panel — the 3D ceiling mesh visibly changes to that material
   4. Preset material selection persists across project save/reload (not reset to default hex on load)
-**Plans**: TBD
+**Plans**: 4 plans
+  - [ ] 26-00-wave0-red-tests-PLAN.md — RED/baseline tests for FIX-01 (fabricSync image) and FIX-02 (ceiling surfaceMaterialId round-trip)
+  - [ ] 26-01-fix01-product-image-rebuild-PLAN.md — Rebuild product Group on async image load (FIX-01)
+  - [ ] 26-02-fix02-ceiling-preset-material-PLAN.md — Diagnose & fix ceiling preset render/persist bug, FloorMesh parity (FIX-02)
+  - [ ] 26-03-wave3-verification-and-closeout-PLAN.md — Full suite + D-10/D-12 manual smoke + GitHub #42/#43 close-out
 
 ### Phase 27: Upgrade Tracking
 **Goal**: R3F v9 / React 19 upgrade path is documented and the blocking issue is tracked so it can be executed when R3F v9 stabilizes
