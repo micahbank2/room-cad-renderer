@@ -135,7 +135,11 @@ Zustand store keeps `past[]` and `future[]` arrays of `CADSnapshot` objects (roo
 - User-uploaded PBR textures on 3D materials
 - Camera presets (eye-level, top-down)
 - Editable dimension labels (double-click to change wall length)
-- Auto-save with debounce
+
+### Auto-save (shipped Phase 28, v1.6):
+- 2000ms debounced save via `useAutoSave`. Triggers: CAD mutations (rooms/activeRoomId/customElements) and project rename (`projectStore.activeName` while `activeId` is non-null). UI-store changes do NOT trigger saves.
+- Status states: `idle | saving | saved | failed`. `SAVE_FAILED` persists until the next successful save (no auto-fade) — Jessica must see failures before closing the tab.
+- Silent restore on mount: `App.tsx` reads `room-cad-last-project` pointer via `getLastProjectId()`, calls `loadProject(id)`, hydrates cadStore + projectStore, skips WelcomeScreen on success. No pointer / stale pointer / load error → falls through to WelcomeScreen.
 
 ### Planned phases:
 - Design system redesign (pending mockups)

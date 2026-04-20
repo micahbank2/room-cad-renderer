@@ -1,9 +1,9 @@
 ---
 phase: 28
 slug: auto-save
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: signed
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-20
 ---
 
@@ -78,11 +78,27 @@ created: 2026-04-20
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 20s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 20s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** signed 2026-04-20
+
+### Phase 28 Final Test Results (2026-04-20)
+
+- `npx vitest run --reporter=dot` → **201 passed | 6 failed (pre-existing, unrelated) | 3 todo (210)**
+- Phase 28 stubs: **10/10 PASS** (6 useAutoSave + 4 App.restore)
+- `npx tsc --noEmit` → **exit 0** (only pre-existing baseUrl deprecation warning)
+- 6 failing tests confirmed pre-existing per Plan 03 Summary: AddProductModal (LIB-04) ×3, SidebarProductPicker (LIB-05) ×2, productStore (LIB-03) ×1
+
+### Manual Smoke Verification (Task 3)
+
+Auto-approved per orchestrator directive (auto-mode: `workflow.auto_advance=true`). Tests green, code wired end-to-end. All 4 perceptual behaviors deferred to HUMAN-UAT created by phase verifier:
+
+1. SAVE_FAILED visibility + persistence (D-04/D-04a)
+2. Single save per continuous drag (SAVE-05 drag-safe)
+3. Hard-refresh restore / no WelcomeScreen flash (SAVE-05 #3, D-02)
+4. Project rename triggers save (D-05)
