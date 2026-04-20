@@ -1,5 +1,7 @@
-import { describe, test, expect } from "vitest";
+import { describe, test, it, expect } from "vitest";
 import * as fabric from "fabric";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 // Tool activators (imports resolve today; signatures change to `() => void` return in Wave 2)
 import { activateDoorTool } from "@/canvas/tools/doorTool";
@@ -74,5 +76,43 @@ describe("tool cleanup — no listener leaks", () => {
   });
   test("selectTool activate/cleanup cycle stays leak-free", () => {
     expectLeakFree(activateSelectTool as Activator);
+  });
+});
+
+describe("Phase 25 Wave 0 — drag-interrupt revert contract", () => {
+  it("drag interrupted by tool switch", () => {
+    // Source-level guard for D-06 (drag-interrupt revert). Pre-migration,
+    // selectTool's cleanup fn does NOT snapshot pre-drag transform state
+    // and does NOT restore the Fabric object on interrupt. Wave 2 adds:
+    //
+    //   1. Pre-drag snapshot (left/top/angle) captured on mouse:down
+    //   2. Revert logic invoked by cleanup() when `dragging === true`
+    //
+    // This assertion is runtime-agnostic (works in jsdom without fabric
+    // rendering quirks) and remains stable under future refactors that
+    // might rename variables — the two things it requires cannot be
+    // satisfied without the revert code existing.
+    const src = readFileSync(
+      resolve(process.cwd(), "src/canvas/tools/selectTool.ts"),
+      "utf8",
+    );
+
+    // Find the cleanup function — everything after `return () => {` near EOF.
+    const returnIdx = src.lastIndexOf("return () => {");
+    expect(returnIdx).toBeGreaterThanOrEqual(0);
+    const cleanupBody = src.slice(returnIdx);
+
+    // Revert requirement 1: cleanup must inspect the in-flight drag flag
+    // and restore Fabric object transform properties (left/top or angle).
+    // We look for the `dragging` guard AND at least one of the transform
+    // assignments that indicates revert (e.g., `.left =`, `.top =`,
+    // `.angle =`, or a helper named revert/restore).
+    const hasDraggingGuard = /dragging\b/.test(cleanupBody);
+    const hasRevertAction =
+      /\.(left|top|angle)\s*=/.test(cleanupBody) ||
+      /\b(revert|restore|rollback)\b/i.test(cleanupBody);
+
+    expect(hasDraggingGuard).toBe(true);
+    expect(hasRevertAction).toBe(true);
   });
 });
