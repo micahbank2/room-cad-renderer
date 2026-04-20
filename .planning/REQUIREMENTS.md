@@ -12,12 +12,12 @@
 
 ### Performance (PERF)
 
-- [ ] **PERF-01**: Canvas redraw uses incremental updates instead of full clear-and-redraw
+- [x] **PERF-01**: Canvas redraw uses incremental updates instead of full clear-and-redraw
   - **Source:** [#51](https://github.com/micahbank2/room-cad-renderer/issues/51)
   - **Verifiable:** Dragging a product in a 50-wall / 30-product scene maintains 60fps on M-series Mac. Visual parity with current behavior. All 115 tests pass.
   - **Files:** `src/canvas/FabricCanvas.tsx`, `src/canvas/fabricSync.ts`
 
-- [ ] **PERF-02**: cadStore snapshots use `structuredClone()` instead of `JSON.parse(JSON.stringify())`
+- [x] **PERF-02**: cadStore snapshots use `structuredClone()` instead of `JSON.parse(JSON.stringify())` — **Partial** (D-07 contract met; ≥2× speedup target missed — see 25-VERIFICATION.md)
   - **Source:** [#52](https://github.com/micahbank2/room-cad-renderer/issues/52)
   - **Verifiable:** Snapshot perf measured before/after — ≥2x improvement at 50 walls / 30 products. Undo/redo still produces single entries for drag-completed mutations.
   - **Files:** `src/stores/cadStore.ts` (lines 38–44)
@@ -91,8 +91,8 @@ From PROJECT.md:
 
 | Requirement | Issue | Phase | Status |
 |-------------|-------|-------|--------|
-| PERF-01 | #51 | Phase 25 | Pending |
-| PERF-02 | #52 | Phase 25 | Pending |
+| PERF-01 | #51 | Phase 25 | Complete |
+| PERF-02 | #52 | Phase 25 | Partial — D-07 contract met; ≥2× speedup NOT met (see 25-VERIFICATION.md) |
 | TOOL-01 | #53 | Phase 24 | Pending |
 | TOOL-02 | #54 | Phase 24 | Pending |
 | TOOL-03 | #55 | Phase 24 | Pending |
