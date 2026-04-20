@@ -22,7 +22,7 @@ import {
   hitTestOpeningHandle,
   projectOntoWall,
 } from "../openingEditHandles";
-import { wallLength } from "@/lib/geometry";
+import { wallLength, wallCorners } from "@/lib/geometry";
 import { pxToFeet } from "./toolUtils";
 
 type DragType =
@@ -140,6 +140,30 @@ export function setSelectToolProductLibrary(products: Product[]) {
   _productLibrary = products;
 }
 
+/** Module-level drag-in-progress flag. Set by the active selectTool instance
+ *  on mouse:down, cleared on mouse:up / cleanup. Read by FabricCanvas to
+ *  skip selection-triggered full redraws while a drag is live — otherwise
+ *  `select([hit.id])` on mouse:down would trigger redraw → fc.clear() →
+ *  destroy the Fabric object being dragged mid-gesture. Per D-07 this is
+ *  a public-API bridge (tool → component), not per-activation state. */
+let _dragActive = false;
+export function isSelectToolDragActive(): boolean {
+  return _dragActive;
+}
+
+/** Set to true when a redraw was skipped because `_dragActive` was true.
+ *  On mouse:up / cleanup the tool will invoke the registered redraw
+ *  callback to catch up on the skipped refresh (so selection highlight +
+ *  handles appear after a click that starts and ends without movement). */
+let _redrawPending = false;
+export function markRedrawSkippedDueToDrag(): void {
+  _redrawPending = true;
+}
+let _redrawCallback: (() => void) | null = null;
+export function setSelectToolRedrawCallback(cb: (() => void) | null): void {
+  _redrawCallback = cb;
+}
+
 export function activateSelectTool(
   fc: fabric.Canvas,
   scale: number,
@@ -162,6 +186,164 @@ export function activateSelectTool(
   let openingInitialOffset: number | null = null;
   let openingInitialWidth: number | null = null;
   let openingInitialPointerOffset: number | null = null;
+
+  // Phase 25 D-01/D-03/D-04/D-05/D-06 — Drag fast-path state.
+  // Covers EXACTLY the 4 D-03 operations: product move (incl. custom element),
+  // wall move, wall endpoint drag, product rotation. All other drag types
+  // continue to use the pre-existing NoHistory per-move path.
+  //
+  // During an active fast-path drag: Fabric objects are mutated directly,
+  // `fc.requestRenderAll()` is called, and ZERO store writes happen per move.
+  // On mouse:up: a single committing store action runs (one history entry).
+  // On cleanup (tool switch / unmount): revert fabric transform; no store write.
+  type WallFabricCache = {
+    fabricObj: fabric.Object;
+    origLeft: number;
+    origTop: number;
+    type: string; // "wall" | "wall-side" | "wall-limewash" | "wall-limewash-b"
+    side?: "A" | "B";
+  };
+  type DragPre =
+    | {
+        kind: "product";
+        id: string;
+        fabricObj: fabric.Object | null;
+        origLeft: number;
+        origTop: number;
+        origAngle: number;
+      }
+    | {
+        kind: "product-rotate";
+        id: string;
+        isCustom: boolean; // true = custom element (out of D-03 scope, uses old path)
+        fabricObj: fabric.Object | null;
+        origAngle: number;
+      }
+    | {
+        kind: "wall-move";
+        id: string;
+        fabricObjs: WallFabricCache[];
+        origWall: { start: Point; end: Point; thickness: number };
+      }
+    | {
+        kind: "wall-endpoint";
+        id: string;
+        endpoint: "start" | "end";
+        fabricObjs: WallFabricCache[];
+        origWall: { start: Point; end: Point; thickness: number };
+      };
+
+  let dragPre: DragPre | null = null;
+  // Mouse-move caches the latest drag result for the mouse:up commit.
+  let lastDragFeetPos: Point | null = null;
+  let lastDragRotation: number | null = null;
+  let lastDragWallStart: Point | null = null;
+  let lastDragWallEnd: Point | null = null;
+
+  /** Find all Fabric objects that render parts of a given wall. */
+  const findWallFabricObjs = (wallId: string): WallFabricCache[] => {
+    const out: WallFabricCache[] = [];
+    for (const obj of fc.getObjects()) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const data = (obj as any).data;
+      if (!data || data.wallId !== wallId) continue;
+      if (
+        data.type === "wall" ||
+        data.type === "wall-side" ||
+        data.type === "wall-limewash" ||
+        data.type === "wall-limewash-b"
+      ) {
+        out.push({
+          fabricObj: obj,
+          origLeft: obj.left ?? 0,
+          origTop: obj.top ?? 0,
+          type: data.type,
+          side: data.side,
+        });
+      }
+    }
+    return out;
+  };
+
+  /** Compute pixel corners for a wall (scale/origin closure-captured). */
+  const wallPxCorners = (
+    start: Point,
+    end: Point,
+    thickness: number,
+  ): { sL: Point; sR: Point; eR: Point; eL: Point } => {
+    const [cSL, cSR, cER, cEL] = wallCorners({
+      start,
+      end,
+      thickness,
+    } as Parameters<typeof wallCorners>[0]);
+    const toPx = (p: Point): Point => ({
+      x: origin.x + p.x * scale,
+      y: origin.y + p.y * scale,
+    });
+    return { sL: toPx(cSL), sR: toPx(cSR), eR: toPx(cER), eL: toPx(cEL) };
+  };
+
+  /** Mutate the polygon points of each wall fabric obj to match the given endpoints. */
+  const applyWallShapeToFabric = (
+    objs: WallFabricCache[],
+    start: Point,
+    end: Point,
+    thickness: number,
+  ) => {
+    const { sL, sR, eR, eL } = wallPxCorners(start, end, thickness);
+    const midStart = { x: (sL.x + sR.x) / 2, y: (sL.y + sR.y) / 2 };
+    const midEnd = { x: (eL.x + eR.x) / 2, y: (eL.y + eR.y) / 2 };
+    for (const entry of objs) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const poly = entry.fabricObj as any;
+      if (entry.type === "wall" || entry.type === "wall-limewash") {
+        // Single solid outline / limewash overlay uses all 4 corners.
+        // (For split-paint walls, "wall" is the outline; both shapes = full 4-corner polygon.)
+        if (entry.type === "wall-limewash" && entry.side === "A") {
+          poly.points = [sL, midStart, midEnd, eL];
+        } else if (entry.type === "wall-limewash" && entry.side === "B") {
+          poly.points = [midStart, sR, eR, midEnd];
+        } else {
+          poly.points = [sL, sR, eR, eL];
+        }
+      } else if (entry.type === "wall-side" && entry.side === "A") {
+        poly.points = [sL, midStart, midEnd, eL];
+      } else if (entry.type === "wall-side" && entry.side === "B") {
+        poly.points = [midStart, sR, eR, midEnd];
+      } else if (entry.type === "wall-limewash-b") {
+        poly.points = [midStart, sR, eR, midEnd];
+      }
+      // Reset left/top to the translation origin of the new points.
+      // Fabric recomputes pathOffset from set coords; a simple setCoords() is enough.
+      if (typeof poly.setCoords === "function") poly.setCoords();
+    }
+  };
+
+  /** Translate all wall fabric objs by a pixel delta (pure move, no shape change). */
+  const translateWallFabric = (objs: WallFabricCache[], dxPx: number, dyPx: number) => {
+    for (const entry of objs) {
+      entry.fabricObj.set({
+        left: entry.origLeft + dxPx,
+        top: entry.origTop + dyPx,
+      });
+      if (typeof (entry.fabricObj as unknown as { setCoords?: () => void }).setCoords === "function") {
+        (entry.fabricObj as unknown as { setCoords: () => void }).setCoords();
+      }
+    }
+  };
+
+  /** Find the fabric object for a placed product or custom element. */
+  const findProductFabricObj = (id: string): fabric.Object | null => {
+    for (const obj of fc.getObjects()) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const data = (obj as any).data;
+      if (!data) continue;
+      // Real products: data.placedProductId; custom elements: data.placedId
+      if (data.type === "product" && data.placedProductId === id) return obj;
+      if (data.type === "custom-element" && data.placedId === id) return obj;
+    }
+    return null;
+  };
 
   // Live size-tag shown during product resize — closure-scoped per D-06.
   let sizeTag: fabric.Group | null = null;
@@ -281,8 +463,16 @@ export function activateSelectTool(
           dragId = selId;
           dragType = "rotate";
           rotateInitialAngle = pp.rotation;
-          // Push single history snapshot at drag start as undo boundary
-          useCADStore.getState().rotateProduct(selId, pp.rotation);
+          // D-03 fast path: cache pre-drag fabric transform; NO store write here.
+          const fobj = findProductFabricObj(selId);
+          dragPre = {
+            kind: "product-rotate",
+            id: selId,
+            isCustom: false,
+            fabricObj: fobj,
+            origAngle: fobj?.angle ?? pp.rotation,
+          };
+          lastDragRotation = pp.rotation;
           return;
         }
         // Resize handle hit-test (EDIT-14)
@@ -344,8 +534,20 @@ export function activateSelectTool(
           dragId = selId;
           dragType = "wall-endpoint";
           wallEndpointWhich = whichEndpoint;
-          // Push history snapshot at drag start
-          useCADStore.getState().updateWall(selId, {});
+          // D-03 fast path: cache pre-drag wall shape + fabric objs; NO store write here.
+          dragPre = {
+            kind: "wall-endpoint",
+            id: selId,
+            endpoint: whichEndpoint,
+            fabricObjs: findWallFabricObjs(selId),
+            origWall: {
+              start: { ...wall.start },
+              end: { ...wall.end },
+              thickness: wall.thickness,
+            },
+          };
+          lastDragWallStart = { ...wall.start };
+          lastDragWallEnd = { ...wall.end };
           return;
         }
         // Thickness drag (EDIT-16)
@@ -406,6 +608,11 @@ export function activateSelectTool(
         return;
       }
 
+      // Set the drag-active flag BEFORE calling select() so the
+      // subscription-driven redraw (zustand fires listeners synchronously
+      // during the set() call) sees dragActive=true and skips clearing
+      // the canvas mid-gesture.
+      _dragActive = true;
       useUIStore.getState().select([hit.id]);
 
       dragging = true;
@@ -431,6 +638,17 @@ export function activateSelectTool(
             x: feet.x - pos.x,
             y: feet.y - pos.y,
           };
+          // D-03 fast path: cache pre-drag fabric transform for product move.
+          const fobj = findProductFabricObj(hit.id);
+          dragPre = {
+            kind: "product",
+            id: hit.id,
+            fabricObj: fobj,
+            origLeft: fobj?.left ?? 0,
+            origTop: fobj?.top ?? 0,
+            origAngle: fobj?.angle ?? 0,
+          };
+          lastDragFeetPos = { ...pos };
         }
       } else if (hit.type === "wall") {
         const wall = (getActiveRoomDoc()?.walls ?? {})[hit.id];
@@ -438,6 +656,19 @@ export function activateSelectTool(
           const cx = (wall.start.x + wall.end.x) / 2;
           const cy = (wall.start.y + wall.end.y) / 2;
           dragOffsetFeet = { x: feet.x - cx, y: feet.y - cy };
+          // D-03 fast path: cache pre-drag wall fabric objs; NO store write here.
+          dragPre = {
+            kind: "wall-move",
+            id: hit.id,
+            fabricObjs: findWallFabricObjs(hit.id),
+            origWall: {
+              start: { ...wall.start },
+              end: { ...wall.end },
+              thickness: wall.thickness,
+            },
+          };
+          lastDragWallStart = { ...wall.start };
+          lastDragWallEnd = { ...wall.end };
         }
       }
     } else {
@@ -445,6 +676,11 @@ export function activateSelectTool(
       dragging = false;
       dragId = null;
     }
+    // Sync module-level drag-active flag so FabricCanvas can skip full
+    // redraws triggered by the select()/clearSelection() calls above while
+    // the drag is live. Otherwise a redraw between mouse:down and mouse:up
+    // would fc.clear() and destroy the Fabric object being dragged.
+    _dragActive = dragging;
   };
 
   const onMouseMove = (opt: fabric.TEvent) => {
@@ -460,9 +696,17 @@ export function activateSelectTool(
       const raw = angleFromCenterToPointer(target.position, feet);
       const shiftHeld = (opt.e as MouseEvent).shiftKey === true;
       const next = snapAngle(raw, shiftHeld);
-      if (pp) {
-        useCADStore.getState().rotateProductNoHistory(dragId, next);
-      } else {
+      // D-03 fast path for product rotation (custom elements stay on old path).
+      if (pp && dragPre?.kind === "product-rotate" && dragPre.fabricObj) {
+        dragPre.fabricObj.set({ angle: next });
+        if (typeof (dragPre.fabricObj as unknown as { setCoords?: () => void }).setCoords === "function") {
+          (dragPre.fabricObj as unknown as { setCoords: () => void }).setCoords();
+        }
+        fc.requestRenderAll();
+        lastDragRotation = next;
+        return;
+      }
+      if (pce) {
         useCADStore.getState().rotateCustomElementNoHistory(dragId, next);
       }
       return;
@@ -504,22 +748,28 @@ export function activateSelectTool(
     }
 
     if (dragType === "wall-endpoint") {
-      const wall = (getActiveRoomDoc()?.walls ?? {})[dragId];
-      if (!wall || !wallEndpointWhich) return;
+      if (!wallEndpointWhich || dragPre?.kind !== "wall-endpoint") return;
       const gridSnap = useUIStore.getState().gridSnap;
       const snapped = gridSnap > 0 ? snapPoint(feet, gridSnap) : feet;
-      const changes = wallEndpointWhich === "start"
-        ? { start: snapped }
-        : { end: snapped };
-      useCADStore.getState().updateWallNoHistory(dragId, changes);
-      // Live length tag
-      const w2 = (getActiveRoomDoc()?.walls ?? {})[dragId];
-      if (w2) {
-        const lenFt = wallLength(w2);
-        const mx = (w2.start.x + w2.end.x) / 2;
-        const my = (w2.start.y + w2.end.y) / 2;
-        updateTextTag(`${formatFeet(lenFt)}`, { x: mx, y: my - 0.8 });
-      }
+      // D-03 fast path: compute new endpoints, rewrite polygon points in place.
+      const newStart = wallEndpointWhich === "start" ? snapped : dragPre.origWall.start;
+      const newEnd = wallEndpointWhich === "end" ? snapped : dragPre.origWall.end;
+      applyWallShapeToFabric(
+        dragPre.fabricObjs,
+        newStart,
+        newEnd,
+        dragPre.origWall.thickness,
+      );
+      fc.requestRenderAll();
+      lastDragWallStart = newStart;
+      lastDragWallEnd = newEnd;
+      // Live length tag (recomputed from cached endpoints)
+      const lenFt = Math.sqrt(
+        (newEnd.x - newStart.x) ** 2 + (newEnd.y - newStart.y) ** 2,
+      );
+      const mx = (newStart.x + newEnd.x) / 2;
+      const my = (newStart.y + newEnd.y) / 2;
+      updateTextTag(`${formatFeet(lenFt)}`, { x: mx, y: my - 0.8 });
       return;
     }
 
@@ -625,28 +875,88 @@ export function activateSelectTool(
         useCADStore.getState().updateCeilingNoHistory(dragId, { points: newPoints });
       }
     } else if (dragType === "product") {
-      const pp3 = (getActiveRoomDoc()?.placedProducts ?? {})[dragId];
-      if (pp3) {
-        useCADStore.getState().moveProduct(dragId, snapped);
-      } else {
-        useCADStore.getState().moveCustomElement(dragId, snapped);
+      // D-03 fast path: mutate fabric group transform; NO store write per move.
+      if (dragPre?.kind === "product" && dragPre.fabricObj) {
+        const newLeft = origin.x + snapped.x * scale;
+        const newTop = origin.y + snapped.y * scale;
+        dragPre.fabricObj.set({ left: newLeft, top: newTop });
+        if (typeof (dragPre.fabricObj as unknown as { setCoords?: () => void }).setCoords === "function") {
+          (dragPre.fabricObj as unknown as { setCoords: () => void }).setCoords();
+        }
+        fc.requestRenderAll();
+        lastDragFeetPos = snapped;
       }
     } else if (dragType === "wall") {
-      const wall = (getActiveRoomDoc()?.walls ?? {})[dragId];
-      if (wall) {
-        const cx = (wall.start.x + wall.end.x) / 2;
-        const cy = (wall.start.y + wall.end.y) / 2;
-        const dx = snapped.x - cx;
-        const dy = snapped.y - cy;
-        useCADStore.getState().updateWall(dragId, {
-          start: { x: wall.start.x + dx, y: wall.start.y + dy },
-          end: { x: wall.end.x + dx, y: wall.end.y + dy },
-        });
+      // D-03 fast path: translate all wall fabric objs by pixel delta.
+      if (dragPre?.kind === "wall-move") {
+        const cx = (dragPre.origWall.start.x + dragPre.origWall.end.x) / 2;
+        const cy = (dragPre.origWall.start.y + dragPre.origWall.end.y) / 2;
+        const dxFt = snapped.x - cx;
+        const dyFt = snapped.y - cy;
+        const dxPx = dxFt * scale;
+        const dyPx = dyFt * scale;
+        translateWallFabric(dragPre.fabricObjs, dxPx, dyPx);
+        fc.requestRenderAll();
+        lastDragWallStart = {
+          x: dragPre.origWall.start.x + dxFt,
+          y: dragPre.origWall.start.y + dyFt,
+        };
+        lastDragWallEnd = {
+          x: dragPre.origWall.end.x + dxFt,
+          y: dragPre.origWall.end.y + dyFt,
+        };
       }
     }
   };
 
   const onMouseUp = () => {
+    // Clear the drag-active flag BEFORE committing to the store so the
+    // redraw triggered by the commit runs normally and paints the final
+    // selection highlight + handles. If we cleared it after the commit,
+    // the subscription-triggered redraw would see _dragActive=true and
+    // no-op, leaving stale selection visuals.
+    _dragActive = false;
+    // Determine whether the commit below will trigger a store change (and
+    // therefore a subscription-driven redraw). For bare clicks (no drag
+    // movement) no commit fires, so we need to explicitly flush the
+    // redraw we skipped on mouse:down to repaint the selection highlight.
+    const willCommit = Boolean(dragPre && dragging && (
+      (dragPre.kind === "product" && lastDragFeetPos) ||
+      (dragPre.kind === "wall-move" && lastDragWallStart && lastDragWallEnd) ||
+      (dragPre.kind === "wall-endpoint" && lastDragWallStart && lastDragWallEnd) ||
+      (dragPre.kind === "product-rotate" && lastDragRotation != null)
+    ));
+    const hadPendingRedraw = _redrawPending;
+    _redrawPending = false;
+
+    // D-04 fast-path commit: run exactly once per drag via the committing action.
+    // This is the SINGLE history entry for the entire drag.
+    if (dragPre && dragging) {
+      const store = useCADStore.getState();
+      if (dragPre.kind === "product" && lastDragFeetPos) {
+        // Distinguish real product vs custom element by where the id lives.
+        const doc = getActiveRoomDoc();
+        if (doc?.placedProducts[dragPre.id]) {
+          store.moveProduct(dragPre.id, lastDragFeetPos);
+        } else {
+          store.moveCustomElement(dragPre.id, lastDragFeetPos);
+        }
+      } else if (dragPre.kind === "wall-move" && lastDragWallStart && lastDragWallEnd) {
+        store.updateWall(dragPre.id, {
+          start: lastDragWallStart,
+          end: lastDragWallEnd,
+        });
+      } else if (dragPre.kind === "wall-endpoint" && lastDragWallStart && lastDragWallEnd) {
+        const changes =
+          dragPre.endpoint === "start"
+            ? { start: lastDragWallStart }
+            : { end: lastDragWallEnd };
+        store.updateWall(dragPre.id, changes);
+      } else if (dragPre.kind === "product-rotate" && lastDragRotation != null) {
+        store.rotateProduct(dragPre.id, lastDragRotation);
+      }
+    }
+
     if (
       dragType === "product-resize" ||
       dragType === "wall-endpoint" ||
@@ -658,6 +968,7 @@ export function activateSelectTool(
       clearSizeTag();
     }
     dragging = false;
+    _dragActive = false;
     dragId = null;
     dragType = null;
     dragOffsetFeet = null;
@@ -672,6 +983,21 @@ export function activateSelectTool(
     openingInitialOffset = null;
     openingInitialWidth = null;
     openingInitialPointerOffset = null;
+    dragPre = null;
+    lastDragFeetPos = null;
+    lastDragRotation = null;
+    lastDragWallStart = null;
+    lastDragWallEnd = null;
+
+    // Flush a pending redraw for the bare-click case — when no commit
+    // fires (no move happened) the subscription won't re-trigger redraw,
+    // so we need to paint the selection highlight that we skipped on
+    // mouse:down. For committing drags, the store change itself triggers
+    // a redraw via the zustand subscription, so we only flush here when
+    // no commit will happen.
+    if (hadPendingRedraw && !willCommit && _redrawCallback) {
+      _redrawCallback();
+    }
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -697,6 +1023,51 @@ export function activateSelectTool(
   document.addEventListener("keydown", onKeyDown);
 
   return () => {
+    // D-06 — revert in-flight fast-path drag without committing to the store.
+    if (dragging && dragPre) {
+      if (dragPre.kind === "product" && dragPre.fabricObj) {
+        dragPre.fabricObj.set({
+          left: dragPre.origLeft,
+          top: dragPre.origTop,
+          angle: dragPre.origAngle,
+        });
+        if (typeof (dragPre.fabricObj as unknown as { setCoords?: () => void }).setCoords === "function") {
+          (dragPre.fabricObj as unknown as { setCoords: () => void }).setCoords();
+        }
+        fc.requestRenderAll();
+      } else if (dragPre.kind === "product-rotate" && dragPre.fabricObj) {
+        dragPre.fabricObj.set({ angle: dragPre.origAngle });
+        if (typeof (dragPre.fabricObj as unknown as { setCoords?: () => void }).setCoords === "function") {
+          (dragPre.fabricObj as unknown as { setCoords: () => void }).setCoords();
+        }
+        fc.requestRenderAll();
+      } else if (dragPre.kind === "wall-move") {
+        // Restore each wall fabric obj to its pre-drag left/top.
+        for (const entry of dragPre.fabricObjs) {
+          entry.fabricObj.set({ left: entry.origLeft, top: entry.origTop });
+          if (typeof (entry.fabricObj as unknown as { setCoords?: () => void }).setCoords === "function") {
+            (entry.fabricObj as unknown as { setCoords: () => void }).setCoords();
+          }
+        }
+        fc.requestRenderAll();
+      } else if (dragPre.kind === "wall-endpoint") {
+        // Restore polygon points from the cached original wall shape.
+        applyWallShapeToFabric(
+          dragPre.fabricObjs,
+          dragPre.origWall.start,
+          dragPre.origWall.end,
+          dragPre.origWall.thickness,
+        );
+        fc.requestRenderAll();
+      }
+    }
+    dragPre = null;
+    lastDragFeetPos = null;
+    lastDragRotation = null;
+    lastDragWallStart = null;
+    lastDragWallEnd = null;
+    _dragActive = false;
+    _redrawPending = false;
     fc.off("mouse:down", onMouseDown);
     fc.off("mouse:move", onMouseMove);
     fc.off("mouse:up", onMouseUp);
