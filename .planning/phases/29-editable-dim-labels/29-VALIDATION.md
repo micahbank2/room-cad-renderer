@@ -37,11 +37,20 @@ created: 2026-04-20
 
 ## Per-Task Verification Map
 
-*Populated by planner — every task MUST map to an automated command or a Wave 0 test stub. Manual-only items go to the table below.*
+*Planner-pre-filled against the four PLAN.md files. Status column updated by executor / Plan 04 sign-off.*
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| *(planner fills)* | | | | | | | |
+| 01.1 | 29-01 | 0 | EDIT-20 | unit (extend) | `npx vitest run tests/dimensionEditor.test.ts` | yes (extended) | red at creation (drives 02) |
+| 01.2 | 29-01 | 0 | EDIT-20 | RTL (new) | `npx vitest run tests/dimensionOverlay.test.tsx` | yes (new) | red at creation (drives 02) |
+| 01.3 | 29-01 | 0 | EDIT-20 | RTL (new) | `npx vitest run tests/PropertiesPanel.length.test.tsx` | yes (new) | red at creation (drives 03) |
+| 01.4 | 29-01 | 0 | EDIT-21 | unit (new) | `npx vitest run tests/cadStore.resizeWallByLabel.test.ts` | yes (new) | green at creation (regression guard) |
+| 02.1 | 29-02 | 1 | EDIT-20 | unit | `npx vitest run tests/dimensionEditor.test.ts` | yes | drives green |
+| 02.2 | 29-02 | 1 | EDIT-20 | RTL | `npx vitest run tests/dimensionOverlay.test.tsx` | yes | drives green |
+| 03.1 | 29-03 | 1 | EDIT-20 | RTL | `npx vitest run tests/PropertiesPanel.length.test.tsx` | yes | drives green |
+| 04.1 | 29-04 | 2 | EDIT-20, EDIT-21 | suite + typecheck | `npx vitest run && npx tsc --noEmit` | n/a | gate |
+| 04.2 | 29-04 | 2 | EDIT-20, EDIT-21 | manual (checkpoint) | `checkpoint:human-verify` (3 items from Manual-Only Verifications below) | n/a | gate |
+| 04.3 | 29-04 | 2 | EDIT-20, EDIT-21 | doc | `grep "nyquist_compliant: true" 29-VALIDATION.md` | yes | gate |
 
 ---
 
