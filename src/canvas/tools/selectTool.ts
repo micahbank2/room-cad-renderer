@@ -24,6 +24,15 @@ import {
 } from "../openingEditHandles";
 import { wallLength, wallCorners } from "@/lib/geometry";
 import { pxToFeet } from "./toolUtils";
+import {
+  computeSnap,
+  buildSceneGeometry,
+  axisAlignedBBoxOfRotated,
+  SNAP_TOLERANCE_PX,
+  type SceneGeometry,
+  type BBox,
+} from "@/canvas/snapEngine";
+import { renderSnapGuides, clearSnapGuides } from "@/canvas/snapGuides";
 
 type DragType =
   | "wall"
@@ -254,6 +263,91 @@ export function activateSelectTool(
   let lastDragRotation: number | null = null;
   let lastDragWallStart: Point | null = null;
   let lastDragWallEnd: Point | null = null;
+
+  // Phase 30 — smart snap (D-08a) — scene cached at drag start (D-09b). Only
+  // used by the generic-move branch below (products, custom elements,
+  // ceilings). Wall-endpoint branch (L765-789) deliberately untouched per
+  // D-08b (v1 scope).
+  let cachedScene: SceneGeometry | null = null;
+
+  /**
+   * Compute the axis-aligned bbox of the currently dragged object centered at
+   * `pos`. Used by the smart-snap code path so each mousemove evaluates the
+   * current-frame bbox. Falls back to a degenerate point-bbox when lookup
+   * fails (snap engine still works on center). D-03.
+   */
+  const computeDraggedBBox = (
+    id: string,
+    kind: "product" | "ceiling" | "custom-element",
+    pos: Point,
+  ): BBox => {
+    const doc = getActiveRoomDoc();
+    if (!doc) return { id, minX: pos.x, maxX: pos.x, minY: pos.y, maxY: pos.y };
+
+    if (kind === "product") {
+      const pp = doc.placedProducts?.[id];
+      if (pp) {
+        const prod = _productLibrary.find((p) => p.id === pp.productId);
+        const { width, depth } = effectiveDimensions(prod, pp.sizeScale);
+        return axisAlignedBBoxOfRotated(pos, width, depth, pp.rotation, id);
+      }
+      // Custom elements are hit-tested as "product" by hitTestStore.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const pce = (doc as any).placedCustomElements?.[id];
+      if (pce) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const catalog = (useCADStore.getState() as any).customElements ?? {};
+        const el = catalog[pce.customElementId] as CustomElement | undefined;
+        if (el) {
+          const sc = pce.sizeScale ?? 1;
+          return axisAlignedBBoxOfRotated(
+            pos,
+            el.width * sc,
+            el.depth * sc,
+            pce.rotation,
+            id,
+          );
+        }
+      }
+    } else if (kind === "custom-element") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const pce = (doc as any).placedCustomElements?.[id];
+      if (pce) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const catalog = (useCADStore.getState() as any).customElements ?? {};
+        const el = catalog[pce.customElementId] as CustomElement | undefined;
+        if (el) {
+          const sc = pce.sizeScale ?? 1;
+          return axisAlignedBBoxOfRotated(
+            pos,
+            el.width * sc,
+            el.depth * sc,
+            pce.rotation,
+            id,
+          );
+        }
+      }
+    } else if (kind === "ceiling") {
+      const ceiling = doc.ceilings?.[id];
+      if (ceiling && ceiling.points.length > 0) {
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        for (const p of ceiling.points) {
+          if (p.x < minX) minX = p.x;
+          if (p.x > maxX) maxX = p.x;
+          if (p.y < minY) minY = p.y;
+          if (p.y > maxY) maxY = p.y;
+        }
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+        // Translate bbox from current center to target pos.
+        const halfW = (maxX - minX) / 2;
+        const halfH = (maxY - minY) / 2;
+        void cx; void cy;
+        return { id, minX: pos.x - halfW, maxX: pos.x + halfW, minY: pos.y - halfH, maxY: pos.y + halfH };
+      }
+    }
+    return { id, minX: pos.x, maxX: pos.x, minY: pos.y, maxY: pos.y };
+  };
 
   /** Find all Fabric objects that render parts of a given wall. */
   const findWallFabricObjs = (wallId: string): WallFabricCache[] => {
@@ -634,6 +728,22 @@ export function activateSelectTool(
       dragId = hit.id;
       dragType = hit.type as "wall" | "product" | "ceiling";
 
+      // Phase 30 — D-09b: cache SceneGeometry ONCE at drag start for
+      // products + ceilings (generic-move smart-snap path). Walls use the
+      // wall-move branch which is OUT of scope per D-08; wall-endpoint
+      // path is untouched per D-08b.
+      if (hit.type === "product" || hit.type === "ceiling") {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const customCatalog = (useCADStore.getState() as any).customElements ?? {};
+        cachedScene = buildSceneGeometry(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          useCADStore.getState() as any,
+          hit.id,
+          _productLibrary,
+          customCatalog,
+        );
+      }
+
       if (hit.type === "ceiling") {
         const ceiling = (getActiveRoomDoc()?.ceilings ?? {})[hit.id];
         if (ceiling && ceiling.points.length > 0) {
@@ -872,12 +982,36 @@ export function activateSelectTool(
 
     if (!dragOffsetFeet) return;
     const gridSnap = useUIStore.getState().gridSnap;
-    const targetX = feet.x - dragOffsetFeet.x;
-    const targetY = feet.y - dragOffsetFeet.y;
-    const snapped =
-      gridSnap > 0
-        ? snapPoint({ x: targetX, y: targetY }, gridSnap)
-        : { x: targetX, y: targetY };
+    const altHeld = (opt.e as MouseEvent).altKey === true; // D-07 Alt disable
+    const targetPos = {
+      x: feet.x - dragOffsetFeet.x,
+      y: feet.y - dragOffsetFeet.y,
+    };
+
+    // Phase 30 smart-snap integration (D-08a). Applies to products + custom
+    // elements + ceilings (dragType === "product" | "ceiling"). Walls fall
+    // through to the existing grid-only path per D-08.
+    let snapped: Point;
+    const isSmartSnapTarget =
+      dragType === "product" || dragType === "ceiling";
+    if (!isSmartSnapTarget || altHeld || !cachedScene) {
+      // D-07 Alt disabled OR wall-move OR no cached scene → grid only.
+      snapped = gridSnap > 0 ? snapPoint(targetPos, gridSnap) : targetPos;
+      if (isSmartSnapTarget) clearSnapGuides(fc);
+    } else {
+      const bboxKind: "product" | "ceiling" | "custom-element" =
+        dragType === "ceiling" ? "ceiling" : "product";
+      const draggedBBox = computeDraggedBBox(dragId, bboxKind, targetPos);
+      const result = computeSnap({
+        candidate: { pos: targetPos, bbox: draggedBBox },
+        scene: cachedScene, // D-09b cached scene
+        tolerancePx: SNAP_TOLERANCE_PX,
+        scale,
+        gridSnap,
+      });
+      snapped = result.snapped;
+      renderSnapGuides(fc, result.guides, scale, origin);
+    }
 
     if (dragType === "ceiling") {
       const ceiling = (getActiveRoomDoc()?.ceilings ?? {})[dragId];
@@ -982,6 +1116,9 @@ export function activateSelectTool(
     ) {
       clearSizeTag();
     }
+    // Phase 30 — clear smart-snap guides on mouseup (D-06b / Pitfall 2).
+    clearSnapGuides(fc);
+    cachedScene = null;
     dragging = false;
     _dragActive = false;
     dragId = null;
@@ -1037,6 +1174,96 @@ export function activateSelectTool(
   fc.on("mouse:up", onMouseUp);
   document.addEventListener("keydown", onKeyDown);
 
+  // Phase 30 — test-mode driver (D-07 contract from 30-01-SUMMARY.md).
+  // Installed only under `import.meta.env.MODE === "test"`; removed in
+  // cleanup(). RTL harness uses these hooks because happy-dom's fabric
+  // pointer-event simulation is fragile; driver invokes the real drag
+  // branches with a synthesized MouseEvent whose `altKey` reflects the
+  // caller's intent (D-07).
+  let driveSnapHook:
+    | ((args: {
+        tool: "select" | "product";
+        pos: Point;
+        dragId?: string;
+        altKey?: boolean;
+        phase: "move" | "up" | "down";
+      }) => void)
+    | undefined;
+  let getSnapGuidesHook: (() => fabric.Object[]) | undefined;
+  if (import.meta.env.MODE === "test") {
+    const toPx = (p: Point): { x: number; y: number } => ({
+      x: origin.x + p.x * scale,
+      y: origin.y + p.y * scale,
+    });
+    const fakeEvt = (altKey: boolean): MouseEvent => {
+      // Build the minimum shape onMouseMove / onMouseUp read off `opt.e`.
+      return { altKey, metaKey: false, ctrlKey: false, shiftKey: false } as unknown as MouseEvent;
+    };
+    // Override getViewportPoint for the duration of each driven call so
+    // the existing handler code sees the desired pixel pointer.
+    const origGetViewportPoint = fc.getViewportPoint.bind(fc);
+    const withDrivenPointer = <T,>(posFeet: Point, fn: () => T): T => {
+      const px = toPx(posFeet);
+      (fc as unknown as { getViewportPoint: (e: unknown) => { x: number; y: number } }).getViewportPoint =
+        () => px;
+      try {
+        return fn();
+      } finally {
+        (fc as unknown as { getViewportPoint: typeof origGetViewportPoint }).getViewportPoint =
+          origGetViewportPoint;
+      }
+    };
+
+    driveSnapHook = (args) => {
+      if (args.tool !== "select") return;
+      const altKey = args.altKey === true;
+      const opt = { e: fakeEvt(altKey) } as unknown as fabric.TEvent;
+      // Ensure a drag is started for the referenced dragId before moving.
+      if (args.phase === "move" || args.phase === "up") {
+        if (!dragging && args.dragId) {
+          // Synthesize a mousedown on the product position so the handler
+          // finds the hit and sets dragType/dragPre/dragOffsetFeet/etc.
+          const doc = getActiveRoomDoc();
+          const pp = doc?.placedProducts?.[args.dragId];
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const pce = (doc as any)?.placedCustomElements?.[args.dragId];
+          const ceiling = doc?.ceilings?.[args.dragId];
+          const startPos: Point | null =
+            pp?.position ?? pce?.position ?? (ceiling ? {
+              x: ceiling.points.reduce((s: number, p: Point) => s + p.x, 0) / ceiling.points.length,
+              y: ceiling.points.reduce((s: number, p: Point) => s + p.y, 0) / ceiling.points.length,
+            } : null);
+          if (startPos) {
+            withDrivenPointer(startPos, () => onMouseDown(opt));
+          }
+        }
+        if (args.phase === "move") {
+          withDrivenPointer(args.pos, () => onMouseMove(opt));
+        } else {
+          // Move to final pos first so lastDragFeetPos gets set, then up.
+          withDrivenPointer(args.pos, () => onMouseMove(opt));
+          onMouseUp();
+        }
+      }
+    };
+    getSnapGuidesHook = () =>
+      fc
+        .getObjects()
+        .filter(
+          (o) =>
+            (o as unknown as { data?: { type?: string } }).data?.type ===
+            "snap-guide",
+        );
+    (window as unknown as {
+      __driveSnap?: typeof driveSnapHook;
+      __getSnapGuides?: typeof getSnapGuidesHook;
+    }).__driveSnap = driveSnapHook;
+    (window as unknown as {
+      __driveSnap?: typeof driveSnapHook;
+      __getSnapGuides?: typeof getSnapGuidesHook;
+    }).__getSnapGuides = getSnapGuidesHook;
+  }
+
   return () => {
     // D-06 — revert in-flight fast-path drag without committing to the store.
     if (dragging && dragPre) {
@@ -1088,5 +1315,17 @@ export function activateSelectTool(
     fc.off("mouse:up", onMouseUp);
     document.removeEventListener("keydown", onKeyDown);
     clearSizeTag();
+    // Phase 30 — clear smart-snap guides on tool-switch cleanup (Pitfall 3).
+    clearSnapGuides(fc);
+    cachedScene = null;
+    // Phase 30 — remove the test-mode driver hooks we installed.
+    if (import.meta.env.MODE === "test") {
+      const w = window as unknown as {
+        __driveSnap?: unknown;
+        __getSnapGuides?: unknown;
+      };
+      if (w.__driveSnap === driveSnapHook) delete w.__driveSnap;
+      if (w.__getSnapGuides === getSnapGuidesHook) delete w.__getSnapGuides;
+    }
   };
 }

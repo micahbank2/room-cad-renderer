@@ -24,8 +24,39 @@
  *   - The window.__driveSnap / window.__getSnapGuides hooks are not wired
  *     (Plan 03 wires them into productTool + selectTool)
  */
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, act } from "@testing-library/react";
+
+// Stub router-dependent hook so `<App />` can mount without a <Router>
+// wrapper in this harness (mirrors tests/App.restore.test.tsx pattern).
+// Plan 03 Rule 3 auto-fix — unblocks integration test execution; the hook
+// under test here is the smart-snap driver, not help-route sync.
+vi.mock("@/hooks/useHelpRouteSync", () => ({
+  useHelpRouteSync: () => {},
+}));
+
+// Stub the 3D viewport (lazy-loaded) so happy-dom doesn't attempt WebGL.
+vi.mock("@/three/ThreeViewport", () => ({
+  default: () => null,
+}));
+
+// idb-keyval has no happy-dom shim — stub it so the product/wainscot/framed-art
+// stores' load() calls don't reject on `indexedDB is not defined`.
+vi.mock("idb-keyval", () => ({
+  get: vi.fn().mockResolvedValue(undefined),
+  set: vi.fn().mockResolvedValue(undefined),
+  del: vi.fn().mockResolvedValue(undefined),
+  keys: vi.fn().mockResolvedValue([]),
+}));
+vi.mock("@/lib/serialization", () => ({
+  saveProject: vi.fn().mockResolvedValue(undefined),
+  setLastProjectId: vi.fn().mockResolvedValue(undefined),
+  getLastProjectId: vi.fn().mockResolvedValue(null),
+  loadProject: vi.fn().mockResolvedValue(null),
+  deleteProject: vi.fn().mockResolvedValue(undefined),
+  listProjects: vi.fn().mockResolvedValue([]),
+}));
+
 import App from "@/App";
 import { useCADStore, resetCADStoreForTests } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
@@ -85,12 +116,48 @@ function seedRoom(opts: { withProduct?: boolean } = {}) {
   } as Parameters<typeof useCADStore.setState>[0]);
 }
 
+/**
+ * happy-dom returns 0-sized bounding rects, which makes FabricCanvas.redraw()
+ * short-circuit before activating the current tool (and hence before
+ * installing the window.__driveSnap driver). Stub a reasonable viewport so
+ * the canvas init path actually runs. 800x600 matches toolCleanup.test.ts
+ * canvas dims.
+ */
+function stubCanvasViewport(): void {
+  const origGBCR = HTMLElement.prototype.getBoundingClientRect;
+  HTMLElement.prototype.getBoundingClientRect = function (): DOMRect {
+    return {
+      x: 0, y: 0, left: 0, top: 0, right: 800, bottom: 600,
+      width: 800, height: 600,
+      toJSON: () => ({}),
+    } as DOMRect;
+  };
+  // Store for afterEach restore.
+  (globalThis as unknown as { __origGBCR?: typeof origGBCR }).__origGBCR = origGBCR;
+}
+function restoreCanvasViewport(): void {
+  const orig = (globalThis as unknown as { __origGBCR?: () => DOMRect }).__origGBCR;
+  if (orig) HTMLElement.prototype.getBoundingClientRect = orig;
+}
+
 async function waitForDriver(): Promise<void> {
   await vi.waitFor(() => {
     expect(typeof window.__driveSnap).toBe("function");
     expect(typeof window.__getSnapGuides).toBe("function");
-  });
+  }, { timeout: 2000 });
 }
+
+// File-level viewport stub + driver cleanup for every test.
+beforeEach(() => {
+  stubCanvasViewport();
+});
+afterEach(() => {
+  restoreCanvasViewport();
+  // Remove any lingering driver hooks between tests so waitForDriver
+  // reflects the current canvas's install, not the previous one.
+  delete (window as { __driveSnap?: unknown }).__driveSnap;
+  delete (window as { __getSnapGuides?: unknown }).__getSnapGuides;
+});
 
 describe("productTool placement (Phase 30 integration)", () => {
   beforeEach(() => {

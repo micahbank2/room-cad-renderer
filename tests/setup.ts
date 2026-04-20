@@ -41,6 +41,16 @@ HTMLCanvasElement.prototype.getContext = function (type: string, ...rest: unknow
       getTransform: () => ({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }),
       setLineDash: () => {},
       getLineDash: () => [],
+      // Phase 30 — additional path-building methods Fabric calls when
+      // rendering Rect/Circle with rounded corners. happy-dom ships without
+      // these; missing methods throw "not a function" during fc.renderAll().
+      bezierCurveTo: () => {},
+      quadraticCurveTo: () => {},
+      arcTo: () => {},
+      ellipse: () => {},
+      clip: () => {},
+      isPointInPath: () => false,
+      isPointInStroke: () => false,
     };
     return ctx as unknown as CanvasRenderingContext2D;
   }
