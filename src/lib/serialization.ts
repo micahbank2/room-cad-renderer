@@ -3,6 +3,17 @@ import type { CADSnapshot } from "@/types/cad";
 
 const PROJECT_PREFIX = "room-cad-project-";
 
+export const LAST_PROJECT_KEY = "room-cad-last-project";
+
+export async function setLastProjectId(id: string): Promise<void> {
+  await set(LAST_PROJECT_KEY, id);
+}
+
+export async function getLastProjectId(): Promise<string | null> {
+  const id = await get<string>(LAST_PROJECT_KEY);
+  return id ?? null;
+}
+
 export interface SavedProject {
   id: string;
   name: string;

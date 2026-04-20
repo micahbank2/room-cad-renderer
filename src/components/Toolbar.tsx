@@ -168,6 +168,19 @@ const TOOL_SHORTCUTS: Record<ToolType, string> = {
 /** Prominent save indicator in the top toolbar (SAVE-04) */
 function ToolbarSaveStatus() {
   const status = useProjectStore((s) => s.saveStatus);
+
+  // D-04 / D-04a: SAVE_FAILED surface — persists (no auto-fade) until store leaves "failed"
+  if (status === "failed") {
+    return (
+      <div className="flex items-center gap-1.5 min-w-[72px]">
+        <span className="material-symbols-outlined text-[14px] text-error">error</span>
+        <span className="font-mono text-[10px] tracking-widest text-error">
+          SAVE_FAILED
+        </span>
+      </div>
+    );
+  }
+
   const isSaving = status === "saving";
   const isSaved = status === "saved" || status === "idle";
   return (
