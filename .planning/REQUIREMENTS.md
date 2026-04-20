@@ -12,12 +12,12 @@
 
 ### Performance (PERF)
 
-- [ ] **PERF-01**: Canvas redraw uses incremental updates instead of full clear-and-redraw
+- [x] **PERF-01**: Canvas redraw uses incremental updates instead of full clear-and-redraw
   - **Source:** [#51](https://github.com/micahbank2/room-cad-renderer/issues/51)
   - **Verifiable:** Dragging a product in a 50-wall / 30-product scene maintains 60fps on M-series Mac. Visual parity with current behavior. All 115 tests pass.
   - **Files:** `src/canvas/FabricCanvas.tsx`, `src/canvas/fabricSync.ts`
 
-- [ ] **PERF-02**: cadStore snapshots use `structuredClone()` instead of `JSON.parse(JSON.stringify())`
+- [x] **PERF-02**: cadStore snapshots use `structuredClone()` instead of `JSON.parse(JSON.stringify())` — **Partial** (D-07 contract met; ≥2× speedup target missed — see 25-VERIFICATION.md)
   - **Source:** [#52](https://github.com/micahbank2/room-cad-renderer/issues/52)
   - **Verifiable:** Snapshot perf measured before/after — ≥2x improvement at 50 walls / 30 products. Undo/redo still produces single entries for drag-completed mutations.
   - **Files:** `src/stores/cadStore.ts` (lines 38–44)
@@ -48,12 +48,12 @@
 
 ### Bug Fixes (FIX)
 
-- [ ] **FIX-01**: Product images render in 2D canvas (async load)
+- [x] **FIX-01**: Product images render in 2D canvas (async load)
   - **Source:** [#42](https://github.com/micahbank2/room-cad-renderer/issues/42)
   - **Verifiable:** Product thumbnails appear in 2D canvas after placement. No flicker on existing renders. Project reload shows images without re-trigger.
   - **Files:** `src/canvas/fabricSync.ts:155-168`
 
-- [ ] **FIX-02**: Ceiling preset materials apply correctly in `CeilingMesh`
+- [x] **FIX-02**: Ceiling preset materials apply correctly in `CeilingMesh`
   - **Source:** [#43](https://github.com/micahbank2/room-cad-renderer/issues/43)
   - **Verifiable:** Selecting a ceiling preset visibly changes the 3D ceiling material. Preset persists across reload. Hex color path still works.
   - **Files:** `src/three/CeilingMesh.tsx`, `src/lib/surfaceMaterials.ts`
@@ -91,11 +91,11 @@ From PROJECT.md:
 
 | Requirement | Issue | Phase | Status |
 |-------------|-------|-------|--------|
-| PERF-01 | #51 | Phase 25 | Pending |
-| PERF-02 | #52 | Phase 25 | Pending |
+| PERF-01 | #51 | Phase 25 | Complete |
+| PERF-02 | #52 | Phase 25 | Partial — D-07 contract met; ≥2× speedup NOT met (see 25-VERIFICATION.md) |
 | TOOL-01 | #53 | Phase 24 | Pending |
 | TOOL-02 | #54 | Phase 24 | Pending |
 | TOOL-03 | #55 | Phase 24 | Pending |
 | TRACK-01 | #56 | Phase 27 | Pending |
-| FIX-01 | #42 | Phase 26 | Pending |
-| FIX-02 | #43 | Phase 26 | Pending |
+| FIX-01 | #42 | Phase 26 | Complete |
+| FIX-02 | #43 | Phase 26 | Complete — closed as perception-only (Outcome A); regression guards added (see 26-02 SUMMARY) |

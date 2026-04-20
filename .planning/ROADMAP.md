@@ -57,8 +57,8 @@
 ### Phases
 
 - [x] **Phase 24: Tool Architecture Refactor** — Eliminate `as any` casts, move state to closures, extract shared utilities (shipped 2026-04-18)
-- [ ] **Phase 25: Canvas & Store Performance** — Incremental canvas updates, faster cadStore snapshots
-- [ ] **Phase 26: Bug Sweep** — Fix async product images in 2D canvas and ceiling preset material path
+- [x] **Phase 25: Canvas & Store Performance** — Incremental canvas updates, faster cadStore snapshots (completed 2026-04-20)
+- [x] **Phase 26: Bug Sweep** — Fix async product images in 2D canvas and ceiling preset material path (completed 2026-04-20)
 - [ ] **Phase 27: Upgrade Tracking** — Document R3F v9 / React 19 upgrade path
 
 ### Phase Details
@@ -93,7 +93,7 @@
   - [x] 25-00-wave0-validation-scaffolding-PLAN.md — 7 RED contract tests + window.__cadSeed/__cadBench dev helpers
   - [x] 25-01-wave1-structured-clone-PLAN.md — snapshot() uses structuredClone + dev-gated timing (PERF-02)
   - [x] 25-02-wave2-drag-fast-path-PLAN.md — drag fast path for 4 ops + renderOnAddRemove: false (PERF-01)
-  - [ ] 25-03-wave3-verification-PLAN.md — Chrome trace + bench ratio + ROADMAP update
+  - [x] 25-03-wave3-verification-PLAN.md — Chrome trace + bench ratio + ROADMAP update
 
 ### Phase 26: Bug Sweep
 **Goal**: Product thumbnails appear in 2D canvas after placement and ceiling preset materials render correctly in 3D
@@ -104,7 +104,11 @@
   2. Project reload shows product images in 2D canvas without any re-trigger or user action
   3. Select a ceiling preset material in the ceiling panel — the 3D ceiling mesh visibly changes to that material
   4. Preset material selection persists across project save/reload (not reset to default hex on load)
-**Plans**: TBD
+**Plans**: 4 plans
+  - [x] 26-00-wave0-red-tests-PLAN.md — RED/baseline tests for FIX-01 (fabricSync image) and FIX-02 (ceiling surfaceMaterialId round-trip)
+  - [x] 26-01-fix01-product-image-rebuild-PLAN.md — Rebuild product Group on async image load (FIX-01)
+  - [x] 26-02-fix02-ceiling-preset-material-PLAN.md — Diagnose & close ceiling preset bug (Outcome A — perception-only; regression guards added) (FIX-02)
+  - [x] 26-03-wave3-verification-and-closeout-PLAN.md — Full suite + D-10/D-12 manual smoke + GitHub #42/#43 close-out
 
 ### Phase 27: Upgrade Tracking
 **Goal**: R3F v9 / React 19 upgrade path is documented and the blocking issue is tracked so it can be executed when R3F v9 stabilizes
@@ -121,6 +125,6 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 24. Tool Architecture Refactor | 4/4 | Complete    | 2026-04-19 |
-| 25. Canvas & Store Performance | 3/4 | In Progress|  |
-| 26. Bug Sweep | 0/? | Not started | - |
+| 25. Canvas & Store Performance | 4/4 | Complete    | 2026-04-20 |
+| 26. Bug Sweep | 4/4 | Complete    | 2026-04-20 |
 | 27. Upgrade Tracking | 0/? | Not started | - |

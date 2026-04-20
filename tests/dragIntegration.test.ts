@@ -18,6 +18,17 @@ const setSelectToolRedrawCallback =
 const isSelectToolDragActive =
   (selectToolModule as { isSelectToolDragActive?: () => boolean })
     .isSelectToolDragActive ?? (() => false);
+// Hotfix #2 export — shared helper so this test and FabricCanvas.redraw()
+// use identical short-circuit logic. If absent (pre-hotfix-2), fall back
+// to the old coarse short-circuit which will trip the tool-switch-revert
+// assertion, making the regression visible.
+const shouldSkipRedrawDuringDrag =
+  (selectToolModule as {
+    shouldSkipRedrawDuringDrag?: (opts: { activeToolChanged: boolean }) => boolean;
+  }).shouldSkipRedrawDuringDrag
+  ?? ((_opts: { activeToolChanged: boolean }) =>
+    ((selectToolModule as { isSelectToolDragActive?: () => boolean })
+      .isSelectToolDragActive ?? (() => false))());
 import { renderProducts, renderWalls } from "@/canvas/fabricSync";
 
 // ---------------------------------------------------------------------------
@@ -244,6 +255,166 @@ describe("Wave 2 drag regression — select → drag → release round-trip", ()
     // Cleanup.
     unsubscribe();
     cleanup();
+    setSelectToolRedrawCallback(null);
+    fc.dispose();
+  });
+
+  it("tool-switch during drag reverts the in-flight drag", () => {
+    // Phase 25 Wave 2 Hotfix #2 — Tool-switch revert regression.
+    //
+    // Hotfix #1 added `_dragActive` + `isSelectToolDragActive()` to short-circuit
+    // FabricCanvas.redraw() on selectedIds changes during a drag. That fix was
+    // too coarse: the short-circuit also fired on activeTool changes, breaking
+    // the D-06 tool-switch-revert contract. Pressing `W` mid-drag should
+    // immediately revert the in-flight drag (Fabric object returns to pre-drag
+    // left/top) and discard the drag without committing to the store.
+    //
+    // This test RED's on post-hotfix-#1 code (the activeTool-triggered redraw
+    // short-circuits, cleanup never runs, drag commits on mouse:up) and GREEN's
+    // after hotfix #2 (redraw differentiates activeTool changes from selectedIds
+    // changes and allows cleanup to run on tool switch).
+    // ------------------------------------------------------------------------
+
+    // Seed product at (5, 5) ft
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    useCADStore.setState((s: any) => {
+      const doc = s.rooms[s.activeRoomId];
+      const pp: PlacedProduct = {
+        id: "pp_chair",
+        productId: "prod_chair",
+        position: { x: 5, y: 5 },
+        rotation: 0,
+      };
+      return {
+        rooms: {
+          ...s.rooms,
+          [s.activeRoomId]: {
+            ...doc,
+            placedProducts: { ...doc.placedProducts, pp_chair: pp },
+          },
+        },
+      };
+    });
+
+    const fc = makeCanvas();
+    const scale = 10;
+    const origin = { x: 0, y: 0 };
+    renderWalls(fc, getActiveRoomDoc()!.walls, scale, origin, []);
+    renderProducts(
+      fc,
+      getActiveRoomDoc()!.placedProducts,
+      [
+        {
+          id: "prod_chair",
+          name: "Chair",
+          category: "Seating",
+          width: 2,
+          depth: 2,
+          height: 3,
+          material: "",
+          imageUrl: "",
+          textureUrls: [],
+        },
+      ],
+      scale,
+      origin,
+      [],
+    );
+
+    // Wire redraw callback (selectTool uses it to flush skipped bare-click redraw)
+    setSelectToolRedrawCallback(vi.fn());
+
+    // Activate selectTool; capture cleanup so the simulated FabricCanvas
+    // useEffect can invoke it when activeTool changes.
+    let cleanup = activateSelectTool(fc, scale, origin);
+
+    // Mirror FabricCanvas.redraw()'s short-circuit using the SAME shared
+    // helper (`shouldSkipRedrawDuringDrag`). Production:
+    //   - activeTool change fires the [redraw] effect
+    //   - redraw() calls shouldSkipRedrawDuringDrag({ activeToolChanged: true })
+    //   - fix: returns false → redraw runs → toolCleanupRef.current?.() fires
+    //          → selectTool cleanup reverts the drag
+    //   - bug: returns true (coarse short-circuit) → cleanup never runs →
+    //          drag remains live → mouse:up commits permanently.
+    //
+    // Production tracks prev activeTool via a useRef; in the test we use a
+    // captured prev value initialized at the time the simulation started.
+    let simulatedPrevActiveTool = useUIStore.getState().activeTool;
+    let toolSwitchCleanupFired = 0;
+    const unsubscribe = useUIStore.subscribe((state, prev) => {
+      if (state.activeTool === prev.activeTool && state.selectedIds === prev.selectedIds) return;
+      const activeToolChanged = state.activeTool !== simulatedPrevActiveTool;
+      simulatedPrevActiveTool = state.activeTool;
+      if (shouldSkipRedrawDuringDrag({ activeToolChanged })) {
+        return;
+      }
+      if (activeToolChanged) {
+        toolSwitchCleanupFired += 1;
+        cleanup();
+      }
+    });
+
+    // --- mouse:down on product ---
+    const downPx = feetToPx({ x: 5, y: 5 });
+    fc.fire("mouse:down", makePointerEvent(downPx.x, downPx.y));
+    expect(useUIStore.getState().selectedIds).toEqual(["pp_chair"]);
+    expect(isSelectToolDragActive()).toBe(true);
+
+    // Cache the fabric product object's pre-drag left/top (before mouse:move).
+    // selectTool's dragPre.origLeft/origTop were snapshotted at mouse:down,
+    // from findProductFabricObj — these are the values cleanup() will
+    // restore to.
+    const productObj = fc.getObjects().find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (o) => (o as any).data?.type === "product" && (o as any).data?.placedProductId === "pp_chair",
+    );
+    expect(productObj).toBeDefined();
+    const preDragLeft = productObj!.left ?? 0;
+    const preDragTop = productObj!.top ?? 0;
+    const preDragStorePos = { ...getActiveRoomDoc()!.placedProducts.pp_chair.position };
+    const preDragHistory = useCADStore.getState().past.length;
+
+    // --- mouse:move — drag to (8, 7) ft ---
+    const movePx = feetToPx({ x: 8, y: 7 });
+    fc.fire("mouse:move", makePointerEvent(movePx.x, movePx.y));
+
+    // Fabric object moved mid-drag (fast-path mutation).
+    expect(productObj!.left).not.toBe(preDragLeft);
+    expect(productObj!.top).not.toBe(preDragTop);
+
+    // --- TOOL SWITCH: change activeTool to "wall" ---
+    // This is the production path via `W` keypress → setTool("wall") → the
+    // FabricCanvas useEffect reacts and runs cleanup. The mirrored
+    // subscription above invokes cleanup().
+    useUIStore.setState({ activeTool: "wall" });
+
+    // Cleanup fired exactly once in response to the activeTool change.
+    expect(toolSwitchCleanupFired).toBe(1);
+
+    // --- Assertions: drag was REVERTED ---
+    // a) Fabric object's left/top reverted to pre-drag values (D-06 revert).
+    expect(productObj!.left).toBeCloseTo(preDragLeft, 5);
+    expect(productObj!.top).toBeCloseTo(preDragTop, 5);
+
+    // b) Store's placedProducts[id].position is unchanged from pre-drag.
+    const postSwitchPos = getActiveRoomDoc()!.placedProducts.pp_chair.position;
+    expect(postSwitchPos.x).toBeCloseTo(preDragStorePos.x, 5);
+    expect(postSwitchPos.y).toBeCloseTo(preDragStorePos.y, 5);
+
+    // c) History did NOT grow — no pushHistory commit happened.
+    expect(useCADStore.getState().past.length).toBe(preDragHistory);
+
+    // d) `_dragActive` flag cleared — cleanup resets it.
+    expect(isSelectToolDragActive()).toBe(false);
+
+    // --- Late mouse:up — should be a no-op (listeners detached by cleanup) ---
+    // fc.fire calls the registered listeners; after cleanup, selectTool's
+    // onMouseUp is unbound, so this must not commit.
+    fc.fire("mouse:up", makePointerEvent(movePx.x, movePx.y));
+    expect(useCADStore.getState().past.length).toBe(preDragHistory);
+    expect(getActiveRoomDoc()!.placedProducts.pp_chair.position.x).toBeCloseTo(preDragStorePos.x, 5);
+
+    unsubscribe();
     setSelectToolRedrawCallback(null);
     fc.dispose();
   });
