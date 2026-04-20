@@ -24,7 +24,7 @@ import {
   setSelectToolRedrawCallback,
 } from "./tools/selectTool";
 import type { ToolType } from "@/types/cad";
-import { activateProductTool } from "./tools/productTool";
+import { activateProductTool, setProductToolLibrary } from "./tools/productTool";
 import { activateDoorTool } from "./tools/doorTool";
 import { activateWindowTool } from "./tools/windowTool";
 import { activateCeilingTool } from "./tools/ceilingTool";
@@ -108,6 +108,9 @@ export default function FabricCanvas({ productLibrary }: Props) {
   // Keep select tool's product library reference up to date
   useEffect(() => {
     setSelectToolProductLibrary(productLibrary);
+    // Phase 30 — product tool needs the library too to resolve the
+    // pending product's bbox for smart-snap.
+    setProductToolLibrary(productLibrary);
   }, [productLibrary]);
 
   /** Full redraw of the canvas from store state */
