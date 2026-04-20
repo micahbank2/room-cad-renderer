@@ -24,13 +24,23 @@ vi.mock("idb-keyval", () => ({
   keys: vi.fn().mockResolvedValue([]),
 }));
 
-// Mock serialization to stub loadProject / listProjects.
-vi.mock("@/lib/serialization", () => ({
-  saveProject: vi.fn().mockResolvedValue(undefined),
-  loadProject: vi.fn(),
-  deleteProject: vi.fn().mockResolvedValue(undefined),
-  listProjects: vi.fn().mockResolvedValue([]),
-}));
+// Mock serialization to stub loadProject / listProjects / getLastProjectId.
+// getLastProjectId delegates to the idb-keyval `get` mock so individual
+// tests can control the pointer value per-case via vi.mocked(get).
+vi.mock("@/lib/serialization", async () => {
+  const idb = await import("idb-keyval");
+  return {
+    saveProject: vi.fn().mockResolvedValue(undefined),
+    setLastProjectId: vi.fn().mockResolvedValue(undefined),
+    getLastProjectId: vi.fn(async () => {
+      const id = await idb.get("room-cad-last-project");
+      return id ?? null;
+    }),
+    loadProject: vi.fn(),
+    deleteProject: vi.fn().mockResolvedValue(undefined),
+    listProjects: vi.fn().mockResolvedValue([]),
+  };
+});
 
 // Stub the 3D viewport (lazy-loaded) so happy-dom doesn't explode on WebGL.
 vi.mock("@/three/ThreeViewport", () => ({

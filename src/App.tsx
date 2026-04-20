@@ -9,7 +9,7 @@ import { useWainscotStyleStore } from "@/stores/wainscotStyleStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { useHelpRouteSync } from "@/hooks/useHelpRouteSync";
-import { listProjects } from "@/lib/serialization";
+import { getLastProjectId, loadProject } from "@/lib/serialization";
 import Toolbar from "@/components/Toolbar";
 import { ToolPalette } from "@/components/Toolbar";
 import Sidebar from "@/components/Sidebar";
@@ -60,17 +60,29 @@ export default function App() {
     useWainscotStyleStore.getState().load();
   }, []);
 
-  // Hydrate last-saved project on mount (SAVE-02 reload support)
+  // D-02: Silent restore last-active project (pointer-based)
+  // Reads "room-cad-last-project" pointer; on hit → loadProject →
+  // hydrate CAD + project store + skip WelcomeScreen (setHasStarted).
+  // On missing/stale/throw → fall through to WelcomeScreen (D-02a).
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const projects = await listProjects();
-      if (cancelled || projects.length === 0) return;
-      const latest = projects[0];
-      useCADStore.getState().loadSnapshot(latest.snapshot);
-      useProjectStore.getState().setActive(latest.id, latest.name);
+      try {
+        const lastId = await getLastProjectId();
+        if (cancelled || !lastId) return;
+        const project = await loadProject(lastId);
+        if (cancelled || !project) return;
+        useCADStore.getState().loadSnapshot(project.snapshot);
+        useProjectStore.getState().setActive(project.id, project.name);
+        setHasStarted(true);
+      } catch (err) {
+        console.error("[App] Silent restore failed", err);
+        // D-02a: fall through → WelcomeScreen
+      }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Auto-detect if user has started (has walls or products)
