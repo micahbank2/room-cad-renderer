@@ -147,7 +147,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 32. PBR Foundation | 7/7 | Complete   | 2026-04-21 |
+| 32. PBR Foundation | 7/7 | Complete    | 2026-04-21 |
 | 33. User-Uploaded Textures | 0/0 | Not started | - |
 | 34. Camera Presets | 0/0 | Not started | - |
 | 35. Tech-Debt Sweep | 0/0 | Not started | - |

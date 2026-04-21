@@ -4,7 +4,7 @@ milestone: v1.7
 milestone_name: 3D Realism
 status: verifying
 stopped_at: Completed Phase 32 Plan 04 — regression guards landed, phase ready for closeout
-last_updated: "2026-04-21T21:23:22.147Z"
+last_updated: "2026-04-21T21:32:02.917Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 6
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 ## Current Position
 
 Milestone: v1.7 3D Realism
-Phase: 32 (pbr-foundation) — EXECUTING
-Plan: 4 of 4
+Phase: 999.1
+Plan: Not started
 Status: Phase complete — ready for verification
 Last activity: 2026-04-21
 
