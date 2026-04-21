@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Editing UX
 status: executing
-stopped_at: Completed 31-03-integration-PLAN.md
-last_updated: "2026-04-21T00:34:56.038Z"
+stopped_at: Completed 31-04-verification-PLAN.md
+last_updated: "2026-04-21T00:40:51.131Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 17
-  completed_plans: 16
+  completed_plans: 17
 ---
 
 # Project State
@@ -57,6 +57,7 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 31]: Plan 31-02 (Wave 1 pure modules): 5 schema fields + resolver + edge handles + restricted snap scene + 8 store actions. 43 Wave 0 unit tests RED->GREEN; integration tests still RED awaiting Wave 2 drivers
 - [Phase 31]: Pitfall 4 separation: updateCustomElement (catalog) + updatePlacedCustomElement (placement) coexist with clear naming; placement actions write to rooms[active].placedCustomElements[id] not root.customElements
 - [Phase 31]: Plan 31-03 wired all Wave 1 pure modules into selectTool + PropertiesPanel + fabricSync; all 4 RTL specs green; +27 assertions
+- [Phase 31]: Phase 31 closure: VALIDATION signed (nyquist_compliant=true, wave_0_complete=true), 28/28 RTL assertions green, 6 pre-existing LIB-03/04/05 failures documented out-of-scope, EDIT-22/23/24/CUSTOM-06 closed
 
 ### Pending Todos
 
@@ -75,6 +76,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-21T00:34:49.568Z
-Stopped at: Completed 31-03-integration-PLAN.md
+Last session: 2026-04-21T00:40:51.129Z
+Stopped at: Completed 31-04-verification-PLAN.md
 Resume file: None

@@ -20,9 +20,9 @@
 
 ### Drag-to-Resize (EDIT)
 
-- [ ] **EDIT-22** — A selected product shows corner/edge resize handles. Dragging a handle updates `widthFt` / `lengthFt`, snapped to the active grid (`uiStore.gridSnap`, default 0.5ft). Source: [#60](https://github.com/micahbank2/room-cad-renderer/issues/60).
-- [ ] **EDIT-23** — A selected wall shows endpoint handles. Dragging an endpoint updates the wall's `start` / `end` point. Shift constrains the drag to orthogonal. Source: [#60](https://github.com/micahbank2/room-cad-renderer/issues/60).
-- [ ] **EDIT-24** — Drag-resize commits a single undo entry at mouse-up, not per frame. Preserves the Phase 25 PERF-01 drag fast-path (`shouldSkipRedrawDuringDrag`, `renderOnAddRemove: false`). Source: [#60](https://github.com/micahbank2/room-cad-renderer/issues/60).
+- [x] **EDIT-22** — A selected product shows corner/edge resize handles. Dragging a handle updates `widthFt` / `lengthFt`, snapped to the active grid (`uiStore.gridSnap`, default 0.5ft). Source: [#60](https://github.com/micahbank2/room-cad-renderer/issues/60).
+- [x] **EDIT-23** — A selected wall shows endpoint handles. Dragging an endpoint updates the wall's `start` / `end` point. Shift constrains the drag to orthogonal. Source: [#60](https://github.com/micahbank2/room-cad-renderer/issues/60).
+- [x] **EDIT-24** — Drag-resize commits a single undo entry at mouse-up, not per frame. Preserves the Phase 25 PERF-01 drag fast-path (`shouldSkipRedrawDuringDrag`, `renderOnAddRemove: false`). Source: [#60](https://github.com/micahbank2/room-cad-renderer/issues/60).
 
 ### Smart Snapping (SNAP)
 
@@ -32,7 +32,7 @@
 
 ### Per-Placement Label Override (CUSTOM)
 
-- [ ] **CUSTOM-06** — Selecting a placed custom element reveals a label-override input in `PropertiesPanel`. When set, the 2D canvas renders the override instead of the catalog name. Empty reverts to the catalog name. Override persists with the project. Source: [#50](https://github.com/micahbank2/room-cad-renderer/issues/50).
+- [x] **CUSTOM-06** — Selecting a placed custom element reveals a label-override input in `PropertiesPanel`. When set, the 2D canvas renders the override instead of the catalog name. Empty reverts to the catalog name. Override persists with the project. Source: [#50](https://github.com/micahbank2/room-cad-renderer/issues/50).
 
 ---
 
