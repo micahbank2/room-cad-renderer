@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.7
-milestone_name: 3D Realism
-status: verifying
-stopped_at: Completed Phase 32 Plan 04 — regression guards landed, phase ready for closeout
-last_updated: "2026-04-21T21:32:02.917Z"
+milestone: v1.7.5
+milestone_name: Design System & UI Polish
+status: discussing
+stopped_at: v1.7.5 milestone + 8 issues created (#83–#90); awaiting /gsd:discuss-phase in fresh chat
+last_updated: "2026-04-21T23:30:00.000Z"
 last_activity: 2026-04-21
 progress:
-  total_phases: 6
-  completed_phases: 1
-  total_plans: 7
-  completed_plans: 7
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -20,17 +20,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 32 — pbr-foundation
+**Current focus:** v1.7.5 — Design System & UI Polish (milestone scoping)
 
 ## Current Position
 
-Milestone: v1.7 3D Realism
-Phase: 999.1
+Milestone: v1.7.5 Design System & UI Polish
+Phase: TBD (not yet scoped — run `/gsd:discuss-phase` next)
 Plan: Not started
-Status: Phase complete — ready for verification
+Status: Milestone + 8 issues created (#83–#90); ready for phase scoping
 Last activity: 2026-04-21
 
-[░░░░░░░░░░] 0% (0/0 phases — roadmap pending)
+Completed: Phase 32 PBR Foundation (shipped with carry-over → 999.2 wallpaper regression)
+Backlog: 999.1 ceiling resize, 999.2 wallpaper view-toggle regression
 
 ## Accumulated Context
 
@@ -68,7 +69,9 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 
 ### Pending Todos
 
-- Run `/gsd:plan-phase 28` to begin Phase 28 (Auto-Save)
+- Run `/gsd:discuss-phase` in fresh chat to scope v1.7.5 as a proper phase
+- Issues #83–#90 assigned to v1.7.5 milestone — 8 UI polish items from Pascal audit
+- Pre-existing Pascal insights #72–#81 remain unscheduled (keep separate from v1.7.5)
 
 ### Open Blockers/Concerns
 
@@ -83,6 +86,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-21T21:23:22.143Z
-Stopped at: Completed Phase 32 Plan 04 — regression guards landed, phase ready for closeout
+Last session: 2026-04-21T23:30:00.000Z
+Stopped at: v1.7.5 milestone + 8 issues created (#83–#90); STATE.md bumped; awaiting /gsd:discuss-phase in fresh chat
 Resume file: None
