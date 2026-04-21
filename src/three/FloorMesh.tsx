@@ -84,12 +84,17 @@ export default function FloorMesh({ width, length, halfW, halfL, material, fallb
           }
         />
       ) : (
+        // Cached texture (custom-upload data URL via getCustomTexture module cache,
+        // or the shared procedural fallbackTexture created once in ThreeViewport).
+        // dispose={null} opts out of R3F auto-dispose so the cached instance
+        // survives 2D↔3D toggles — matches WallMesh fix (Plan 32-07).
         <meshStandardMaterial
-          map={texture ?? undefined}
           color={color}
           roughness={roughness}
           metalness={0}
-        />
+        >
+          {texture && <primitive attach="map" object={texture} dispose={null} />}
+        </meshStandardMaterial>
       )}
     </mesh>
   );

@@ -74,7 +74,7 @@
 
 ### Phases
 
-- [ ] **Phase 32: PBR Foundation** — WOOD_PLANK / CONCRETE / PLASTER render with bundled albedo + normal + roughness maps; loader is non-blocking and color-space correct
+- [x] **Phase 32: PBR Foundation** — WOOD_PLANK / CONCRETE / PLASTER render with bundled albedo + normal + roughness maps; loader is non-blocking and color-space correct (completed 2026-04-21)
 - [ ] **Phase 33: User-Uploaded Textures** — Jessica uploads a photo of a real surface; it appears as a custom material on walls/floors/ceilings; persists locally with dedup + downscale
 - [ ] **Phase 34: Camera Presets** — eye-level / top-down / 3-quarter / corner switchable via toolbar buttons + 1/2/3/4 hotkeys with smooth ~600ms tween
 - [ ] **Phase 35: Tech-Debt Sweep** — close GH #44/#46/#50/#60, delete orphan SaveIndicator, finish resolveEffectiveDims migration, backfill Phase 29 frontmatter
@@ -82,7 +82,7 @@
 ### Phase Details
 
 #### Phase 32: PBR Foundation
-**Plans:** 5 plans (3 executed + gap-closure)
+**Plans:** 7/7 plans complete
 **Goal**: Jessica's WOOD_PLANK, CONCRETE, and PLASTER walls/floors/ceilings read as believable surfaces in 3D — wood shows plank seams + grain, concrete shows aggregate roughness, plaster shows subtle surface variation
 **Depends on**: Nothing (first v1.7 phase)
 **Requirements**: VIZ-07, VIZ-08, VIZ-09
@@ -97,8 +97,8 @@
 - [x] 32-01-PLAN.md — Texture assets (CC0 downloads) + SurfaceMaterial.pbr registry extension (wave 1)
 - [x] 32-02-PLAN.md — PBR loader infrastructure (color-space helper, refcount cache, ErrorBoundary) (wave 1, parallel)
 - [x] 32-03-PLAN.md — Wire PBR into FloorMesh/CeilingMesh/WallMesh; swap Environment HDR; migrate legacy caches (D-05) (wave 2)
-- [ ] 32-04-PLAN.md — Test driver + integration tests + boundary tests (wave 3)
-- [ ] 32-05-PLAN.md — GAP CLOSURE: debounced texture disposal (wallpaper/wallArt regression from D-05 cache migration) (wave 4)
+- [x] 32-04-PLAN.md — Test driver + integration tests + boundary tests (wave 3)
+- [x] 32-05-PLAN.md — GAP CLOSURE: debounced texture disposal (wallpaper/wallArt regression from D-05 cache migration) (wave 4)
 **UI hint**: yes
 
 #### Phase 33: User-Uploaded Textures
@@ -147,7 +147,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 32. PBR Foundation | 3/5 | In Progress (gap closure pending) |  |
+| 32. PBR Foundation | 7/7 | Complete    | 2026-04-21 |
 | 33. User-Uploaded Textures | 0/0 | Not started | - |
 | 34. Camera Presets | 0/0 | Not started | - |
 | 35. Tech-Debt Sweep | 0/0 | Not started | - |
@@ -165,3 +165,15 @@ Plans:
 - [ ] TBD (promote with /gsd:review-backlog when ready)
 
 **Discovered:** 2026-04-21 during Phase 32 T4 human UAT (Jessica) — pre-existing, not Phase 32 scope.
+
+### Phase 999.2: Wallpaper + wallArt view-toggle regression (BACKLOG, deferred from Phase 32)
+
+**Goal:** [To be addressed early in Phase 33 — same code paths] Fix the regression where uploaded-image wallpaper and wallArt disappear after a 2D↔3D view toggle. PBR paths, color wallpaper, and paint paths all work — only the cached data-URL texture paths through `<meshStandardMaterial>` fail. Three stacked fix attempts in Phase 32 (Plans 05, 06, 07) landed correct code against known R3F footguns without resolving the underlying issue. Phase 33's first task: build a runtime instrumentation harness (Playwright + instrumented build) that captures the full sequence (first-mount texture upload → unmount → second-mount attempt → pixel diff) to identify the actual cause before a fourth fix.
+
+**Requirements:** TBD — see `.planning/phases/32-pbr-foundation/32-HUMAN-UAT.md` Gap 1 and `32-07-SUMMARY.md` "What's left that could cause it" for the still-plausible candidate causes.
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote early in Phase 33)
+
+**Discovered:** 2026-04-21 Phase 32 T4 human UAT. Deferred rather than attempting a 4th speculative fix. Retained defensive code from 32-06 and 32-07 stays in place (non-disposing caches + `dispose={null}` primitive attach + static regression test).

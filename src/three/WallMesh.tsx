@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import * as THREE from "three";
 import type { WallSegment, Wallpaper, WainscotConfig, CrownConfig, WallArt } from "@/types/cad";
 import { wallLength, angle } from "@/lib/geometry";
@@ -8,44 +8,12 @@ import { renderWainscotStyle } from "./wainscotStyles";
 import type { WainscotStyleItem } from "@/types/wainscotStyle";
 import { resolvePaintHex } from "@/lib/colorUtils";
 import { usePaintStore } from "@/stores/paintStore";
-import { acquireTexture, releaseTexture } from "./pbrTextureCache";
-import { useSharedTexture } from "./useSharedTexture";
+import { useWallpaperTexture } from "./wallpaperTextureCache";
+import { useWallArtTextures } from "./wallArtTextureCache";
 
 interface Props {
   wall: WallSegment;
   isSelected: boolean;
-}
-
-/** Batch-acquire textures for an array of keyed items; returns a Map<key, Texture|null>. */
-function useSharedTextures(items: Array<{ id: string; url: string }>): Map<string, THREE.Texture | null> {
-  // Stabilize the signature so effect doesn't rerun on shallow array churn.
-  const sig = items.map((i) => `${i.id}:${i.url}`).join("|");
-  const [map, setMap] = useState<Map<string, THREE.Texture | null>>(() => new Map());
-
-  useEffect(() => {
-    let cancelled = false;
-    const acquiredUrls = items.map((i) => i.url);
-    const next = new Map<string, THREE.Texture | null>();
-    // Kick off all loads.
-    Promise.all(
-      items.map((i) =>
-        acquireTexture(i.url, "albedo")
-          .then((t) => ({ id: i.id, tex: t, url: i.url }))
-          .catch(() => ({ id: i.id, tex: null as THREE.Texture | null, url: i.url }))
-      )
-    ).then((results) => {
-      if (cancelled) return;
-      for (const r of results) next.set(r.id, r.tex);
-      setMap(next);
-    });
-    return () => {
-      cancelled = true;
-      for (const url of acquiredUrls) releaseTexture(url);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sig]);
-
-  return map;
 }
 
 export default function WallMesh({ wall, isSelected }: Props) {
@@ -102,8 +70,8 @@ export default function WallMesh({ wall, isSelected }: Props) {
   // Hoisted hooks: resolve textures once at component top level (Rules of Hooks).
   const wpAUrl = wall.wallpaper?.A?.kind === "pattern" ? wall.wallpaper.A.imageUrl : undefined;
   const wpBUrl = wall.wallpaper?.B?.kind === "pattern" ? wall.wallpaper.B.imageUrl : undefined;
-  const wallpaperATex = useSharedTexture(wpAUrl);
-  const wallpaperBTex = useSharedTexture(wpBUrl);
+  const wallpaperATex = useWallpaperTexture(wpAUrl);
+  const wallpaperBTex = useWallpaperTexture(wpBUrl);
 
   const artA = (wall.wallArt ?? []).filter((a) => (a.side ?? "A") === "A");
   const artB = (wall.wallArt ?? []).filter((a) => (a.side ?? "A") === "B");
@@ -112,7 +80,7 @@ export default function WallMesh({ wall, isSelected }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [artA.map((a) => `${a.id}:${a.imageUrl}`).join(","), artB.map((a) => `${a.id}:${a.imageUrl}`).join(",")]
   );
-  const artTextures = useSharedTextures(allArt);
+  const artTextures = useWallArtTextures(allArt);
 
   // Build a wallpaper overlay plane for one face (null if no wallpaper on that side)
   const renderWallpaperOverlay = (wp: Wallpaper | undefined, tex: THREE.Texture | null, key: string) => {
@@ -154,11 +122,12 @@ export default function WallMesh({ wall, isSelected }: Props) {
         <planeGeometry args={[length, height]} />
         <meshStandardMaterial
           color={wp.kind === "color" ? wp.color ?? "#f8f5ef" : "#ffffff"}
-          map={tex ?? undefined}
           roughness={0.85}
           metalness={0}
           side={THREE.DoubleSide}
-        />
+        >
+          {tex && <primitive attach="map" object={tex} dispose={null} />}
+        </meshStandardMaterial>
       </mesh>
     );
   };
@@ -239,11 +208,12 @@ export default function WallMesh({ wall, isSelected }: Props) {
               <mesh key={art.id} position={[artX, artY, baseZ]}>
                 <planeGeometry args={[art.width, art.height]} />
                 <meshStandardMaterial
-                  map={tex ?? undefined}
                   roughness={0.5}
                   metalness={0}
                   side={THREE.DoubleSide}
-                />
+                >
+                  {tex && <primitive attach="map" object={tex} dispose={null} />}
+                </meshStandardMaterial>
               </mesh>
             );
           }
@@ -258,11 +228,12 @@ export default function WallMesh({ wall, isSelected }: Props) {
               <mesh position={[0, 0, artZ]}>
                 <planeGeometry args={[innerW, innerH]} />
                 <meshStandardMaterial
-                  map={tex ?? undefined}
                   roughness={0.5}
                   metalness={0}
                   side={THREE.DoubleSide}
-                />
+                >
+                  {tex && <primitive attach="map" object={tex} dispose={null} />}
+                </meshStandardMaterial>
               </mesh>
               <mesh position={[0, art.height / 2 - frameW / 2, frameCenterZ]} castShadow>
                 <boxGeometry args={[art.width, frameW, frameD]} />

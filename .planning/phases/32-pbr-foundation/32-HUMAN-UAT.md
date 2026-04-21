@@ -51,7 +51,13 @@ blocked: 0
 
 ### Gap 1: Wallpaper disappears after 2D → 3D view toggle (Phase 32 regression)
 
-- status: failed
+- status: deferred-to-phase-33
+- remediation_attempts:
+  - 32-05 (debounced dispose) — FAILED verify 2026-04-21
+  - 32-06 (restore non-disposing caches) — FAILED verify 2026-04-21
+  - 32-07 (R3F dispose={null} escape hatch + static regression test) — FAILED verify 2026-04-21 (code retained as defense in depth)
+- disposition: Phase 33 ("user-uploaded textures") will touch these code paths anyway. First task in Phase 33 is to build a runtime instrumentation harness (Playwright or similar) that captures the full texture upload → unmount → remount cycle so a fourth speculative fix isn't needed. See `32-07-SUMMARY.md` for the list of still-plausible candidate causes.
+- backlog_ref: 999.2
 - severity: high
 - source_test: Test 4 above (how-to-verify step 8)
 - reproduction:
