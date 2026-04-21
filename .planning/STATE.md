@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Editing UX
-status: executing
-stopped_at: Completed 31-04-verification-PLAN.md
-last_updated: "2026-04-21T00:40:51.131Z"
-last_activity: 2026-04-20
+status: phase_complete
+stopped_at: Phase 31 verified passed (6/6 truths, 4/4 reqs) — milestone v1.6 complete
+last_updated: "2026-04-21T00:50:00.000Z"
+last_activity: 2026-04-21
 progress:
   total_phases: 4
   completed_phases: 4
@@ -20,17 +20,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 31 — drag-resize + label override (Wave 1 complete)
+**Current focus:** Milestone v1.6 complete — awaiting v1.7 scoping
 
 ## Current Position
 
 Milestone: v1.6 Editing UX
 Phase: 31
-Plan: 31-02 complete — Wave 2 (Plan 31-03 integration) up next
-Status: In Progress
-Last activity: 2026-04-20
+Plan: 31-04 complete — phase verified passed (6/6 truths, 4/4 reqs)
+Status: Complete
+Last activity: 2026-04-21
 
-[░░░░░░░░░░] 0% (0/4 phases complete)
+[██████████] 100% (4/4 phases complete)
 
 ## Accumulated Context
 
