@@ -1,12 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { flushSync } from "react-dom";
-import { useCADStore, useActiveWalls, useActivePlacedProducts, useActiveCeilings } from "@/stores/cadStore";
+import {
+  useCADStore,
+  useActiveWalls,
+  useActivePlacedProducts,
+  useActiveCeilings,
+  useActivePlacedCustomElements,
+  useCustomElements,
+} from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useProductStore } from "@/stores/productStore";
 import { formatFeet, wallLength } from "@/lib/geometry";
 import { validateInput } from "@/canvas/dimensionEditor";
 import type { Product } from "@/types/product";
 import { hasDimensions } from "@/types/product";
+import type { PlacedCustomElement } from "@/types/cad";
 import WallSurfacePanel from "./WallSurfacePanel";
 import CeilingPaintSection from "./CeilingPaintSection";
 
@@ -26,10 +34,20 @@ export default function PropertiesPanel({ productLibrary }: Props) {
   const updateProduct = useProductStore((s) => s.updateProduct);
   const storeProducts = useProductStore((s) => s.products);
 
+  // Phase 31 CUSTOM-06 — custom-element placement selectors (open question 1).
+  const placedCustoms = useActivePlacedCustomElements();
+  const customCatalog = useCustomElements();
+  const clearCustomElementOverrides = useCADStore(
+    (s) => s.clearCustomElementOverrides,
+  );
+  const clearProductOverrides = useCADStore((s) => s.clearProductOverrides);
+
   const id = selectedIds[0];
   const wall = id ? walls[id] : undefined;
   const pp = id ? placedProducts[id] : undefined;
   const ceiling = id ? ceilings[id] : undefined;
+  const pce = id ? placedCustoms[id] : undefined;
+  const ce = pce ? customCatalog[pce.customElementId] : undefined;
 
   function handleDelete() {
     removeSelected(selectedIds);
@@ -84,7 +102,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
     );
   }
 
-  if (!wall && !pp && !ceiling) return null;
+  if (!wall && !pp && !ceiling && !pce) return null;
 
   return (
     <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto glass-panel rounded-sm p-4 space-y-3">
@@ -210,12 +228,176 @@ export default function PropertiesPanel({ productLibrary }: Props) {
         );
       })()}
 
+      {pce && ce && (
+        <div className="space-y-2">
+          <div className="font-mono text-xs text-accent-light">
+            {ce.name.toUpperCase()}
+          </div>
+          <div className="space-y-1.5">
+            <Row label="WIDTH" value={`${ce.width} FT`} />
+            <Row label="DEPTH" value={`${ce.depth} FT`} />
+            <Row label="HEIGHT" value={`${ce.height} FT`} />
+            <Row
+              label="POSITION"
+              value={`${pce.position.x.toFixed(1)}, ${pce.position.y.toFixed(1)}`}
+            />
+            <Row label="ROTATION" value={`${pce.rotation.toFixed(0)}°`} />
+          </div>
+          <LabelOverrideInput pce={pce} catalogName={ce.name} />
+          {(pce.widthFtOverride !== undefined ||
+            pce.depthFtOverride !== undefined) && (
+            <button
+              type="button"
+              onClick={() => clearCustomElementOverrides(pce.id)}
+              className="w-full font-mono text-[11px] text-accent hover:text-accent-light tracking-wider py-1 border border-accent/30 rounded-sm"
+            >
+              RESET_SIZE
+            </button>
+          )}
+        </div>
+      )}
+
+      {pp &&
+        (pp.widthFtOverride !== undefined || pp.depthFtOverride !== undefined) && (
+          <button
+            type="button"
+            onClick={() => clearProductOverrides(pp.id)}
+            className="w-full font-mono text-[11px] text-accent hover:text-accent-light tracking-wider py-1 border border-accent/30 rounded-sm"
+          >
+            RESET_SIZE
+          </button>
+        )}
+
       <button
         onClick={handleDelete}
         className="w-full py-1.5 rounded-sm font-mono text-[11px] tracking-widest bg-red-900/30 text-red-400 border border-red-900/40 hover:bg-red-900/50 transition-colors"
       >
         DELETE ELEMENT
       </button>
+    </div>
+  );
+}
+
+/**
+ * Phase 31 CUSTOM-06 — per-placement label override.
+ *
+ * Live preview on every keystroke via NoHistory (D-09 no debounce).
+ * Commit on Enter or blur via the history-pushing variant — exactly ONE
+ * history entry per edit session (D-10). Escape rewinds the live-preview
+ * via NoHistory back to the original value (mirror Phase 29).
+ *
+ * Empty string (after trim) commits as `undefined` so the canvas reverts
+ * to the catalog name (D-11). Client-enforced 40-char cap (D-12).
+ */
+function LabelOverrideInput({
+  pce,
+  catalogName,
+}: {
+  pce: PlacedCustomElement;
+  catalogName: string;
+}) {
+  const updatePlacedCustomElement = useCADStore(
+    (s) => s.updatePlacedCustomElement,
+  );
+  const updatePlacedCustomElementNoHistory = useCADStore(
+    (s) => s.updatePlacedCustomElementNoHistory,
+  );
+  const [draft, setDraft] = useState<string>(pce.labelOverride ?? "");
+  const originalRef = useRef<string | undefined>(pce.labelOverride);
+  // Pitfall guard: Escape calls .blur() to clean up focus, which also fires
+  // onBlur → commit(). Escape ran cancel() with the pre-edit value, but
+  // commit() reads the stale draft closure (still has the typed text). Set
+  // this ref in cancel() so onBlur skips commit for the cancellation cycle.
+  const skipNextBlurRef = useRef<boolean>(false);
+
+  // Reseed on selection swap.
+  useEffect(() => {
+    setDraft(pce.labelOverride ?? "");
+    originalRef.current = pce.labelOverride;
+  }, [pce.id]);
+
+  function commit() {
+    if (skipNextBlurRef.current) {
+      skipNextBlurRef.current = false;
+      return;
+    }
+    const trimmed = draft.trim();
+    const finalValue = trimmed === "" ? undefined : draft.slice(0, 40);
+    updatePlacedCustomElement(pce.id, { labelOverride: finalValue });
+    originalRef.current = finalValue;
+  }
+
+  function cancel() {
+    skipNextBlurRef.current = true;
+    updatePlacedCustomElementNoHistory(pce.id, {
+      labelOverride: originalRef.current,
+    });
+    setDraft(originalRef.current ?? "");
+  }
+
+  // Phase 31 CUSTOM-06 D-10 — programmatic test driver. Bypasses the DOM
+  // input but exercises the same store-action sequence the keyboard path
+  // uses (NoHistory keystrokes + history-pushing commit).
+  useEffect(() => {
+    if (import.meta.env.MODE !== "test" || typeof window === "undefined") return;
+    (window as unknown as {
+      __driveLabelOverride?: {
+        typeAndCommit: (
+          pceId: string,
+          text: string,
+          mode: "enter" | "blur",
+        ) => void;
+      };
+    }).__driveLabelOverride = {
+      typeAndCommit: (pceId, text, _mode) => {
+        // Live preview: one NoHistory write per cumulative prefix.
+        for (let i = 1; i <= text.length; i++) {
+          updatePlacedCustomElementNoHistory(pceId, {
+            labelOverride: text.slice(0, i),
+          });
+        }
+        // Commit: one history-pushing write.
+        const trimmed = text.trim();
+        const finalValue = trimmed === "" ? undefined : text.slice(0, 40);
+        updatePlacedCustomElement(pceId, { labelOverride: finalValue });
+        // mode is observational — Enter and blur are identical per D-10.
+        void _mode;
+      },
+    };
+    return () => {
+      delete (window as unknown as { __driveLabelOverride?: unknown })
+        .__driveLabelOverride;
+    };
+  }, [pce.id, updatePlacedCustomElement, updatePlacedCustomElementNoHistory]);
+
+  return (
+    <div className="flex flex-col gap-1">
+      <label className="font-mono text-[11px] text-text-ghost tracking-wider">
+        LABEL_OVERRIDE
+      </label>
+      <input
+        type="text"
+        value={draft}
+        maxLength={40}
+        placeholder={catalogName.toUpperCase()}
+        aria-label="Label override"
+        onChange={(e) => {
+          const v = e.target.value;
+          setDraft(v);
+          updatePlacedCustomElementNoHistory(pce.id, { labelOverride: v });
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            commit();
+            (e.target as HTMLInputElement).blur();
+          } else if (e.key === "Escape") {
+            cancel();
+            (e.target as HTMLInputElement).blur();
+          }
+        }}
+        onBlur={commit}
+        className="px-2 py-1 font-mono text-[11px] text-text-primary bg-obsidian-deepest border border-outline-variant/30 rounded-sm"
+      />
     </div>
   );
 }

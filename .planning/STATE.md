@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Editing UX
-status: verifying
-stopped_at: Completed 30-04-PLAN.md — Phase 30 smart-snapping complete
-last_updated: "2026-04-20T23:12:14.384Z"
-last_activity: 2026-04-20
+status: phase_complete
+stopped_at: Phase 31 verified passed (6/6 truths, 4/4 reqs) — milestone v1.6 complete
+last_updated: "2026-04-21T00:50:00.000Z"
+last_activity: 2026-04-21
 progress:
   total_phases: 4
-  completed_phases: 3
-  total_plans: 13
-  completed_plans: 13
+  completed_phases: 4
+  total_plans: 17
+  completed_plans: 17
 ---
 
 # Project State
@@ -20,17 +20,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 30 — smart-snapping
+**Current focus:** Milestone v1.6 complete — awaiting v1.7 scoping
 
 ## Current Position
 
 Milestone: v1.6 Editing UX
 Phase: 31
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-04-20
+Plan: 31-04 complete — phase verified passed (6/6 truths, 4/4 reqs)
+Status: Complete
+Last activity: 2026-04-21
 
-[░░░░░░░░░░] 0% (0/4 phases complete)
+[██████████] 100% (4/4 phases complete)
 
 ## Accumulated Context
 
@@ -53,6 +53,11 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 30]: Wall-endpoint drag path deliberately untouched per D-08b (Phase 31 owns smart snap for wall endpoints)
 - [Phase 30]: productTool driver auto-seeds default test product when pendingProductId is unset (gated by import.meta.env.MODE === test)
 - [Phase 30-smart-snapping]: Plan 04 gate signed off — nyquist_compliant true, full suite green, Alt/Option documented in CLAUDE.md; perceptual items persisted to 30-HUMAN-UAT.md
+- [Phase 31]: Driver bridges (__driveResize/__driveWallEndpoint/__driveLabelOverride) advertised in-file for Wave 2; locked Phase 29/30 TDD shape
+- [Phase 31]: Plan 31-02 (Wave 1 pure modules): 5 schema fields + resolver + edge handles + restricted snap scene + 8 store actions. 43 Wave 0 unit tests RED->GREEN; integration tests still RED awaiting Wave 2 drivers
+- [Phase 31]: Pitfall 4 separation: updateCustomElement (catalog) + updatePlacedCustomElement (placement) coexist with clear naming; placement actions write to rooms[active].placedCustomElements[id] not root.customElements
+- [Phase 31]: Plan 31-03 wired all Wave 1 pure modules into selectTool + PropertiesPanel + fabricSync; all 4 RTL specs green; +27 assertions
+- [Phase 31]: Phase 31 closure: VALIDATION signed (nyquist_compliant=true, wave_0_complete=true), 28/28 RTL assertions green, 6 pre-existing LIB-03/04/05 failures documented out-of-scope, EDIT-22/23/24/CUSTOM-06 closed
 
 ### Pending Todos
 
@@ -71,6 +76,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-20T23:09:19.399Z
-Stopped at: Completed 30-04-PLAN.md — Phase 30 smart-snapping complete
+Last session: 2026-04-21T00:40:51.129Z
+Stopped at: Completed 31-04-verification-PLAN.md
 Resume file: None

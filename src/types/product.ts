@@ -70,3 +70,62 @@ export function searchProducts(query: string, products: Product[]): Product[] {
   if (!q) return products;
   return products.filter((p) => p.name.toLowerCase().includes(q));
 }
+
+// ---------------------------------------------------------------------------
+// Phase 31 — per-axis override resolvers (D-02)
+// ---------------------------------------------------------------------------
+// NOTE: existing `effectiveDimensions` ABOVE is intentionally LEFT UNCHANGED
+// (anti-pattern guard from RESEARCH). Non-placed callers (placement preview,
+// productTool) keep using effectiveDimensions(product, scale).
+
+import type { PlacedProduct, PlacedCustomElement, CustomElement } from "@/types/cad";
+
+/**
+ * D-02: effective render dims for a placed product, honoring per-axis overrides.
+ *   width  = widthFtOverride  ?? (libraryWidth × sizeScale)
+ *   depth  = depthFtOverride  ?? (libraryDepth × sizeScale)
+ *   height = libraryHeight    (no override; sizeScale never applied to height per existing contract)
+ */
+export function resolveEffectiveDims(
+  product: Product | undefined | null,
+  placed: Pick<PlacedProduct, "sizeScale" | "widthFtOverride" | "depthFtOverride">,
+): { width: number; depth: number; height: number; isPlaceholder: boolean } {
+  const scale = placed.sizeScale && placed.sizeScale > 0 ? placed.sizeScale : 1;
+  const isPlaceholder =
+    !product ||
+    product.width == null ||
+    product.depth == null ||
+    product.height == null;
+  const baseW = isPlaceholder ? PLACEHOLDER_DIM_FT : (product!.width as number);
+  const baseD = isPlaceholder ? PLACEHOLDER_DIM_FT : (product!.depth as number);
+  const baseH = isPlaceholder ? PLACEHOLDER_DIM_FT : (product!.height as number);
+  return {
+    width: placed.widthFtOverride ?? baseW * scale,
+    depth: placed.depthFtOverride ?? baseD * scale,
+    height: baseH,
+    isPlaceholder,
+  };
+}
+
+/**
+ * D-02: effective render dims for a placed custom element, honoring per-axis overrides.
+ * Custom elements always have numeric dims when defined, so no isPlaceholder flag.
+ */
+export function resolveEffectiveCustomDims(
+  el: CustomElement | undefined,
+  placed: Pick<PlacedCustomElement, "sizeScale" | "widthFtOverride" | "depthFtOverride">,
+): { width: number; depth: number; height: number } {
+  const scale = placed.sizeScale && placed.sizeScale > 0 ? placed.sizeScale : 1;
+  if (!el) {
+    return {
+      width: PLACEHOLDER_DIM_FT,
+      depth: PLACEHOLDER_DIM_FT,
+      height: PLACEHOLDER_DIM_FT,
+    };
+  }
+  return {
+    width: placed.widthFtOverride ?? el.width * scale,
+    depth: placed.depthFtOverride ?? el.depth * scale,
+    height: el.height,
+  };
+}

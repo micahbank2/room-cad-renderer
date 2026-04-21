@@ -4,7 +4,7 @@ import { useUIStore } from "@/stores/uiStore";
 import { snapPoint, distance, closestPointOnWall, formatFeet } from "@/lib/geometry";
 import type { Point, PlacedProduct, PlacedCustomElement, CustomElement } from "@/types/cad";
 import type { Product } from "@/types/product";
-import { effectiveDimensions } from "@/types/product";
+import { effectiveDimensions, resolveEffectiveDims, resolveEffectiveCustomDims } from "@/types/product";
 import { hitTestHandle, snapAngle, angleFromCenterToPointer } from "../rotationHandle";
 import {
   hitTestWallHandle,
@@ -12,7 +12,15 @@ import {
   wallAngleDeg,
   snapWallAngle,
 } from "../wallRotationHandle";
-import { hitTestResizeHandle } from "../resizeHandles";
+import {
+  hitTestResizeHandle,
+  hitTestAnyResizeHandle,
+  edgeDragToAxisValue,
+  getEdgeHandles,
+  getResizeHandles,
+  type EdgeHandle,
+} from "../resizeHandles";
+import { buildWallEndpointSnapScene } from "@/canvas/wallEndpointSnap";
 import {
   hitTestWallEndpoint,
   hitTestWallThickness,
@@ -41,6 +49,7 @@ type DragType =
   | "rotate"
   | "wall-rotate"
   | "product-resize"
+  | "product-resize-edge" // Phase 31 EDIT-22 — per-axis edge-handle drag
   | "wall-endpoint"
   | "wall-thickness"
   | "opening-slide"
@@ -79,7 +88,8 @@ function hitTestStore(
   // Check products first (they're on top) — orphan + null-dim use 2x2 AABB
   for (const pp of Object.values(doc.placedProducts)) {
     const product = productLibrary.find((p) => p.id === pp.productId);
-    const { width, depth } = effectiveDimensions(product, pp.sizeScale);
+    // Phase 31: per-axis overrides flow through resolveEffectiveDims so hit-test matches render.
+    const { width, depth } = resolveEffectiveDims(product, pp);
     const halfW = width / 2;
     const halfD = depth / 2;
     // Simple AABB check (ignoring rotation for now)
@@ -99,9 +109,10 @@ function hitTestStore(
   for (const pce of Object.values(customElements) as PlacedCustomElement[]) {
     const el = catalog[pce.customElementId] as CustomElement | undefined;
     if (!el) continue;
-    const sc = pce.sizeScale ?? 1;
-    const halfW = (el.width * sc) / 2;
-    const halfD = (el.depth * sc) / 2;
+    // Phase 31: per-axis overrides flow through resolveEffectiveCustomDims.
+    const ceDims = resolveEffectiveCustomDims(el, pce);
+    const halfW = ceDims.width / 2;
+    const halfD = ceDims.depth / 2;
     if (
       feetPos.x >= pce.position.x - halfW &&
       feetPos.x <= pce.position.x + halfW &&
@@ -211,6 +222,19 @@ export function activateSelectTool(
   let openingInitialWidth: number | null = null;
   let openingInitialPointerOffset: number | null = null;
 
+  // Phase 31 EDIT-22 — edge-handle drag state.
+  let edgeDragInfo:
+    | {
+        placedId: string;
+        edge: EdgeHandle;
+        isCustom: boolean;
+        pp: PlacedProduct | PlacedCustomElement;
+      }
+    | null = null;
+
+  // Phase 31 EDIT-23 — cached restricted snap scene for wall-endpoint drag (D-05).
+  let cachedEndpointScene: SceneGeometry | null = null;
+
   // Phase 25 D-01/D-03/D-04/D-05/D-06 — Drag fast-path state.
   // Covers EXACTLY the 4 D-03 operations: product move (incl. custom element),
   // wall move, wall endpoint drag, product rotation. All other drag types
@@ -288,7 +312,8 @@ export function activateSelectTool(
       const pp = doc.placedProducts?.[id];
       if (pp) {
         const prod = _productLibrary.find((p) => p.id === pp.productId);
-        const { width, depth } = effectiveDimensions(prod, pp.sizeScale);
+        // Phase 31: per-axis overrides flow through resolveEffectiveDims.
+        const { width, depth } = resolveEffectiveDims(prod, pp);
         return axisAlignedBBoxOfRotated(pos, width, depth, pp.rotation, id);
       }
       // Custom elements are hit-tested as "product" by hitTestStore.
@@ -299,11 +324,12 @@ export function activateSelectTool(
         const catalog = (useCADStore.getState() as any).customElements ?? {};
         const el = catalog[pce.customElementId] as CustomElement | undefined;
         if (el) {
-          const sc = pce.sizeScale ?? 1;
+          // Phase 31: per-axis overrides flow through resolveEffectiveCustomDims.
+          const ceDims = resolveEffectiveCustomDims(el, pce);
           return axisAlignedBBoxOfRotated(
             pos,
-            el.width * sc,
-            el.depth * sc,
+            ceDims.width,
+            ceDims.depth,
             pce.rotation,
             id,
           );
@@ -317,11 +343,12 @@ export function activateSelectTool(
         const catalog = (useCADStore.getState() as any).customElements ?? {};
         const el = catalog[pce.customElementId] as CustomElement | undefined;
         if (el) {
-          const sc = pce.sizeScale ?? 1;
+          // Phase 31: per-axis overrides flow through resolveEffectiveCustomDims.
+          const ceDims = resolveEffectiveCustomDims(el, pce);
           return axisAlignedBBoxOfRotated(
             pos,
-            el.width * sc,
-            el.depth * sc,
+            ceDims.width,
+            ceDims.depth,
             pce.rotation,
             id,
           );
@@ -585,8 +612,11 @@ export function activateSelectTool(
           return;
         }
         // Resize handle hit-test (EDIT-14)
-        const { width, depth } = effectiveDimensions(prod, pp.sizeScale);
-        if (hitTestResizeHandle(feet, pp, width, depth)) {
+        // Phase 31: use resolveEffectiveDims so hit-test rectangle matches rendered size.
+        const { width, depth } = resolveEffectiveDims(prod, pp);
+        // Phase 31 EDIT-22: combined corner+edge hit-test (corners win ties).
+        const handleHit = hitTestAnyResizeHandle(feet, pp, width, depth);
+        if (handleHit?.kind === "corner") {
           dragging = true;
           dragId = selId;
           dragType = "product-resize";
@@ -599,6 +629,24 @@ export function activateSelectTool(
           useCADStore.getState().resizeProduct(selId, resizeInitialScale);
           return;
         }
+        if (handleHit?.kind === "edge") {
+          // Phase 31 EDIT-22 — edge drag → per-axis override write.
+          const initial = edgeDragToAxisValue(handleHit.which, feet, pp);
+          dragging = true;
+          dragId = selId;
+          dragType = "product-resize-edge";
+          edgeDragInfo = {
+            placedId: selId,
+            edge: handleHit.which,
+            isCustom: false,
+            pp: { ...pp },
+          };
+          // Push exactly one history entry at drag start (D-16).
+          useCADStore
+            .getState()
+            .resizeProductAxis(selId, initial.axis, initial.valueFt);
+          return;
+        }
       }
       // Custom element handles (POLISH-01) — mirror product handles
       const pce = (getActiveRoomDoc()?.placedCustomElements ?? {})[selId];
@@ -606,9 +654,10 @@ export function activateSelectTool(
         const customCatalog = (useCADStore.getState() as any).customElements ?? {};
         const el = customCatalog[pce.customElementId] as CustomElement | undefined;
         if (el) {
-          const sc = pce.sizeScale ?? 1;
-          const w = el.width * sc;
-          const d = el.depth * sc;
+          // Phase 31: per-axis overrides honored via resolveEffectiveCustomDims.
+          const ceDims = resolveEffectiveCustomDims(el, pce);
+          const w = ceDims.width;
+          const d = ceDims.depth;
           // Rotation handle
           if (hitTestHandle(feet, pce as unknown as PlacedProduct, d)) {
             dragging = true;
@@ -618,8 +667,14 @@ export function activateSelectTool(
             useCADStore.getState().rotateCustomElement(selId, pce.rotation);
             return;
           }
-          // Resize handles
-          if (hitTestResizeHandle(feet, pce as unknown as PlacedProduct, w, d)) {
+          // Phase 31 EDIT-22 — combined corner+edge hit-test (corners win).
+          const ceHandleHit = hitTestAnyResizeHandle(
+            feet,
+            pce as unknown as PlacedProduct,
+            w,
+            d,
+          );
+          if (ceHandleHit?.kind === "corner") {
             dragging = true;
             dragId = selId;
             dragType = "product-resize";
@@ -628,6 +683,26 @@ export function activateSelectTool(
             const dy = feet.y - pce.position.y;
             resizeInitialDiagFt = Math.sqrt(dx * dx + dy * dy);
             useCADStore.getState().resizeCustomElement(selId, resizeInitialScale);
+            return;
+          }
+          if (ceHandleHit?.kind === "edge") {
+            const initial = edgeDragToAxisValue(
+              ceHandleHit.which,
+              feet,
+              pce as unknown as PlacedProduct,
+            );
+            dragging = true;
+            dragId = selId;
+            dragType = "product-resize-edge";
+            edgeDragInfo = {
+              placedId: selId,
+              edge: ceHandleHit.which,
+              isCustom: true,
+              pp: { ...pce } as unknown as PlacedCustomElement,
+            };
+            useCADStore
+              .getState()
+              .resizeCustomElementAxis(selId, initial.axis, initial.valueFt);
             return;
           }
         }
@@ -657,6 +732,10 @@ export function activateSelectTool(
           };
           lastDragWallStart = { ...wall.start };
           lastDragWallEnd = { ...wall.end };
+          // Phase 31 EDIT-23 — build restricted snap scene once at drag start (D-05/D-09b).
+          const wallsMap =
+            (getActiveRoomDoc()?.walls ?? {}) as Record<string, import("@/types/cad").WallSegment>;
+          cachedEndpointScene = buildWallEndpointSnapScene(wallsMap, selId);
           return;
         }
         // Thickness drag (EDIT-16)
@@ -837,6 +916,41 @@ export function activateSelectTool(
       return;
     }
 
+    if (dragType === "product-resize-edge") {
+      if (!edgeDragInfo) return;
+      // Recompute axis value from current pointer relative to original pp at drag start.
+      const result = edgeDragToAxisValue(
+        edgeDragInfo.edge,
+        feet,
+        edgeDragInfo.pp as PlacedProduct,
+      );
+      const gridSnap = useUIStore.getState().gridSnap;
+      const snappedValue =
+        gridSnap > 0
+          ? Math.max(0.25, Math.round(result.valueFt / gridSnap) * gridSnap)
+          : result.valueFt;
+      _dragActive = true;
+      if (edgeDragInfo.isCustom) {
+        useCADStore
+          .getState()
+          .resizeCustomElementAxisNoHistory(
+            edgeDragInfo.placedId,
+            result.axis,
+            snappedValue,
+          );
+      } else {
+        useCADStore
+          .getState()
+          .resizeProductAxisNoHistory(
+            edgeDragInfo.placedId,
+            result.axis,
+            snappedValue,
+          );
+      }
+      fc.requestRenderAll();
+      return;
+    }
+
     if (dragType === "product-resize") {
       const pp = (getActiveRoomDoc()?.placedProducts ?? {})[dragId];
       const pce2 = (getActiveRoomDoc()?.placedCustomElements ?? {})[dragId];
@@ -852,9 +966,12 @@ export function activateSelectTool(
         useCADStore.getState().resizeProductNoHistory(dragId, newScale);
         // Update live size tag for products
         const prod = _productLibrary.find((p) => p.id === pp.productId);
-        const dims = effectiveDimensions(prod, newScale);
         const updatedPp = (getActiveRoomDoc()?.placedProducts ?? {})[dragId];
-        if (updatedPp) updateSizeTag(updatedPp, dims.width, dims.depth);
+        if (updatedPp) {
+          // Phase 31: per-axis overrides honored via resolveEffectiveDims.
+          const dims = resolveEffectiveDims(prod, updatedPp);
+          updateSizeTag(updatedPp, dims.width, dims.depth);
+        }
       } else {
         useCADStore.getState().resizeCustomElementNoHistory(dragId, newScale);
         // Update live size tag for custom elements
@@ -863,9 +980,9 @@ export function activateSelectTool(
         if (el2) {
           const updatedPce = (getActiveRoomDoc()?.placedCustomElements ?? {})[dragId];
           if (updatedPce) {
-            const w2 = el2.width * newScale;
-            const d2 = el2.depth * newScale;
-            updateSizeTag(updatedPce as unknown as PlacedProduct, w2, d2);
+            // Phase 31: per-axis overrides honored via resolveEffectiveCustomDims.
+            const ceDims2 = resolveEffectiveCustomDims(el2, updatedPce);
+            updateSizeTag(updatedPce as unknown as PlacedProduct, ceDims2.width, ceDims2.depth);
           }
         }
       }
@@ -875,7 +992,57 @@ export function activateSelectTool(
     if (dragType === "wall-endpoint") {
       if (!wallEndpointWhich || dragPre?.kind !== "wall-endpoint") return;
       const gridSnap = useUIStore.getState().gridSnap;
-      const snapped = gridSnap > 0 ? snapPoint(feet, gridSnap) : feet;
+      // Phase 31 EDIT-23 — smart-snap (D-05) + Shift-ortho (D-06) + Alt-disable (D-07).
+      const shiftHeld = (opt.e as MouseEvent)?.shiftKey === true;
+      const altHeld = (opt.e as MouseEvent)?.altKey === true;
+      const anchor =
+        wallEndpointWhich === "start" ? dragPre.origWall.end : dragPre.origWall.start;
+
+      // Step 1: raw candidate.
+      let candidate: Point = { x: feet.x, y: feet.y };
+
+      // Step 2: Shift-ortho lock (D-06) — happens before snap.
+      if (shiftHeld) {
+        const dx = Math.abs(feet.x - anchor.x);
+        const dy = Math.abs(feet.y - anchor.y);
+        if (dx > dy) candidate.y = anchor.y;
+        else candidate.x = anchor.x;
+      }
+
+      // Step 3: smart-snap (unless Alt held) using cached restricted scene.
+      let snapped: Point = candidate;
+      let guides: ReturnType<typeof computeSnap>["guides"] = [];
+      if (!altHeld && cachedEndpointScene) {
+        const degenerateBBox: BBox = {
+          id: "wall-endpoint-candidate",
+          minX: candidate.x,
+          maxX: candidate.x,
+          minY: candidate.y,
+          maxY: candidate.y,
+        };
+        const result = computeSnap({
+          candidate: { pos: candidate, bbox: degenerateBBox },
+          scene: cachedEndpointScene,
+          tolerancePx: SNAP_TOLERANCE_PX,
+          scale,
+          gridSnap,
+        });
+        snapped = result.snapped;
+        guides = result.guides;
+        // Pitfall 3: re-apply Shift lock post-snap so ortho wins on locked axis.
+        if (shiftHeld) {
+          const dx = Math.abs(feet.x - anchor.x);
+          const dy = Math.abs(feet.y - anchor.y);
+          if (dx > dy) snapped.y = anchor.y;
+          else snapped.x = anchor.x;
+        }
+      } else if (altHeld && gridSnap > 0) {
+        snapped = snapPoint(candidate, gridSnap);
+      }
+
+      // Step 4: render guides (cleared automatically when guides=[] e.g. Alt held).
+      renderSnapGuides(fc, guides, scale, origin);
+
       // D-03 fast path: compute new endpoints, rewrite polygon points in place.
       const newStart = wallEndpointWhich === "start" ? snapped : dragPre.origWall.start;
       const newEnd = wallEndpointWhich === "end" ? snapped : dragPre.origWall.end;
@@ -1108,6 +1275,7 @@ export function activateSelectTool(
 
     if (
       dragType === "product-resize" ||
+      dragType === "product-resize-edge" ||
       dragType === "wall-endpoint" ||
       dragType === "wall-thickness" ||
       dragType === "opening-slide" ||
@@ -1119,6 +1287,9 @@ export function activateSelectTool(
     // Phase 30 — clear smart-snap guides on mouseup (D-06b / Pitfall 2).
     clearSnapGuides(fc);
     cachedScene = null;
+    // Phase 31 EDIT-23 — clear cached endpoint snap scene + edge-drag state.
+    cachedEndpointScene = null;
+    edgeDragInfo = null;
     dragging = false;
     _dragActive = false;
     dragId = null;
@@ -1262,6 +1433,137 @@ export function activateSelectTool(
       __driveSnap?: typeof driveSnapHook;
       __getSnapGuides?: typeof getSnapGuidesHook;
     }).__getSnapGuides = getSnapGuidesHook;
+
+    // ---------------------------------------------------------------------
+    // Phase 31 EDIT-22 / EDIT-23 / EDIT-24 — drive bridges for drag-resize +
+    // wall-endpoint smart-snap. Mirrors the Phase 30 driveSnap pattern: the
+    // bridge synthesizes a mousedown that walks the existing handler with a
+    // pointer positioned at the requested handle, then routes subsequent
+    // .to() / .end() through onMouseMove / onMouseUp via withDrivenPointer.
+    // ---------------------------------------------------------------------
+    type ResizeHandleId =
+      | "corner-ne"
+      | "corner-nw"
+      | "corner-sw"
+      | "corner-se"
+      | "edge-n"
+      | "edge-s"
+      | "edge-e"
+      | "edge-w";
+
+    const driveResizeHook = {
+      start: (placedId: string, handle: ResizeHandleId) => {
+        // Compute the world-feet position of the requested handle so the
+        // existing mousedown hit-tests will detect the corner/edge.
+        const doc = getActiveRoomDoc();
+        if (!doc) return;
+        const pp = doc.placedProducts?.[placedId];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const pce = (doc as any).placedCustomElements?.[placedId];
+        const target = (pp ?? pce) as
+          | PlacedProduct
+          | PlacedCustomElement
+          | undefined;
+        if (!target) return;
+        let widthFt: number;
+        let depthFt: number;
+        if (pp) {
+          const prod = _productLibrary.find((p) => p.id === pp.productId);
+          const dims = resolveEffectiveDims(prod, pp);
+          widthFt = dims.width;
+          depthFt = dims.depth;
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const cat = (useCADStore.getState() as any).customElements ?? {};
+          const el = cat[(pce as PlacedCustomElement).customElementId] as
+            | CustomElement
+            | undefined;
+          const dims = resolveEffectiveCustomDims(el, pce as PlacedCustomElement);
+          widthFt = dims.width;
+          depthFt = dims.depth;
+        }
+        // Resolve the handle's world-feet point.
+        let handlePos: Point;
+        if (handle.startsWith("corner-")) {
+          const which = handle.slice("corner-".length) as
+            | "ne"
+            | "nw"
+            | "sw"
+            | "se";
+          const handles = getResizeHandles(target as PlacedProduct, widthFt, depthFt);
+          handlePos = handles[which];
+        } else {
+          const which = handle.slice("edge-".length) as EdgeHandle;
+          handlePos = getEdgeHandles(target, widthFt, depthFt)[which];
+        }
+        // Need the placed object to be the current selection, otherwise the
+        // mousedown handle hit-test branch won't run.
+        useUIStore.getState().select([placedId]);
+        const opt = { e: fakeEvt(false) } as unknown as fabric.TEvent;
+        withDrivenPointer(handlePos, () => onMouseDown(opt));
+      },
+      to: (
+        feetX: number,
+        feetY: number,
+        opts: { shift?: boolean; alt?: boolean } = {},
+      ) => {
+        const evt = {
+          altKey: opts.alt === true,
+          shiftKey: opts.shift === true,
+          metaKey: false,
+          ctrlKey: false,
+        } as unknown as MouseEvent;
+        const opt = { e: evt } as unknown as fabric.TEvent;
+        withDrivenPointer({ x: feetX, y: feetY }, () => onMouseMove(opt));
+      },
+      end: () => {
+        onMouseUp();
+      },
+    };
+
+    const driveWallEndpointHook = {
+      start: (wallId: string, which: "start" | "end") => {
+        const doc = getActiveRoomDoc();
+        const wall = doc?.walls?.[wallId];
+        if (!wall) return;
+        useUIStore.getState().select([wallId]);
+        const ep = which === "start" ? wall.start : wall.end;
+        const opt = { e: fakeEvt(false) } as unknown as fabric.TEvent;
+        withDrivenPointer(ep, () => onMouseDown(opt));
+      },
+      to: (
+        feetX: number,
+        feetY: number,
+        opts: { shift?: boolean; alt?: boolean } = {},
+      ) => {
+        const evt = {
+          altKey: opts.alt === true,
+          shiftKey: opts.shift === true,
+          metaKey: false,
+          ctrlKey: false,
+        } as unknown as MouseEvent;
+        const opt = { e: evt } as unknown as fabric.TEvent;
+        withDrivenPointer({ x: feetX, y: feetY }, () => onMouseMove(opt));
+      },
+      end: () => {
+        onMouseUp();
+      },
+      getGuides: () =>
+        fc
+          .getObjects()
+          .filter(
+            (o) =>
+              (o as unknown as { data?: { type?: string } }).data?.type ===
+              "snap-guide",
+          )
+          .map(() => ({ type: "snap-guide" })),
+    };
+
+    (window as unknown as { __driveResize?: typeof driveResizeHook }).__driveResize =
+      driveResizeHook;
+    (window as unknown as {
+      __driveWallEndpoint?: typeof driveWallEndpointHook;
+    }).__driveWallEndpoint = driveWallEndpointHook;
   }
 
   return () => {
@@ -1318,14 +1620,21 @@ export function activateSelectTool(
     // Phase 30 — clear smart-snap guides on tool-switch cleanup (Pitfall 3).
     clearSnapGuides(fc);
     cachedScene = null;
+    // Phase 31 — clear cached endpoint snap scene + edge-drag info.
+    cachedEndpointScene = null;
+    edgeDragInfo = null;
     // Phase 30 — remove the test-mode driver hooks we installed.
     if (import.meta.env.MODE === "test") {
       const w = window as unknown as {
         __driveSnap?: unknown;
         __getSnapGuides?: unknown;
+        __driveResize?: unknown;
+        __driveWallEndpoint?: unknown;
       };
       if (w.__driveSnap === driveSnapHook) delete w.__driveSnap;
       if (w.__getSnapGuides === getSnapGuidesHook) delete w.__getSnapGuides;
+      delete w.__driveResize;
+      delete w.__driveWallEndpoint;
     }
   };
 }

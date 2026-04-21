@@ -7,13 +7,13 @@ import type {
   PlacedCustomElement,
 } from "@/types/cad";
 import type { Product } from "@/types/product";
-import { effectiveDimensions, hasDimensions } from "@/types/product";
+import { effectiveDimensions, hasDimensions, resolveEffectiveDims, resolveEffectiveCustomDims } from "@/types/product";
 import { wallCorners, angle as wallAngle } from "@/lib/geometry";
 import { getWallHandleWorldPos } from "./wallRotationHandle";
 import { drawWallDimension } from "./dimensions";
 import { getCachedImage } from "./productImageCache";
 import { getHandleWorldPos } from "./rotationHandle";
-import { getResizeHandles } from "./resizeHandles";
+import { getResizeHandles, getEdgeHandles } from "./resizeHandles";
 import { getWallEndpointHandles, getWallThicknessHandle } from "./wallEditHandles";
 import { getOpeningHandles } from "./openingEditHandles";
 import { resolvePaintHex } from "@/lib/colorUtils";
@@ -56,9 +56,10 @@ export function renderCustomElements(
   for (const p of Object.values(placed)) {
     const el = catalog[p.customElementId];
     if (!el) continue;
-    const sc = p.sizeScale ?? 1;
-    const pw = el.width * sc * scale;
-    const pd = el.depth * sc * scale;
+    // Phase 31 D-02: per-axis overrides flow through resolveEffectiveCustomDims.
+    const dims = resolveEffectiveCustomDims(el, p);
+    const pw = dims.width * scale;
+    const pd = dims.depth * scale;
     const cx = origin.x + p.position.x * scale;
     const cy = origin.y + p.position.y * scale;
     const isSelected = selectedIds.includes(p.id);
@@ -81,8 +82,11 @@ export function renderCustomElements(
     });
     fc.add(rect);
 
-    // Name label
-    const label = new fabric.FabricText(el.name.toUpperCase(), {
+    // Phase 31 CUSTOM-06 D-14 — label override at the custom-element label site.
+    const displayName = (p.labelOverride && p.labelOverride.trim() !== "")
+      ? p.labelOverride
+      : el.name;
+    const label = new fabric.FabricText(displayName.toUpperCase(), {
       left: cx,
       top: cy,
       fontSize: 9,
@@ -92,13 +96,14 @@ export function renderCustomElements(
       originY: "center",
       selectable: false,
       evented: false,
+      // Tag for the __getCustomElementLabel test bridge.
+      data: { type: "custom-element-label", pceId: p.id },
     });
     fc.add(label);
 
     // Rotation handle for selected custom element (POLISH-01)
     if (isSelected && selectedIds.length === 1) {
-      const sc = p.sizeScale ?? 1;
-      const d = el.depth * sc;
+      const d = dims.depth;
       // Reuse the product rotation handle helper — PlacedCustomElement has
       // same position/rotation shape as PlacedProduct.
       const handlePos = getHandleWorldPos(p as unknown as import("@/types/cad").PlacedProduct, d);
@@ -128,7 +133,7 @@ export function renderCustomElements(
       fc.add(circle);
 
       // Corner resize handles (POLISH-01)
-      const w = el.width * sc;
+      const w = dims.width;
       const handles = getResizeHandles(p as unknown as import("@/types/cad").PlacedProduct, w, d);
       for (const key of ["ne", "nw", "sw", "se"] as const) {
         const h = handles[key];
@@ -146,6 +151,28 @@ export function renderCustomElements(
             selectable: false,
             evented: false,
             data: { type: "resize-handle", corner: key, placedId: p.id },
+          })
+        );
+      }
+
+      // Phase 31 EDIT-22 — edge midpoint handles (per-axis override drag).
+      const edgeHandles = getEdgeHandles(p as unknown as import("@/types/cad").PlacedProduct, w, d);
+      for (const key of ["n", "s", "e", "w"] as const) {
+        const h = edgeHandles[key];
+        fc.add(
+          new fabric.Rect({
+            left: origin.x + h.x * scale,
+            top: origin.y + h.y * scale,
+            width: 10,
+            height: 10,
+            fill: "#12121d",
+            stroke: "#7c5bf0",
+            strokeWidth: 2,
+            originX: "center",
+            originY: "center",
+            selectable: false,
+            evented: false,
+            data: { type: "resize-handle-edge", edge: key, placedId: p.id },
           })
         );
       }
@@ -808,7 +835,8 @@ export function renderProducts(
 ) {
   for (const pp of Object.values(placedProducts)) {
     const product = productLibrary.find((p) => p.id === pp.productId);
-    const { width, depth, isPlaceholder } = effectiveDimensions(product, pp.sizeScale);
+    // Phase 31: per-axis overrides flow through resolveEffectiveDims.
+    const { width, depth, isPlaceholder } = resolveEffectiveDims(product, pp);
     const orphan = !product;
     const showPlaceholder = orphan || isPlaceholder;
 
@@ -950,6 +978,53 @@ export function renderProducts(
           })
         );
       }
+
+      // Phase 31 EDIT-22 — edge midpoint handles (per-axis override drag).
+      const edgeHandles = getEdgeHandles(pp, width, depth);
+      for (const key of ["n", "s", "e", "w"] as const) {
+        const h = edgeHandles[key];
+        fc.add(
+          new fabric.Rect({
+            left: origin.x + h.x * scale,
+            top: origin.y + h.y * scale,
+            width: 10,
+            height: 10,
+            fill: "#12121d",
+            stroke: "#7c5bf0",
+            strokeWidth: 2,
+            originX: "center",
+            originY: "center",
+            selectable: false,
+            evented: false,
+            data: { type: "resize-handle-edge", edge: key, placedProductId: pp.id },
+          })
+        );
+      }
     }
+  }
+}
+
+// Phase 31 — install __getCustomElementLabel test bridge so the
+// phase31LabelOverride spec can read the rendered label by pceId. Caller
+// supplies the active fabric.Canvas; bridge resolves to the latest canvas
+// (re-installed each render via setLabelLookupCanvas).
+let _labelLookupFc: fabric.Canvas | null = null;
+export function setLabelLookupCanvas(fc: fabric.Canvas | null): void {
+  _labelLookupFc = fc;
+  if (import.meta.env.MODE === "test" && typeof window !== "undefined") {
+    (window as unknown as {
+      __getCustomElementLabel?: (pceId: string) => string | null;
+    }).__getCustomElementLabel = (pceId: string): string | null => {
+      const cv = _labelLookupFc;
+      if (!cv) return null;
+      const obj = cv.getObjects().find(
+        (o) =>
+          (o as unknown as { data?: { type?: string; pceId?: string } }).data
+            ?.type === "custom-element-label" &&
+          (o as unknown as { data?: { pceId?: string } }).data?.pceId === pceId,
+      );
+      // FabricText stores the rendered string in `text`.
+      return obj ? ((obj as unknown as { text?: string }).text ?? null) : null;
+    };
   }
 }

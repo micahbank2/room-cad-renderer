@@ -85,6 +85,11 @@ export interface PlacedProduct {
    *  1.0 = library default. Stored as a single number so width+depth always
    *  scale together (aspect ratio preserved). */
   sizeScale?: number;
+  /** D-01/D-02: per-axis width override. Set only by edge-handle drag.
+   *  When present, resolver returns override (ignores sizeScale for width). */
+  widthFtOverride?: number;
+  /** D-01/D-02: per-axis depth override. Set only by edge-handle drag. */
+  depthFtOverride?: number;
 }
 
 export interface Room {
@@ -111,6 +116,12 @@ export interface PlacedCustomElement {
   position: Point; // center in feet
   rotation: number; // degrees
   sizeScale?: number; // per-placement scale
+  /** D-01/D-02: per-axis width override. */
+  widthFtOverride?: number;
+  /** D-01/D-02: per-axis depth override. */
+  depthFtOverride?: number;
+  /** D-13: per-placement display name override. Empty/undefined → render catalog name. Max 40 chars (client-enforced). */
+  labelOverride?: string;
 }
 
 export interface Ceiling {

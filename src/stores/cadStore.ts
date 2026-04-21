@@ -48,6 +48,10 @@ interface CADState {
   rotateWallNoHistory: (id: string, angleDeltaDeg: number) => void;
   resizeProduct: (id: string, scale: number) => void;
   resizeProductNoHistory: (id: string, scale: number) => void;
+  // Phase 31 — per-axis override mutations (D-01/D-02)
+  resizeProductAxis: (id: string, axis: "width" | "depth", valueFt: number) => void;
+  resizeProductAxisNoHistory: (id: string, axis: "width" | "depth", valueFt: number) => void;
+  clearProductOverrides: (id: string) => void;
   setFloorPlanImage: (dataUrl: string | undefined) => void;
   addCeiling: (points: Point[], height: number, material?: string) => string;
   updateCeiling: (id: string, changes: Partial<Ceiling>) => void;
@@ -72,6 +76,12 @@ interface CADState {
   rotateCustomElementNoHistory: (id: string, angle: number) => void;
   resizeCustomElement: (id: string, scale: number) => void;
   resizeCustomElementNoHistory: (id: string, scale: number) => void;
+  // Phase 31 — placement-instance mutations (Pitfall 4: distinct from updateCustomElement)
+  updatePlacedCustomElement: (id: string, changes: Partial<PlacedCustomElement>) => void;
+  updatePlacedCustomElementNoHistory: (id: string, changes: Partial<PlacedCustomElement>) => void;
+  resizeCustomElementAxis: (id: string, axis: "width" | "depth", valueFt: number) => void;
+  resizeCustomElementAxisNoHistory: (id: string, axis: "width" | "depth", valueFt: number) => void;
+  clearCustomElementOverrides: (id: string) => void;
   removeProduct: (id: string) => void;
   removeSelected: (ids: string[]) => void;
   undo: () => void;
@@ -392,6 +402,47 @@ export const useCADStore = create<CADState>()((set) => ({
       })
     ),
 
+  // Phase 31 — per-axis override mutations for placed products (D-01/D-02).
+  resizeProductAxis: (id, axis, valueFt) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const pp = doc.placedProducts[id];
+        if (!pp) return;
+        const v = Math.max(0.25, Math.min(50, valueFt));
+        pushHistory(s);
+        if (axis === "width") pp.widthFtOverride = v;
+        else pp.depthFtOverride = v;
+      })
+    ),
+
+  resizeProductAxisNoHistory: (id, axis, valueFt) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const pp = doc.placedProducts[id];
+        if (!pp) return;
+        const v = Math.max(0.25, Math.min(50, valueFt));
+        if (axis === "width") pp.widthFtOverride = v;
+        else pp.depthFtOverride = v;
+      })
+    ),
+
+  clearProductOverrides: (id) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const pp = doc.placedProducts[id];
+        if (!pp) return;
+        pushHistory(s);
+        pp.widthFtOverride = undefined;
+        pp.depthFtOverride = undefined;
+      })
+    ),
+
   setFloorPlanImage: (dataUrl) =>
     set(
       produce((s: CADState) => {
@@ -703,6 +754,62 @@ export const useCADStore = create<CADState>()((set) => ({
         const doc = activeDoc(s);
         if (!doc?.placedCustomElements?.[id]) return;
         doc.placedCustomElements[id].sizeScale = Math.max(0.1, Math.min(10, scale));
+      })
+    ),
+
+  // Phase 31 — placement-instance mutations (Pitfall 4).
+  // These target rooms[active].placedCustomElements[id] (PLACEMENT), NOT the
+  // root.customElements catalog. updateCustomElement (above) targets the catalog.
+  updatePlacedCustomElement: (id, changes) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.placedCustomElements?.[id]) return;
+        pushHistory(s);
+        Object.assign(doc.placedCustomElements[id], changes);
+      })
+    ),
+
+  updatePlacedCustomElementNoHistory: (id, changes) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.placedCustomElements?.[id]) return;
+        Object.assign(doc.placedCustomElements[id], changes);
+      })
+    ),
+
+  resizeCustomElementAxis: (id, axis, valueFt) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.placedCustomElements?.[id]) return;
+        const v = Math.max(0.25, Math.min(50, valueFt));
+        pushHistory(s);
+        if (axis === "width") doc.placedCustomElements[id].widthFtOverride = v;
+        else doc.placedCustomElements[id].depthFtOverride = v;
+      })
+    ),
+
+  resizeCustomElementAxisNoHistory: (id, axis, valueFt) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.placedCustomElements?.[id]) return;
+        const v = Math.max(0.25, Math.min(50, valueFt));
+        if (axis === "width") doc.placedCustomElements[id].widthFtOverride = v;
+        else doc.placedCustomElements[id].depthFtOverride = v;
+      })
+    ),
+
+  clearCustomElementOverrides: (id) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.placedCustomElements?.[id]) return;
+        pushHistory(s);
+        doc.placedCustomElements[id].widthFtOverride = undefined;
+        doc.placedCustomElements[id].depthFtOverride = undefined;
       })
     ),
 

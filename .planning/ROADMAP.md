@@ -69,7 +69,7 @@
 - [x] **Phase 28: Auto-Save** — CAD scene saves itself; toolbar shows SAVING/SAVED status (completed 2026-04-20)
 - [x] **Phase 29: Editable Dimension Labels** — double-click any wall label to type a new length (completed 2026-04-20)
 - [x] **Phase 30: Smart Snapping** — edges snap to walls and objects; auto-center on midpoints; guides appear on snap (completed 2026-04-20)
-- [ ] **Phase 31: Drag-to-Resize + Label Override** — drag handles resize products and walls; custom elements can be renamed per placement
+- [x] **Phase 31: Drag-to-Resize + Label Override** — drag handles resize products and walls; custom elements can be renamed per placement (completed 2026-04-21)
 
 ### Phase Details
 
@@ -119,7 +119,7 @@
   3. A drag-resize operation produces exactly one undo entry — Ctrl+Z fully restores the pre-drag size/position in one step
   4. Mid-drag canvas performance matches the Phase 25 fast-path baseline (no per-frame store commits)
   5. Selecting a placed custom element and typing into the label-override field in PropertiesPanel changes its 2D canvas label; clearing the field reverts to the catalog name
-**Plans**: TBD
+**Plans**: 4 plans (see .planning/phases/31-drag-resize-label-override/)
 **UI hint**: yes
 
 ---
@@ -131,4 +131,4 @@
 | 28. Auto-Save | 5/5 | Complete    | 2026-04-20 |
 | 29. Editable Dimension Labels | 4/4 | Complete    | 2026-04-20 |
 | 30. Smart Snapping | 4/4 | Complete    | 2026-04-20 |
-| 31. Drag-to-Resize + Label Override | 0/? | Not started | - |
+| 31. Drag-to-Resize + Label Override | 4/4 | Complete   | 2026-04-21 |
