@@ -82,6 +82,7 @@
 ### Phase Details
 
 #### Phase 32: PBR Foundation
+**Plans:** 4 plans (3 waves)
 **Goal**: Jessica's WOOD_PLANK, CONCRETE, and PLASTER walls/floors/ceilings read as believable surfaces in 3D — wood shows plank seams + grain, concrete shows aggregate roughness, plaster shows subtle surface variation
 **Depends on**: Nothing (first v1.7 phase)
 **Requirements**: VIZ-07, VIZ-08, VIZ-09
@@ -92,7 +93,11 @@
   4. PBR loading is non-blocking — Suspense fallback is per-mesh, not whole-scene; canvas does not freeze while textures load
   5. `public/textures/` ships three CC0-licensed sets (`wood-plank/`, `concrete/`, `plaster/`) at 1024² albedo + 512² normal + 512² roughness, ~1.5 MB total
   6. Refcount-based dispose API releases GPU memory when a texture is no longer referenced by any active material; anisotropy is set from renderer capabilities; wrap mode is `RepeatWrapping`
-**Plans**: TBD
+**Plans**:
+- [ ] 32-01-PLAN.md — Texture assets (CC0 downloads) + SurfaceMaterial.pbr registry extension (wave 1)
+- [ ] 32-02-PLAN.md — PBR loader infrastructure (color-space helper, refcount cache, ErrorBoundary) (wave 1, parallel)
+- [ ] 32-03-PLAN.md — Wire PBR into FloorMesh/CeilingMesh/WallMesh; swap Environment HDR; migrate legacy caches (D-05) (wave 2)
+- [ ] 32-04-PLAN.md — Test driver + integration tests + boundary tests (wave 3)
 **UI hint**: yes
 
 #### Phase 33: User-Uploaded Textures
@@ -141,7 +146,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 32. PBR Foundation | 0/0 | Not started | - |
+| 32. PBR Foundation | 0/4 | Not started | - |
 | 33. User-Uploaded Textures | 0/0 | Not started | - |
 | 34. Camera Presets | 0/0 | Not started | - |
 | 35. Tech-Debt Sweep | 0/0 | Not started | - |
