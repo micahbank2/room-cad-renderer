@@ -9,37 +9,11 @@ import type { WainscotStyleItem } from "@/types/wainscotStyle";
 import { resolvePaintHex } from "@/lib/colorUtils";
 import { usePaintStore } from "@/stores/paintStore";
 import { acquireTexture, releaseTexture } from "./pbrTextureCache";
+import { useSharedTexture } from "./useSharedTexture";
 
 interface Props {
   wall: WallSegment;
   isSelected: boolean;
-}
-
-/** Suspense-friendly hook: acquires a texture via shared cache, releases on unmount.
- *  Returns null while loading (renderer shows base material until resolved). */
-function useSharedTexture(url: string | undefined): THREE.Texture | null {
-  const [tex, setTex] = useState<THREE.Texture | null>(null);
-  useEffect(() => {
-    if (!url) {
-      setTex(null);
-      return;
-    }
-    let cancelled = false;
-    acquireTexture(url, "albedo")
-      .then((t) => {
-        if (!cancelled) setTex(t);
-        else releaseTexture(url);
-      })
-      .catch(() => {
-        // On error: leave tex null; caller renders base color (existing behavior for wallpaper).
-        if (!cancelled) setTex(null);
-      });
-    return () => {
-      cancelled = true;
-      releaseTexture(url);
-    };
-  }, [url]);
-  return tex;
 }
 
 /** Batch-acquire textures for an array of keyed items; returns a Map<key, Texture|null>. */
