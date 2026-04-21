@@ -122,11 +122,12 @@ export default function WallMesh({ wall, isSelected }: Props) {
         <planeGeometry args={[length, height]} />
         <meshStandardMaterial
           color={wp.kind === "color" ? wp.color ?? "#f8f5ef" : "#ffffff"}
-          map={tex ?? undefined}
           roughness={0.85}
           metalness={0}
           side={THREE.DoubleSide}
-        />
+        >
+          {tex && <primitive attach="map" object={tex} dispose={null} />}
+        </meshStandardMaterial>
       </mesh>
     );
   };
@@ -207,11 +208,12 @@ export default function WallMesh({ wall, isSelected }: Props) {
               <mesh key={art.id} position={[artX, artY, baseZ]}>
                 <planeGeometry args={[art.width, art.height]} />
                 <meshStandardMaterial
-                  map={tex ?? undefined}
                   roughness={0.5}
                   metalness={0}
                   side={THREE.DoubleSide}
-                />
+                >
+                  {tex && <primitive attach="map" object={tex} dispose={null} />}
+                </meshStandardMaterial>
               </mesh>
             );
           }
@@ -226,11 +228,12 @@ export default function WallMesh({ wall, isSelected }: Props) {
               <mesh position={[0, 0, artZ]}>
                 <planeGeometry args={[innerW, innerH]} />
                 <meshStandardMaterial
-                  map={tex ?? undefined}
                   roughness={0.5}
                   metalness={0}
                   side={THREE.DoubleSide}
-                />
+                >
+                  {tex && <primitive attach="map" object={tex} dispose={null} />}
+                </meshStandardMaterial>
               </mesh>
               <mesh position={[0, art.height / 2 - frameW / 2, frameCenterZ]} castShadow>
                 <boxGeometry args={[art.width, frameW, frameD]} />
