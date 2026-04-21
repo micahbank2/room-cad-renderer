@@ -4,6 +4,17 @@
 
 export type SurfaceTarget = "floor" | "ceiling" | "both";
 
+/** Physically-based rendering maps for a surface material. Phase 32.
+ *  All three URLs are served from `public/` (absolute paths starting with `/`).
+ *  `tile.wFt` and `tile.lFt` are the real-world repeat size in feet; identical
+ *  repeat applies to all three maps (D-04). */
+export interface PbrMaps {
+  albedo: string;
+  normal: string;
+  roughness: string;
+  tile: { wFt: number; lFt: number };
+}
+
 export interface SurfaceMaterial {
   id: string;
   label: string;
@@ -12,6 +23,8 @@ export interface SurfaceMaterial {
   /** Which surface(s) this material applies to. */
   surface: SurfaceTarget;
   defaultScaleFt: number;
+  /** Optional PBR maps. Absence = flat-color render path (D-13). */
+  pbr?: PbrMaps;
 }
 
 /** All 11 surface materials: 8 floor-only, 1 shared (CONCRETE), 3 ceiling-only. */
@@ -57,6 +70,12 @@ export const SURFACE_MATERIALS: Record<string, SurfaceMaterial> = {
     roughness: 0.85,
     surface: "both",
     defaultScaleFt: 4,
+    pbr: {
+      albedo: "/textures/concrete/albedo.jpg",
+      normal: "/textures/concrete/normal.jpg",
+      roughness: "/textures/concrete/roughness.jpg",
+      tile: { wFt: 4, lFt: 4 },
+    },
   },
   CARPET: {
     id: "CARPET",
@@ -90,6 +109,12 @@ export const SURFACE_MATERIALS: Record<string, SurfaceMaterial> = {
     roughness: 0.9,
     surface: "ceiling",
     defaultScaleFt: 4,
+    pbr: {
+      albedo: "/textures/plaster/albedo.jpg",
+      normal: "/textures/plaster/normal.jpg",
+      roughness: "/textures/plaster/roughness.jpg",
+      tile: { wFt: 6, lFt: 6 },
+    },
   },
   WOOD_PLANK: {
     id: "WOOD_PLANK",
@@ -98,6 +123,12 @@ export const SURFACE_MATERIALS: Record<string, SurfaceMaterial> = {
     roughness: 0.75,
     surface: "ceiling",
     defaultScaleFt: 0.5,
+    pbr: {
+      albedo: "/textures/wood-plank/albedo.jpg",
+      normal: "/textures/wood-plank/normal.jpg",
+      roughness: "/textures/wood-plank/roughness.jpg",
+      tile: { wFt: 0.5, lFt: 4 },
+    },
   },
   PAINTED_DRYWALL: {
     id: "PAINTED_DRYWALL",
