@@ -9,6 +9,7 @@
 - ✅ **v1.4 Polish & Tech Debt** — Phases 21–23 (shipped 2026-04-08) — see [milestones/v1.4-ROADMAP.md](milestones/v1.4-ROADMAP.md)
 - ✅ **v1.5 Performance & Tech Debt** — Phases 24–27 (shipped 2026-04-20) — see [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
 - ✅ **v1.6 Editing UX** — Phases 28–31 (shipped 2026-04-21) — see [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
+- 🚧 **v1.7 3D Realism** — Phases 32–35 (in progress) — see below
 
 ---
 
@@ -65,6 +66,82 @@
 
 ---
 
+## v1.7 3D Realism
+
+**Goal:** Make Jessica's 3D view feel like the actual room — physically-based materials replace flat-color placeholders, she can drop in textures from photos of real surfaces she's considering, and she can switch camera angles to evaluate the space from multiple vantage points.
+
+**Requirements:** 13 | **Phases:** 4 (32–35)
+
+### Phases
+
+- [ ] **Phase 32: PBR Foundation** — WOOD_PLANK / CONCRETE / PLASTER render with bundled albedo + normal + roughness maps; loader is non-blocking and color-space correct
+- [ ] **Phase 33: User-Uploaded Textures** — Jessica uploads a photo of a real surface; it appears as a custom material on walls/floors/ceilings; persists locally with dedup + downscale
+- [ ] **Phase 34: Camera Presets** — eye-level / top-down / 3-quarter / corner switchable via toolbar buttons + 1/2/3/4 hotkeys with smooth ~600ms tween
+- [ ] **Phase 35: Tech-Debt Sweep** — close GH #44/#46/#50/#60, delete orphan SaveIndicator, finish resolveEffectiveDims migration, backfill Phase 29 frontmatter
+
+### Phase Details
+
+#### Phase 32: PBR Foundation
+**Goal**: Jessica's WOOD_PLANK, CONCRETE, and PLASTER walls/floors/ceilings read as believable surfaces in 3D — wood shows plank seams + grain, concrete shows aggregate roughness, plaster shows subtle surface variation
+**Depends on**: Nothing (first v1.7 phase)
+**Requirements**: VIZ-07, VIZ-08, VIZ-09
+**Success Criteria** (what must be TRUE):
+  1. In the 3D viewport at default 3/4 camera with default lighting, WOOD_PLANK / CONCRETE / PLASTER each read as visually distinct from a flat hex-color render — no color-space corruption (albedo loads `SRGBColorSpace`; normal/roughness load `NoColorSpace`)
+  2. PAINTED_DRYWALL and existing flat-color materials render unchanged from v1.6 baseline
+  3. Manually breaking a texture URL leaves the affected surface rendering with its base hex color; the rest of the scene continues rendering; no React error boundary trip
+  4. PBR loading is non-blocking — Suspense fallback is per-mesh, not whole-scene; canvas does not freeze while textures load
+  5. `public/textures/` ships three CC0-licensed sets (`wood-plank/`, `concrete/`, `plaster/`) at 1024² albedo + 512² normal + 512² roughness, ~1.5 MB total
+  6. Refcount-based dispose API releases GPU memory when a texture is no longer referenced by any active material; anisotropy is set from renderer capabilities; wrap mode is `RepeatWrapping`
+**Plans**: TBD
+**UI hint**: yes
+
+#### Phase 33: User-Uploaded Textures
+**Goal**: Jessica uploads a photo of a real surface she's considering and applies it to a wall/floor/ceiling within ~10 seconds; the upload persists across reload and never bloats project snapshots
+**Depends on**: Phase 32 (reuses PBR loader, color-space helper, per-mesh Suspense pattern, refcount dispose API)
+**Requirements**: LIB-06, LIB-07, LIB-08
+**Success Criteria** (what must be TRUE):
+  1. Dropping or picking a JPEG/PNG/WebP file in the new "Upload Texture" UI shows a preview, accepts a name + real-world tile size in feet+inches (Phase 29 parser), and saves to the material picker for walls/floors/ceilings
+  2. Uploaded textures apply on selection like bundled materials and persist across full page reload
+  3. SVG and GIF uploads are rejected at the MIME-whitelist gate with a clear error message
+  4. Images larger than 2048 px on the longest edge are auto-downscaled client-side to ≤2048 px before persistence; SHA-256 of the resulting bytes dedups same-image re-uploads to a single IDB entry
+  5. `JSON.stringify(snapshot)` contains zero `data:` substrings >10 KB and zero `Blob` instances — `CADSnapshot` references textures by `userTextureId` only; Blobs live in a separate `userTextureStore` IDB keyspace
+  6. Deleting a texture from the library while a project still references it leaves the project loadable; the orphan-referenced surface falls back to its base hex color without crash
+**Plans**: TBD
+**UI hint**: yes
+
+#### Phase 34: Camera Presets
+**Goal**: Jessica can switch between top-down, eye-level, 3/4, and corner views with a single keystroke or click, with a smooth glide between poses
+**Depends on**: Phase 33 (sequencing only — no code coupling; could run after Phase 32)
+**Requirements**: CAM-01, CAM-02, CAM-03
+**Success Criteria** (what must be TRUE):
+  1. Four toolbar buttons and bare `1`/`2`/`3`/`4` hotkeys switch between eye-level (5.5 ft), top-down (Y = 1.5× max(roomWidth, roomLength)), 3/4 (current default), and corner (room corner at ceiling - 0.5 ft, looking at opposite corner)
+  2. Hotkeys are inert when focus is in an input or textarea (`document.activeElement` guard) — no preset switch fires while typing in PropertiesPanel or RoomSettings
+  3. Camera transitions glide ~600ms ease-in-out, not snap; `OrbitControls` damping is disabled during the tween, snap on epsilon, and a mid-tween preset switch cancels-and-restarts cleanly from the current position
+  4. The active preset is visually indicated on its toolbar button (`bg-accent/20 text-accent-light border-accent/30`)
+  5. Preset switches do NOT push to undo history (`past.length` unchanged) and do NOT trigger `useAutoSave` (no Blob/MB churn into IDB on every glide)
+  6. Switching view modes (2D/3D/split) mid-tween clears the in-flight tween cleanly without throwing or stranding the camera; walk-mode handoff is decided in plan-phase
+**Plans**: TBD
+**UI hint**: yes
+
+#### Phase 35: Tech-Debt Sweep
+**Goal**: v1.6 leftover noise is gone — shipped issues are closed on GitHub, dead code is deleted, the resolver migration is complete, and Phase 29 traceability frontmatter is correct
+**Depends on**: Nothing (independent; recommended last so it can be cut under scope pressure without leaving features half-shipped)
+**Requirements**: DEBT-01, DEBT-02, DEBT-03, DEBT-04
+**Success Criteria** (what must be TRUE):
+  1. GitHub issues #44 (auto-save), #46 (editable dim labels), #50 (per-placement label override), and #60 (drag-to-resize) are closed with comments referencing PR #66 / PR #67
+  2. `src/components/SaveIndicator.tsx` no longer exists; `grep -r "SaveIndicator"` returns no production references; build still passes; full test suite (340+) still passes
+  3. `grep "effectiveDimensions(" src/` returns only catalog-context usages — all `PlacedProduct` / `PlacedCustomElement` call sites use `resolveEffectiveDims` / `resolveEffectiveCustomDims`; per-placement overrides continue to render correctly across 3D meshes, snap scene, fabricSync, and selectTool
+  4. Phase 29 SUMMARY.md frontmatter `requirements-completed` field is backfilled with `EDIT-20, EDIT-21` for the relevant plan summaries (verifiable via `gsd-tools summary-extract`)
+**Plans**: TBD
+**UI hint**: yes
+
+---
+
 ## Progress
 
-_No phases planned for next milestone yet — run `/gsd:new-milestone` to scope v1.7._
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 32. PBR Foundation | 0/0 | Not started | - |
+| 33. User-Uploaded Textures | 0/0 | Not started | - |
+| 34. Camera Presets | 0/0 | Not started | - |
+| 35. Tech-Debt Sweep | 0/0 | Not started | - |
