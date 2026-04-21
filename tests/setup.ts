@@ -57,3 +57,27 @@ HTMLCanvasElement.prototype.getContext = function (type: string, ...rest: unknow
   // @ts-expect-error - passthrough
   return origGetContext ? origGetContext.call(this, type, ...rest) : null;
 } as typeof HTMLCanvasElement.prototype.getContext;
+
+// Phase 31 Plan 03 Rule 3 deviation — happy-dom returns 0-sized layout rects
+// for every element, which makes FabricCanvas.redraw() short-circuit before it
+// ever activates the current tool (the activate path is where the test-mode
+// driver bridges install). Stub a 800x600 viewport on every HTMLElement so
+// canvas-mounted integration tests (Phase 30 snapIntegration, Phase 31
+// driver-based suites) all see a non-zero rect without each file repeating
+// the stub. Snap integration suite already overrides this to 800x600 so the
+// values agree.
+if (typeof HTMLElement !== "undefined") {
+  const _origGBCR = HTMLElement.prototype.getBoundingClientRect;
+  HTMLElement.prototype.getBoundingClientRect = function (): DOMRect {
+    // Honor any per-test override that returned non-zero from the original
+    // implementation; only stub when happy-dom's default 0-size would make
+    // the canvas init bail.
+    const native = _origGBCR ? _origGBCR.call(this) : null;
+    if (native && (native.width > 0 || native.height > 0)) return native;
+    return {
+      x: 0, y: 0, left: 0, top: 0, right: 800, bottom: 600,
+      width: 800, height: 600,
+      toJSON: () => ({}),
+    } as DOMRect;
+  };
+}

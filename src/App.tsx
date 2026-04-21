@@ -1,7 +1,13 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import type { ToolType, WallSegment, PlacedProduct } from "@/types/cad";
 import { useUIStore } from "@/stores/uiStore";
-import { useCADStore, useActiveWalls, getActiveRoomDoc } from "@/stores/cadStore";
+import {
+  useCADStore,
+  useActiveWalls,
+  useActivePlacedProducts,
+  useActivePlacedCustomElements,
+  getActiveRoomDoc,
+} from "@/stores/cadStore";
 import { uid } from "@/lib/geometry";
 import { useProductStore } from "@/stores/productStore";
 import { useFramedArtStore } from "@/stores/framedArtStore";
@@ -45,6 +51,15 @@ export default function App() {
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
   const activeWalls = useActiveWalls();
   const wallCount = Object.keys(activeWalls).length;
+  // Phase 31 Plan 03 Rule 2: comment in auto-detect effect says "walls or
+  // products" but original code only watched walls. Also watch placed products
+  // + placed custom elements so seeded fixtures (Phase 31 RTL specs) skip the
+  // welcome screen and mount the canvas. Critical for driver-bridge install.
+  const activePlacedProducts = useActivePlacedProducts();
+  const activePlacedCustomElements = useActivePlacedCustomElements();
+  const placedCount =
+    Object.keys(activePlacedProducts).length +
+    Object.keys(activePlacedCustomElements).length;
 
   useAutoSave();
   useHelpRouteSync();
@@ -87,8 +102,8 @@ export default function App() {
 
   // Auto-detect if user has started (has walls or products)
   useEffect(() => {
-    if (wallCount > 0) setHasStarted(true);
-  }, [wallCount]);
+    if (wallCount > 0 || placedCount > 0) setHasStarted(true);
+  }, [wallCount, placedCount]);
 
   // Auto-start onboarding tour the first time the canvas is shown
   useEffect(() => {
