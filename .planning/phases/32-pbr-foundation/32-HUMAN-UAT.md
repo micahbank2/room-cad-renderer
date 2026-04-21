@@ -51,7 +51,12 @@ blocked: 0
 
 ### Gap 1: Wallpaper disappears after 2D → 3D view toggle (Phase 32 regression)
 
-- status: failed
+- status: in-progress
+- remediation_attempts:
+  - 32-05 (debounced dispose) — FAILED verify 2026-04-21
+  - 32-06 (restore non-disposing caches) — FAILED verify 2026-04-21; correct code, wrong layer
+  - 32-07 (R3F dispose={null} escape hatch) — queued
+- root_cause_final: React Three Fiber auto-disposes texture resources on primitive unmount; module-cache retention is not sufficient on its own. Fix requires `<primitive attach="map" object={tex} dispose={null} />` at every render site that consumes cached textures.
 - severity: high
 - source_test: Test 4 above (how-to-verify step 8)
 - reproduction:
