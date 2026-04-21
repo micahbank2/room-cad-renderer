@@ -82,7 +82,7 @@
 ### Phase Details
 
 #### Phase 32: PBR Foundation
-**Plans:** 3/4 plans executed
+**Plans:** 5 plans (3 executed + gap-closure)
 **Goal**: Jessica's WOOD_PLANK, CONCRETE, and PLASTER walls/floors/ceilings read as believable surfaces in 3D — wood shows plank seams + grain, concrete shows aggregate roughness, plaster shows subtle surface variation
 **Depends on**: Nothing (first v1.7 phase)
 **Requirements**: VIZ-07, VIZ-08, VIZ-09
@@ -98,6 +98,7 @@
 - [x] 32-02-PLAN.md — PBR loader infrastructure (color-space helper, refcount cache, ErrorBoundary) (wave 1, parallel)
 - [x] 32-03-PLAN.md — Wire PBR into FloorMesh/CeilingMesh/WallMesh; swap Environment HDR; migrate legacy caches (D-05) (wave 2)
 - [ ] 32-04-PLAN.md — Test driver + integration tests + boundary tests (wave 3)
+- [ ] 32-05-PLAN.md — GAP CLOSURE: debounced texture disposal (wallpaper/wallArt regression from D-05 cache migration) (wave 4)
 **UI hint**: yes
 
 #### Phase 33: User-Uploaded Textures
@@ -146,7 +147,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 32. PBR Foundation | 3/4 | In Progress|  |
+| 32. PBR Foundation | 3/5 | In Progress (gap closure pending) |  |
 | 33. User-Uploaded Textures | 0/0 | Not started | - |
 | 34. Camera Presets | 0/0 | Not started | - |
 | 35. Tech-Debt Sweep | 0/0 | Not started | - |
