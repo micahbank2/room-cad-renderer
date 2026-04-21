@@ -4,7 +4,7 @@ import { useUIStore } from "@/stores/uiStore";
 import { snapPoint, distance, closestPointOnWall, formatFeet } from "@/lib/geometry";
 import type { Point, PlacedProduct, PlacedCustomElement, CustomElement } from "@/types/cad";
 import type { Product } from "@/types/product";
-import { effectiveDimensions } from "@/types/product";
+import { effectiveDimensions, resolveEffectiveDims, resolveEffectiveCustomDims } from "@/types/product";
 import { hitTestHandle, snapAngle, angleFromCenterToPointer } from "../rotationHandle";
 import {
   hitTestWallHandle,
@@ -79,7 +79,8 @@ function hitTestStore(
   // Check products first (they're on top) — orphan + null-dim use 2x2 AABB
   for (const pp of Object.values(doc.placedProducts)) {
     const product = productLibrary.find((p) => p.id === pp.productId);
-    const { width, depth } = effectiveDimensions(product, pp.sizeScale);
+    // Phase 31: per-axis overrides flow through resolveEffectiveDims so hit-test matches render.
+    const { width, depth } = resolveEffectiveDims(product, pp);
     const halfW = width / 2;
     const halfD = depth / 2;
     // Simple AABB check (ignoring rotation for now)
@@ -99,9 +100,10 @@ function hitTestStore(
   for (const pce of Object.values(customElements) as PlacedCustomElement[]) {
     const el = catalog[pce.customElementId] as CustomElement | undefined;
     if (!el) continue;
-    const sc = pce.sizeScale ?? 1;
-    const halfW = (el.width * sc) / 2;
-    const halfD = (el.depth * sc) / 2;
+    // Phase 31: per-axis overrides flow through resolveEffectiveCustomDims.
+    const ceDims = resolveEffectiveCustomDims(el, pce);
+    const halfW = ceDims.width / 2;
+    const halfD = ceDims.depth / 2;
     if (
       feetPos.x >= pce.position.x - halfW &&
       feetPos.x <= pce.position.x + halfW &&
@@ -288,7 +290,8 @@ export function activateSelectTool(
       const pp = doc.placedProducts?.[id];
       if (pp) {
         const prod = _productLibrary.find((p) => p.id === pp.productId);
-        const { width, depth } = effectiveDimensions(prod, pp.sizeScale);
+        // Phase 31: per-axis overrides flow through resolveEffectiveDims.
+        const { width, depth } = resolveEffectiveDims(prod, pp);
         return axisAlignedBBoxOfRotated(pos, width, depth, pp.rotation, id);
       }
       // Custom elements are hit-tested as "product" by hitTestStore.
@@ -299,11 +302,12 @@ export function activateSelectTool(
         const catalog = (useCADStore.getState() as any).customElements ?? {};
         const el = catalog[pce.customElementId] as CustomElement | undefined;
         if (el) {
-          const sc = pce.sizeScale ?? 1;
+          // Phase 31: per-axis overrides flow through resolveEffectiveCustomDims.
+          const ceDims = resolveEffectiveCustomDims(el, pce);
           return axisAlignedBBoxOfRotated(
             pos,
-            el.width * sc,
-            el.depth * sc,
+            ceDims.width,
+            ceDims.depth,
             pce.rotation,
             id,
           );
@@ -317,11 +321,12 @@ export function activateSelectTool(
         const catalog = (useCADStore.getState() as any).customElements ?? {};
         const el = catalog[pce.customElementId] as CustomElement | undefined;
         if (el) {
-          const sc = pce.sizeScale ?? 1;
+          // Phase 31: per-axis overrides flow through resolveEffectiveCustomDims.
+          const ceDims = resolveEffectiveCustomDims(el, pce);
           return axisAlignedBBoxOfRotated(
             pos,
-            el.width * sc,
-            el.depth * sc,
+            ceDims.width,
+            ceDims.depth,
             pce.rotation,
             id,
           );
@@ -585,7 +590,8 @@ export function activateSelectTool(
           return;
         }
         // Resize handle hit-test (EDIT-14)
-        const { width, depth } = effectiveDimensions(prod, pp.sizeScale);
+        // Phase 31: use resolveEffectiveDims so hit-test rectangle matches rendered size.
+        const { width, depth } = resolveEffectiveDims(prod, pp);
         if (hitTestResizeHandle(feet, pp, width, depth)) {
           dragging = true;
           dragId = selId;
@@ -606,9 +612,10 @@ export function activateSelectTool(
         const customCatalog = (useCADStore.getState() as any).customElements ?? {};
         const el = customCatalog[pce.customElementId] as CustomElement | undefined;
         if (el) {
-          const sc = pce.sizeScale ?? 1;
-          const w = el.width * sc;
-          const d = el.depth * sc;
+          // Phase 31: per-axis overrides honored via resolveEffectiveCustomDims.
+          const ceDims = resolveEffectiveCustomDims(el, pce);
+          const w = ceDims.width;
+          const d = ceDims.depth;
           // Rotation handle
           if (hitTestHandle(feet, pce as unknown as PlacedProduct, d)) {
             dragging = true;
@@ -852,9 +859,12 @@ export function activateSelectTool(
         useCADStore.getState().resizeProductNoHistory(dragId, newScale);
         // Update live size tag for products
         const prod = _productLibrary.find((p) => p.id === pp.productId);
-        const dims = effectiveDimensions(prod, newScale);
         const updatedPp = (getActiveRoomDoc()?.placedProducts ?? {})[dragId];
-        if (updatedPp) updateSizeTag(updatedPp, dims.width, dims.depth);
+        if (updatedPp) {
+          // Phase 31: per-axis overrides honored via resolveEffectiveDims.
+          const dims = resolveEffectiveDims(prod, updatedPp);
+          updateSizeTag(updatedPp, dims.width, dims.depth);
+        }
       } else {
         useCADStore.getState().resizeCustomElementNoHistory(dragId, newScale);
         // Update live size tag for custom elements
@@ -863,9 +873,9 @@ export function activateSelectTool(
         if (el2) {
           const updatedPce = (getActiveRoomDoc()?.placedCustomElements ?? {})[dragId];
           if (updatedPce) {
-            const w2 = el2.width * newScale;
-            const d2 = el2.depth * newScale;
-            updateSizeTag(updatedPce as unknown as PlacedProduct, w2, d2);
+            // Phase 31: per-axis overrides honored via resolveEffectiveCustomDims.
+            const ceDims2 = resolveEffectiveCustomDims(el2, updatedPce);
+            updateSizeTag(updatedPce as unknown as PlacedProduct, ceDims2.width, ceDims2.depth);
           }
         }
       }

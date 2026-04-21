@@ -30,7 +30,7 @@ import type {
   CustomElement,
 } from "@/types/cad";
 import type { Product } from "@/types/product";
-import { effectiveDimensions } from "@/types/product";
+import { effectiveDimensions, resolveEffectiveDims, resolveEffectiveCustomDims } from "@/types/product";
 
 // ---------------------------------------------------------------------------
 // Public constants
@@ -183,7 +183,8 @@ export function buildSceneGeometry(
   for (const pp of Object.values(doc.placedProducts)) {
     if (pp.id === excludeId) continue; // D-02b
     const prod = productLibrary.find((p) => p.id === pp.productId);
-    const dims = effectiveDimensions(prod, pp.sizeScale ?? 1);
+    // Phase 31: use resolveEffectiveDims so per-axis overrides flow into snap scene.
+    const dims = resolveEffectiveDims(prod, pp);
     objectBBoxes.push(
       axisAlignedBBoxOfRotated(pp.position, dims.width, dims.depth, pp.rotation, pp.id),
     );
@@ -193,12 +194,13 @@ export function buildSceneGeometry(
     if (pce.id === excludeId) continue; // D-02b
     const el = customCatalog[pce.customElementId];
     if (!el) continue;
-    const sc = pce.sizeScale ?? 1;
+    // Phase 31: use resolveEffectiveCustomDims so per-axis overrides flow into snap scene.
+    const dims = resolveEffectiveCustomDims(el, pce);
     objectBBoxes.push(
       axisAlignedBBoxOfRotated(
         pce.position,
-        el.width * sc,
-        el.depth * sc,
+        dims.width,
+        dims.depth,
         pce.rotation,
         pce.id,
       ),

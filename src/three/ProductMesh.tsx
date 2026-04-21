@@ -1,6 +1,6 @@
 import type { PlacedProduct } from "@/types/cad";
 import type { Product } from "@/types/product";
-import { effectiveDimensions } from "@/types/product";
+import { resolveEffectiveDims } from "@/types/product";
 import { useProductTexture } from "./productTextureCache";
 
 interface Props {
@@ -10,7 +10,8 @@ interface Props {
 }
 
 export default function ProductMesh({ placed, product, isSelected }: Props) {
-  const { width, depth, height, isPlaceholder } = effectiveDimensions(product, placed.sizeScale);
+  // Phase 31: per-axis overrides resolved here so 3D mesh respects edge drags.
+  const { width, depth, height, isPlaceholder } = resolveEffectiveDims(product, placed);
 
   // D-03: placeholders never receive textures, even if imageUrl exists
   const textureUrl = !isPlaceholder && product?.imageUrl ? product.imageUrl : null;

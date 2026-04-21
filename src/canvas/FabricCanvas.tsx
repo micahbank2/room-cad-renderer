@@ -14,7 +14,7 @@ import {
 import { useUIStore } from "@/stores/uiStore";
 import { drawGrid } from "./grid";
 import { drawRoomDimensions } from "./dimensions";
-import { renderWalls, renderProducts, renderCeilings, renderCustomElements } from "./fabricSync";
+import { renderWalls, renderProducts, renderCeilings, renderCustomElements, setLabelLookupCanvas } from "./fabricSync";
 import { activateWallTool } from "./tools/wallTool";
 import {
   activateSelectTool,
@@ -206,6 +206,9 @@ export default function FabricCanvas({ productLibrary }: Props) {
 
     // 6. Custom elements
     renderCustomElements(fc, placedCustoms, customCatalog, scale, origin, selectedIds);
+
+    // Phase 31 — install __getCustomElementLabel test bridge (test mode only).
+    setLabelLookupCanvas(fc);
 
     fc.renderAll();
 
