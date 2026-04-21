@@ -1,7 +1,8 @@
 import * as THREE from "three";
 import { Suspense, useRef, useEffect, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, PointerLockControls } from "@react-three/drei";
+import { registerRenderer } from "./pbrTextureCache";
 import { useActiveRoom, useActiveRoomDoc, useActiveWalls, useActivePlacedProducts, useActiveCeilings, useActivePlacedCustomElements, useCustomElements } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import type { Product } from "@/types/product";
@@ -36,6 +37,12 @@ function Scene({ productLibrary }: Props) {
   const halfL = room.length / 2;
 
   const floorTexture = getFloorTexture(room.width, room.length);
+
+  // Register the renderer once so pbrTextureCache applies device anisotropy (clamped ≤8).
+  const gl = useThree((s) => s.gl);
+  useEffect(() => {
+    registerRenderer(gl);
+  }, [gl]);
 
   // D-09: preserve orbit camera position+target across mode switches
   const orbitPosRef = useRef<[number, number, number]>([halfW + 15, 12, halfL + 15]);
@@ -116,9 +123,9 @@ function Scene({ productLibrary }: Props) {
         fallbackTexture={floorTexture}
       />
 
-      {/* Ambient PBR bounce — D-08 */}
+      {/* Ambient PBR bounce — D-08 (bundled local HDR) */}
       <Suspense fallback={null}>
-        <Environment preset="apartment" />
+        <Environment files="/hdr/studio_small_09_1k.hdr" />
       </Suspense>
 
       {/* Floor grid helper */}
