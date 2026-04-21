@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: 3D Realism
-status: Scoping
-stopped_at: Phase 32 context gathered
-last_updated: "2026-04-21T03:16:03.537Z"
+status: executing
+stopped_at: Completed 32-02-PLAN.md
+last_updated: "2026-04-21T14:31:48.996Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 4
+  completed_plans: 1
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Milestone v1.7 — 3D Realism (PBR materials + user textures + camera presets + tech-debt sweep)
+**Current focus:** Phase 32 — pbr-foundation
 
 ## Current Position
 
 Milestone: v1.7 3D Realism
-Phase: not yet planned
-Plan: scoping — PROJECT.md updated, awaiting research → REQUIREMENTS → ROADMAP
-Status: Scoping
+Phase: 32 (pbr-foundation) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
 Last activity: 2026-04-21
 
 [░░░░░░░░░░] 0% (0/0 phases — roadmap pending)
@@ -58,6 +58,8 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 31]: Pitfall 4 separation: updateCustomElement (catalog) + updatePlacedCustomElement (placement) coexist with clear naming; placement actions write to rooms[active].placedCustomElements[id] not root.customElements
 - [Phase 31]: Plan 31-03 wired all Wave 1 pure modules into selectTool + PropertiesPanel + fabricSync; all 4 RTL specs green; +27 assertions
 - [Phase 31]: Phase 31 closure: VALIDATION signed (nyquist_compliant=true, wave_0_complete=true), 28/28 RTL assertions green, 6 pre-existing LIB-03/04/05 failures documented out-of-scope, EDIT-22/23/24/CUSTOM-06 closed
+- [Phase 32-pbr-foundation]: Plan 02: Centralized PBR loader infrastructure — applyColorSpace helper (D-18), refcount acquireTexture/releaseTexture cache with imperative THREE.TextureLoader (D-12/16/17), PbrErrorBoundary (D-15). +14 tests, zero regressions. Plan 03 will wire into meshes and migrate legacy caches.
+- [Phase 32-pbr-foundation]: Tests placed in tests/ (not colocated) because vitest.config include pattern only covers tests/** and src/__tests__/** — auto-fixed per Rule 3 (blocking: would be silently skipped otherwise).
 
 ### Pending Todos
 
@@ -76,6 +78,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-21T03:16:03.535Z
-Stopped at: Phase 32 context gathered
-Resume file: .planning/phases/32-pbr-foundation/32-CONTEXT.md
+Last session: 2026-04-21T14:31:43.939Z
+Stopped at: Completed 32-02-PLAN.md
+Resume file: None

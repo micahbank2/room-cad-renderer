@@ -16,12 +16,12 @@
 
 ### PBR Materials (VIZ)
 
-- [ ] **VIZ-07** — `WOOD_PLANK`, `CONCRETE`, and `PLASTER` surface materials render with PBR maps (albedo + normal + roughness) on walls, floor, and ceiling. `PAINTED_DRYWALL` and existing flat-color materials remain unchanged.
+- [x] **VIZ-07** — `WOOD_PLANK`, `CONCRETE`, and `PLASTER` surface materials render with PBR maps (albedo + normal + roughness) on walls, floor, and ceiling. `PAINTED_DRYWALL` and existing flat-color materials remain unchanged.
   - **Source:** [#61](https://github.com/micahbank2/room-cad-renderer/issues/61)
   - **Verifiable:** In 3D viewport at default 3/4 camera with default lighting, each of the three materials reads as visually distinct from a flat hex-color render — wood shows plank seams + grain, concrete shows aggregate + roughness, plaster shows subtle surface variation. No color-space corruption (normal/roughness load with `NoColorSpace`; albedo with `SRGBColorSpace`).
   - **Acceptance:** D-1 (imperative `TextureLoader`), D-2 (optional `pbr?: PbrMaps` on `SurfaceMaterial`), MUST-CS, MUST-WRAP, MUST-ANISO.
 
-- [ ] **VIZ-08** — PBR texture loading is non-blocking and fault-tolerant: a missing or failed texture URL leaves the surface rendering with its base hex color (existing fallback) instead of blacking out the scene. Loading does not freeze the canvas via Suspense.
+- [x] **VIZ-08** — PBR texture loading is non-blocking and fault-tolerant: a missing or failed texture URL leaves the surface rendering with its base hex color (existing fallback) instead of blacking out the scene. Loading does not freeze the canvas via Suspense.
   - **Source:** [#61](https://github.com/micahbank2/room-cad-renderer/issues/61)
   - **Verifiable:** Manually break a texture URL in `surfaceMaterials.ts`; viewport continues rendering, only the affected surface falls back to base color. No console errors propagate to React error boundary.
   - **Acceptance:** MUST-SUSP (per-mesh `<Suspense>` + `<ErrorBoundary>`), MUST-DISP (refcount-based dispose API).
