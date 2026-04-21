@@ -8,9 +8,14 @@ import { acquireTexture, releaseTexture } from "./pbrTextureCache";
  * fallback (e.g., wallpaper renders base color until the texture resolves).
  *
  * Extracted from WallMesh.tsx in Phase 32 Plan 05 so the hook is directly
- * testable without rendering the full mesh tree. See
- * `tests/wallpaperViewToggle.test.tsx` for the unmount+remount-within-grace
- * regression coverage.
+ * testable without rendering the full mesh tree.
+ *
+ * NOTE (Phase 32 Plan 06): This hook is now used only by PBR consumers that
+ * live inside the long-running Three scene graph. Wallpaper, wallArt, and
+ * custom-upload floor textures have been reverted to separate non-disposing
+ * module-level caches because ThreeViewport unmounts on view-mode toggle,
+ * which destroys the WebGL context and invalidates any refcount-cached
+ * textures. See 32-06-PLAN.md for context.
  */
 export function useSharedTexture(url: string | undefined): THREE.Texture | null {
   const [tex, setTex] = useState<THREE.Texture | null>(null);

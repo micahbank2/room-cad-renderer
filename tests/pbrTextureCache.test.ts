@@ -6,7 +6,6 @@ import {
   registerRenderer,
   loadPbrSet,
   __resetPbrCacheForTests,
-  __setDisposeGraceMsForTests,
 } from "@/three/pbrTextureCache";
 
 // Mock THREE.TextureLoader so tests don't hit network.
@@ -35,11 +34,6 @@ vi.mock("three", async () => {
 
 beforeEach(() => {
   __resetPbrCacheForTests();
-  // Phase 32 Plan 05: default is now 3000ms debounced dispose. This suite
-  // asserts synchronous-dispose semantics for refcount behavior, so opt
-  // into grace=0 (documented test-only knob). New `pbrTextureCacheDebounce`
-  // suite covers the debounced path explicitly.
-  __setDisposeGraceMsForTests(0);
 });
 
 describe("pbrTextureCache", () => {
