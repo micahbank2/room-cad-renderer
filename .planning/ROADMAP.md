@@ -131,4 +131,4 @@
 | 28. Auto-Save | 5/5 | Complete    | 2026-04-20 |
 | 29. Editable Dimension Labels | 4/4 | Complete    | 2026-04-20 |
 | 30. Smart Snapping | 4/4 | Complete    | 2026-04-20 |
-| 31. Drag-to-Resize + Label Override | 0/4 | Planned     | - |
+| 31. Drag-to-Resize + Label Override | 1/4 | In Progress|  |

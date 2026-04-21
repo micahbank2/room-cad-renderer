@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Editing UX
 status: verifying
-stopped_at: Phase 31 context gathered
-last_updated: "2026-04-20T23:23:21.876Z"
+stopped_at: Completed 31-01-PLAN.md (TDD red stubs, 71 it blocks across 8 files, 63 failures)
+last_updated: "2026-04-21T00:05:40.986Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 13
-  completed_plans: 13
+  total_plans: 17
+  completed_plans: 14
 ---
 
 # Project State
@@ -53,6 +53,7 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 30]: Wall-endpoint drag path deliberately untouched per D-08b (Phase 31 owns smart snap for wall endpoints)
 - [Phase 30]: productTool driver auto-seeds default test product when pendingProductId is unset (gated by import.meta.env.MODE === test)
 - [Phase 30-smart-snapping]: Plan 04 gate signed off — nyquist_compliant true, full suite green, Alt/Option documented in CLAUDE.md; perceptual items persisted to 30-HUMAN-UAT.md
+- [Phase 31]: Driver bridges (__driveResize/__driveWallEndpoint/__driveLabelOverride) advertised in-file for Wave 2; locked Phase 29/30 TDD shape
 
 ### Pending Todos
 
@@ -71,6 +72,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-20T23:23:21.865Z
-Stopped at: Phase 31 context gathered
-Resume file: .planning/phases/31-drag-resize-label-override/31-CONTEXT.md
+Last session: 2026-04-21T00:05:40.984Z
+Stopped at: Completed 31-01-PLAN.md (TDD red stubs, 71 it blocks across 8 files, 63 failures)
+Resume file: None
