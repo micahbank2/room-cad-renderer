@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: 3D Realism
 status: executing
-stopped_at: Completed 32-02-PLAN.md
-last_updated: "2026-04-21T14:31:48.996Z"
+stopped_at: Completed 32-01-PLAN.md (PBR asset foundation + data contract)
+last_updated: "2026-04-21T14:35:52.683Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 Milestone: v1.7 3D Realism
 Phase: 32 (pbr-foundation) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -60,6 +60,8 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 31]: Phase 31 closure: VALIDATION signed (nyquist_compliant=true, wave_0_complete=true), 28/28 RTL assertions green, 6 pre-existing LIB-03/04/05 failures documented out-of-scope, EDIT-22/23/24/CUSTOM-06 closed
 - [Phase 32-pbr-foundation]: Plan 02: Centralized PBR loader infrastructure — applyColorSpace helper (D-18), refcount acquireTexture/releaseTexture cache with imperative THREE.TextureLoader (D-12/16/17), PbrErrorBoundary (D-15). +14 tests, zero regressions. Plan 03 will wire into meshes and migrate legacy caches.
 - [Phase 32-pbr-foundation]: Tests placed in tests/ (not colocated) because vitest.config include pattern only covers tests/** and src/__tests__/** — auto-fixed per Rule 3 (blocking: would be silently skipped otherwise).
+- [Phase 32-pbr-foundation]: Chose oak_veneer_01 / concrete_floor_worn_001 / beige_wall_001 from Poly Haven CC0 for PBR texture sets
+- [Phase 32-pbr-foundation]: HDR 1.58 MB exceeds plan 700KB ceiling; Poly Haven smallest 1k HDR is 1.2MB — accepted named asset, documented in LICENSE and SUMMARY
 
 ### Pending Todos
 
@@ -78,6 +80,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-21T14:31:43.939Z
-Stopped at: Completed 32-02-PLAN.md
+Last session: 2026-04-21T14:35:52.681Z
+Stopped at: Completed 32-01-PLAN.md (PBR asset foundation + data contract)
 Resume file: None

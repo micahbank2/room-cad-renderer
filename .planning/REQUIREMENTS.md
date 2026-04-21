@@ -26,7 +26,7 @@
   - **Verifiable:** Manually break a texture URL in `surfaceMaterials.ts`; viewport continues rendering, only the affected surface falls back to base color. No console errors propagate to React error boundary.
   - **Acceptance:** MUST-SUSP (per-mesh `<Suspense>` + `<ErrorBoundary>`), MUST-DISP (refcount-based dispose API).
 
-- [ ] **VIZ-09** — Bundled PBR texture sets ship at sized for desktop viewing without bloating bundle: 1024×1024 albedo + 512×512 normal + 512×512 roughness per material, ~1.5 MB total in `public/textures/`.
+- [x] **VIZ-09** — Bundled PBR texture sets ship at sized for desktop viewing without bloating bundle: 1024×1024 albedo + 512×512 normal + 512×512 roughness per material, ~1.5 MB total in `public/textures/`.
   - **Source:** Locked per LOCK-RES, FEATURES §1.
   - **Verifiable:** `ls -la public/textures/` shows three subdirectories (`wood-plank/`, `concrete/`, `plaster/`) with the three required maps each. CC0-licensed from a verifiable source (e.g. ambientCG / Poly Haven).
 
