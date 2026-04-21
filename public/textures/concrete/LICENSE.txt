@@ -1,0 +1,17 @@
+Source: Poly Haven — Concrete Floor Worn 001
+URL: https://polyhaven.com/a/concrete_floor_worn_001
+Asset ID: concrete_floor_worn_001
+License: CC0 1.0 Universal (Public Domain Dedication)
+License URL: https://creativecommons.org/publicdomain/zero/1.0/
+
+Maps bundled:
+  albedo.jpg    — concrete_floor_worn_001_diff_1k.jpg, resampled to 1024x1024 JPG q=82 (mozjpeg)
+  normal.jpg    — concrete_floor_worn_001_nor_gl_1k.jpg (OpenGL convention), resampled to 512x512 JPG q=85
+  roughness.jpg — concrete_floor_worn_001_rough_1k.jpg, resampled to 512x512 JPG q=80 (grayscale)
+
+Taste profile (D-10): plain grey concrete slab. Poly Haven does not publish a
+true "smooth polished" concrete; this is the closest plain/bare option and
+reads smoother than any aggregate-heavy / rough alternative in the library.
+Tile size (D-20): 4 ft × 4 ft (typical slab pour-joint spacing).
+
+CC0 does not require attribution. Poly Haven appreciates credit.

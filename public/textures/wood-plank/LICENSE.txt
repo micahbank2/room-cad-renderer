@@ -1,0 +1,15 @@
+Source: Poly Haven — Oak Veneer 01
+URL: https://polyhaven.com/a/oak_veneer_01
+Asset ID: oak_veneer_01
+License: CC0 1.0 Universal (Public Domain Dedication)
+License URL: https://creativecommons.org/publicdomain/zero/1.0/
+
+Maps bundled:
+  albedo.jpg    — oak_veneer_01_diff_1k.jpg, resampled to 1024x1024 JPG q=82 (mozjpeg)
+  normal.jpg    — oak_veneer_01_nor_gl_1k.jpg (OpenGL convention), resampled to 512x512 JPG q=85
+  roughness.jpg — oak_veneer_01_rough_1k.jpg, resampled to 512x512 JPG q=80 (grayscale)
+
+Taste profile (D-10): warm light oak, straight grain.
+Tile size (D-20): 0.5 ft × 4 ft (6" × 48" residential planks).
+
+CC0 does not require attribution. Poly Haven appreciates credit.
