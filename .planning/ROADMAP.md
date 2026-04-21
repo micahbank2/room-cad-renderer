@@ -150,3 +150,17 @@
 | 33. User-Uploaded Textures | 0/0 | Not started | - |
 | 34. Camera Presets | 0/0 | Not started | - |
 | 35. Tech-Debt Sweep | 0/0 | Not started | - |
+
+## Backlog
+
+### Phase 999.1: Ceiling resize handles (BACKLOG)
+
+**Goal:** [Captured for future planning] Extend drag-to-resize handles from Phase 31 (products + custom-elements) to cover ceilings. Ceilings (customElements with `kind: "ceiling"`) currently have no resize handles — users can only move or delete and redraw. Mirror Phase 31's width/depth override pattern (`widthFtOverride` / `depthFtOverride`, single-undo drag transaction, Alt disables smart-snap).
+
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd:review-backlog when ready)
+
+**Discovered:** 2026-04-21 during Phase 32 T4 human UAT (Jessica) — pre-existing, not Phase 32 scope.
