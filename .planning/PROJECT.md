@@ -28,11 +28,21 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 See `.planning/ROADMAP.md` for links to each milestone archive.
 
-## Next Milestone Goals
+## Current Milestone: v1.7 3D Realism
 
-v1.7 not yet scoped. Run `/gsd:new-milestone` to begin requirements + roadmap.
+**Goal:** Make Jessica's 3D view feel like the actual room — physically-based materials replace flat-color placeholders, she can drop in textures from photos of real surfaces she's considering, and she can switch camera angles to evaluate the space from multiple vantage points.
 
-Carried-forward backlog candidates: #22 measurement/annotation, #48 design system redesign (mockups still blocking), #56 R3F v9 / React 19 upgrade (await R3F v9 stabilization), 3D realism / PBR materials (#61), library overhaul, materials engine, cloud sync, docs guides. Plus tech debt: `SaveIndicator.tsx` cleanup, full `effectiveDimensions` → `resolveEffectiveDims` migration.
+**Target features:**
+- **PBR material upgrade (#61)** — `WOOD_PLANK`, `CONCRETE`, `PLASTER` get albedo + normal + roughness maps; existing `PAINTED_DRYWALL` keeps current treatment
+- **User-uploaded textures (#47)** — Jessica drops a single image → albedo, with optional advanced pathway to add normal/roughness for full PBR
+- **Camera presets (#45)** — eye-level, top-down, 3/4 (current default), corner; toolbar buttons + `1/2/3/4` keyboard switch with smooth tween
+- **Tech-debt sweep** — close GH #44/#46/#50/#60 (v1.6 commits), delete orphan `SaveIndicator.tsx`, finish `effectiveDimensions` → `resolveEffectiveDims` migration in `productTool` placement, backfill Phase 29 SUMMARY frontmatter
+
+**Phase numbering:** continues from 32. Estimated 4–5 phases.
+
+**Out of v1.7:** GLTF/OBJ upload (#29 — Out of Scope per PROJECT), cloud sync (#30 — Out of Scope), design system redesign (#48 — blocked on mockups), R3F v9 / React 19 (#56 — deferred per D-02). Library overhaul, materials engine, parametric, architectural breadth all queued for v1.8+.
+
+**Why this milestone, why now:** Core Value is "Jessica can SEE her future room with her actual furniture before spending money." v1.0–v1.6 perfected the 2D editing + persistence + interaction layer; the SEEING side is 3D, and the realism gap is now the loudest friction. PBR + user textures compound directly on top of every prior milestone's work.
 
 ## Target User
 
@@ -233,4 +243,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-21 — v1.6 Editing UX shipped (4 phases, 17 plans, 11/11 requirements)*
+*Last updated: 2026-04-21 — v1.7 3D Realism scoped (PBR materials + user-uploaded textures + camera presets + tech-debt sweep)*

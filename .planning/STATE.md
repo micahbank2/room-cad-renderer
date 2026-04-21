@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.6
-milestone_name: Editing UX
-status: completed
-stopped_at: Completed 31-04-verification-PLAN.md
-last_updated: "2026-04-21T00:59:08.767Z"
+milestone: v1.7
+milestone_name: 3D Realism
+status: scoping
+stopped_at: v1.7 milestone scoping started — PROJECT.md updated, research pending
+last_updated: "2026-04-21T01:30:00.000Z"
 last_activity: 2026-04-21
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 17
-  completed_plans: 17
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -20,17 +20,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Milestone v1.6 complete — awaiting v1.7 scoping
+**Current focus:** Milestone v1.7 — 3D Realism (PBR materials + user textures + camera presets + tech-debt sweep)
 
 ## Current Position
 
-Milestone: v1.6 Editing UX
-Phase: 31
-Plan: 31-04 complete — phase verified passed (6/6 truths, 4/4 reqs)
-Status: Complete
+Milestone: v1.7 3D Realism
+Phase: not yet planned
+Plan: scoping — PROJECT.md updated, awaiting research → REQUIREMENTS → ROADMAP
+Status: Scoping
 Last activity: 2026-04-21
 
-[██████████] 100% (4/4 phases complete)
+[░░░░░░░░░░] 0% (0/0 phases — roadmap pending)
 
 ## Accumulated Context
 
