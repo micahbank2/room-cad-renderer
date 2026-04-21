@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Editing UX
 status: verifying
-stopped_at: Completed 31-01-PLAN.md (TDD red stubs, 71 it blocks across 8 files, 63 failures)
-last_updated: "2026-04-21T00:05:40.986Z"
+stopped_at: Completed 31-02-PLAN.md (Wave 1 pure modules; 43 unit assertions green; integration tests still red pending Wave 2)
+last_updated: "2026-04-21T00:15:50.471Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 17
-  completed_plans: 14
+  completed_plans: 15
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 30 — smart-snapping
+**Current focus:** Phase 31 — drag-resize + label override (Wave 1 complete)
 
 ## Current Position
 
 Milestone: v1.6 Editing UX
 Phase: 31
-Plan: Not started
-Status: Phase complete — ready for verification
+Plan: 31-02 complete — Wave 2 (Plan 31-03 integration) up next
+Status: In Progress
 Last activity: 2026-04-20
 
 [░░░░░░░░░░] 0% (0/4 phases complete)
@@ -54,6 +54,8 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 30]: productTool driver auto-seeds default test product when pendingProductId is unset (gated by import.meta.env.MODE === test)
 - [Phase 30-smart-snapping]: Plan 04 gate signed off — nyquist_compliant true, full suite green, Alt/Option documented in CLAUDE.md; perceptual items persisted to 30-HUMAN-UAT.md
 - [Phase 31]: Driver bridges (__driveResize/__driveWallEndpoint/__driveLabelOverride) advertised in-file for Wave 2; locked Phase 29/30 TDD shape
+- [Phase 31]: Plan 31-02 (Wave 1 pure modules): 5 schema fields + resolver + edge handles + restricted snap scene + 8 store actions. 43 Wave 0 unit tests RED->GREEN; integration tests still RED awaiting Wave 2 drivers
+- [Phase 31]: Pitfall 4 separation: updateCustomElement (catalog) + updatePlacedCustomElement (placement) coexist with clear naming; placement actions write to rooms[active].placedCustomElements[id] not root.customElements
 
 ### Pending Todos
 
@@ -72,6 +74,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-21T00:05:40.984Z
-Stopped at: Completed 31-01-PLAN.md (TDD red stubs, 71 it blocks across 8 files, 63 failures)
+Last session: 2026-04-21T00:15:50.469Z
+Stopped at: Completed 31-02-PLAN.md (Wave 1 pure modules; 43 unit assertions green; integration tests still red pending Wave 2)
 Resume file: None
