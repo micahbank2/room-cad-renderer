@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import * as THREE from "three";
 import type { FloorMaterial } from "@/types/cad";
 import { FLOOR_PRESETS, type FloorPresetId } from "@/data/floorMaterials";
+import { SURFACE_MATERIALS } from "@/data/surfaceMaterials";
+import { PbrSurface } from "./PbrSurface";
 
 interface Props {
   width: number;
@@ -35,6 +37,13 @@ function getCustomTexture(dataUrl: string, scaleFt: number, rotationDeg: number,
 }
 
 export default function FloorMesh({ width, length, halfW, halfL, material, fallbackTexture }: Props) {
+  // PBR branch: if material.presetId resolves to a SURFACE_MATERIALS entry with pbr, route through PbrSurface
+  const pbrMaterial = useMemo(() => {
+    if (material?.kind !== "preset" || !material.presetId) return null;
+    const surf = SURFACE_MATERIALS[material.presetId];
+    return surf?.pbr ? { mat: surf, pbr: surf.pbr } : null;
+  }, [material]);
+
   // Determine rendering path
   const { texture, color, roughness } = useMemo(() => {
     if (!material) {
@@ -61,12 +70,27 @@ export default function FloorMesh({ width, length, halfW, halfL, material, fallb
       receiveShadow
     >
       <planeGeometry args={[width, length]} />
-      <meshStandardMaterial
-        map={texture ?? undefined}
-        color={color}
-        roughness={roughness}
-        metalness={0}
-      />
+      {pbrMaterial ? (
+        <PbrSurface
+          pbr={pbrMaterial.pbr}
+          widthFt={width}
+          lengthFt={length}
+          fallback={
+            <meshStandardMaterial
+              color={pbrMaterial.mat.color}
+              roughness={pbrMaterial.mat.roughness}
+              metalness={0}
+            />
+          }
+        />
+      ) : (
+        <meshStandardMaterial
+          map={texture ?? undefined}
+          color={color}
+          roughness={roughness}
+          metalness={0}
+        />
+      )}
     </mesh>
   );
 }

@@ -1,5 +1,30 @@
 # Milestones — Room CAD Renderer
 
+## v1.6 Editing UX (Shipped: 2026-04-21)
+
+**Phases completed:** 4 phases, 17 plans, 34 tasks
+
+**Key accomplishments:**
+
+- Wave 0 red-state test stubs for SAVE-05 debounce + rename trigger + no-spam + save-failure persistence, and SAVE-06 silent-restore with pointer fallthrough — drives Plans 02/03 to green.
+- Extends useAutoSave with a SAVE_FAILED path and a rename trigger; turns Plan 01's 4 red stubs green without touching the Phase 25 drag fast-path filter.
+- Pointer-based silent restore on app mount: Jessica reloads → lands back in her last-active project. Replaces broken listProjects-based hydration; completes SAVE-05 reload-restore.
+- Closes Phase 28. Per-Task Verification Map signed, full vitest suite green for Phase 28 stubs, CLAUDE.md documents the shipped auto-save hardening.
+- One-liner:
+- [Rule 3 – Blocker] Added `window.__openDimensionEditor` test driver (sanctioned by Plan 01 handoff).
+- Plan:
+- Auto-approved per orchestrator auto-mode
+- Locks the SNAP-01/02/03 contract in executable form — 29 red assertions across unit + Fabric + RTL layers define what Plans 02 and 03 must deliver.
+- Turns Plan 01's 25 red unit assertions green by delivering one pure-math module (`snapEngine.ts`, 427 lines) and one Fabric-side renderer (`snapGuides.ts`, 110 lines) — SNAP-01 edge math and SNAP-02 midpoint math are now implemented; Plan 03 will wire them into the drag tools.
+- Lights up smart snap in the UI — dragging products/custom elements/ceilings or placing a new product now snaps edges to walls + object bboxes and auto-centers on wall midpoints, with the purple accent guides from Plan 02 rendering live during the gesture. Phase 25 drag fast-path intact; wall-endpoint drag (D-08b) untouched; all 4 Plan 01 integration tests GREEN.
+- Status:
+- Wave 0 TDD red-stub plan — pure test files, no production code.
+- Per-axis resize override schema + edge-handle hit-test + restricted wall-endpoint snap scene + 8 placement-mutation store actions, all locked behind Wave 0 red tests turned green.
+- Wave 2 wires every Wave 1 pure module into live user flows: corner+edge product resize via combined hit-test, wall-endpoint smart-snap closing Phase 30 D-08b, custom-element label override with single-undo commit, and migrates all 7 enumerated effectiveDimensions consumer sites to resolveEffectiveDims/Custom — all 4 red RTL spec files turn GREEN.
+- Final phase gate: full vitest suite re-run confirms 340/346 passing (6 pre-existing LIB-03/04/05 only, documented out-of-scope), 31-VALIDATION.md signed off as nyquist_compliant=true / wave_0_complete=true / status=approved with all 8 Phase 31 test files mapped, 31-HUMAN-UAT.md created with 10 perceptual items (auto-approved), and CLAUDE.md updated with the complete Phase 31 surface — schema additions, resolver pattern, wall-endpoint smart-snap, single-undo hardening, label-override UX, new store actions, and test drivers.
+
+---
+
 ## v1.5 — Performance & Tech Debt ✅
 
 **Shipped:** 2026-04-20

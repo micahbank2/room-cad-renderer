@@ -8,7 +8,8 @@
 - ✅ **v1.3 Color, Polish & Materials** — Phases 18–20 (shipped 2026-04-06) — see [milestones/v1.3-ROADMAP.md](milestones/v1.3-ROADMAP.md)
 - ✅ **v1.4 Polish & Tech Debt** — Phases 21–23 (shipped 2026-04-08) — see [milestones/v1.4-ROADMAP.md](milestones/v1.4-ROADMAP.md)
 - ✅ **v1.5 Performance & Tech Debt** — Phases 24–27 (shipped 2026-04-20) — see [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
-- 🚧 **v1.6 Editing UX** — Phases 28–31 (in progress) — see below
+- ✅ **v1.6 Editing UX** — Phases 28–31 (shipped 2026-04-21) — see [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
+- 🚧 **v1.7 3D Realism** — Phases 32–35 (in progress) — see below
 
 ---
 
@@ -56,70 +57,88 @@
 
 </details>
 
+<details>
+<summary>✅ v1.6 Editing UX (Phases 28–31) — SHIPPED 2026-04-21</summary>
+
+4 phases, 17 plans, 11/11 requirements complete. Auto-save (debounced; SAVING/SAVED toolbar status; pointer-based silent restore on reload), editable dimension labels (double-click wall label → feet+inches input; single-undo guard), smart snapping (edges snap to walls/objects; midpoint auto-center; purple accent guides; Alt/Option disable), drag-to-resize handles (corner uniform + edge per-axis on products; wall-endpoint with smart-snap closing Phase 30 D-08b; single undo entry preserving Phase 25 fast-path), per-placement label override for custom elements with PropertiesPanel input + live 2D render. See [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md).
+
+</details>
+
 ---
 
-## v1.6 Editing UX
+## v1.7 3D Realism
 
-**Goal:** Close daily-workflow gaps in 2D editing — Jessica can size walls precisely, resize without menus, snap intelligently, rename placed items, and never lose work.
+**Goal:** Make Jessica's 3D view feel like the actual room — physically-based materials replace flat-color placeholders, she can drop in textures from photos of real surfaces she's considering, and she can switch camera angles to evaluate the space from multiple vantage points.
 
-**Requirements:** 11 | **Phases:** 4 (28–31)
+**Requirements:** 13 | **Phases:** 4 (32–35)
 
 ### Phases
 
-- [x] **Phase 28: Auto-Save** — CAD scene saves itself; toolbar shows SAVING/SAVED status (completed 2026-04-20)
-- [x] **Phase 29: Editable Dimension Labels** — double-click any wall label to type a new length (completed 2026-04-20)
-- [x] **Phase 30: Smart Snapping** — edges snap to walls and objects; auto-center on midpoints; guides appear on snap (completed 2026-04-20)
-- [x] **Phase 31: Drag-to-Resize + Label Override** — drag handles resize products and walls; custom elements can be renamed per placement (completed 2026-04-21)
+- [ ] **Phase 32: PBR Foundation** — WOOD_PLANK / CONCRETE / PLASTER render with bundled albedo + normal + roughness maps; loader is non-blocking and color-space correct
+- [ ] **Phase 33: User-Uploaded Textures** — Jessica uploads a photo of a real surface; it appears as a custom material on walls/floors/ceilings; persists locally with dedup + downscale
+- [ ] **Phase 34: Camera Presets** — eye-level / top-down / 3-quarter / corner switchable via toolbar buttons + 1/2/3/4 hotkeys with smooth ~600ms tween
+- [ ] **Phase 35: Tech-Debt Sweep** — close GH #44/#46/#50/#60, delete orphan SaveIndicator, finish resolveEffectiveDims migration, backfill Phase 29 frontmatter
 
 ### Phase Details
 
-#### Phase 28: Auto-Save
-**Goal**: Jessica never loses work — the CAD scene saves itself within seconds of any edit
-**Depends on**: Nothing (standalone persistence layer)
-**Requirements**: SAVE-05, SAVE-06
+#### Phase 32: PBR Foundation
+**Plans:** 5 plans (3 executed + gap-closure)
+**Goal**: Jessica's WOOD_PLANK, CONCRETE, and PLASTER walls/floors/ceilings read as believable surfaces in 3D — wood shows plank seams + grain, concrete shows aggregate roughness, plaster shows subtle surface variation
+**Depends on**: Nothing (first v1.7 phase)
+**Requirements**: VIZ-07, VIZ-08, VIZ-09
 **Success Criteria** (what must be TRUE):
-  1. After drawing a wall and waiting ~2 seconds, the toolbar briefly shows "SAVING..." then "SAVED" without any manual action
-  2. Continuous drag operations (moving a product) do not trigger save spam — exactly one save fires after the drag ends
-  3. Reloading the page restores the scene exactly as left, with no data loss
-  4. The SAVING/SAVED indicator uses the existing SAVE-04 surface from v1.1 (no new chrome)
+  1. In the 3D viewport at default 3/4 camera with default lighting, WOOD_PLANK / CONCRETE / PLASTER each read as visually distinct from a flat hex-color render — no color-space corruption (albedo loads `SRGBColorSpace`; normal/roughness load `NoColorSpace`)
+  2. PAINTED_DRYWALL and existing flat-color materials render unchanged from v1.6 baseline
+  3. Manually breaking a texture URL leaves the affected surface rendering with its base hex color; the rest of the scene continues rendering; no React error boundary trip
+  4. PBR loading is non-blocking — Suspense fallback is per-mesh, not whole-scene; canvas does not freeze while textures load
+  5. `public/textures/` ships three CC0-licensed sets (`wood-plank/`, `concrete/`, `plaster/`) at 1024² albedo + 512² normal + 512² roughness, ~1.5 MB total
+  6. Refcount-based dispose API releases GPU memory when a texture is no longer referenced by any active material; anisotropy is set from renderer capabilities; wrap mode is `RepeatWrapping`
+**Plans**:
+- [x] 32-01-PLAN.md — Texture assets (CC0 downloads) + SurfaceMaterial.pbr registry extension (wave 1)
+- [x] 32-02-PLAN.md — PBR loader infrastructure (color-space helper, refcount cache, ErrorBoundary) (wave 1, parallel)
+- [x] 32-03-PLAN.md — Wire PBR into FloorMesh/CeilingMesh/WallMesh; swap Environment HDR; migrate legacy caches (D-05) (wave 2)
+- [ ] 32-04-PLAN.md — Test driver + integration tests + boundary tests (wave 3)
+- [ ] 32-05-PLAN.md — GAP CLOSURE: debounced texture disposal (wallpaper/wallArt regression from D-05 cache migration) (wave 4)
+**UI hint**: yes
+
+#### Phase 33: User-Uploaded Textures
+**Goal**: Jessica uploads a photo of a real surface she's considering and applies it to a wall/floor/ceiling within ~10 seconds; the upload persists across reload and never bloats project snapshots
+**Depends on**: Phase 32 (reuses PBR loader, color-space helper, per-mesh Suspense pattern, refcount dispose API)
+**Requirements**: LIB-06, LIB-07, LIB-08
+**Success Criteria** (what must be TRUE):
+  1. Dropping or picking a JPEG/PNG/WebP file in the new "Upload Texture" UI shows a preview, accepts a name + real-world tile size in feet+inches (Phase 29 parser), and saves to the material picker for walls/floors/ceilings
+  2. Uploaded textures apply on selection like bundled materials and persist across full page reload
+  3. SVG and GIF uploads are rejected at the MIME-whitelist gate with a clear error message
+  4. Images larger than 2048 px on the longest edge are auto-downscaled client-side to ≤2048 px before persistence; SHA-256 of the resulting bytes dedups same-image re-uploads to a single IDB entry
+  5. `JSON.stringify(snapshot)` contains zero `data:` substrings >10 KB and zero `Blob` instances — `CADSnapshot` references textures by `userTextureId` only; Blobs live in a separate `userTextureStore` IDB keyspace
+  6. Deleting a texture from the library while a project still references it leaves the project loadable; the orphan-referenced surface falls back to its base hex color without crash
 **Plans**: TBD
 **UI hint**: yes
 
-#### Phase 29: Editable Dimension Labels
-**Goal**: Jessica can set an exact wall length by typing it — no drag-to-measure guessing
-**Depends on**: Phase 28
-**Requirements**: EDIT-20, EDIT-21
+#### Phase 34: Camera Presets
+**Goal**: Jessica can switch between top-down, eye-level, 3/4, and corner views with a single keystroke or click, with a smooth glide between poses
+**Depends on**: Phase 33 (sequencing only — no code coupling; could run after Phase 32)
+**Requirements**: CAM-01, CAM-02, CAM-03
 **Success Criteria** (what must be TRUE):
-  1. Double-clicking a wall's dimension label opens an in-place feet+inches input field on the canvas
-  2. Typing a new value and pressing Enter resizes the wall from its start point along its current angle
-  3. Pressing Escape closes the input with no change to the wall
-  4. Each dimension-label edit produces exactly one undo entry — pressing Ctrl+Z once fully undoes the resize
+  1. Four toolbar buttons and bare `1`/`2`/`3`/`4` hotkeys switch between eye-level (5.5 ft), top-down (Y = 1.5× max(roomWidth, roomLength)), 3/4 (current default), and corner (room corner at ceiling - 0.5 ft, looking at opposite corner)
+  2. Hotkeys are inert when focus is in an input or textarea (`document.activeElement` guard) — no preset switch fires while typing in PropertiesPanel or RoomSettings
+  3. Camera transitions glide ~600ms ease-in-out, not snap; `OrbitControls` damping is disabled during the tween, snap on epsilon, and a mid-tween preset switch cancels-and-restarts cleanly from the current position
+  4. The active preset is visually indicated on its toolbar button (`bg-accent/20 text-accent-light border-accent/30`)
+  5. Preset switches do NOT push to undo history (`past.length` unchanged) and do NOT trigger `useAutoSave` (no Blob/MB churn into IDB on every glide)
+  6. Switching view modes (2D/3D/split) mid-tween clears the in-flight tween cleanly without throwing or stranding the camera; walk-mode handoff is decided in plan-phase
 **Plans**: TBD
 **UI hint**: yes
 
-#### Phase 30: Smart Snapping
-**Goal**: Jessica places objects precisely — edges and midpoints snap, and she can see when a snap is active
-**Depends on**: Phase 29
-**Requirements**: SNAP-01, SNAP-02, SNAP-03
+#### Phase 35: Tech-Debt Sweep
+**Goal**: v1.6 leftover noise is gone — shipped issues are closed on GitHub, dead code is deleted, the resolver migration is complete, and Phase 29 traceability frontmatter is correct
+**Depends on**: Nothing (independent; recommended last so it can be cut under scope pressure without leaving features half-shipped)
+**Requirements**: DEBT-01, DEBT-02, DEBT-03, DEBT-04
 **Success Criteria** (what must be TRUE):
-  1. Dragging a product near a wall edge causes it to snap flush to that wall edge within a small pixel tolerance
-  2. Dragging a product near the midpoint of a wall snaps it to be centered on that wall
-  3. A visible guide (line or highlight) appears on the canvas when any snap is active, and disappears when the drag ends
-  4. Snapping works during both placement (product tool) and repositioning (select tool drag)
+  1. GitHub issues #44 (auto-save), #46 (editable dim labels), #50 (per-placement label override), and #60 (drag-to-resize) are closed with comments referencing PR #66 / PR #67
+  2. `src/components/SaveIndicator.tsx` no longer exists; `grep -r "SaveIndicator"` returns no production references; build still passes; full test suite (340+) still passes
+  3. `grep "effectiveDimensions(" src/` returns only catalog-context usages — all `PlacedProduct` / `PlacedCustomElement` call sites use `resolveEffectiveDims` / `resolveEffectiveCustomDims`; per-placement overrides continue to render correctly across 3D meshes, snap scene, fabricSync, and selectTool
+  4. Phase 29 SUMMARY.md frontmatter `requirements-completed` field is backfilled with `EDIT-20, EDIT-21` for the relevant plan summaries (verifiable via `gsd-tools summary-extract`)
 **Plans**: TBD
-**UI hint**: yes
-
-#### Phase 31: Drag-to-Resize + Label Override
-**Goal**: Jessica resizes furniture and walls with handles, and can rename any custom element she has placed
-**Depends on**: Phase 30
-**Requirements**: EDIT-22, EDIT-23, EDIT-24, CUSTOM-06
-**Success Criteria** (what must be TRUE):
-  1. Selecting a placed product shows corner/edge resize handles; dragging one updates the product dimensions snapped to the active grid increment
-  2. Selecting a wall shows endpoint handles; dragging an endpoint moves that end of the wall (Shift constrains to orthogonal)
-  3. A drag-resize operation produces exactly one undo entry — Ctrl+Z fully restores the pre-drag size/position in one step
-  4. Mid-drag canvas performance matches the Phase 25 fast-path baseline (no per-frame store commits)
-  5. Selecting a placed custom element and typing into the label-override field in PropertiesPanel changes its 2D canvas label; clearing the field reverts to the catalog name
-**Plans**: 4 plans (see .planning/phases/31-drag-resize-label-override/)
 **UI hint**: yes
 
 ---
@@ -128,7 +147,21 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 28. Auto-Save | 5/5 | Complete    | 2026-04-20 |
-| 29. Editable Dimension Labels | 4/4 | Complete    | 2026-04-20 |
-| 30. Smart Snapping | 4/4 | Complete    | 2026-04-20 |
-| 31. Drag-to-Resize + Label Override | 4/4 | Complete   | 2026-04-21 |
+| 32. PBR Foundation | 3/5 | In Progress (gap closure pending) |  |
+| 33. User-Uploaded Textures | 0/0 | Not started | - |
+| 34. Camera Presets | 0/0 | Not started | - |
+| 35. Tech-Debt Sweep | 0/0 | Not started | - |
+
+## Backlog
+
+### Phase 999.1: Ceiling resize handles (BACKLOG)
+
+**Goal:** [Captured for future planning] Extend drag-to-resize handles from Phase 31 (products + custom-elements) to cover ceilings. Ceilings (customElements with `kind: "ceiling"`) currently have no resize handles — users can only move or delete and redraw. Mirror Phase 31's width/depth override pattern (`widthFtOverride` / `depthFtOverride`, single-undo drag transaction, Alt disables smart-snap).
+
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd:review-backlog when ready)
+
+**Discovered:** 2026-04-21 during Phase 32 T4 human UAT (Jessica) — pre-existing, not Phase 32 scope.

@@ -1,0 +1,20 @@
+Source: Poly Haven — Beige Wall 001
+URL: https://polyhaven.com/a/beige_wall_001
+Asset ID: beige_wall_001
+License: CC0 1.0 Universal (Public Domain Dedication)
+License URL: https://creativecommons.org/publicdomain/zero/1.0/
+
+Maps bundled:
+  albedo.jpg    — beige_wall_001_diff_1k.jpg, resampled to 1024x1024 JPG q=82 (mozjpeg)
+  normal.jpg    — beige_wall_001_nor_gl_1k.jpg (OpenGL convention), resampled to 512x512 JPG q=85
+  roughness.jpg — beige_wall_001_rough_1k.jpg, resampled to 512x512 JPG q=80 (grayscale)
+
+Taste profile (D-10): warm off-white beige painted plaster, smooth suburban
+house wall. Matches "warm off-white, NOT bright white, NOT gray" exactly.
+Tile size (D-20): 6 ft × 6 ft (large repeat hides on single wall).
+
+Note: the source albedo is nearly uniform beige, so the resampled JPG
+compresses very small (~12 KB). This is expected for a flat wall paint —
+there is no high-frequency detail to preserve.
+
+CC0 does not require attribution. Poly Haven appreciates credit.

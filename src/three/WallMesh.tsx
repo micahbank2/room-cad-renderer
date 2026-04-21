@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as THREE from "three";
 import type { WallSegment, Wallpaper, WainscotConfig, CrownConfig, WallArt } from "@/types/cad";
 import { wallLength, angle } from "@/lib/geometry";
@@ -8,36 +8,44 @@ import { renderWainscotStyle } from "./wainscotStyles";
 import type { WainscotStyleItem } from "@/types/wainscotStyle";
 import { resolvePaintHex } from "@/lib/colorUtils";
 import { usePaintStore } from "@/stores/paintStore";
+import { acquireTexture, releaseTexture } from "./pbrTextureCache";
+import { useSharedTexture } from "./useSharedTexture";
 
 interface Props {
   wall: WallSegment;
   isSelected: boolean;
 }
 
-// Separate caches for wall art (clamped, stretched) vs wallpaper (tiling).
-const wallArtTextureCache = new Map<string, THREE.Texture>();
-function getWallArtTexture(dataUrl: string): THREE.Texture {
-  let tex = wallArtTextureCache.get(dataUrl);
-  if (!tex) {
-    const loader = new THREE.TextureLoader();
-    tex = loader.load(dataUrl);
-    tex.wrapS = THREE.ClampToEdgeWrapping;
-    tex.wrapT = THREE.ClampToEdgeWrapping;
-    tex.repeat.set(1, 1);
-    wallArtTextureCache.set(dataUrl, tex);
-  }
-  return tex;
-}
+/** Batch-acquire textures for an array of keyed items; returns a Map<key, Texture|null>. */
+function useSharedTextures(items: Array<{ id: string; url: string }>): Map<string, THREE.Texture | null> {
+  // Stabilize the signature so effect doesn't rerun on shallow array churn.
+  const sig = items.map((i) => `${i.id}:${i.url}`).join("|");
+  const [map, setMap] = useState<Map<string, THREE.Texture | null>>(() => new Map());
 
-const wallpaperTextureCache = new Map<string, THREE.Texture>();
-function getWallpaperTexture(dataUrl: string): THREE.Texture {
-  let tex = wallpaperTextureCache.get(dataUrl);
-  if (!tex) {
-    const loader = new THREE.TextureLoader();
-    tex = loader.load(dataUrl);
-    wallpaperTextureCache.set(dataUrl, tex);
-  }
-  return tex;
+  useEffect(() => {
+    let cancelled = false;
+    const acquiredUrls = items.map((i) => i.url);
+    const next = new Map<string, THREE.Texture | null>();
+    // Kick off all loads.
+    Promise.all(
+      items.map((i) =>
+        acquireTexture(i.url, "albedo")
+          .then((t) => ({ id: i.id, tex: t, url: i.url }))
+          .catch(() => ({ id: i.id, tex: null as THREE.Texture | null, url: i.url }))
+      )
+    ).then((results) => {
+      if (cancelled) return;
+      for (const r of results) next.set(r.id, r.tex);
+      setMap(next);
+    });
+    return () => {
+      cancelled = true;
+      for (const url of acquiredUrls) releaseTexture(url);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sig]);
+
+  return map;
 }
 
 export default function WallMesh({ wall, isSelected }: Props) {
@@ -91,8 +99,23 @@ export default function WallMesh({ wall, isSelected }: Props) {
   const baseColor = isSelected ? "#93c5fd" : "#f8f5ef"; // neutral drywall
   const bandOffset = 0.01;
 
+  // Hoisted hooks: resolve textures once at component top level (Rules of Hooks).
+  const wpAUrl = wall.wallpaper?.A?.kind === "pattern" ? wall.wallpaper.A.imageUrl : undefined;
+  const wpBUrl = wall.wallpaper?.B?.kind === "pattern" ? wall.wallpaper.B.imageUrl : undefined;
+  const wallpaperATex = useSharedTexture(wpAUrl);
+  const wallpaperBTex = useSharedTexture(wpBUrl);
+
+  const artA = (wall.wallArt ?? []).filter((a) => (a.side ?? "A") === "A");
+  const artB = (wall.wallArt ?? []).filter((a) => (a.side ?? "A") === "B");
+  const allArt = useMemo(
+    () => [...artA, ...artB].map((a) => ({ id: a.id, url: a.imageUrl })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [artA.map((a) => `${a.id}:${a.imageUrl}`).join(","), artB.map((a) => `${a.id}:${a.imageUrl}`).join(",")]
+  );
+  const artTextures = useSharedTextures(allArt);
+
   // Build a wallpaper overlay plane for one face (null if no wallpaper on that side)
-  const renderWallpaperOverlay = (wp: Wallpaper | undefined, key: string) => {
+  const renderWallpaperOverlay = (wp: Wallpaper | undefined, tex: THREE.Texture | null, key: string) => {
     if (!wp) return null;
 
     // kind="paint" branch — must come before kind="color" to avoid fall-through
@@ -112,9 +135,8 @@ export default function WallMesh({ wall, isSelected }: Props) {
       );
     }
 
-    let tex: THREE.Texture | null = null;
-    if (wp.kind === "pattern" && wp.imageUrl) {
-      tex = getWallpaperTexture(wp.imageUrl);
+    // Apply wrap/repeat each render (shared cache returns the singleton; we mutate per-render).
+    if (wp.kind === "pattern" && wp.imageUrl && tex) {
       const s = wp.scaleFt ?? 0;
       if (s > 0) {
         tex.wrapS = THREE.RepeatWrapping;
@@ -196,7 +218,14 @@ export default function WallMesh({ wall, isSelected }: Props) {
 
         {/* Wall art — framed or flat */}
         {artItems.map((art) => {
-          const tex = getWallArtTexture(art.imageUrl);
+          const tex = artTextures.get(art.id) ?? null;
+          // Wall art uses clamped wrap (stretched). Apply each render (shared singleton).
+          if (tex) {
+            tex.wrapS = THREE.ClampToEdgeWrapping;
+            tex.wrapT = THREE.ClampToEdgeWrapping;
+            tex.repeat.set(1, 1);
+            tex.needsUpdate = true;
+          }
           const artX = art.offset - halfLen + art.width / 2;
           const artY = art.centerY - halfH;
           const preset = art.frameStyle ? FRAME_PRESETS[art.frameStyle] : null;
@@ -210,7 +239,7 @@ export default function WallMesh({ wall, isSelected }: Props) {
               <mesh key={art.id} position={[artX, artY, baseZ]}>
                 <planeGeometry args={[art.width, art.height]} />
                 <meshStandardMaterial
-                  map={tex}
+                  map={tex ?? undefined}
                   roughness={0.5}
                   metalness={0}
                   side={THREE.DoubleSide}
@@ -229,7 +258,7 @@ export default function WallMesh({ wall, isSelected }: Props) {
               <mesh position={[0, 0, artZ]}>
                 <planeGeometry args={[innerW, innerH]} />
                 <meshStandardMaterial
-                  map={tex}
+                  map={tex ?? undefined}
                   roughness={0.5}
                   metalness={0}
                   side={THREE.DoubleSide}
@@ -258,9 +287,6 @@ export default function WallMesh({ wall, isSelected }: Props) {
     );
   };
 
-  const artA = (wall.wallArt ?? []).filter((a) => (a.side ?? "A") === "A");
-  const artB = (wall.wallArt ?? []).filter((a) => (a.side ?? "A") === "B");
-
   return (
     <group position={position} rotation={rotation}>
       {/* Base wall — neutral drywall color */}
@@ -275,13 +301,13 @@ export default function WallMesh({ wall, isSelected }: Props) {
 
       {/* Side B — positive Z face (matches +perp / right side in 2D) */}
       <group>
-        {renderWallpaperOverlay(wall.wallpaper?.B, "wp-B")}
+        {renderWallpaperOverlay(wall.wallpaper?.B, wallpaperBTex, "wp-B")}
         {renderSideDecor(wall.wainscoting?.B, wall.crownMolding?.B, artB)}
       </group>
 
       {/* Side A — flip 180° around Y to -Z face (matches -perp / left side in 2D) */}
       <group rotation={[0, Math.PI, 0]}>
-        {renderWallpaperOverlay(wall.wallpaper?.A, "wp-A")}
+        {renderWallpaperOverlay(wall.wallpaper?.A, wallpaperATex, "wp-A")}
         {renderSideDecor(wall.wainscoting?.A, wall.crownMolding?.A, artA)}
       </group>
     </group>

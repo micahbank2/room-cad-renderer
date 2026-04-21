@@ -1,147 +1,247 @@
-# Technology Stack — v1.4 Polish & Tech Debt
+# Stack Research — v1.7 3D Realism
 
-**Project:** Room CAD Renderer
-**Researched:** 2026-04-06
-**Scope:** Stack assessment for v1.4 polish features only.
-         Existing tech is locked and validated from v1.0-v1.3. Not re-researched here.
+**Domain:** Browser-only PBR materials, user-uploaded textures, animated camera presets in R3F v8 + drei v9
+**Researched:** 2026-04-20
+**Confidence:** HIGH (Three.js + drei + camera-controls APIs verified against official docs / source / npm)
 
----
-
-## Summary: Zero New Dependencies
-
-All five v1.4 features are achievable with the existing stack. No new npm packages, no version bumps, no build config changes. This milestone is pure React component work and string formatting fixes.
+> **Scope reminder:** Existing stack (React 18, Vite 8, Three 0.183, R3F v8.17.14, drei 9.122.0, Zustand 5, Immer 11, idb-keyval 6.2.2, Tailwind v4) is **locked**. Only NEW additions/usage patterns are catalogued below. R3F v9 / React 19 explicitly deferred per D-02 / GH #56.
 
 ---
 
-## Current Stack (Unchanged for v1.4)
+## Core Conclusion
 
-### Core
-| Technology | Version | v1.4 Impact |
-|------------|---------|-------------|
-| React | ^18.3.1 | None |
-| TypeScript | ^6.0.2 | None |
-| Vite | ^8.0.3 | None |
-| Tailwind CSS | ^4.2.2 | None |
+**No new runtime dependencies are required for any of the three target features.** Everything ships in the locked versions of `three@^0.183`, `@react-three/drei@^9.122`, `@react-three/fiber@^8.17`, and `idb-keyval@^6.2`.
 
-### Canvas / 3D
-| Technology | Version | v1.4 Impact |
-|------------|---------|-------------|
-| Fabric.js | ^6.9.1 | None — wainscot inline edit is React UI, not canvas interaction |
-| Three.js | ^0.183.2 | None — frame color override already reads `frameColorOverride` in WallMesh.tsx |
-| @react-three/fiber | ^8.17.14 | None |
-| @react-three/drei | ^9.122.0 | None |
+| Feature | Verdict | Why |
+|---------|---------|-----|
+| PBR maps on existing materials | Use what's installed | `useTexture` from drei v9 + `meshStandardMaterial` slots (already used). |
+| User-uploaded image → texture → IndexedDB | Use what's installed | `idb-keyval` already stores `Blob`; `URL.createObjectURL(blob)` → `THREE.TextureLoader().load(url)`. |
+| Camera preset tween (no R3F v9 upgrade) | Use what's installed | Continue Phase 30/31's `useFrame` + `lerp`/`Quaternion.slerp` pattern (matches `ThreeViewport.tsx:84–103`). Drei `<CameraControls>` is **available** as opt-in but not required. |
 
-### State / Persistence
-| Technology | Version | v1.4 Impact |
-|------------|---------|-------------|
-| Zustand | ^5.0.12 | One new action for copy-side (trivial) |
-| Immer | ^11.1.4 | None |
-| idb-keyval | ^6.2.2 | None |
-| react-colorful | ^5.6.1 | Already installed, used for frame color override |
-
-### Testing
-| Technology | Version | v1.4 Impact |
-|------------|---------|-------------|
-| Vitest | ^4.1.2 | None |
-| @testing-library/react | ^16 | None |
+The optional `camera-controls` upgrade is documented for evaluation only; current `useFrame` lerp pattern is sufficient and already proven in this codebase.
 
 ---
 
-## Feature-by-Feature Stack Analysis
+## Recommended Stack — New APIs Only
 
-### POLISH-02: Wainscot Inline Edit (double-click to change style/height)
+### Texture loading — PBR (Feature 1)
 
-**Stack needed:** React state only. No library.
+| API | Module | Purpose | Why |
+|-----|--------|---------|-----|
+| `useTexture({ map, normalMap, roughnessMap })` | `@react-three/drei` (already installed) | Load multiple PBR maps in parallel, suspend until ready, auto-spread to material via `<meshStandardMaterial {...textures} />` | Object-form is the documented PBR pattern (drei docs `loaders/texture-use-texture`). Already inside Three.js Suspense boundary in `ThreeViewport.tsx`. |
+| `useTexture(url, (tex) => { tex.colorSpace = THREE.SRGBColorSpace })` | `@react-three/drei` | Set per-map color space + wrap/repeat in onLoad | `map`/albedo MUST be `SRGBColorSpace`; `normalMap` + `roughnessMap` MUST be `NoColorSpace` (Three.js docs: "Color textures (.map, .emissiveMap) use sRGB; non-color data (normal, roughness, metalness, AO) must be NoColorSpace"). |
+| `THREE.RepeatWrapping` + `texture.repeat.set(W/scaleFt, H/scaleFt)` | `three` | Tile textures across walls/floors | Pattern already used in `WallMesh.tsx:120–122` and `floorTexture.ts`. Reuse for new PBR maps; **all maps in a set must share the same repeat/offset** or normals/roughness will desync from albedo. |
 
-**Why no library:** The codebase already uses a triple-state inline edit pattern throughout (display -> editing on click/dblclick -> save on blur/Enter). This pattern appears in `TerritoryPlanner.tsx` in the sibling project and conceptually in how `RoomSettings.tsx` handles dimension inputs. It is 10-15 lines of React per editable field.
+**Existing material catalog impact:** `src/data/surfaceMaterials.ts` needs new optional fields per material:
 
-**Integration point:** `WallSurfacePanel.tsx` already renders wainscot style and height. Add local `useState` for edit mode, render a `<select>` for style and `<input type="number">` for height when editing, save to cadStore on blur.
+```ts
+interface SurfaceMaterial {
+  // existing fields...
+  maps?: {
+    albedo: string;       // /textures/wood_plank/albedo.jpg
+    normal?: string;      // /textures/wood_plank/normal.jpg
+    roughness?: string;   // /textures/wood_plank/roughness.jpg
+  };
+  normalScale?: number;   // default 1.0; tune per material (concrete higher, plaster lower)
+}
+```
 
-**Rejected:** `react-editext`, `react-inline-editing`, `react-contenteditable` — all add dependencies for something trivially implementable with native React patterns already established in this codebase.
+Apply at render time:
 
-### POLISH-03: Copy Wall Treatment to Opposite Side
+```tsx
+const maps = useTexture({
+  map: m.maps.albedo,
+  ...(m.maps.normal && { normalMap: m.maps.normal }),
+  ...(m.maps.roughness && { roughnessMap: m.maps.roughness }),
+}, (loaded) => {
+  // loaded may be array OR record; drei docs note this
+  const arr = Array.isArray(loaded) ? loaded : Object.values(loaded);
+  arr.forEach((t) => { t.wrapS = t.wrapT = THREE.RepeatWrapping; });
+  // colorSpace per-map handled by separate post-load step
+});
+```
 
-**Stack needed:** One new Zustand action in cadStore. No library.
+### Texture loading — User uploads (Feature 2)
 
-**Why:** Wall treatments are stored per-side (`A`/`B`) on `WallSegment` as `wallpaper`, `wainscoting`, `crownMolding`, and `paint` fields. Copying A to B is a structured deep-copy within a single Immer `produce()` call.
+| API | Module | Purpose | Why |
+|-----|--------|---------|-----|
+| `<input type="file" accept="image/*">` + native `dragover`/`drop` events | DOM | File picker + drag-drop ingestion | Zero-dep; existing `ProductForm.tsx` already handles uploads via FileReader → dataURL pattern. |
+| `URL.createObjectURL(blob)` | DOM | Convert `Blob` → loadable URL for Three.js | Three.js forum confirmed (donmccurdy thread): "use createObjectURL on the Blob, then `new THREE.TextureLoader().load(url)`". Faster than dataURL for large images and avoids 33% base64 storage bloat. **Must `URL.revokeObjectURL()` when texture disposed** to avoid memory leak. |
+| `new THREE.TextureLoader().load(objectUrl, onLoad, onProgress, onError)` | `three` | Build `THREE.Texture` | Already used in `WallMesh.tsx:36`, `floorTexture.ts`. Same pattern; just point at object URL. |
+| `idbKeyval.set(key, blob)` / `idbKeyval.get(key) → Blob` | `idb-keyval` (already installed) | Persist user textures | `idb-keyval` accepts any structured-cloneable value including `Blob`. **Store Blob, not dataURL or ArrayBuffer** — Blobs are first-class in IndexedDB, persist binary efficiently, and survive across reloads. |
+| `HTMLCanvasElement` + `ctx.drawImage(img, 0, 0, w, h)` + `canvas.toBlob()` | DOM | Resize uploads before storage | WebGL `MAX_TEXTURE_SIZE` is commonly 4096 on consumer GPUs (~40% of devices); Three.js silently downsamples larger textures. Pre-resize to ≤2048 px on the longest edge before storing to (a) keep IndexedDB small, (b) avoid GPU-side resize cost, (c) skip non-PoT scaling artifacts. **Power-of-two not required in WebGL2** (R3F default) but still recommended for `RepeatWrapping` correctness. |
 
-**Integration point:** Add `copyWallTreatment(wallId: string, fromSide: 'A' | 'B')` action to `cadStore.ts`. Wire a button in `WallSurfacePanel.tsx`. The action deep-copies all surface properties from one side to the other using `JSON.parse(JSON.stringify(...))` (the same clone pattern used for undo snapshots).
+**Storage shape recommendation:**
 
-**Rejected:** Clipboard APIs, copy-paste libraries — this is internal store mutation, not system clipboard.
+```ts
+interface UserTexture {
+  id: string;          // uid()
+  name: string;
+  blob: Blob;          // primary — written to idb-keyval as-is
+  width: number;       // post-resize
+  height: number;
+  createdAt: number;
+}
+// In-memory: cache `URL.createObjectURL(blob)` per session, revoke on app unload.
+```
 
-### POLISH-04: Per-Placement Frame Color Override
+### Camera presets — Animated tween (Feature 3)
 
-**Stack needed:** None. Already fully wired.
+| API | Module | Purpose | Why |
+|-----|--------|---------|-----|
+| `useFrame((_, dt) => cam.position.lerp(target, speed))` + `controls.target.lerp(...)` | `@react-three/fiber` v8 (installed) | Per-frame interpolation toward target pos + look-at | **Already implemented and working in `ThreeViewport.tsx:84–103` (MIC-35 wall-side animation).** Extend the same `cameraAnimTarget = useRef<{pos, look} | null>(null)` pattern with a preset enum. No new deps. |
+| `THREE.Quaternion.slerp(qa, qb, t)` | `three` | Smooth orientation tween (alternative for top-down → 3/4 transitions) | Lerping look-at can yield gimbal-flip near zenith; computing source/target quaternions and slerping the camera quaternion is the textbook fix. Drop in only if specific presets reveal flip artifacts. |
+| Preset table (no API, just data) | `src/three/cameraPresets.ts` (new file) | Compute `(pos, look)` per preset from active room dims | Eye-level: `(roomCenter, eyeHeight=5.5ft, roomCenter)` looking +Z; Top-down: `(centerX, ceilingHeight×2.5, centerY)` looking -Y; Corner: `(roomMaxX+8, roomHeight×0.8, roomMaxY+8)` looking center; 3/4: existing default. Stored as constants, not in store. |
 
-**Evidence:**
-- Type exists: `frameColorOverride?: string` on `WallArtPlacement` in `src/types/cad.ts:67`
-- 3D reads it: `WallMesh.tsx:206` — `const frameColor = art.frameColorOverride ?? preset?.color ?? "#ffffff"`
-- UI exists: `WallSurfacePanel.tsx:347-350` — color input bound to `frameColorOverride`
+**Drei `<CameraControls>` (optional, NOT required):**
 
-**Verdict:** This is a verification task, not an implementation task. The code shipped in v1.3. Verify end-to-end: change color in panel -> 3D mesh updates -> persists on save/reload.
-
-### POLISH-06: Sidebar Scroll Verification
-
-**Stack needed:** None. Pure CSS verification.
-
-**Current state:** `Sidebar.tsx` line 71 has `overflow-y-auto` on the scrollable container. If any child panel (WallSurfacePanel, ProductLibrary, RoomSettings, etc.) breaks scroll, the fix is CSS — likely `min-h-0` on a flex child or `max-h-[calc(...)]` on a specific section.
-
-**No scrollbar styling library needed.** Tailwind's scrollbar utilities or 5 lines of custom CSS in `index.css` handle any aesthetic tweaks.
-
-### UI Cleanup: Remove Underscores from Labels
-
-**Stack needed:** None. String replacement changes in 4 files + static label audit.
-
-**Exact locations of dynamic underscore insertion:**
-| File | Line | Current Code |
-|------|------|-------------|
-| `src/components/ProductLibrary.tsx` | 159 | `.toUpperCase().replace(/\s/g, "_")` |
-| `src/components/PropertiesPanel.tsx` | 134 | `.toUpperCase().replace(/\s/g, "_")` |
-| `src/components/SidebarProductPicker.tsx` | 50 | `.toUpperCase().replace(/\s/g, "_")` |
-| `src/components/RoomTabs.tsx` | 32 | `.toUpperCase().replace(/\s/g, "_")` |
-
-**Fix:** Remove the `.replace(/\s/g, "_")` call. Keep `.toUpperCase()` to maintain the Obsidian CAD monospace label aesthetic. Spaces in monospace uppercase text read cleanly (e.g., "LIVING ROOM" instead of "LIVING_ROOM").
-
-**Additional audit needed:** 26 component files contain underscores in strings. Most are CSS class names or code identifiers (fine to keep). Audit for hardcoded UI label strings like `"ROOM_CONFIG"`, `"SYSTEM_STATUS"`, `"FLOOR_PLAN"` and decide per-label whether to replace with spaces. These are part of the CAD/terminal aesthetic and may be intentional design choices worth discussing.
+| Aspect | Detail |
+|--------|--------|
+| Status | Available in drei v9 (drei docs `controls/camera-controls`). Wraps yomotsu's `camera-controls` library. |
+| Compatibility | Works in R3F v8 — drei v9.x is the v8-compatible major (drei v10 is the v9 major). No version conflict. |
+| Method to use | `controlsRef.current.setLookAt(px, py, pz, tx, ty, tz, true)` — last `true` enables built-in SmoothDamp transition (controlled by `smoothTime`, default 0.25s). |
+| Tradeoff vs status quo | Replaces `OrbitControls`; SmoothDamp is smoother than manual lerp but **forces a controls swap**, breaking existing `orbitControlsRef` wiring (used by `wallSideCameraTarget` effect, `onChange` save-state, walk-mode toggle). Cost > benefit for v1.7 unless we're already touching that code. |
+| Recommendation | **Defer.** Stay on existing `OrbitControls` + `useFrame` lerp. Document `<CameraControls>` as v1.8+ option if SmoothDamp quality becomes a felt issue. |
 
 ---
 
-## What NOT to Add
+## Supporting Libraries — None Required
 
-| Library | Why Not |
-|---------|---------|
-| Any inline-edit package | Triple-state edit pattern is 10 lines of React, already used in codebase |
-| Any clipboard/copy package | Copy-side is internal store mutation, not clipboard |
-| Any scrollbar library | Tailwind + native CSS overflow handles it |
-| Any string formatting library | 4 string replacements do not justify a dependency |
+No new packages need to be added to `dependencies` or `devDependencies` for v1.7.
+
+| Considered | Recommendation | Reason |
+|------------|----------------|--------|
+| `camera-controls` (yomotsu) | Skip | Already available via drei v9 if needed; current lerp pattern works. |
+| `react-spring` / `@react-spring/three` | Skip | Adds 60+ KB; `useFrame.lerp` covers our 2 transition types (eye-level, top-down) trivially. |
+| `r3f-perf` | Skip (dev-only candidate for later) | Useful for v1.8+ perf debugging once PBR + uploads land; not needed to ship v1.7. |
+| `pica` (image resize) | Skip | Native `canvas.drawImage` is sufficient for a single-user tool; pica's Lanczos quality is not user-visible at the source-photo → 2048px resize step. |
+| `meshoptimizer` / `three-mesh-bvh` | Skip | No geometry growth in v1.7. |
+| Texture atlas tooling | Skip | We have ≤3 PBR materials in scope (WOOD_PLANK, CONCRETE, PLASTER). Atlas overhead pays off at ~20+. |
+
+---
+
+## Bundled PBR Texture Sources (Asset Pipeline, not deps)
+
+For the 3 in-scope materials, the project needs actual texture files committed to the repo. **Not a code dep**, but a stack decision:
+
+| Source | License | Why |
+|--------|---------|-----|
+| ambientCG (cc0textures.com) | CC0 — no attribution required | Industry-standard free PBR set; offers WOOD/CONCRETE/PLASTER in 1K/2K/4K with albedo+normal+roughness+AO+displacement maps as separate JPGs. |
+| polyhaven.com | CC0 | Equivalent quality, also CC0; secondary source. |
+
+**Recommended commit shape:**
+
+```
+public/textures/
+  wood_plank/
+    albedo.jpg     (~200 KB at 1024×1024 JPG q85)
+    normal.jpg     (~150 KB)
+    roughness.jpg  (~100 KB)
+  concrete/
+    ...
+  plaster/
+    ...
+```
+
+Total bundled asset cost: ~1.5 MB across 3 materials at 1K. Acceptable for a desktop-only tool with no perf budget concerns documented. Vite serves `public/` as static; no build config change needed.
 
 ---
 
 ## Installation
 
+**Nothing to install.** Verify lockfile pins remain at:
+
 ```bash
-# Nothing to install. Current package.json is complete for v1.4.
-npm install   # verify lockfile is clean
+# Sanity-check existing versions (no install action)
+npm ls three @react-three/fiber @react-three/drei idb-keyval
+# Expected: three@0.183.x, @react-three/fiber@8.17.x, @react-three/drei@9.122.x, idb-keyval@6.2.x
 ```
 
 ---
 
-## Confidence Assessment
+## Alternatives Considered
 
-| Claim | Confidence | Basis |
-|-------|-----------|-------|
-| Zero new dependencies needed | HIGH | All 5 features analyzed against codebase; all use existing patterns |
-| frameColorOverride already fully wired | HIGH | Confirmed in 3 files: type, 3D renderer, UI panel |
-| Underscore labels in exactly 4 dynamic locations | HIGH | Grep confirmed: `toUpperCase().replace(/\s/g, "_")` in 4 files |
-| Sidebar scroll fix is CSS-only | HIGH | `overflow-y-auto` already present; any fix is layout constraint adjustment |
-| Copy-side needs one new cadStore action | HIGH | Per-side data model confirmed in `cad.ts`; deep-copy is the only operation |
+| Recommended | Alternative | When to Use Alternative |
+|-------------|-------------|-------------------------|
+| `useTexture({ map, normalMap, roughnessMap })` from drei | Raw `new THREE.TextureLoader().load()` per map | When we need non-Suspense lazy loading or want to share a single texture instance across many meshes manually (we already do this in `floorTexture.ts` for the procedural floor — keep that pattern there for consistency). For new PBR materials, `useTexture` is cleaner. |
+| `URL.createObjectURL(blob)` for user uploads | dataURL via `FileReader.readAsDataURL` | When the texture must survive `URL.revokeObjectURL` cycles or be inlined into exported HTML. Not our case. dataURL is what `ProductForm.tsx` uses today; the **pattern shift** is intentional for Feature 2 to keep IndexedDB lean. |
+| `useFrame` + `lerp` for camera | drei `<CameraControls>` SmoothDamp | When we want time-based easing (not framerate-coupled) or interactive zoom-to-fit. Defer to v1.8+. |
+| `useFrame` + `lerp` for camera | `react-spring` `useSpring` for camera | When animating multiple coupled values (FOV + position + target) with shared physics. Overkill for 4 presets. |
+| Bundled CC0 PBR textures in `public/` | Procedural generation (noise + bump) | When download size matters more than realism. We're desktop-local; ship the JPGs. |
+
+---
+
+## What NOT to Use
+
+| Avoid | Why | Use Instead |
+|-------|-----|-------------|
+| `RGBELoader` for material maps | RGBELoader is for HDR environment lighting (`Environment` in drei already wraps this — see `ThreeViewport.tsx:121`). PBR albedo/normal/roughness are LDR JPG/PNG, loaded by `TextureLoader`/`useTexture`. | `THREE.TextureLoader` / `useTexture` |
+| Storing textures as base64 dataURLs in IndexedDB | 33% storage overhead vs Blob; slower JSON parse on hydrate; harder to revoke from memory. | `Blob` directly via `idb-keyval.set(key, blob)` |
+| `texture.colorSpace = THREE.SRGBColorSpace` on **all** maps | Setting sRGB on a normal/roughness map gamma-corrects them, producing visibly wrong lighting (over-bright normals, wrong roughness response). Three.js docs are explicit. | `SRGBColorSpace` for albedo/`map` only; `NoColorSpace` for `normalMap`, `roughnessMap`, `metalnessMap`, `aoMap` |
+| Mismatched `repeat`/`offset` between maps in one material | Albedo and normal must align pixel-for-pixel; independent repeat values cause shading misalignment. | Compute one `repeat` from `roomDim/scaleFt`, apply to **all** maps in the set after load. |
+| Unbounded user uploads (no resize) | A 4032×3024 iPhone photo = ~12 MB Blob, 50 MB GPU memory, may exceed `MAX_TEXTURE_SIZE` on older GPUs (silent downsample by Three.js). | Pre-resize via `<canvas>` + `drawImage` to longest-edge ≤2048 px, re-encode JPEG q85 via `canvas.toBlob('image/jpeg', 0.85)`. |
+| Forgetting `URL.revokeObjectURL()` on texture disposal | Each `createObjectURL` holds the Blob in memory until revoked or page unload — leaks across multi-room sessions. | Track object URLs in a module-level `Map<textureId, objectUrl>`; revoke when texture is removed from cache. |
+| `<CameraControls>` swap mid-milestone | Replaces `OrbitControls`, breaks `orbitControlsRef` consumers in `ThreeViewport.tsx` (wall-side animation effect, walk-mode toggle, position persistence). | Stay on `OrbitControls` + `useFrame.lerp` pattern that already works (lines 84–103). |
+| Upgrading R3F to v9 to get newer camera helpers | Locked per D-02 / GH #56 — R3F v9 + React 19 deferred until R3F v9 stabilizes. | All v1.7 features are achievable on v8; no v9 API is required. |
+
+---
+
+## Stack Patterns by Variant
+
+**If a material has only an albedo (e.g. user upload at v1):**
+- Use `useTexture(url)` single-form
+- Set `colorSpace = SRGBColorSpace`, `wrapS = wrapT = RepeatWrapping`
+- `<meshStandardMaterial map={tex} roughness={preset.roughness} />` — the existing flat-color path with the texture slotted in
+
+**If a material has full PBR set (bundled WOOD_PLANK / CONCRETE / PLASTER):**
+- Use `useTexture({ map, normalMap, roughnessMap })` object-form
+- Apply per-map colorSpace in `onLoad`
+- `<meshStandardMaterial {...maps} normalScale={[s, s]} />`
+
+**If user wants to upload normal + roughness (advanced path per #47):**
+- Same upload pipeline (Blob + IndexedDB), three slots in the form
+- Same `useTexture` object-form at render time
+- UI gates this behind "Advanced" disclosure to avoid overwhelming Jessica
+
+**If a camera preset depends on room dimensions:**
+- Compute `(pos, look)` lazily inside the preset-trigger handler from `useActiveRoom()`
+- Set `cameraAnimTarget.current = { pos, look }`; existing `useFrame` lerp picks it up
+- No store mutation needed (camera state is view-layer only)
+
+---
+
+## Version Compatibility
+
+| Package A | Compatible With | Notes |
+|-----------|-----------------|-------|
+| `@react-three/drei@9.122.0` | `@react-three/fiber@8.17.x` | drei 9.x major is the R3F v8 compatible track. drei 10.x is for R3F v9 (NOT installed). |
+| `three@0.183.x` | `@react-three/fiber@8.17.x` | R3F v8.17 supports Three 0.150–0.183; we're at the top of the range. PBR APIs (TextureLoader, MeshStandardMaterial, Quaternion.slerp) are stable since Three r130. |
+| `idb-keyval@6.2.2` | All modern browsers | Stores Blobs natively via structured clone. No version concern. |
+| `useTexture` PBR object-form | drei ≥ 9.50 | Confirmed available in 9.122. |
+| `<CameraControls>` (if adopted later) | drei ≥ 9.x | Available; based on `camera-controls` v3+. |
 
 ---
 
 ## Sources
 
-- Codebase grep: `frameColorOverride` in 4 files (`cad.ts`, `WallSurfacePanel.tsx`, `WallMesh.tsx`)
-- Codebase grep: `.toUpperCase().replace` in 4 component files
-- Codebase grep: `overflow-y` in `Sidebar.tsx:71`
-- `package.json` dependency list — `react-colorful ^5.6.1` already installed
-- `src/types/cad.ts` — `WainscotConfig`, `WallArtPlacement`, per-side wall treatment types
+- [Drei — Texture / useTexture (loaders/texture-use-texture)](https://drei.docs.pmnd.rs/loaders/texture-use-texture) — single, array, and object-form patterns; onLoad callback shape — HIGH
+- [React Three Fiber — Loading Textures tutorial](https://r3f.docs.pmnd.rs/tutorials/loading-textures) — useTexture PBR pattern with `meshStandardMaterial {...textures}` — HIGH
+- [Drei GitHub README — controls list](https://github.com/pmndrs/drei) — `<CameraControls>` is exported in drei v9 — HIGH
+- [pmndrs/drei issue #176 — Loading multiple textures](https://github.com/pmndrs/drei/issues/176) — confirms object-form auto-spreads to material — HIGH
+- [pmndrs/drei issue #1969 — useTexture onLoad callback shape caveat](https://github.com/pmndrs/drei/issues/1969) — known type quirk; treat callback arg defensively — MEDIUM
+- [Three.js issue #27760 — texture color space requirements](https://github.com/mrdoob/three.js/issues/27760) — `SRGBColorSpace` for color maps, `NoColorSpace` for non-color data — HIGH
+- [Three.js forum — colorspace for normal/roughness/metalness](https://discourse.threejs.org/t/docs-which-material-textures-must-be-srgbcolorspace/81423) — confirms NoColorSpace for normal/roughness — HIGH
+- [Three.js TextureLoader docs](https://threejs.org/docs/pages/TextureLoader.html) — load(url, onLoad, onProgress, onError) signature — HIGH
+- [Three.js forum — How to use Blob images as texture (donmccurdy)](https://discourse.threejs.org/t/how-to-use-blob-images-as-texture/49846) — `URL.createObjectURL(blob)` → TextureLoader.load pattern — HIGH
+- [Three.js forum — How to load Blob objects](https://discourse.threejs.org/t/how-to-load-blob-objects/37970) — confirms ArrayBuffer alternative via `Blob.arrayBuffer()` — HIGH
+- [yomotsu/camera-controls README](https://github.com/yomotsu/camera-controls) — `setLookAt(..., enableTransition=true)`, `lerpLookAt`, `smoothTime`, `maxSpeed` API — HIGH
+- [Drei controls docs (CameraControls)](https://drei.docs.pmnd.rs/controls/camera-controls) — drei wrapper exposes camera-controls methods via ref — HIGH
+- [WebGL fundamentals — texture max sizes](https://webglfundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html) — 4096 px common ceiling on consumer GPUs — HIGH
+- [MDN — WebGL best practices](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices) — pre-resize uploads to avoid driver-side downsampling — HIGH
+- [ambientCG license (CC0)](https://ambientcg.com/) — bundled-texture source, CC0 — HIGH
+- [idb-keyval README](https://github.com/jakearchibald/idb-keyval) — Blob is a valid value type via structured clone — HIGH
+
+---
+
+*Stack research for: v1.7 3D Realism — additions to existing locked stack only*
+*Researched: 2026-04-20*

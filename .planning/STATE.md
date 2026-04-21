@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.6
-milestone_name: Editing UX
-status: phase_complete
-stopped_at: Phase 31 verified passed (6/6 truths, 4/4 reqs) — milestone v1.6 complete
-last_updated: "2026-04-21T00:50:00.000Z"
+milestone: v1.7
+milestone_name: 3D Realism
+status: executing
+stopped_at: Completed 32-03-PLAN.md (PBR mesh wiring + HDR swap + cache migration)
+last_updated: "2026-04-21T15:25:19.024Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 4
-  completed_phases: 4
-  total_plans: 17
-  completed_plans: 17
+  completed_phases: 0
+  total_plans: 4
+  completed_plans: 3
 ---
 
 # Project State
@@ -20,17 +20,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Milestone v1.6 complete — awaiting v1.7 scoping
+**Current focus:** Phase 32 — pbr-foundation
 
 ## Current Position
 
-Milestone: v1.6 Editing UX
-Phase: 31
-Plan: 31-04 complete — phase verified passed (6/6 truths, 4/4 reqs)
-Status: Complete
+Milestone: v1.7 3D Realism
+Phase: 32 (pbr-foundation) — EXECUTING
+Plan: 4 of 4
+Status: Ready to execute
 Last activity: 2026-04-21
 
-[██████████] 100% (4/4 phases complete)
+[░░░░░░░░░░] 0% (0/0 phases — roadmap pending)
 
 ## Accumulated Context
 
@@ -58,6 +58,12 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 31]: Pitfall 4 separation: updateCustomElement (catalog) + updatePlacedCustomElement (placement) coexist with clear naming; placement actions write to rooms[active].placedCustomElements[id] not root.customElements
 - [Phase 31]: Plan 31-03 wired all Wave 1 pure modules into selectTool + PropertiesPanel + fabricSync; all 4 RTL specs green; +27 assertions
 - [Phase 31]: Phase 31 closure: VALIDATION signed (nyquist_compliant=true, wave_0_complete=true), 28/28 RTL assertions green, 6 pre-existing LIB-03/04/05 failures documented out-of-scope, EDIT-22/23/24/CUSTOM-06 closed
+- [Phase 32-pbr-foundation]: Plan 02: Centralized PBR loader infrastructure — applyColorSpace helper (D-18), refcount acquireTexture/releaseTexture cache with imperative THREE.TextureLoader (D-12/16/17), PbrErrorBoundary (D-15). +14 tests, zero regressions. Plan 03 will wire into meshes and migrate legacy caches.
+- [Phase 32-pbr-foundation]: Tests placed in tests/ (not colocated) because vitest.config include pattern only covers tests/** and src/__tests__/** — auto-fixed per Rule 3 (blocking: would be silently skipped otherwise).
+- [Phase 32-pbr-foundation]: Chose oak_veneer_01 / concrete_floor_worn_001 / beige_wall_001 from Poly Haven CC0 for PBR texture sets
+- [Phase 32-pbr-foundation]: HDR 1.58 MB exceeds plan 700KB ceiling; Poly Haven smallest 1k HDR is 1.2MB — accepted named asset, documented in LICENSE and SUMMARY
+- [Phase 32-pbr-foundation]: Plan 03: Wired PBR into CeilingMesh/FloorMesh via new PbrSurface wrapper (Suspense+ErrorBoundary); swapped Environment to bundled /hdr/studio_small_09_1k.hdr; registered renderer with pbrTextureCache for device anisotropy; migrated wallpaper/wallArt/floorTexture caches to shared acquireTexture (D-05). FloorMesh customTextureCache deferred to Phase 33.
+- [Phase 32-pbr-foundation]: D-06 fix-not-rollback: wallpaper loader previously defaulted to NoColorSpace (wrong for sRGB JPGs); shared cache now sets SRGBColorSpace — documented as a correctness fix, not reverted.
 
 ### Pending Todos
 
@@ -76,6 +82,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-21T00:40:51.129Z
-Stopped at: Completed 31-04-verification-PLAN.md
+Last session: 2026-04-21T15:25:19.022Z
+Stopped at: Completed 32-03-PLAN.md (PBR mesh wiring + HDR swap + cache migration)
 Resume file: None

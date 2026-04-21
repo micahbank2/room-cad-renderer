@@ -1,0 +1,22 @@
+Source: Poly Haven — Studio Small 09
+URL: https://polyhaven.com/a/studio_small_09
+Asset ID: studio_small_09
+License: CC0 1.0 Universal (Public Domain Dedication)
+License URL: https://creativecommons.org/publicdomain/zero/1.0/
+
+File bundled:
+  studio_small_09_1k.hdr — 1024×512 Radiance .hdr, unmodified from upstream
+
+Taste profile (D-09): neutral interior studio class — soft, low-contrast,
+PBR color reads true under this IBL. Matches the exact asset named in the
+Phase 32 plan.
+
+Size note: the 1k Radiance .hdr from Poly Haven is ~1.6 MB, which exceeds
+the D-08 target of "~≤500 KB" and the 32-01-PLAN acceptance-criteria ceiling
+of 700 KB. Poly Haven's smallest resolution is 1k, and no smaller 1k HDR in
+their indoor/studio library fits the budget (the full library floor is
+~1.2 MB). Accepting the 1.6 MB ship cost is the only way to honor the named
+asset; smaller alternatives would be non-CC0, non-Poly Haven, or lower
+quality. Raised to user at PR preview.
+
+CC0 does not require attribution. Poly Haven appreciates credit.

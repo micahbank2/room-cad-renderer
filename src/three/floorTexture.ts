@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { applyColorSpace } from "./textureColorSpace";
 
 /** Returns {x, y} tile repeat for a room of given feet dimensions, assuming `tileFt` per tile. */
 export function tileRepeatFor(roomW: number, roomL: number, tileFt = 4): { x: number; y: number } {
@@ -60,7 +61,7 @@ export function createFloorTexture(): THREE.CanvasTexture {
   const tex = new THREE.CanvasTexture(canvas);
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.colorSpace = THREE.SRGBColorSpace;
+  applyColorSpace(tex, "albedo");
   return tex;
 }
 

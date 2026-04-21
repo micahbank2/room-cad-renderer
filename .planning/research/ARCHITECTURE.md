@@ -1,308 +1,165 @@
-# Architecture Patterns -- v1.4 Polish & Tech Debt
+# Architecture Research — v1.7 3D Realism Integration
 
-**Domain:** Interior design CAD tool (v1.4 deferred polish + UI label cleanup)
-**Researched:** 2026-04-06
-**Confidence:** HIGH -- based on direct codebase analysis of all affected files
+**Domain:** PBR materials + user-uploaded textures + camera presets layered onto existing Room CAD Renderer
+**Researched:** 2026-04-21
+**Confidence:** HIGH (existing patterns well-established; decisions extend rather than redesign)
 
----
-
-## Scope
-
-Five features touching existing components. No new stores, no new data types, no new 3D geometry. This is purely UI-layer and store-action verification work.
+> Scope: ONLY the architectural seams the new features need. Existing Zustand-driven render, drag fast-path, single-undo invariant, save/load round-trip, and Pitfall 4 catalog/placement separation are non-negotiable inputs.
 
 ---
 
-## Existing Architecture (Relevant Subset)
+## D-1 — PBR Texture Asset Layout & Loading
 
-### Data Flow for Wall Treatments
+**Decision:** Bundled PBR maps live under `public/textures/<material-id>/{albedo,normal,roughness}.jpg`, loaded lazily through a single module-level `getPbrTextureSet(materialId)` cache that mirrors the existing `wallpaperTextureCache` / `productTextureCache` / `getFloorTexture` patterns. Use Three's `TextureLoader` directly, NOT drei's `useTexture`.
 
+**Rationale:**
+- `public/` is Vite's static-asset convention; URLs become `/textures/wood-plank/albedo.jpg` and benefit from HTTP caching + GPU-side dedup.
+- Module-level Promise/Texture caches are already the proven pattern across `WallMesh.tsx`, `ProductMesh.tsx`, `FloorMesh.tsx`. They naturally dedupe concurrent loads (logged as a "Good" decision in PROJECT.md).
+- `useTexture` from drei is a Suspense hook — it suspends the entire `<Scene>` subtree on first load, which would re-trigger orbit-camera reset (we already fight this in `orbitPosRef` plumbing) and freeze the 3D viewport on every fresh material swap. Imperative loaders return immediately with a placeholder texture and patch in the real bitmap on `needsUpdate`.
+- 3 PBR materials × 3 maps × 1024² × ~150 KB JPEG ≈ **~1.4 MB total over the wire, ~36 MB GPU VRAM** (1024² RGB uncompressed = 4 MB × 9 maps). Acceptable for a desktop-only personal tool. Cap at 1024² in this milestone; 2K is a v1.8 concern.
+
+**Trade-off accepted:** Imperative loaders mean we surface a 1-frame flash of `baseColor` before the texture lands. Acceptable — already true for floor textures and never reported as a bug.
+
+**File layout:**
 ```
-cadStore (Zustand + Immer)
-  rooms[activeRoomId].walls[wallId]
-    .wainscoting.{A,B} -> WainscotConfig { enabled, styleItemId, heightFt, color }
-    .wallpaper.{A,B}    -> Wallpaper { kind, color, paintId, ... }
-    .crownMolding.{A,B} -> CrownConfig { enabled, heightFt, color }
-    .wallArt[]           -> WallArt { frameStyle, frameColorOverride, side, ... }
-```
-
-### Component Hierarchy (Selection Context)
-
-```
-App.tsx
-  PropertiesPanel.tsx          -- appears when selectedIds.length >= 1
-    WallSurfacePanel.tsx       -- appears when exactly 1 wall selected
-      PaintSection.tsx         -- F&B paint picker for wall side
-    CeilingPaintSection.tsx    -- appears when ceiling selected
-  Sidebar.tsx                  -- always visible (collapsible)
-    CollapsibleSection         -- file-scoped component, wraps each panel
-    WainscotLibrary.tsx        -- wainscot style CRUD (in sidebar)
+public/textures/
+├── wood-plank/{albedo,normal,roughness}.jpg
+├── concrete/{albedo,normal,roughness}.jpg
+└── plaster/{albedo,normal,roughness}.jpg
+src/three/
+└── pbrTextureCache.ts        # NEW — getPbrTextureSet(id) → { albedo, normal, roughness }
 ```
 
-### Store Actions (Already Implemented)
-
-| Action | Store | Status |
-|--------|-------|--------|
-| `toggleWainscoting(wallId, side, enabled, heightFt, color, styleItemId)` | cadStore | Exists, works |
-| `copyWallSide(wallId, from, to)` | cadStore | Exists -- copies wallpaper, wainscoting, crown, wall art |
-| `updateWallArt(wallId, artId, changes)` | cadStore | Exists, accepts `Partial<WallArt>` including `frameColorOverride` |
-
 ---
 
-## Feature-by-Feature Integration Analysis
+## D-2 — Surface Material Catalog Evolution
 
-### 1. Wainscot Inline Edit (POLISH-02)
+**Decision:** Add an optional `pbr` field to `SurfaceMaterial` in the existing `surfaceMaterials.ts`. NO `kind` discriminator, NO separate PBR catalog. The render path checks `material.pbr` and switches behavior — color-only materials keep the current `meshStandardMaterial color={hex}` path; PBR materials add `map`/`normalMap`/`roughnessMap` from the cache.
 
-**What it does:** Double-click a wainscot style in WallSurfacePanel to change style/height in place, rather than navigating to the WainscotLibrary sidebar panel.
-
-**Current state:** WallSurfacePanel.tsx (lines 181-234) shows a `<select>` dropdown to pick a wainscot style when wainscoting is enabled. There is NO inline editing of height or style parameters from the properties panel -- you can only toggle on/off and pick a library style. The WainscotLibrary.tsx already has double-click-to-edit on library items (line 177: `onDoubleClick={() => setEditingId(it.id)}`), but this edits the library definition, not the per-wall application.
-
-**What needs to change:**
-
-| Component | Change | Type |
-|-----------|--------|------|
-| `WallSurfacePanel.tsx` | Add inline height input + style dropdown below the wainscot checkbox when enabled | Modify |
-| `cadStore.ts` | No change -- `toggleWainscoting` already accepts `heightFt` and `styleItemId` params | None |
-
-**Integration points:**
-- `toggleWainscoting(wallId, side, true, newHeight, color, styleItemId)` -- call with updated params on blur/change
-- Read `wains.heightFt` and `wains.styleItemId` from `wall.wainscoting[activeSide]`
-- Import `STYLE_META` from `@/types/wainscotStyle` and `useWainscotStyleStore` (already imported in WallSurfacePanel)
-
-**Data flow:** User edits height/style in WallSurfacePanel -> calls `toggleWainscoting` with new values -> cadStore updates wall -> Fabric canvas redraws -> Three.js WallMesh re-renders wainscoting geometry.
-
-**Complexity:** Low. The select dropdown already exists. Add a number input for height next to it.
-
----
-
-### 2. Copy Wall Treatment to Opposite Side (POLISH-03)
-
-**What it does:** One-click button to copy all treatments (wallpaper, wainscoting, crown, art) from the active side to the opposite side.
-
-**Current state:** FULLY IMPLEMENTED. The button exists in WallSurfacePanel.tsx (lines 116-124):
-```tsx
-<button onClick={() => copyWallSide(wall.id, activeSide, target)}>
-  COPY_TO_SIDE_{activeSide === "A" ? "B" : "A"}
-</button>
+```ts
+// src/data/surfaceMaterials.ts
+export interface PbrMaps {
+  albedo: string;        // "/textures/wood-plank/albedo.jpg"
+  normal: string;
+  roughness: string;
+  tileFt: number;        // real-world tile size for repeat math
+}
+export interface SurfaceMaterial {
+  id: string;
+  label: string;
+  color: string;         // RETAINED — used as fallback + tint multiplier on PBR albedo
+  roughness: number;     // RETAINED — fallback when no roughnessMap
+  surface: SurfaceTarget;
+  defaultScaleFt: number;
+  pbr?: PbrMaps;         // NEW — presence = PBR-capable
+}
 ```
 
-The `copyWallSide` store action (cadStore.ts lines 777-817) deep-clones wallpaper, wainscoting, crown molding, and wall art with new IDs.
+**Rationale:**
+- Keeps the catalog as the single source of truth for `WOOD_PLANK`, `CONCRETE`, `PLASTER` — exactly the three materials called out in #61 already exist as color entries. No data migration, no parallel catalog drift.
+- `materialsForSurface()` and every existing consumer keeps working unchanged. New PBR-aware consumers do `if (mat.pbr) { ...textured path... } else { ...color path... }` — one branch, locally scoped.
+- Avoids the discriminator-union refactor explosion that would touch `floorTexture.ts`, `CeilingMesh`, `WallMesh`, `Sidebar` material picker, save/load migration. v1.5's PERF-02 already taught us the cost of "small invariant changes" rippling.
+- `PAINTED_DRYWALL` keeps its color-only path per #61 spec.
 
-**What needs to change:**
-
-| Component | Change | Type |
-|-----------|--------|------|
-| Nothing | Verify it works end-to-end | Verification only |
-
-**Verification checklist:**
-- Copy wallpaper (color, pattern, paint) from A to B and vice versa
-- Copy wainscoting config including styleItemId
-- Copy crown molding
-- Copy wall art with new IDs and flipped side
-- Undo reverts the copy
-
-**Complexity:** None (verification only).
+**Trade-off accepted:** A material can technically be misconfigured (have `pbr` but `surface: "ceiling"` only). Mitigated by the catalog being a small static `Record` — typo-resistant, code-reviewed.
 
 ---
 
-### 3. Per-Placement Frame Color Override (POLISH-04)
+## D-3 — User-Uploaded Texture Storage
 
-**What it does:** Color picker on each wall art item to override the library frame style's default color.
+**Decision:** New `userTextureStore` (Zustand + idb-keyval persistence, mirroring `productStore` pattern). Textures stored as **base64 data URLs** keyed by `userTex_<uid>`, GLOBAL across projects (not per-project). Snapshots reference textures by ID only, NEVER by inlined bytes. ObjectURLs are derived at render time inside the existing texture cache.
 
-**Current state:** FULLY IMPLEMENTED.
-
-- `WallArt.frameColorOverride` exists in types/cad.ts (line 67)
-- WallSurfacePanel.tsx (lines 344-354) renders a color input for each art item with a frame style, reading `a.frameColorOverride ?? FRAME_PRESETS[a.frameStyle].color` and calling `updateWallArt` with `{ frameColorOverride: e.target.value }`
-- WallMesh.tsx (line 206) reads `art.frameColorOverride ?? preset?.color ?? "#ffffff"` for 3D frame rendering
-
-**What needs to change:**
-
-| Component | Change | Type |
-|-----------|--------|------|
-| Nothing | Verify picker works, color persists through save/load, undo works | Verification only |
-
-**Verification checklist:**
-- Color picker appears only for art items with `frameStyle !== "none"`
-- Changing color updates 3D view immediately
-- Color persists in project save/load (via CADSnapshot serialization)
-- Undo reverts color change
-- copyWallSide clones the override (deep clone in copyWallSide handles this)
-
-**Complexity:** None (verification only).
-
----
-
-### 4. Sidebar Scroll Verification (POLISH-06)
-
-**What it does:** Ensure all sidebar panels scroll correctly when content exceeds viewport height.
-
-**Current state:** Sidebar.tsx uses `overflow-y-auto` on the scrollable content container (line 71):
-```tsx
-<div className="flex-1 overflow-y-auto p-4 space-y-4">
+```
+src/stores/
+└── userTextureStore.ts       # NEW — Zustand + idb-keyval
+src/types/
+└── userTexture.ts            # NEW — { id, name, dataUrl, createdAt, advanced?: { normal?, roughness? } }
 ```
 
-The sidebar structure is:
-- Fixed header with collapse button (`shrink-0`)
-- Scrollable body (`flex-1 overflow-y-auto`) containing all CollapsibleSections
+**Rationale:**
+- **Global, not per-project**: Jessica's whole Pinterest-driven workflow is "I keep finding fabrics I love." Re-uploading the same hardwood photo into 4 different room layouts would feel broken. Mirrors the locked decision "Global product library" in PROJECT.md.
+- **Base64 data URL, not Blob+ObjectURL in storage**: existing wallpaper (`Wallpaper.imageUrl`), wall art (`WallArt.imageUrl`), floor custom (`FloorMaterial.imageUrl`), and product images all use data URLs. The whole snapshot serialization path (`structuredClone(toPlain(...))` in `cadStore.snapshot()` and `idb-keyval` JSON encoding) already handles strings cleanly. Blobs would require a parallel persistence path and break the symmetric save/load round-trip the v1.5 D-07 contract guarantees. ObjectURL revocation lifecycle is also a known footgun on undo/redo.
+- **ID reference in snapshot**: a `Wallpaper { kind: "userTexture", userTextureId: "userTex_abc" }` discriminant (or analogous field on `FloorMaterial`/`Ceiling`) keeps `CADSnapshot` size bounded — undo history caps at 50 entries × N textures × ~500 KB each would otherwise blow IndexedDB's per-DB quota fast.
+- **Advanced PBR pathway**: optional `advanced.normal` / `advanced.roughness` data URLs on the SAME `UserTexture` record — single "asset" the user thinks of as "my wood photo," with optional extra maps. Renderer checks `advanced` presence and falls back to single-map mode if absent.
 
-PropertiesPanel.tsx uses `max-h-[calc(100vh-6rem)] overflow-y-auto` (line 85) for its floating panel.
+**Auto-save implication:** Auto-save's observation set (`rooms`, `activeRoomId`, `customElements`) does NOT need to expand. User-texture uploads are CATALOG actions (separate store, separate IndexedDB key) — they persist on their own write, identical to how `productStore` handles uploads today.
 
-**What needs to change:**
-
-| Component | Change | Type |
-|-----------|--------|------|
-| Sidebar.tsx | Verify scroll works with all sections expanded | Verification only |
-| PropertiesPanel.tsx | Verify scroll works with tall wall surface panels | Verification only |
-
-**Potential issues to check:**
-- All CollapsibleSections expanded simultaneously (Room Config + System Stats + Layers + Floor Material + Snap + Custom Elements + Framed Art + Wainscot Library + Product Library)
-- WallSurfacePanel inside PropertiesPanel when many art items exist
-- WainscotLibrary create form with 3D preview open
-- Small viewport heights (laptop screens)
-
-**Complexity:** None (manual testing).
+**Trade-off accepted:** A user texture deleted from the catalog while still referenced by a placement becomes an orphan. Render path mirrors existing `ProductMesh` orphan-safety: missing → render placeholder color from `material.color` fallback, no crash. Add `pruneOrphanUserTextures()` lazy on load if it becomes a problem (defer — not in scope for v1.7).
 
 ---
 
-### 5. Remove All Underscores from UI Labels
+## D-4 — Camera Preset State Location
 
-**What it does:** Replace `ROOM_CONFIG` with `ROOM CONFIG`, `WALL_SEGMENT_XXXX` with `WALL SEGMENT XXXX`, etc. across all visible UI text.
+**Decision:** Camera presets live in **`uiStore`** as an enum + a transient tween target (mirroring the existing `wallSideCameraTarget` pattern already in `uiStore`). Per-project saved camera position is **explicitly out of scope for v1.7**.
 
-**Current state:** 38 occurrences of underscore-containing uppercase labels across 15 component files. Labels fall into categories:
+```ts
+// uiStore.ts additions
+cameraPreset: "default" | "eye" | "top" | "corner";
+cameraTweenTarget: { pos: [number,number,number]; look: [number,number,number]; seq: number } | null;
+setCameraPreset: (p) => void;
+clearCameraTweenTarget: () => void;
+```
 
-**Category A -- Static string literals (direct replacement):**
-- Sidebar.tsx: `ROOM_CONFIG`, `SYSTEM_STATS`, `SQ_FT`, `FLOOR_MATERIAL`, `3_INCH`, `6_INCH`, `1_FOOT`, `PRODUCT_LIBRARY`
-- WallSurfacePanel.tsx: `WALL_SURFACE`, `SIDE_A`/`SIDE_B`, `COPY_TO_SIDE_B`, `UPLOAD_PATTERN`, `TILE_PATTERN`, `CROWN_MOLDING`, `WALL_ART`, `ART_LIBRARY_EMPTY`, `FRAME_COLOR_OVERRIDE`
-- WainscotLibrary.tsx: `WAINSCOT_LIBRARY`, `SAVE_TO_LIBRARY`, `NO_WAINSCOT_STYLES_YET`, `LOADING_PREVIEW...`, `DOUBLE_CLICK_TO_EDIT`, `CREATE_STYLE_IN_LIBRARY_FIRST`, `PANEL_W`, `STILE_W`, `PLANK_W`, `BATTEN_W`, `PLANK_H`
-- PropertiesPanel.tsx: `BULK_ACTIONS`, `ITEMS_SELECTED`, `PAINT_ALL_WALLS`, `APPLIES_TO_BOTH_SIDES`, `DELETE_ALL`, `DELETE_ELEMENT`, `SET_DIMENSIONS`, `WALL_SEGMENT_XXXX`
-- StatusBar.tsx: `{tool}_TOOL`, `WALK_MODE`, `ORBIT_MODE`
-- Toolbar.tsx: `OBSIDIAN_CAD`
-- RoomSettings.tsx, AddRoomDialog.tsx, FramedArtLibrary.tsx, FloorMaterialPicker.tsx, SwatchPicker.tsx, etc.
+**Rationale:**
+- **uiStore over cadStore**: cadStore is the **persisted** scene. Putting camera there forces a `version: 3` snapshot bump + `migrateSnapshot` branch + extends auto-save's observation set + occupies an undo slot every time the camera moves. Jessica's preferred angle "restoring on reload" is a v1.8 nice-to-have, not a v1.7 requirement (#45 spec lists toolbar + 1/2/3/4 keys, not persistence).
+- **uiStore over local Scene state**: the Toolbar buttons + global keyboard handler (`1/2/3/4`) need to dispatch into the camera. uiStore is where every other tool/view dispatch lives. Local React state in `<Scene>` would require lifting handlers via prop-drilling or context — strictly worse.
+- **uiStore over a new cameraStore**: 4 fields and 2 actions don't justify a new store file. The existing `wallSideCameraTarget` precedent in uiStore is the closest analog and is one screen up — natural co-location.
+- **Tween via existing useFrame lerp**: `<Scene>` already has a `useFrame` lerp loop for `wallSideCameraTarget`. Reuse the same pattern; the seq counter pattern means switching to the same preset twice still re-triggers the tween.
 
-**Category B -- Dynamic string construction:**
-- StatusBar.tsx line 25: `{activeTool.toUpperCase()}_TOOL` -- template literal with underscore
-- StatusBar.tsx line 44: `WALK_MODE` / `ORBIT_MODE` -- ternary
-- PropertiesPanel.tsx line 93: `CEILING_{id}` -- template
-- PropertiesPanel.tsx line 106: `WALL_SEGMENT_{id}` -- template
-- PropertiesPanel.tsx line 134: `product?.name?.toUpperCase().replace(/\s/g, "_")` -- explicit underscore insertion
-
-**Category C -- title attributes (tooltips):**
-- WallSurfacePanel.tsx line 353: `title="FRAME_COLOR_OVERRIDE"`
-- Sidebar.tsx line 65: `title="COLLAPSE_SIDEBAR"`
-- WainscotLibrary.tsx line 179: `title="DOUBLE_CLICK_TO_EDIT"`
-
-**What needs to change:**
-
-| Component | Count | Type |
-|-----------|-------|------|
-| Sidebar.tsx | ~8 labels | Modify |
-| WallSurfacePanel.tsx | ~10 labels | Modify |
-| WainscotLibrary.tsx | ~8 labels | Modify |
-| PropertiesPanel.tsx | ~8 labels + 1 regex | Modify |
-| StatusBar.tsx | ~3 labels | Modify |
-| Toolbar.tsx | 1 label (OBSIDIAN_CAD) | Modify |
-| RoomSettings.tsx | ~3 labels | Modify |
-| AddRoomDialog.tsx | ~5 labels | Modify |
-| FramedArtLibrary.tsx | ~1 label | Modify |
-| FloorMaterialPicker.tsx | ~1 label | Modify |
-| SwatchPicker.tsx | ~4 labels | Modify |
-| SidebarProductPicker.tsx | ~1 label | Modify |
-| RoomTabs.tsx | ~1 label | Modify |
-| TemplatePickerDialog.tsx | ~2 labels | Modify |
-| Help/onboarding files | ~5 labels | Modify |
-
-**Key transformation rule:** Replace `_` with ` ` (space) in all visible UI text. Preserve underscore convention in:
-- Variable names, prop names, CSS class names (not visible to user)
-- Data model field names
-- The brand name `OBSIDIAN CAD` (remove underscore -- it reads better as two words)
-
-**Special case:** PropertiesPanel line 134 uses `.replace(/\s/g, "_")` to format product names. Change to just `.toUpperCase()` (spaces are fine in labels).
-
-**Complexity:** Medium. Wide surface area (15 files, ~38 occurrences) but each change is trivial. Risk is missing one or creating inconsistency.
+**Per-project camera position deferred:** If Jessica asks for it, it becomes a separate v1.8 ticket — adds `RoomDoc.savedCameraPose?: { pos, look }` and a "Save current view" button. v1.7 does not pay that cost.
 
 ---
 
-## Component Boundaries
+## D-5 — Drag Fast-Path & Undo/Redo Implications
 
-### Files That Need Modification
+**Decision:**
+- **Camera preset switch:** does NOT push to history. Camera is uiStore (D-4) → outside the cadStore undo/redo subsystem entirely. Same pattern as tool switches and selection.
+- **User-texture upload (catalog):** does NOT push to cadStore history. Uploads land in `userTextureStore`, separate from cadStore.
+- **Applying a user texture to a wall/floor/ceiling (placement):** DOES push exactly one history entry, via the existing `setWallpaper` / `setFloorMaterial` / `updateCeiling` actions. No new action, no new undo semantics.
+- **PBR material apply:** identical to current color-material apply — single history entry from the same action. PBR is a render-path concern, not a state-shape concern.
 
-| File | Features Affected | Changes |
-|------|-------------------|---------|
-| `src/components/WallSurfacePanel.tsx` | POLISH-02, underscore cleanup | Add height/style inline edit; replace ~10 label strings |
-| `src/components/Sidebar.tsx` | Underscore cleanup | Replace ~8 label strings |
-| `src/components/PropertiesPanel.tsx` | Underscore cleanup | Replace ~8 labels + fix `.replace(/\s/g, "_")` |
-| `src/components/WainscotLibrary.tsx` | Underscore cleanup | Replace ~8 label strings |
-| `src/components/StatusBar.tsx` | Underscore cleanup | Replace ~3 labels, fix template literal |
-| `src/components/Toolbar.tsx` | Underscore cleanup | Replace OBSIDIAN_CAD |
-| `src/components/RoomSettings.tsx` | Underscore cleanup | Replace ~3 labels |
-| `src/components/AddRoomDialog.tsx` | Underscore cleanup | Replace ~5 labels |
-| `src/components/SwatchPicker.tsx` | Underscore cleanup | Replace ~4 labels |
-| 6 more component files | Underscore cleanup | 1-2 labels each |
+**Drag fast-path preservation:** No new drag interactions in v1.7 — PBR/textures/camera are click-to-apply or button-press. The Phase 25 `shouldSkipRedrawDuringDrag` + `*NoHistory` action family + single mouseup commit invariant is **untouched**. Verification gate: any new action that mutates cadStore must come with a `*NoHistory` twin if it could ever fire mid-gesture; for v1.7 NONE of the new actions fall in that bucket.
 
-### Files That Need NO Modification
-
-| File | Reason |
-|------|--------|
-| `src/stores/cadStore.ts` | All store actions already exist and work |
-| `src/types/cad.ts` | Data model is complete (frameColorOverride, WainscotConfig, etc.) |
-| `src/three/WallMesh.tsx` | Already reads frameColorOverride correctly |
-| `src/canvas/fabricSync.ts` | 2D rendering unaffected |
-| `src/stores/uiStore.ts` | No new UI state needed |
-
-### No New Components
-
-Zero new components are needed. All features integrate into existing component surfaces.
+**Trade-off accepted:** "Apply 8 different paints in a row" still pollutes undo with 8 entries — same as today, not made worse.
 
 ---
 
-## Suggested Build Order
+## D-6 — R3F v8 / drei v9 Forward-Compat Constraints
 
-Based on dependency analysis and risk:
+**Decision:** Build PBR + camera-preset code against **today's R3F v8 / drei v9 idioms** with one explicit precaution: **avoid `useTexture` for PBR loads** (which is also the D-1 decision for unrelated reasons). All other choices are forward-compatible.
 
-### Phase 1: Verification (POLISH-03, POLISH-04, POLISH-06)
+**Why this is enough:**
+- The R3F v9 / React 19 migration (#56) is documented in `.planning/codebase/CONCERNS.md` and **deferred until R3F v9 stabilizes**. Per PROJECT.md, "execution deferred until R3F v9 stabilizes."
+- v8→v9 is mostly TypeScript types + React 19 hook compat, NOT an API rewrite of `meshStandardMaterial`, `Canvas`, `OrbitControls`, `PointerLockControls`, `Environment`, or `useFrame` — the entire surface area v1.7 touches.
+- `useTexture` (drei) is the one hook with known suspension semantics changes between drei 9 and 10. Avoiding it (D-1) means zero rework when #56 lands.
+- Camera preset implementation reuses the existing `useFrame` lerp pattern from `wallSideCameraTarget` — already part of the audited scene, will migrate together.
 
-These three features are already implemented. Verify before changing anything else.
-
-**Order within phase:**
-1. POLISH-04 (frame color override) -- smallest surface, easiest to verify
-2. POLISH-03 (copy wall side) -- test all four treatment types copy correctly
-3. POLISH-06 (sidebar scroll) -- manual testing, may surface overflow bugs
-
-**Rationale:** Verify first so you know what already works before touching label strings. If verification reveals bugs, fix them before the label sweep muddles the diff.
-
-### Phase 2: Wainscot Inline Edit (POLISH-02)
-
-Single component change in WallSurfacePanel.tsx. Add height input and potentially style-specific knobs below the existing wainscot dropdown.
-
-**Why after verification:** The wainscot section in WallSurfacePanel is the same area being verified in POLISH-03. Get verification done first so inline edit additions are isolated in their own commit.
-
-### Phase 3: Underscore Label Removal
-
-Sweep all 15 files. This is the widest-surface-area change but the lowest risk per change.
-
-**Why last:**
-- It touches every component file -- do it after all functional changes are done
-- It is purely cosmetic -- no data flow, no store changes, no 3D rendering impact
-- A single focused sweep produces a clean diff vs. mixing label changes into functional work
+**Trade-off accepted:** None material. We don't take a forward-compat hit by writing v1.7 against current versions.
 
 ---
 
-## Anti-Patterns to Avoid
+## Quality Gate Checklist
 
-### Anti-Pattern: Mixing Label Cleanup into Feature Commits
-**Why bad:** Makes git blame useless for understanding when functional behavior changed. Impossible to revert label changes without reverting features.
-**Instead:** One dedicated commit for all underscore removal, separate from functional changes.
-
-### Anti-Pattern: Introducing a Label Formatting Utility
-**Why bad:** Over-engineering for a one-time cleanup. The codebase intentionally uses raw string literals for labels -- a utility adds indirection for no ongoing benefit.
-**Instead:** Direct string replacement in each file. `"ROOM_CONFIG"` becomes `"ROOM CONFIG"`.
-
-### Anti-Pattern: Changing WainscotConfig Shape for Inline Edit
-**Why bad:** The existing `toggleWainscoting` signature already accepts all needed params. Adding new fields or splitting into a separate `updateWainscoting` action adds unnecessary API surface.
-**Instead:** Reuse `toggleWainscoting(wallId, side, true, newHeight, color, styleId)` for inline edits. It pushes history and updates correctly.
-
----
+- [x] Zustand-driven render preserved — PBR materials are render-path-only; user-texture refs are IDs in the existing snapshot shape
+- [x] Phase 25 drag fast-path untouched — no new drag interactions, no per-frame store writes introduced
+- [x] Single-undo invariant per gesture — every new mutating action lands a single history entry; no compound user actions
+- [x] Save/load round-trip preserves all state — snapshot extension is additive (optional `pbr` field is data-only; user-texture refs are strings; camera state is intentionally NOT persisted in v1.7)
+- [x] productTool placement uses fresh objects — unchanged; no override seeding
+- [x] Pitfall 4 catalog vs placement separation — `surfaceMaterials.ts` (catalog) and per-wall `wallpaper`/`floorMaterial` references (placement) stay distinct; user textures follow the same split via `userTextureStore` (catalog) + ID reference (placement)
 
 ## Sources
 
-- Direct codebase analysis of all files listed above
-- Confidence: HIGH -- all integration points verified by reading actual source code
+- `src/stores/cadStore.ts` (snapshot, pushHistory, *NoHistory family, undo/redo)
+- `src/stores/uiStore.ts` (wallSideCameraTarget pattern, cameraMode)
+- `src/stores/projectStore.ts` (saveStatus surface)
+- `src/data/surfaceMaterials.ts` (catalog shape)
+- `src/three/ThreeViewport.tsx` (Scene, useFrame lerp, OrbitControls ref pattern)
+- `src/three/WallMesh.tsx` (wallpaperTextureCache, wallArtTextureCache imperative-loader pattern)
+- `src/three/ProductMesh.tsx` (resolveEffectiveDims + texture cache)
+- `src/lib/serialization.ts` (idb-keyval round-trip, LAST_PROJECT_KEY pattern)
+- `src/types/cad.ts` (Wallpaper discriminant, FloorMaterial.kind, CADSnapshot v2)
+- `.planning/PROJECT.md` (locked decisions: global product library, image-only assets, R3F v9 deferral, Pitfall 4)
+
+---
+*Architecture research for: v1.7 3D Realism — PBR + user textures + camera presets*
+*Researched: 2026-04-21*
