@@ -25,13 +25,15 @@ import type { PlacedProduct, PlacedCustomElement, CustomElement } from "@/types/
 // --- Fixtures -------------------------------------------------------------
 
 function makeProduct(overrides: Partial<Product> = {}): Product {
+  // NOTE: use `in` checks (not ??) so explicit null values propagate.
+  // Fixes a Wave 0 test-fixture bug where `width: null` was coerced to 4.
   return {
     id: overrides.id ?? "prod-1",
     name: overrides.name ?? "Couch",
     category: overrides.category ?? "Seating",
-    width: overrides.width ?? 4,
-    depth: overrides.depth ?? 2,
-    height: overrides.height ?? 3,
+    width: "width" in overrides ? (overrides.width as number | null) : 4,
+    depth: "depth" in overrides ? (overrides.depth as number | null) : 2,
+    height: "height" in overrides ? (overrides.height as number | null) : 3,
     material: overrides.material ?? "fabric",
     imageUrl: overrides.imageUrl ?? "",
     textureUrls: overrides.textureUrls ?? [],
