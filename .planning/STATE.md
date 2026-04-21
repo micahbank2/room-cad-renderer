@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: 3D Realism
 status: executing
-stopped_at: Completed 32-01-PLAN.md (PBR asset foundation + data contract)
-last_updated: "2026-04-21T14:35:52.683Z"
+stopped_at: Completed 32-03-PLAN.md (PBR mesh wiring + HDR swap + cache migration)
+last_updated: "2026-04-21T15:25:19.024Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 Milestone: v1.7 3D Realism
 Phase: 32 (pbr-foundation) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -62,6 +62,8 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 32-pbr-foundation]: Tests placed in tests/ (not colocated) because vitest.config include pattern only covers tests/** and src/__tests__/** — auto-fixed per Rule 3 (blocking: would be silently skipped otherwise).
 - [Phase 32-pbr-foundation]: Chose oak_veneer_01 / concrete_floor_worn_001 / beige_wall_001 from Poly Haven CC0 for PBR texture sets
 - [Phase 32-pbr-foundation]: HDR 1.58 MB exceeds plan 700KB ceiling; Poly Haven smallest 1k HDR is 1.2MB — accepted named asset, documented in LICENSE and SUMMARY
+- [Phase 32-pbr-foundation]: Plan 03: Wired PBR into CeilingMesh/FloorMesh via new PbrSurface wrapper (Suspense+ErrorBoundary); swapped Environment to bundled /hdr/studio_small_09_1k.hdr; registered renderer with pbrTextureCache for device anisotropy; migrated wallpaper/wallArt/floorTexture caches to shared acquireTexture (D-05). FloorMesh customTextureCache deferred to Phase 33.
+- [Phase 32-pbr-foundation]: D-06 fix-not-rollback: wallpaper loader previously defaulted to NoColorSpace (wrong for sRGB JPGs); shared cache now sets SRGBColorSpace — documented as a correctness fix, not reverted.
 
 ### Pending Todos
 
@@ -80,6 +82,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-21T14:35:52.681Z
-Stopped at: Completed 32-01-PLAN.md (PBR asset foundation + data contract)
+Last session: 2026-04-21T15:25:19.022Z
+Stopped at: Completed 32-03-PLAN.md (PBR mesh wiring + HDR swap + cache migration)
 Resume file: None
