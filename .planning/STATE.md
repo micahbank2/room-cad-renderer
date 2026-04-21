@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Editing UX
-status: verifying
-stopped_at: Completed 31-02-PLAN.md (Wave 1 pure modules; 43 unit assertions green; integration tests still red pending Wave 2)
-last_updated: "2026-04-21T00:15:50.471Z"
+status: executing
+stopped_at: Completed 31-03-integration-PLAN.md
+last_updated: "2026-04-21T00:34:56.038Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 17
-  completed_plans: 15
+  completed_plans: 16
 ---
 
 # Project State
@@ -56,6 +56,7 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 31]: Driver bridges (__driveResize/__driveWallEndpoint/__driveLabelOverride) advertised in-file for Wave 2; locked Phase 29/30 TDD shape
 - [Phase 31]: Plan 31-02 (Wave 1 pure modules): 5 schema fields + resolver + edge handles + restricted snap scene + 8 store actions. 43 Wave 0 unit tests RED->GREEN; integration tests still RED awaiting Wave 2 drivers
 - [Phase 31]: Pitfall 4 separation: updateCustomElement (catalog) + updatePlacedCustomElement (placement) coexist with clear naming; placement actions write to rooms[active].placedCustomElements[id] not root.customElements
+- [Phase 31]: Plan 31-03 wired all Wave 1 pure modules into selectTool + PropertiesPanel + fabricSync; all 4 RTL specs green; +27 assertions
 
 ### Pending Todos
 
@@ -74,6 +75,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-21T00:15:50.469Z
-Stopped at: Completed 31-02-PLAN.md (Wave 1 pure modules; 43 unit assertions green; integration tests still red pending Wave 2)
+Last session: 2026-04-21T00:34:49.568Z
+Stopped at: Completed 31-03-integration-PLAN.md
 Resume file: None
