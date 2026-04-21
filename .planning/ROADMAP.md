@@ -74,7 +74,7 @@
 
 ### Phases
 
-- [ ] **Phase 32: PBR Foundation** — WOOD_PLANK / CONCRETE / PLASTER render with bundled albedo + normal + roughness maps; loader is non-blocking and color-space correct
+- [x] **Phase 32: PBR Foundation** — WOOD_PLANK / CONCRETE / PLASTER render with bundled albedo + normal + roughness maps; loader is non-blocking and color-space correct (completed 2026-04-21)
 - [ ] **Phase 33: User-Uploaded Textures** — Jessica uploads a photo of a real surface; it appears as a custom material on walls/floors/ceilings; persists locally with dedup + downscale
 - [ ] **Phase 34: Camera Presets** — eye-level / top-down / 3-quarter / corner switchable via toolbar buttons + 1/2/3/4 hotkeys with smooth ~600ms tween
 - [ ] **Phase 35: Tech-Debt Sweep** — close GH #44/#46/#50/#60, delete orphan SaveIndicator, finish resolveEffectiveDims migration, backfill Phase 29 frontmatter
@@ -82,7 +82,7 @@
 ### Phase Details
 
 #### Phase 32: PBR Foundation
-**Plans:** 4/6 plans executed
+**Plans:** 7/7 plans complete
 **Goal**: Jessica's WOOD_PLANK, CONCRETE, and PLASTER walls/floors/ceilings read as believable surfaces in 3D — wood shows plank seams + grain, concrete shows aggregate roughness, plaster shows subtle surface variation
 **Depends on**: Nothing (first v1.7 phase)
 **Requirements**: VIZ-07, VIZ-08, VIZ-09
@@ -97,7 +97,7 @@
 - [x] 32-01-PLAN.md — Texture assets (CC0 downloads) + SurfaceMaterial.pbr registry extension (wave 1)
 - [x] 32-02-PLAN.md — PBR loader infrastructure (color-space helper, refcount cache, ErrorBoundary) (wave 1, parallel)
 - [x] 32-03-PLAN.md — Wire PBR into FloorMesh/CeilingMesh/WallMesh; swap Environment HDR; migrate legacy caches (D-05) (wave 2)
-- [ ] 32-04-PLAN.md — Test driver + integration tests + boundary tests (wave 3)
+- [x] 32-04-PLAN.md — Test driver + integration tests + boundary tests (wave 3)
 - [x] 32-05-PLAN.md — GAP CLOSURE: debounced texture disposal (wallpaper/wallArt regression from D-05 cache migration) (wave 4)
 **UI hint**: yes
 
@@ -147,7 +147,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 32. PBR Foundation | 4/6 | In Progress|  |
+| 32. PBR Foundation | 7/7 | Complete   | 2026-04-21 |
 | 33. User-Uploaded Textures | 0/0 | Not started | - |
 | 34. Camera Presets | 0/0 | Not started | - |
 | 35. Tech-Debt Sweep | 0/0 | Not started | - |

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: 3D Realism
-status: executing
-stopped_at: Completed 32-06 Tasks 1+2; Task 3 awaiting Jessica's 14-step visual verification
-last_updated: "2026-04-21T20:31:30.281Z"
+status: verifying
+stopped_at: Completed Phase 32 Plan 04 — regression guards landed, phase ready for closeout
+last_updated: "2026-04-21T21:23:22.147Z"
 last_activity: 2026-04-21
 progress:
-  total_phases: 5
-  completed_phases: 0
-  total_plans: 6
-  completed_plans: 4
+  total_phases: 6
+  completed_phases: 1
+  total_plans: 7
+  completed_plans: 7
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 Milestone: v1.7 3D Realism
 Phase: 32 (pbr-foundation) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-21
 
 [░░░░░░░░░░] 0% (0/0 phases — roadmap pending)
@@ -64,6 +64,7 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 32-pbr-foundation]: HDR 1.58 MB exceeds plan 700KB ceiling; Poly Haven smallest 1k HDR is 1.2MB — accepted named asset, documented in LICENSE and SUMMARY
 - [Phase 32-pbr-foundation]: Plan 03: Wired PBR into CeilingMesh/FloorMesh via new PbrSurface wrapper (Suspense+ErrorBoundary); swapped Environment to bundled /hdr/studio_small_09_1k.hdr; registered renderer with pbrTextureCache for device anisotropy; migrated wallpaper/wallArt/floorTexture caches to shared acquireTexture (D-05). FloorMesh customTextureCache deferred to Phase 33.
 - [Phase 32-pbr-foundation]: D-06 fix-not-rollback: wallpaper loader previously defaulted to NoColorSpace (wrong for sRGB JPGs); shared cache now sets SRGBColorSpace — documented as a correctness fix, not reverted.
+- [Phase 32-pbr-foundation]: Plan 04: Locked Phase 32 PBR behavior with +12 vitest assertions (9 integration + 3 boundary) + gated __getPbrCacheState test driver. VIZ-07/VIZ-08 closed with automated regression guards. Zero regressions (367 → 379 passing).
 
 ### Pending Todos
 
@@ -82,6 +83,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-21T20:31:30.278Z
-Stopped at: Completed 32-06 Tasks 1+2; Task 3 awaiting Jessica's 14-step visual verification
+Last session: 2026-04-21T21:23:22.143Z
+Stopped at: Completed Phase 32 Plan 04 — regression guards landed, phase ready for closeout
 Resume file: None
