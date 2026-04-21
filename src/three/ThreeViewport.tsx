@@ -175,7 +175,10 @@ function Scene({ productLibrary }: Props) {
         <OrbitControls
           ref={orbitControlsRef}
           target={orbitTargetRef.current}
-          maxPolarAngle={Math.PI / 2}
+          // Polar 0 = camera directly above target (looks down); π/2 = horizontal;
+          // π = directly below target (looks up). Allow ~60° of "look up" — enough
+          // to see the ceiling without letting the camera flip or clip under the floor.
+          maxPolarAngle={Math.PI * 0.85}
           minDistance={3}
           maxDistance={80}
           enableDamping
