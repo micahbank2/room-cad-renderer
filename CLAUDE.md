@@ -389,6 +389,73 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 ## Cross-Cutting Concerns
 <!-- GSD:architecture-end -->
 
+<!-- GSD:issues-living-system-start -->
+## GitHub Issues — Living System
+
+The GitHub Issues tracker is a **living artifact that must stay in sync with planning state**. Drift here creates stale roadmap, duplicate work, and lost context. The following rules are non-optional:
+
+### On bug discovery (outside a fix-on-the-spot flow)
+
+If a bug is found and NOT fixed in the same turn:
+1. Add a ROADMAP backlog entry (phase `999.N` if generic, or inside the active phase's UAT file if scoped)
+2. Create a corresponding GitHub issue with labels `bug` + `backlog` (+ `deferred` if explicitly deferred)
+3. Link the GH issue number back into the ROADMAP / UAT entry
+4. Never leave a bug observation only in a commit message or scratch note
+
+### On phase plan creation (`/gsd:plan-phase`)
+
+For each requirement or feature the phase addresses:
+- If an existing GH issue maps to it → add label `in-progress` (or create one if missing) and reference the issue in the PLAN.md frontmatter or context block
+- If no issue exists and the work is substantive (≥1 plan) → create the issue with `enhancement` label + reference back to the phase
+
+### On PR creation
+
+- Every PR body **must** list `Closes #N` (or `Fixes #N` for bugs) for every issue the PR addresses. Use GitHub's linked-issues UI so merge auto-closes them.
+- If a PR only partially addresses an issue → use `Refs #N` instead and explain what's still pending
+- Add `Spec: .planning/phases/{phase}/{plan}-PLAN.md` for phase PRs so reviewers can navigate to the full plan
+
+### On PR merge
+
+- Verify the auto-closed issues actually closed (rare GH bug: they don't)
+- Any remaining open issue tagged to this phase that the merge did NOT close → either retag `planned` → next phase, or explicitly keep open with a reason
+- Update `.planning/ROADMAP.md` phase status + any backlog entries that moved state
+
+### On phase completion (`gsd-tools phase complete`)
+
+- Phase's HUMAN-UAT.md gaps → corresponding GH issues must exist, with correct status labels (`backlog` / `deferred` / `in-progress`)
+- Phase's VERIFICATION.md score → if `passed-with-carry-over`, each carry-over must be a tracked GH issue
+
+### On milestone completion (`/gsd:complete-milestone`)
+
+- Close the GH milestone (not the issues — those should already be closed as PRs merged)
+- Verify no orphan open issues reference the completed milestone
+- Any carry-over issues → relabel with the next milestone
+
+### Label taxonomy (keep this tight)
+
+| Label | Meaning | Close trigger |
+|-------|---------|---------------|
+| `enhancement` | Feature request | PR that implements it merges |
+| `bug` | Something's broken | PR that fixes it merges |
+| `backlog` | Parked in 999.x or UAT gaps | Promoted to active phase → relabel |
+| `planned` | Scoped for a specific future phase | Phase ships → close with phase ref |
+| `tech-debt` | Refactor / upgrade / cleanup | Ongoing, close when addressed |
+| `deferred` | Explicitly out of scope for current major version | Never auto-close |
+| `competitor-insight` | Borrowed from competitive audit | Same lifecycle as `enhancement` |
+| `ux` | UX / interaction design | Orthogonal tag (combine with others) |
+| `documentation` | Docs work | Orthogonal tag |
+
+### On drift detected
+
+If issues and planning state diverge (e.g., a phase shipped but the GH issue is still open, or a new bug discovered on-screen but no issue exists), run the `/gsd:sync-issues` skill to reconcile.
+
+### Automation status (as of 2026-04-21)
+
+- **Manual**: everything above, enforced by this rule
+- **Semi-automated**: `/gsd:sync-issues` reconciliation skill (see `.claude/commands/gsd-sync-issues.md` if present)
+- **Future**: post-merge hook that auto-closes linked issues and updates ROADMAP.md — not built yet; tracked as separate issue if pursued
+<!-- GSD:issues-living-system-end -->
+
 <!-- GSD:workflow-start source:GSD defaults -->
 ## GSD Workflow Enforcement
 
