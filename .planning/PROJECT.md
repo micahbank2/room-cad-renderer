@@ -12,11 +12,7 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
-**v1.6 Editing UX — Phase 30 Smart Snapping complete 2026-04-20.** 4 plans (TDD → pure engine → tool integration → gate). Net-new code (unlike hardening in Phases 28/29): `src/canvas/snapEngine.ts` is a pure 427-LOC module with zero Fabric/store/DOM imports — fully unit-testable. Per-axis independent snap algorithm with 8px zoom-aware tolerance (`SNAP_TOLERANCE_PX = 8`, scaled to feet via `/scale`). Snap targets: wall outer edges + wall midpoints (SNAP-02 auto-center) + other-object bbox edges; excludes the dragged object itself. When no smart-snap candidate is within tolerance, per-axis grid fallback preserves existing `gridSnap` behavior. `src/canvas/snapGuides.ts` Fabric renderer draws accent-purple (`#7c5bf0` @ 0.6 opacity) axis line across canvas + tick at snap point, plus a distinct midpoint dot for wall-center snaps; tagged `data.type === "snap-guide"` for clean removal on mouse:up and tool cleanup. Integrated into `selectTool` generic-move drag + `productTool` placement/hover; wall-endpoint drag (lines 765–789) deliberately untouched per D-08b (Phase 31 territory). Hold Alt/Option to disable smart snap while keeping grid snap (documented in CLAUDE.md). `window.__driveSnap` + `window.__getSnapGuides` test bridges under `import.meta.env.MODE === "test"` guard. Phase 25 drag fast-path preserved (`NoHistory` count unchanged; no per-frame store writes introduced). Tests: 31/31 smart-snap green (17 engine + 10 guides + 4 integration); full suite 269 passing (6 pre-existing unrelated). 4 perceptual items in `30-HUMAN-UAT.md`.
-
-**v1.6 Editing UX — Phase 29 Editable Dimension Labels complete 2026-04-20.** 4 plans (1 Wave 0 TDD + 2 parallel impl + 1 gate). Hardened the existing `EDIT-06` in-place overlay rather than rewriting. Feet+inches parser (`12'6"`, `12' 6"`, `12'-6"`, `12'`, `6"`, `12ft 6in`, plus decimal back-compat) rejects ambiguous forms like `12 6` and non-positive values. Overlay now pre-fills with `formatFeet()` (matches the label), widened to 96px, selects-all on focus. `EditableRow` in PropertiesPanel gained an optional `parser` prop — LENGTH row opts in to feet+inches; THICKNESS/HEIGHT rows remain numeric. 1e-6 no-op guard added to suppress spurious undo entries from formatFeet round-trip drift. Bonus: React 18 getSnapshot-caching fix in `SwatchPicker` (Rule-3 auto-fix). EDIT-21 single-undo locked in by regression test — `resizeWallByLabel` already satisfied it by design. Full suite 238 passing (6 pre-existing unrelated failures). 3 perceptual items queued in `29-HUMAN-UAT.md` (overlay angle fidelity, blur-commit feel, Ctrl+Z round-trip).
-
-**v1.6 Editing UX — Phase 28 Auto-Save complete 2026-04-20.** 5 plans (4 standard + 1 gap-closure). Hardened existing `useAutoSave.ts` rather than rewriting: added `"failed"` SaveStatus variant, `SAVE_FAILED` branch in `ToolbarSaveStatus` (Toolbar.tsx) with `text-error` and no auto-fade (D-04a), dual-subscriber for CAD data + project rename (D-05), silent restore on app launch via `room-cad-last-project` idb-keyval pointer with WelcomeScreen fallback on load failure (D-02/D-02a). Phase 25 drag fast-path preserved (subscribe filter unchanged — no per-frame commits, no ui-store leak). Tests: 10/10 Phase 28 stubs green, full suite 204 passing (6 pre-existing unrelated failures). `SaveIndicator.tsx` left orphaned as deferred cleanup. SAVE-05 + SAVE-06 validated; 4 perceptual items persisted in `28-HUMAN-UAT.md` for browser follow-up. See `.planning/phases/28-auto-save/28-VERIFICATION.md`.
+**v1.6 Editing UX shipped 2026-04-21.** 4 phases, 17 plans, 11/11 requirements complete (audit `passed`). Auto-save with debounce + SAVING/SAVED/SAVE_FAILED toolbar status + pointer-based silent restore on reload (Phase 28: SAVE-05, SAVE-06). Editable dimension labels via double-click overlay with feet+inches parser, single-undo guard preserved (Phase 29: EDIT-20, EDIT-21). Smart snapping with pure 427-LOC `snapEngine.ts` + Fabric `snapGuides.ts` renderer, edge/midpoint snap, accent-purple axis guides, Alt/Option disables (Phase 30: SNAP-01, SNAP-02, SNAP-03). Drag-to-resize with corner uniform + edge per-axis handles on products and custom elements; wall-endpoint drag with smart-snap closing Phase 30 D-08b deferral; per-placement label override on custom elements via `PropertiesPanel` input + live 2D render via `resolveEffectiveDims` resolver (Phase 31: EDIT-22, EDIT-23, EDIT-24, CUSTOM-06). Phase 25 drag fast-path preserved across all new editing branches (single undo entry per drag op). Test baseline grew 191 → 340 passing; same 6 pre-existing LIB-03/04/05 failures unrelated. 21 perceptual items auto-approved across 4 HUMAN-UAT.md files. Tech debt: orphan `SaveIndicator.tsx`, legacy `effectiveDimensions` coexists with `resolveEffectiveDims` (incremental migration).
 
 **v1.5 Performance & Tech Debt shipped 2026-04-20.** 4 phases, 15 plans. Tool architecture refactored (18 `(fc as any).__xToolCleanup` casts eliminated, closure state across all 6 tools, shared `toolUtils.ts`). Drag fast-path landed (`renderOnAddRemove: false`, mid-drag Fabric-only mutation, single commit on mouse:up — DevTools ~99.9% clean frames over 47.7s). `cadStore.snapshot()` migrated to `structuredClone(toPlain(...))` — D-07 contract met; ≥2× speedup target missed at tested scales (~1.25× slower due to Immer-draft unwrap) but absolute latency <0.3ms, non-user-visible (accepted as tech debt). Both bugs fixed: product thumbnail async render (#42 closed) and ceiling preset material closed as perception-only Outcome A with regression guards (#43 closed). R3F v9 / React 19 upgrade documented in `.planning/codebase/CONCERNS.md` and tracked on GH #56 (execution deferred until R3F v9 stabilizes). Test baseline grew 168 → 191 passing; same 6 pre-existing failures unrelated.
 
@@ -32,24 +28,11 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 See `.planning/ROADMAP.md` for links to each milestone archive.
 
-## Current Milestone: v1.6 Editing UX
+## Next Milestone Goals
 
-**Goal:** Close the daily-workflow gaps in 2D editing — Jessica can size walls precisely, resize without menus, snap intelligently, rename placed items, and never lose work.
+v1.7 not yet scoped. Run `/gsd:new-milestone` to begin requirements + roadmap.
 
-**Target features (5 GH issues):**
-- #44 Auto-save with debounce (status indicator in chrome)
-- #46 Editable dimension labels (double-click label → type length)
-- #60 Drag-to-resize products and walls
-- #17 Smart snapping (walls, object edges, auto-center)
-- #50 Per-placement label override for custom elements
-
-**Key context:**
-- #44 existed as SAVE-02 in v1.0 — this milestone tightens/completes the UX surface (status indicator, debounce behavior) that #44 still calls out
-- #60 + #17 overlap heavily — both rework interactive 2D-canvas behavior; likely co-located in one phase
-- #46 has precedent in v1.4 wainscot inline-edit (shared dblclick `useEffect` pattern)
-- #50 is a small tack-on; pair with a related phase
-
-Not in v1.6: #22 measurement/annotation (heavier — own milestone), #48 design redesign (blocked on mockups), #56 R3F v9 (deferred per D-02), 3D realism, library overhaul, materials engine, cloud sync, docs guides.
+Carried-forward backlog candidates: #22 measurement/annotation, #48 design system redesign (mockups still blocking), #56 R3F v9 / React 19 upgrade (await R3F v9 stabilization), 3D realism / PBR materials (#61), library overhaul, materials engine, cloud sync, docs guides. Plus tech debt: `SaveIndicator.tsx` cleanup, full `effectiveDimensions` → `resolveEffectiveDims` migration.
 
 ## Target User
 
@@ -62,7 +45,7 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - Jessica wants HER products in HER rooms at the right scale
 - "Feel the space" matters as much as "does it fit"
 - Desktop-first (laptop/monitor). iPad is future wishlist, not v1.
-- Codebase is ~14,355 LOC TypeScript across React 18 + Fabric.js + Three.js + Zustand (as of v1.5)
+- Codebase grew ~17.1K insertions across v1.6 (auto-save hardening, dim-label parser, snapEngine + snapGuides, resizeHandles + wallEndpointSnap + resolver) on top of v1.5's ~14,355 LOC baseline
 
 ## Requirements
 
@@ -153,9 +136,23 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 - ✓ Ceiling preset material bug closed as Outcome A — perception-only (PLASTER vs PAINTED_DRYWALL below JND); 4 regression guards locked the round-trip (FIX-02 / #43, Phase 26)
 - ✓ R3F v9 / React 19 upgrade path documented in `.planning/codebase/CONCERNS.md § R3F v9 / React 19 Upgrade` and tracked on GH #56 (TRACK-01, Phase 27) — execution deferred until R3F v9 stabilizes
 
+**v1.6 Milestone (shipped 2026-04-21) — 11 complete:**
+
+- ✓ CAD scene auto-saves within ~2s of last edit; debounced so continuous drag does not cause save spam (SAVE-05, Phase 28)
+- ✓ Toolbar shows `SAVING...` / `SAVED` / `SAVE_FAILED` via the v1.1 SAVE-04 surface (SAVE-06, Phase 28)
+- ✓ Double-clicking a wall dimension label opens a feet+inches overlay input; Enter commits, Escape cancels; wall resizes from start point along existing angle (EDIT-20, Phase 29)
+- ✓ Each dimension-label edit produces exactly one undo entry (EDIT-21, Phase 29)
+- ✓ Selected product shows corner (uniform) + edge (per-axis) resize handles; drag updates `widthFt` / `lengthFt` with override schema, snapped to active grid (EDIT-22, Phase 31)
+- ✓ Selected wall shows endpoint handles with smart-snap; Shift constrains orthogonal; Alt disables snap (EDIT-23, Phase 31)
+- ✓ Drag-resize commits single undo entry at mouse-up; Phase 25 `shouldSkipRedrawDuringDrag` + `renderOnAddRemove:false` fast-path preserved (EDIT-24, Phase 31)
+- ✓ Object edges snap to nearby wall + object edges within pixel tolerance, during both placement and repositioning (SNAP-01, Phase 30)
+- ✓ Midpoint auto-centering on walls during drag (SNAP-02, Phase 30)
+- ✓ Visible purple accent axis guide + midpoint dot appears on snap engagement, disappears on drag-end (SNAP-03, Phase 30)
+- ✓ Placed custom elements accept a per-placement label override via `PropertiesPanel` input; 2D canvas renders override; empty reverts to catalog name; persists through save/load + undo (CUSTOM-06, Phase 31)
+
 ### Active
 
-v1.6 Editing UX — requirements being defined. Target issues: #44, #46, #60, #17, #50.
+v1.7 not yet scoped. Run `/gsd:new-milestone` to define next milestone requirements.
 
 ### Out of Scope
 
@@ -197,6 +194,14 @@ v1.6 Editing UX — requirements being defined. Target issues: #44, #46, #60, #1
 | `structuredClone(toPlain(...))` snapshots (v1.5, Phase 25, D-07) | Cleaner than JSON roundtrip semantically (handles Dates, Maps in principle) and standards-aligned. Immer drafts require `current()`-normalization before clone. | ⚠ Partial — contract met, ≥2× speedup target missed (~1.25× slower at 50W/30P). Absolute latency <0.3ms — not user-visible. Accepted tech debt. |
 | FIX-02 closed as perception-only Outcome A (v1.5, Phase 26) | End-to-end code path verified correct; PLASTER #f0ebe0 vs PAINTED_DRYWALL #f5f5f5 differ ~3 L* — below JND. Regression guards added to lock the store setter → snapshot → JSON round-trip contract. | ✓ Good — GH #43 closed, 4 new tests |
 | R3F v9 / React 19 upgrade: document now, execute later (v1.5, Phase 27, D-02) | Target majors locked (^9 R3F, ^10 drei, ^19 React); upgrade is documentation-only until R3F v9 stabilizes out of beta. | ✓ Good — CONCERNS.md single source of truth, GH #56 as persistent tracker |
+| Pointer-based silent restore on app mount (v1.6, Phase 28, D-02/D-02a/D-02b) | Replaces broken listProjects hydration; single-write site in `useAutoSave` stores `room-cad-last-project` pointer; mount-time read in `App.tsx` loads last project or falls through to WelcomeScreen. | ✓ Good — reload restores scene exactly; WelcomeScreen only flashes on no-pointer or stale-pointer |
+| SAVE_FAILED persists until next success, no auto-fade (v1.6, Phase 28, D-04a) | Jessica must see a failed save before closing the tab — auto-fade would hide data loss. | ✓ Good — `ToolbarSaveStatus` failed branch renders until next successful save clears it |
+| Three-branch ordered regex for feet+inches parser (v1.6, Phase 29) | "First match wins" cleanly rejects ambiguous forms like `12 6` while accepting `12'6"`, `12'-6"`, `12ft 6in`, `6"`, decimals. | ✓ Good — 37/37 Phase 29 tests green |
+| `window.__openDimensionEditor` / `__driveSnap` / `__drive*` test drivers (v1.6, Phase 29/30/31) | jsdom+fabric hit-test fragility makes pixel-accurate DOM events unreliable; driver bridges gated by `import.meta.env.MODE === "test"` let RTL specs exercise the underlying logic deterministically. | ✓ Good — locked into CLAUDE.md; zero production impact |
+| Restricted wall-endpoint smart-snap scene (v1.6, Phase 30 D-08b → Phase 31 D-05) | Phase 30 deliberately left wall-endpoint drag untouched; Phase 31 built `wallEndpointSnap.ts` to exclude the wall being dragged from snap candidates, preventing self-snap degeneracy. | ✓ Good — 6/6 phase31WallEndpoint assertions green |
+| Per-placement override schema — `widthFtOverride` / `depthFtOverride` / `labelOverride` (v1.6, Phase 31, D-02) | Placement-instance state separated from catalog state (Pitfall 4); `resolveEffectiveDims(placedProduct, product) = override ?? libraryDim × sizeScale`. | ✓ Good — resolver migration through 3D meshes, snap scene, fabricSync, selectTool |
+| Edge-resize commits history at mousedown, not mouseup (v1.6, Phase 31, D-16) | Consistent with existing rotate/resize; mousedown snapshot is the pre-drag state; `*NoHistory` actions handle mid-drag. | ⚠ Minor — fires a history entry even if user starts drag but never moves. Consistent with existing patterns, accepted. |
+| Legacy `effectiveDimensions` coexists with `resolveEffectiveDims` (v1.6, Phase 31) | Incremental migration — placement in productTool still uses legacy because fresh placements have no overrides; all consumers that handle PlacedProduct/PlacedCustomElement go through resolver. | — Pending — remaining legacy call-sites can be swept in v1.7 polish |
 
 ## Tech Stack (Current)
 
@@ -206,7 +211,7 @@ v1.6 Editing UX — requirements being defined. Target issues: #44, #46, #60, #1
 - Zustand v5 + Immer (cadStore + uiStore + productStore + projectStore, undo/redo, auto-save)
 - Tailwind CSS v4 (styling, Obsidian CAD theme inline in index.css)
 - idb-keyval (IndexedDB persistence — projects + product library)
-- Vitest + jsdom + @testing-library (191 passing tests + 3 todo; 6 pre-existing unrelated failures)
+- Vitest + jsdom + @testing-library (340 passing tests + 3 todo; 6 pre-existing LIB-03/04/05 failures documented in deferred-items.md)
 - IBM Plex Mono + Space Grotesk + Inter (typography)
 - Material Symbols Outlined (icons)
 
@@ -228,4 +233,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-20 — v1.6 Editing UX scoping started (5 GH issues: #44, #46, #60, #17, #50)*
+*Last updated: 2026-04-21 — v1.6 Editing UX shipped (4 phases, 17 plans, 11/11 requirements)*
