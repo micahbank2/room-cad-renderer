@@ -98,3 +98,36 @@ export function __resetPbrCacheForTests(): void {
   cache.clear();
   registeredAnisotropy = 1;
 }
+
+// ───────────────────────────────────────────────────────────────────────
+// Test driver (gated). Exposes internal refcount state for integration tests.
+// Follows Phase 29/30/31 convention: window-scoped, MODE === "test" only.
+// ───────────────────────────────────────────────────────────────────────
+export interface PbrCacheSnapshot {
+  url: string;
+  refs: number;
+  channel: TextureChannel;
+  disposed: boolean;
+}
+
+export function __getPbrCacheState(): PbrCacheSnapshot[] {
+  const out: PbrCacheSnapshot[] = [];
+  for (const [url, entry] of cache.entries()) {
+    out.push({
+      url,
+      refs: entry.refs,
+      channel: entry.channel,
+      // three.js Texture has no public "disposed" flag; expose source.data null as a proxy
+      disposed: entry.tex.source?.data == null,
+    });
+  }
+  return out;
+}
+
+if (typeof window !== "undefined" && import.meta.env.MODE === "test") {
+  (window as unknown as { __getPbrCacheState: typeof __getPbrCacheState }).__getPbrCacheState =
+    __getPbrCacheState;
+  (
+    window as unknown as { __resetPbrCacheForTests: typeof __resetPbrCacheForTests }
+  ).__resetPbrCacheForTests = __resetPbrCacheForTests;
+}
