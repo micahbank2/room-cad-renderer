@@ -4,6 +4,7 @@ import type { Ceiling } from "@/types/cad";
 import { resolvePaintHex } from "@/lib/colorUtils";
 import { usePaintStore } from "@/stores/paintStore";
 import { SURFACE_MATERIALS } from "@/data/surfaceMaterials";
+import { PbrSurface } from "./PbrSurface";
 
 interface Props {
   ceiling: Ceiling;
@@ -13,6 +14,25 @@ interface Props {
 /** Ceiling rendered as a horizontal polygon mesh at its height, facing down. */
 export default function CeilingMesh({ ceiling, isSelected }: Props) {
   const customColors = usePaintStore((s) => s.customColors);
+
+  const pbrMaterial = useMemo(() => {
+    if (!ceiling.surfaceMaterialId) return null;
+    const mat = SURFACE_MATERIALS[ceiling.surfaceMaterialId];
+    return mat?.pbr ? { mat, pbr: mat.pbr } : null;
+  }, [ceiling.surfaceMaterialId]);
+
+  const bbox = useMemo(() => {
+    if (ceiling.points.length === 0) return { w: 1, l: 1 };
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (const p of ceiling.points) {
+      if (p.x < minX) minX = p.x;
+      if (p.x > maxX) maxX = p.x;
+      if (p.y < minY) minY = p.y;
+      if (p.y > maxY) maxY = p.y;
+    }
+    return { w: Math.max(0.1, maxX - minX), l: Math.max(0.1, maxY - minY) };
+  }, [ceiling.points]);
+
   const geometry = useMemo(() => {
     const shape = new THREE.Shape();
     if (ceiling.points.length === 0) return new THREE.ShapeGeometry(shape);
@@ -53,14 +73,32 @@ export default function CeilingMesh({ ceiling, isSelected }: Props) {
       position={[0, ceiling.height, 0]}
       receiveShadow
     >
-      <meshStandardMaterial
-        color={color}
-        side={THREE.DoubleSide}
-        roughness={roughness}
-        metalness={0}
-        emissive={isSelected ? "#7c5bf0" : "#000000"}
-        emissiveIntensity={isSelected ? 0.2 : 0}
-      />
+      {pbrMaterial ? (
+        <PbrSurface
+          pbr={pbrMaterial.pbr}
+          widthFt={bbox.w}
+          lengthFt={bbox.l}
+          fallback={
+            <meshStandardMaterial
+              color={pbrMaterial.mat.color}
+              side={THREE.DoubleSide}
+              roughness={pbrMaterial.mat.roughness}
+              metalness={0}
+              emissive={isSelected ? "#7c5bf0" : "#000000"}
+              emissiveIntensity={isSelected ? 0.2 : 0}
+            />
+          }
+        />
+      ) : (
+        <meshStandardMaterial
+          color={color}
+          side={THREE.DoubleSide}
+          roughness={roughness}
+          metalness={0}
+          emissive={isSelected ? "#7c5bf0" : "#000000"}
+          emissiveIntensity={isSelected ? 0.2 : 0}
+        />
+      )}
     </mesh>
   );
 }
