@@ -33,6 +33,7 @@ import { computeLabelPx, hitTestDimLabel, validateInput } from "./dimensionEdito
 import { closestPointOnWall, distance, formatFeet } from "@/lib/geometry";
 import { WainscotPopover } from "@/components/WainscotPopover";
 import { FloatingSelectionToolbar } from "@/components/ui/FloatingSelectionToolbar";
+import { GestureChip } from "@/components/ui/GestureChip";
 import type { WallSide } from "@/types/cad";
 import type { Product } from "@/types/product";
 
@@ -541,6 +542,8 @@ export default function FabricCanvas({ productLibrary }: Props) {
       )}
       {/* Phase 33 GH #85 — floating toolbar anchors to selection bbox (D-10/D-12). */}
       <FloatingSelectionToolbar fc={fcRef.current} wrapperRef={wrapperRef} />
+      {/* Phase 33 GH #86 — persistent gesture hint chip (2D variant). */}
+      <GestureChip mode="2d" />
     </div>
   );
 }
