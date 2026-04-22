@@ -56,7 +56,7 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
   return (
     <aside className="w-64 shrink-0 bg-obsidian-low flex flex-col overflow-hidden">
       {/* Sidebar header with collapse button */}
-      <div className="flex items-center justify-between px-4 pt-3 pb-2">
+      <div className="flex items-center justify-between px-4 pt-2 pb-2">
         <span className="font-mono text-sm font-medium text-text-muted">Panels</span>
         <button
           onClick={toggleSidebar}

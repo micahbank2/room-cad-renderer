@@ -48,7 +48,7 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
           <Tooltip content="Change floor plan / upload reference image" placement="bottom">
             <button
               onClick={onFloorPlanClick}
-              className="flex items-center gap-1.5 font-mono text-sm font-normal px-3 py-1 text-text-dim hover:text-accent-light transition-colors duration-150"
+              className="flex items-center gap-1.5 font-mono text-sm font-normal px-2 py-1 text-text-dim hover:text-accent-light transition-colors duration-150"
             >
               <span className="material-symbols-outlined text-[14px]">grid_view</span>
               Floor plan
@@ -61,7 +61,7 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
             <button
               key={mode}
               onClick={() => onViewChange(mode)}
-              className={`font-mono text-sm font-normal px-3 py-1 transition-colors duration-150 ${
+              className={`font-mono text-sm font-normal px-2 py-1 transition-colors duration-150 ${
                 viewMode === mode
                   ? "text-accent-light border-b-2 border-accent"
                   : "text-text-dim hover:text-accent-light"
@@ -81,7 +81,7 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
         >
           <button
             onClick={toggleCameraMode}
-            className={`flex items-center gap-1.5 font-mono text-sm font-normal px-3 py-1 transition-colors duration-150 mr-6 ${
+            className={`flex items-center gap-1.5 font-mono text-sm font-normal px-2 py-1 transition-colors duration-150 mr-6 ${
               cameraMode === "walk"
                 ? "text-accent-light border-b-2 border-accent"
                 : "text-text-dim hover:text-accent-light"
@@ -97,7 +97,7 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
       <div className="flex-1" />
 
       {/* Right actions */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <Tooltip content="Undo" shortcut="Ctrl+Z" placement="bottom">
           <button
             onClick={undo}
@@ -132,7 +132,7 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
               }
               exportRenderedImage();
             }}
-            className="font-mono text-sm font-normal px-3 py-1 border border-accent text-accent hover:bg-accent/10 transition-colors rounded-sm"
+            className="font-mono text-sm font-normal px-4 py-1 border border-accent text-accent hover:bg-accent/10 transition-colors rounded-sm"
             aria-label="Export"
           >
             Export
