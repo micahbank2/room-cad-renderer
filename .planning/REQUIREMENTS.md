@@ -103,18 +103,18 @@ source: resumes v1.7 3D Realism track + promotes Phase 999.2 backlog
 
 ## Traceability
 
-Phase → requirement mapping will be filled by `/gsd:plan-phase` when the roadmap is generated and approved.
+Phase → requirement mapping. Plan column filled by `/gsd:plan-phase` when each phase is planned.
 
 | Requirement | Phase | Plan(s) |
 | ----------- | ----- | ------- |
-| LIB-06 | — | — |
-| LIB-07 | — | — |
-| LIB-08 | — | — |
-| CAM-01 | — | — |
-| CAM-02 | — | — |
-| CAM-03 | — | — |
-| VIZ-10 | — | — |
-| DEBT-01 | — | — |
-| DEBT-02 | — | — |
-| DEBT-03 | — | — |
-| DEBT-04 | — | — |
+| LIB-06 | Phase 34 | TBD |
+| LIB-07 | Phase 34 | TBD |
+| LIB-08 | Phase 34 | TBD |
+| CAM-01 | Phase 35 | TBD |
+| CAM-02 | Phase 35 | TBD |
+| CAM-03 | Phase 35 | TBD |
+| VIZ-10 | Phase 36 | TBD |
+| DEBT-01 | Phase 37 | TBD |
+| DEBT-02 | Phase 37 | TBD |
+| DEBT-03 | Phase 37 | TBD |
+| DEBT-04 | Phase 37 | TBD |
