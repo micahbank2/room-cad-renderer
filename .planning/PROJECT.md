@@ -30,18 +30,23 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 See `.planning/ROADMAP.md` for links to each milestone archive.
 
-## Next Milestone Goals
+## Current Milestone: v1.8 3D Realism Completion
 
-**v1.7.5 Design System & UI Polish shipped 2026-04-22.** Next milestone is TBD — start with `/gsd:new-milestone` to scope.
+**Goal:** Close the v1.7 3D Realism story that Phase 32 opened — Jessica can upload photos of real surfaces she's considering, switch camera angles instantly, and never see textures vanish on view toggle. The "SEEING" side of Core Value reaches parity with the 2D editing side.
 
-**Likely candidates** (prioritized by existing GH issues / deferred work):
+**Target features:**
+- **User-uploaded textures (#47 → LIB-06/07/08)** — Drop/pick JPEG/PNG/WebP → name + real-world tile size → applies to walls/floors/ceilings. MIME whitelist rejects SVG/GIF. 2048px downscale before persistence. SHA-256 dedup to single IDB entry. Snapshots reference by `userTextureId` only (zero Blobs / data-URLs in snapshot JSON). Orphan-fallback on delete (surface falls back to base hex color, no crash).
+- **Camera presets (#45 → CAM-01/02/03)** — Eye-level (5.5 ft) / top-down (Y = 1.5× max(roomW, roomL)) / 3-quarter / corner via toolbar buttons + `1/2/3/4` hotkeys. ~600ms ease-in-out tween. `activeElement` guard (hotkeys inert while typing). No undo history / autosave pollution on preset switches. Mid-tween switch cancels cleanly.
+- **Tech-debt sweep (DEBT-01..04)** — Close GH #44/#46/#50/#60 with PR references. Delete orphan `src/components/SaveIndicator.tsx`. Finish `effectiveDimensions` → `resolveEffectiveDims` migration (no `PlacedProduct` / `PlacedCustomElement` call sites using legacy resolver). Backfill Phase 29 SUMMARY frontmatter with `EDIT-20, EDIT-21`.
+- **Wallpaper/wallArt 2D↔3D regression investigation (Phase 999.2 promotion)** — Build Playwright instrumentation harness capturing first-mount-upload → unmount → second-mount-attempt → pixel-diff sequence. Identify root cause before any 4th speculative fix (3 prior attempts in Phase 32 Plans 05/06/07 did not resolve). May land as Phase 34's first task or as a separate Phase 37 — decided in plan-phase based on what instrumentation reveals.
 
-1. **Complete v1.7 3D Realism** — Phase 34 User-Uploaded Textures (LIB-06/07/08), Phase 35 Camera Presets (CAM-01/02/03), Phase 36 Tech-Debt Sweep (DEBT-01..04). Phase 32 PBR Foundation already shipped.
-2. **Library surface migration follow-ups** (GH #89 deferred) — migrate WainscotLibrary, Paint/Material picker, FramedArt library onto the shared `LibraryCard` + `CategoryTabs` primitives from Phase 33. Three separate PRs or one consolidated polish phase.
-3. **Phase 999.2 regression fix** (backlog) — uploaded-image wallpaper + wallArt disappear after 2D↔3D toggle; requires Playwright instrumentation harness before a fourth speculative fix.
-4. **Phase 999.1** (backlog) — ceiling resize handles (extend Phase 31 pattern to customElements with `kind: "ceiling"`).
+**Phase numbering:** continues from 33. Next `/gsd:plan-phase` = 34. Estimated 3–4 phases (34/35/36, optional 37).
 
-**Why this milestone selection matters:** Core Value is "Jessica can SEE her future room with her actual furniture before spending money." v1.0–v1.6 delivered 2D editing + persistence; v1.7.5 closed the visual quality gap to peer-grade chrome; v1.7 remainder finishes the 3D realism story (PBR textures + user uploads + camera presets) that compounds directly on the foundations now in place.
+**Out of v1.8:** GLTF/OBJ upload (#29 — Out of Scope per PROJECT), cloud sync (#30 — Out of Scope), R3F v9 / React 19 (#56 — deferred per D-02, GH #56). Library follow-ups under GH #89 deferred to polish cycle. Phase 999.1 (ceiling resize handles) deferred.
+
+**Reused foundations from Phase 32:** color-space helper (`sRGBColorSpace` / `NoColorSpace` discipline), refcount-based dispose API, per-mesh `<Suspense>` + `<ErrorBoundary>` pattern, R3F v8 / drei v9 / React 18 lock.
+
+**Why this milestone, why now:** Core Value is "Jessica can SEE her future room with her actual furniture before spending money." v1.0–v1.6 delivered 2D editing + persistence; v1.7.5 closed the visual quality gap; v1.8 finishes the 3D realism story that compounds directly on every prior milestone's work. User-uploaded textures in particular close the last remaining Core-Value gap — letting Jessica see HER actual materials, not just bundled presets.
 
 ## Target User
 
