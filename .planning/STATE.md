@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: 3D Realism Completion
-status: Phase 34 Plan 03 complete — 3D render integration shipped; phase ready for verification
-stopped_at: Completed Phase 34 Plan 03 — userTextureCache (non-disposing VIZ-10-safe) + useUserTexture hook + 3 mesh branches + 31 new tests green
-last_updated: "2026-04-22T19:55:00.000Z"
-last_activity: "2026-04-22 — Plan 34-03 complete (3 tasks, 31 new tests passing, LIB-08 snapshot purity verified, VIZ-10 regression guard in place, Wave 3 final plan of Phase 34)"
+status: Phase 34 COMPLETE — verification PASS 8/8; LIB-06 / LIB-07 / LIB-08 delivered
+stopped_at: Phase 34 User-Uploaded Textures complete; ready for Phase 35 (Camera Presets)
+last_updated: "2026-04-22T20:10:00.000Z"
+last_activity: "2026-04-22 — Phase 34 verified (107/107 phase tests green, VIZ-10 guard installed, snapshot purity asserted); VERIFICATION.md written"
 progress:
   total_phases: 1
   completed_phases: 1
@@ -20,15 +20,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-22 — v1.8 3D Realism Completion started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Milestone v1.8 — Phase 34 (User-Uploaded Textures) execution COMPLETE (all 4 plans shipped); phase verification next
+**Current focus:** Milestone v1.8 — Phase 34 shipped and verified. Next up: Phase 35 (Camera Presets) or Phase 36 (VIZ-10 regression), either runnable next per roadmap sequencing notes.
 
 ## Current Position
 
 Milestone: v1.8 3D Realism Completion
-Phase: 34 User-Uploaded Textures
-Plan: 00-data-layer — COMPLETE; 01-upload-modal — COMPLETE; 02-picker-integration — COMPLETE; 03-render-integration — COMPLETE
-Status: All waves complete; Phase 34 verifier ready to run next
-Last activity: 2026-04-22 — Plan 34-03 shipped (userTextureCache non-disposing VIZ-10-safe, useUserTexture hook, Wall/Floor/CeilingMesh branches with orphan fallback, LIB-08 snapshot purity verified, 31 new tests green)
+Phase: 34 User-Uploaded Textures — COMPLETE (2026-04-22)
+Plan: all 4 plans shipped (34-00 data / 34-01 modal / 34-02 picker / 34-03 render)
+Status: Phase 34 verification PASS 8/8; LIB-06 / LIB-07 / LIB-08 delivered; ready for Phase 35 (Camera Presets)
+Last activity: 2026-04-22 — Phase 34 verifier passed (107/107 Phase 34 tests, VIZ-10 guard installed, LIB-08 snapshot purity asserted); VERIFICATION.md written
 
 Completed milestones: v1.0, v1.1, v1.2, v1.3, v1.4, v1.5, v1.6, v1.7.5 (all archived in `.planning/milestones/`)
 Partial: v1.7 3D Realism — Phase 32 PBR Foundation shipped 2026-04-21; remainder absorbed into v1.8 as Phases 34–37
@@ -64,8 +64,8 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 
 ### Pending Todos
 
-- Phase 34 verifier next — all 4 plans complete (00 + 01 + 02 + 03)
-- Phase 36 should run EARLY (parallel to Phase 34 or immediately after) — do NOT save for end
+- Phase 35 (Camera Presets) OR Phase 36 (VIZ-10 regression) — either can run next per roadmap
+- Phase 36 should run EARLY (instrumentation-first) — do NOT save for end
 - Phase 37 (Tech-Debt Sweep) sequenced LAST; cuttable under scope pressure
 
 ### Open Blockers/Concerns
@@ -82,6 +82,6 @@ None. Roadmap approved, traceability complete (11/11), ready to plan Phase 34.
 
 ## Session Continuity
 
-Last session: 2026-04-22T19:55:00.000Z
-Stopped at: Completed Phase 34 Plan 03 — all 4 plans of Phase 34 shipped; phase verifier ready
-Resume file: .planning/phases/34-user-uploaded-textures/ (phase verifier should run next)
+Last session: 2026-04-22T20:10:00.000Z
+Stopped at: Phase 34 complete and verified (PASS 8/8); ready for Phase 35 or 36
+Resume file: .planning/ROADMAP.md (next phase selection)
