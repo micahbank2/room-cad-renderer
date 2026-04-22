@@ -17,6 +17,11 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
     updateCeiling(ceilingId, { paintId, surfaceMaterialId: undefined });
   };
 
+  // Phase 34 — apply a user-uploaded texture to this ceiling.
+  const handleCeilingUserTexture = (id: string) => {
+    updateCeiling(ceilingId, { userTextureId: id, surfaceMaterialId: undefined });
+  };
+
   const handleToggleLimeWash = (checked: boolean) => {
     if (!ceiling.paintId) return;
     updateCeiling(ceilingId, { limeWash: checked });
@@ -40,6 +45,8 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
         surface="ceiling"
         activeId={ceiling.surfaceMaterialId}
         onSelect={(id) => setCeilingSurfaceMaterial(ceilingId, id)}
+        onSelectUserTexture={handleCeilingUserTexture}
+        selectedUserTextureId={ceiling.userTextureId}
       />
 
       {hasMaterial && (

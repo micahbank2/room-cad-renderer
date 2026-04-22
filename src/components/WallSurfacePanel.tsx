@@ -4,10 +4,13 @@ import { useUIStore } from "@/stores/uiStore";
 import { angle } from "@/lib/geometry";
 import { useFramedArtStore } from "@/stores/framedArtStore";
 import { useWainscotStyleStore } from "@/stores/wainscotStyleStore";
+import { useUserTextures } from "@/hooks/useUserTextures";
 import type { Wallpaper } from "@/types/cad";
 import { FRAME_PRESETS } from "@/types/framedArt";
 import { STYLE_META } from "@/types/wainscotStyle";
 import PaintSection from "./PaintSection";
+import { CategoryTabs, type CategoryTab } from "@/components/library/CategoryTabs";
+import { MyTexturesList } from "@/components/MyTexturesList";
 
 /** Appears in PropertiesPanel when exactly one wall is selected. */
 export default function WallSurfacePanel() {
@@ -28,6 +31,9 @@ export default function WallSurfacePanel() {
   const framedArtItems = useFramedArtStore((s) => s.items);
   const wainscotStyles = useWainscotStyleStore((s) => s.items);
   const [showLibrary, setShowLibrary] = useState(false);
+  // Phase 34 — WALLPAPER source tab (presets/upload vs MY TEXTURES).
+  const { textures: userTextures } = useUserTextures();
+  const [wallpaperTab, setWallpaperTab] = useState<string>("presets");
 
   // Detect which side faces the room interior (centroid of all wall endpoints)
   const interiorSide = useMemo(() => {
@@ -94,6 +100,25 @@ export default function WallSurfacePanel() {
     const newScale = (wp.scaleFt ?? 0) > 0 ? 0 : 2;
     setWallpaper(wall.id, activeSide, { ...wp, scaleFt: newScale });
   };
+
+  // Phase 34 — apply a user-uploaded texture as wallpaper on the active side.
+  const handleWallpaperUserTexture = (id: string, tileSizeFt: number) => {
+    const material: Wallpaper = {
+      kind: "pattern",
+      userTextureId: id,
+      scaleFt: tileSizeFt,
+    };
+    setWallpaper(wall.id, activeSide, material);
+  };
+
+  const wallpaperTabs: CategoryTab[] = [
+    { id: "presets", label: "PRESETS" },
+    {
+      id: "my-textures",
+      label: "MY TEXTURES",
+      count: userTextures.length > 0 ? userTextures.length : undefined,
+    },
+  ];
 
   const handleAddArt = (file: File) => {
     if (!file.type.startsWith("image/")) return;
@@ -172,7 +197,18 @@ export default function WallSurfacePanel() {
       {/* Wallpaper */}
       <div>
         <div className="font-mono text-[11px] text-text-dim mb-1">WALLPAPER</div>
-        <div className="flex items-center gap-2">
+        <CategoryTabs
+          tabs={wallpaperTabs}
+          activeId={wallpaperTab}
+          onChange={setWallpaperTab}
+        />
+        {wallpaperTab === "my-textures" ? (
+          <MyTexturesList
+            selectedId={wp?.kind === "pattern" ? wp.userTextureId : undefined}
+            onSelect={handleWallpaperUserTexture}
+          />
+        ) : (
+        <div className="flex items-center gap-2 mt-1">
           <input
             type="color"
             value={wp?.color ?? "#f8f5ef"}
@@ -195,6 +231,7 @@ export default function WallSurfacePanel() {
             </button>
           )}
         </div>
+        )}
         <input
           ref={wallpaperFileRef}
           type="file"

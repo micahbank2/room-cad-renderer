@@ -42,7 +42,10 @@ export interface Wallpaper {
   color?: string; // when kind="color"
   paintId?: string; // when kind="paint" — FK into F&B catalog or custom paints
   limeWash?: boolean; // per-placement lime wash toggle
-  imageUrl?: string; // when kind="pattern" (data URL)
+  imageUrl?: string; // when kind="pattern" (data URL) — legacy backward-compat
+  /** Phase 34 (LIB-06/08): id of a UserTexture in the `room-cad-user-textures`
+   *  IDB keyspace. When present, takes priority over `imageUrl` at render. */
+  userTextureId?: string;
   scaleFt?: number; // pattern repeat distance, default 2
 }
 
@@ -138,14 +141,20 @@ export interface Ceiling {
   limeWash?: boolean;
   /** Surface material preset FK into SURFACE_MATERIALS catalog (Phase 20). */
   surfaceMaterialId?: string;
+  /** Phase 34 (LIB-06/08): id of a UserTexture in the `room-cad-user-textures`
+   *  IDB keyspace. When present, takes priority over `surfaceMaterialId` at render. */
+  userTextureId?: string;
 }
 
 export interface FloorMaterial {
-  kind: "preset" | "custom";
+  kind: "preset" | "custom" | "user-texture";
   /** Present when kind === "preset". From FLOOR_PRESET_IDS. */
   presetId?: string;
-  /** Present when kind === "custom". Data URL. */
+  /** Present when kind === "custom". Data URL — legacy backward-compat. */
   imageUrl?: string;
+  /** Phase 34 (LIB-06/08): present when kind === "user-texture". Id of a
+   *  UserTexture in the `room-cad-user-textures` IDB keyspace. */
+  userTextureId?: string;
   /** Texture tile repeat distance in feet (e.g. 2 = pattern repeats every 2ft). */
   scaleFt: number;
   /** Texture rotation in degrees. */

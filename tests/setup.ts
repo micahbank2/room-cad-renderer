@@ -1,5 +1,13 @@
 import "@testing-library/jest-dom";
 
+// Phase 34 Plan 00 — Task 2: happy-dom does not implement IndexedDB natively.
+// Install fake-indexeddb globally so idb-keyval tests (userTextureStore, etc.)
+// can exercise real IDB semantics (named stores, get/set/del/values) without
+// mocking every call site. Safe to import unconditionally — existing tests
+// that mock idb-keyval via vi.mock("idb-keyval") still work; tests that do
+// NOT mock now get a working indexedDB shim.
+import "fake-indexeddb/auto";
+
 // jsdom does not implement HTMLCanvasElement 2D context — stub a minimal one so
 // modules that draw to a canvas (e.g., procedural texture generators) can run in tests.
 if (typeof HTMLCanvasElement !== "undefined" && !HTMLCanvasElement.prototype.getContext) {

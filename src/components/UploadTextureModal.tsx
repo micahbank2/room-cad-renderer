@@ -1,0 +1,477 @@
+/**
+ * Phase 34 — UploadTextureModal (LIB-06/07).
+ *
+ * Dual-mode modal used for both new-upload (mode="create") and catalog-edit
+ * (mode="edit") flows per D-11. The create flow runs a File through
+ * `processTextureFile` (MIME gate + 2048px downscale + SHA-256) and persists
+ * via `useUserTextures().save(...)`. The edit flow only mutates metadata
+ * (name + tileSizeFt) via `useUserTextures().update(id, {...})`.
+ *
+ * Copy source-of-truth: 34-UI-SPEC.md §1 Copywriting Contract. Every string
+ * in this file is load-bearing — grep-verified at plan acceptance.
+ *
+ * Design system: D-33 (lucide-react icons only, no material-symbols),
+ * D-34 (canonical spacing tokens only), D-39 (useReducedMotion() guard on
+ * open-fade + spinner).
+ *
+ * Test driver (gated by import.meta.env.MODE === "test"):
+ *   `window.__driveTextureUpload(file, name, tileSizeFt)` runs the full
+ *   persistence path (processTextureFile + saveUserTextureWithDedup) without
+ *   mounting the modal — happy-dom cannot simulate a real file-input click
+ *   round-trip cleanly, so tests exercise the modal UI separately from
+ *   end-to-end persistence via this bridge.
+ */
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { X, Upload, Loader2 } from "lucide-react";
+import { useUserTextures } from "@/hooks/useUserTextures";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { validateInput } from "@/canvas/dimensionEditor";
+import { formatFeet } from "@/lib/geometry";
+import {
+  processTextureFile,
+  ProcessTextureError,
+  type ProcessTextureResult,
+} from "@/lib/processTextureFile";
+import type { UserTexture } from "@/types/userTexture";
+
+// ---- Locked copy (UI-SPEC §Copywriting Contract) --------------------------
+const COPY = {
+  headingCreate: "UPLOAD TEXTURE",
+  headingEdit: "EDIT TEXTURE",
+  ctaCreate: "Upload Texture",
+  ctaEdit: "Save Changes",
+  ctaDiscard: "Discard",
+  progressCreate: "Uploading\u2026",
+  progressEdit: "Saving Changes\u2026",
+  dropInvite: "Drag and drop a photo, or click to browse.",
+  tileHelper: "Real-world repeat (e.g. 2'6\")",
+  mimeError: "Only JPEG, PNG, and WebP are supported.",
+  decodeError: "This file couldn't be processed. Try a different image.",
+  tileError: "Enter a valid size like 2', 1'6\", or 0.5",
+  nameError: "Name is required.",
+  toastSaved: "Texture saved.",
+  closeAria: "Close upload dialog",
+} as const;
+
+// Sonner is not yet installed in this project. Surface a minimal toast shim so
+// swapping to the real `sonner` import later is a one-line change. Keeps the
+// locked success copy centralized at the call site.
+function toastSuccess(msg: string) {
+  if (typeof window !== "undefined") {
+    // eslint-disable-next-line no-console
+    console.info(`[toast] ${msg}`);
+  }
+}
+
+export interface UploadTextureModalProps {
+  open: boolean;
+  mode: "create" | "edit";
+  /** Required when mode="edit" — pre-fills name + tileSizeFt. */
+  existing?: UserTexture;
+  onClose: () => void;
+  /** Fires with the saved UserTexture id after a successful save. */
+  onSaved?: (id: string) => void;
+}
+
+export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element | null {
+  const { open, mode, existing, onClose, onSaved } = props;
+  const reducedMotion = useReducedMotion();
+  const { save, update } = useUserTextures();
+
+  // ---- Form state ---------------------------------------------------------
+  const [name, setName] = useState<string>(() => existing?.name ?? "");
+  const [rawTileSize, setRawTileSize] = useState<string>(() =>
+    existing ? formatFeet(existing.tileSizeFt) : "2'",
+  );
+  const [tileSizeError, setTileSizeError] = useState<string | null>(null);
+  const [pipelineResult, setPipelineResult] = useState<ProcessTextureResult | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [processing, setProcessing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const nameRef = useRef<HTMLInputElement | null>(null);
+
+  // Reset transient state when the modal opens so stale fileError /
+  // pipelineResult from a prior session never leaks across open/close cycles.
+  useEffect(() => {
+    if (!open) return;
+    setName(existing?.name ?? "");
+    setRawTileSize(existing ? formatFeet(existing.tileSizeFt) : "2'");
+    setTileSizeError(null);
+    setPipelineResult(null);
+    setFileError(null);
+    setProcessing(false);
+    setSaving(false);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
+    // `previewUrl` intentionally excluded to avoid a revoke/create loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, existing]);
+
+  // Edit-mode autoFocus (create mode's focal point is the drop zone).
+  useEffect(() => {
+    if (!open) return;
+    if (mode !== "edit") return;
+    nameRef.current?.focus();
+  }, [open, mode]);
+
+  // Escape key -> Discard.
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [open, onClose]);
+
+  // Revoke preview object URL on unmount.
+  useEffect(
+    () => () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    },
+    [previewUrl],
+  );
+
+  // ---- Validation --------------------------------------------------------
+  const parsedTileSize = useMemo(() => validateInput(rawTileSize), [rawTileSize]);
+  const nameTrimmed = name.trim();
+
+  const unchangedInEditMode =
+    mode === "edit" &&
+    existing !== undefined &&
+    nameTrimmed === existing.name &&
+    parsedTileSize !== null &&
+    Math.abs(parsedTileSize - existing.tileSizeFt) < 1e-6;
+
+  const primaryDisabled =
+    saving ||
+    processing ||
+    nameTrimmed.length === 0 ||
+    parsedTileSize === null ||
+    (mode === "create" && !pipelineResult) ||
+    unchangedInEditMode;
+
+  // ---- File selection -----------------------------------------------------
+  const handleFile = useCallback(async (file: File) => {
+    setFileError(null);
+    setProcessing(true);
+    try {
+      const result = await processTextureFile(file);
+      setPipelineResult(result);
+      // Replace any prior preview URL.
+      setPreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return URL.createObjectURL(result.blob);
+      });
+    } catch (err) {
+      setPipelineResult(null);
+      setPreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+      if (err instanceof ProcessTextureError) {
+        setFileError(err.message);
+      } else {
+        setFileError(COPY.decodeError);
+      }
+    } finally {
+      setProcessing(false);
+    }
+  }, []);
+
+  const openFilePicker = useCallback(() => {
+    fileRef.current?.click();
+  }, []);
+
+  const onInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const f = e.target.files?.[0];
+      if (f) void handleFile(f);
+    },
+    [handleFile],
+  );
+
+  const onDrop = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setDragOver(false);
+      const f = e.dataTransfer.files?.[0];
+      if (f) void handleFile(f);
+    },
+    [handleFile],
+  );
+
+  // ---- Submit handlers ----------------------------------------------------
+  const handleTileSizeBlur = useCallback(() => {
+    setTileSizeError(validateInput(rawTileSize) === null ? COPY.tileError : null);
+  }, [rawTileSize]);
+
+  const submit = useCallback(async () => {
+    if (primaryDisabled) return;
+    const tileFt = parsedTileSize!;
+    if (mode === "create") {
+      if (!pipelineResult) return;
+      setSaving(true);
+      try {
+        const id = await save(
+          {
+            name: nameTrimmed,
+            tileSizeFt: tileFt,
+            blob: pipelineResult.blob,
+            mimeType: pipelineResult.mimeType,
+          },
+          pipelineResult.sha256,
+        );
+        toastSuccess(COPY.toastSaved);
+        onSaved?.(id);
+        onClose();
+      } finally {
+        setSaving(false);
+      }
+    } else {
+      if (!existing) return;
+      setSaving(true);
+      try {
+        await update(existing.id, { name: nameTrimmed, tileSizeFt: tileFt });
+        toastSuccess(COPY.toastSaved);
+        onSaved?.(existing.id);
+        onClose();
+      } finally {
+        setSaving(false);
+      }
+    }
+  }, [
+    primaryDisabled,
+    parsedTileSize,
+    mode,
+    pipelineResult,
+    save,
+    nameTrimmed,
+    onSaved,
+    onClose,
+    existing,
+    update,
+  ]);
+
+  if (!open) return null;
+
+  // D-39: Skip open/close + spinner motion under prefers-reduced-motion.
+  const surfaceTransition = reducedMotion
+    ? ""
+    : " transition-[opacity,transform] duration-150 ease-out";
+  const spinnerClass = reducedMotion ? "size-4" : "size-4 animate-spin";
+
+  const heading = mode === "create" ? COPY.headingCreate : COPY.headingEdit;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop — click = Discard */}
+      <div
+        className="absolute inset-0 bg-obsidian-deepest/80 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Surface */}
+      <div
+        className={`relative w-[520px] bg-obsidian-mid/90 backdrop-blur-xl border border-outline-variant/20 rounded-sm shadow-2xl${surfaceTransition}`}
+        role="dialog"
+        aria-modal="true"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 pb-4">
+          <h2 className="font-mono text-base font-medium uppercase tracking-widest text-text-primary">
+            {heading}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close upload dialog"
+            className="text-text-ghost hover:text-text-primary transition-colors"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="p-6 pt-0 flex flex-col gap-4">
+          {mode === "create" && (
+            <>
+              {pipelineResult && previewUrl ? (
+                <div className="flex flex-col gap-2">
+                  <img
+                    src={previewUrl}
+                    alt="Texture preview"
+                    className="w-40 h-30 rounded-sm border border-outline-variant/20 object-cover"
+                    style={{ width: 160, height: 120 }}
+                  />
+                  <button
+                    type="button"
+                    onClick={openFilePicker}
+                    className="text-accent text-[11px] font-mono text-left hover:text-accent-light"
+                  >
+                    Change
+                  </button>
+                </div>
+              ) : (
+                <div
+                  onClick={openFilePicker}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragOver(true);
+                  }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={onDrop}
+                  className={`rounded-md border-2 border-dashed p-8 flex flex-col items-center gap-2 cursor-pointer transition-colors ${
+                    dragOver
+                      ? "border-accent bg-accent/5"
+                      : "border-outline-variant/40 bg-obsidian-low"
+                  }`}
+                >
+                  <Upload
+                    className={`size-6 ${dragOver ? "text-accent" : "text-text-dim"}`}
+                  />
+                  <p className="font-body text-sm text-text-muted">
+                    {COPY.dropInvite}
+                  </p>
+                </div>
+              )}
+
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={onInputChange}
+                className="hidden"
+              />
+
+              {fileError && (
+                <p className="font-mono text-[11px] text-error">{fileError}</p>
+              )}
+            </>
+          )}
+
+          {/* Name field */}
+          <div className="flex flex-col gap-1">
+            <label
+              htmlFor="utex-name"
+              className={`font-mono text-sm font-medium uppercase tracking-wide ${
+                mode === "edit" ? "text-text-primary" : "text-text-dim"
+              }`}
+            >
+              NAME
+            </label>
+            <input
+              id="utex-name"
+              ref={nameRef}
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Oak Floor"
+              maxLength={40}
+              autoFocus={mode === "edit"}
+              className="bg-obsidian-low border border-outline-variant/20 rounded-sm px-2 py-1 text-sm font-mono text-text-primary w-full placeholder:text-text-ghost"
+            />
+          </div>
+
+          {/* Tile size field */}
+          <div className="flex flex-col gap-1">
+            <label
+              htmlFor="utex-tile-size"
+              className="font-mono text-sm font-medium uppercase tracking-wide text-text-dim"
+            >
+              TILE SIZE
+            </label>
+            <p className="font-body text-[11px] text-text-ghost">
+              {COPY.tileHelper}
+            </p>
+            <input
+              id="utex-tile-size"
+              type="text"
+              value={rawTileSize}
+              onChange={(e) => {
+                setRawTileSize(e.target.value);
+                if (tileSizeError) setTileSizeError(null);
+              }}
+              onBlur={handleTileSizeBlur}
+              placeholder="2'"
+              className={`bg-obsidian-low border rounded-sm px-2 py-1 text-sm font-mono text-text-primary w-full placeholder:text-text-ghost ${
+                tileSizeError ? "border-error" : "border-outline-variant/20"
+              }`}
+            />
+            {tileSizeError && (
+              <p className="font-mono text-[11px] text-error">{tileSizeError}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex justify-end gap-2 p-6 pt-4">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={saving}
+            className="rounded-sm px-4 py-1 font-mono text-sm text-text-muted hover:text-text-primary bg-obsidian-high hover:bg-obsidian-highest border border-outline-variant/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ minHeight: 44 }}
+          >
+            <span>Discard</span>
+          </button>
+          <button
+            type="button"
+            onClick={submit}
+            disabled={primaryDisabled}
+            className="rounded-sm px-4 py-1 font-mono text-sm text-text-primary bg-accent hover:bg-accent/90 border-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            style={{ minHeight: 44 }}
+          >
+            {saving || processing ? (
+              <>
+                <Loader2 className={spinnerClass} />
+                {mode === "create" ? (
+                  <span>Uploading…</span>
+                ) : (
+                  <span>Saving Changes…</span>
+                )}
+              </>
+            ) : mode === "create" ? (
+              <span>Upload Texture</span>
+            ) : (
+              <span>Save Changes</span>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default UploadTextureModal;
+
+// ---- Test driver (Phase 29/30/31 pattern) ---------------------------------
+// Bypasses the React tree so vitest cases can exercise the persistence path
+// end-to-end without simulating drag-drop or file-input events (happy-dom
+// cannot synthesize a real `change` event against a native <input type="file">
+// with `.files` populated in a way that satisfies React's controlled-input
+// contract). Returns the saved id (or dedup id).
+if (typeof window !== "undefined" && import.meta.env.MODE === "test") {
+  (window as unknown as {
+    __driveTextureUpload: (file: File, name: string, tileSizeFt: number) => Promise<string>;
+  }).__driveTextureUpload = async (file, textureName, tileSizeFt) => {
+    const result = await processTextureFile(file);
+    const { saveUserTextureWithDedup } = await import("@/lib/userTextureStore");
+    const { id } = await saveUserTextureWithDedup(
+      {
+        name: textureName,
+        tileSizeFt,
+        blob: result.blob,
+        mimeType: result.mimeType,
+      },
+      result.sha256,
+    );
+    return id;
+  };
+}
