@@ -24,17 +24,17 @@ source: resumes v1.7 3D Realism track + promotes Phase 999.2 backlog
 
 ### User-Uploaded Textures (LIB)
 
-- [ ] **LIB-06** — User can upload a texture image (JPEG/PNG/WebP) via an "Upload Texture" UI, name it, specify real-world tile size in feet+inches (reusing the Phase 29 parser), and apply it to walls / floors / ceilings from the material picker.
+- [x] **LIB-06** — User can upload a texture image (JPEG/PNG/WebP) via an "Upload Texture" UI, name it, specify real-world tile size in feet+inches (reusing the Phase 29 parser), and apply it to walls / floors / ceilings from the material picker.
   - **Source:** [#47](https://github.com/micahbank2/room-cad-renderer/issues/47)
   - **Verifiable:** Drop a 1024×1024 JPEG in the upload UI → preview appears → enter "Oak Floor" + "8ft × 4ft" → Save → appears in material picker → select a floor → material applies and renders tiled correctly in 3D at stated size. Full page reload preserves the material + its floor assignment.
   - **Acceptance:** MIME whitelist (JPEG/PNG/WebP). Reuses Phase 29 feet+inches parser. Written through a dedicated `userTextureStore` (separate from bundled `SurfaceMaterial` registry).
 
-- [ ] **LIB-07** — Upload pipeline enforces a size ceiling and deduplicates identical images.
+- [x] **LIB-07** — Upload pipeline enforces a size ceiling and deduplicates identical images.
   - **Source:** [#47](https://github.com/micahbank2/room-cad-renderer/issues/47)
   - **Verifiable:** Upload a 4096×4096 PNG → it is downscaled client-side to ≤2048 px on the longest edge before persistence (verify IDB entry byte size + image dimensions). Re-upload the same bytes (even under a different name) → SHA-256 of the downscaled bytes matches → only one IDB keyspace entry exists, and the second "upload" links to the existing entry. Uploading SVG or GIF → rejected at the MIME gate with a clear user-facing error ("Only JPEG, PNG, and WebP are supported").
   - **Acceptance:** 2048 px longest-edge client-side downscale. SHA-256 content addressing for dedup. MIME whitelist rejects SVG/GIF/HEIC/BMP.
 
-- [ ] **LIB-08** — Snapshots stay small and orphan texture references don't crash projects.
+- [x] **LIB-08** — Snapshots stay small and orphan texture references don't crash projects.
   - **Source:** [#47](https://github.com/micahbank2/room-cad-renderer/issues/47)
   - **Verifiable:** After placing 5 user-uploaded-texture surfaces, `JSON.stringify(snapshot)` contains zero `data:` substrings >10 KB and zero `Blob` instances — references are `userTextureId` strings only (typical <50 bytes each). Delete a user texture from the library while a project still references it → reload that project → orphan-referenced surface falls back to its base hex color without throwing or blanking the scene; other surfaces unaffected.
   - **Acceptance:** `CADSnapshot` holds `userTextureId` references only. Blobs live in `userTextureStore` IDB keyspace (never in snapshot JSON). Orphan fallback mirrors Phase 32 missing-texture fallback (base hex color).

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: 3D Realism Completion
-status: Phase 34 Plan 02 complete — MY TEXTURES pickers + delete dialog shipped
-stopped_at: Completed Phase 34 Plan 02 — MyTexturesList + DeleteTextureDialog + 3 picker integrations + 22 new tests green
-last_updated: "2026-04-22T15:45:00.000Z"
-last_activity: "2026-04-22 — Plan 34-02 complete (3 tasks, 22 new tests passing, MY TEXTURES tab in floor/ceiling/wall pickers, user-texture-deleted CustomEvent contract for Plan 03)"
+status: Phase 34 Plan 03 complete — 3D render integration shipped; phase ready for verification
+stopped_at: Completed Phase 34 Plan 03 — userTextureCache (non-disposing VIZ-10-safe) + useUserTexture hook + 3 mesh branches + 31 new tests green
+last_updated: "2026-04-22T19:55:00.000Z"
+last_activity: "2026-04-22 — Plan 34-03 complete (3 tasks, 31 new tests passing, LIB-08 snapshot purity verified, VIZ-10 regression guard in place, Wave 3 final plan of Phase 34)"
 progress:
   total_phases: 1
   completed_phases: 1
   total_plans: 8
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -20,15 +20,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-22 — v1.8 3D Realism Completion started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Milestone v1.8 — Phase 34 (User-Uploaded Textures) in execution; Wave 1 (Plan 00 data layer) complete; Wave 2 (Plans 01 upload modal + 02 picker integration) next
+**Current focus:** Milestone v1.8 — Phase 34 (User-Uploaded Textures) execution COMPLETE (all 4 plans shipped); phase verification next
 
 ## Current Position
 
 Milestone: v1.8 3D Realism Completion
 Phase: 34 User-Uploaded Textures
-Plan: 00-data-layer — COMPLETE; 01-upload-modal — COMPLETE; 02-picker-integration — COMPLETE
-Status: Waves 1 + 2 complete; Plan 34-03 (Wave 3: 3D render integration + orphan fallback + user-texture-deleted cache subscription) ready to begin
-Last activity: 2026-04-22 — Plan 34-02 shipped (MyTexturesList, DeleteTextureDialog with locked D-07 copy, MY TEXTURES tab wired into floor/ceiling/wall pickers, user-texture-deleted CustomEvent contract published for Plan 03)
+Plan: 00-data-layer — COMPLETE; 01-upload-modal — COMPLETE; 02-picker-integration — COMPLETE; 03-render-integration — COMPLETE
+Status: All waves complete; Phase 34 verifier ready to run next
+Last activity: 2026-04-22 — Plan 34-03 shipped (userTextureCache non-disposing VIZ-10-safe, useUserTexture hook, Wall/Floor/CeilingMesh branches with orphan fallback, LIB-08 snapshot purity verified, 31 new tests green)
 
 Completed milestones: v1.0, v1.1, v1.2, v1.3, v1.4, v1.5, v1.6, v1.7.5 (all archived in `.planning/milestones/`)
 Partial: v1.7 3D Realism — Phase 32 PBR Foundation shipped 2026-04-21; remainder absorbed into v1.8 as Phases 34–37
@@ -56,11 +56,15 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 34 Plan 02]: MyTexturesList + DeleteTextureDialog ship the LIB-06 picker surface — MY TEXTURES tab lands in FloorMaterialPicker, SurfaceMaterialPicker (ceiling via CeilingPaintSection), and WallSurfacePanel. No cadStore action changes needed (Plan 00 widened types so setFloorMaterial/updateCeiling/setWallpaper accept userTextureId via pass-through).
 - [Phase 34 Plan 02]: DeleteTextureDialog emits window.dispatchEvent(new CustomEvent("user-texture-deleted", { detail: { id } })) after successful remove(). Plan 03 userTextureCache MUST addEventListener on "user-texture-deleted" to invalidate cached THREE.Texture entries. Contract is DOM-event-based to keep Plan 02 dependency-free from Plan 03's cache module.
 - [Phase 34 Plan 02]: Auto-fixed 6 test mocks (phase31*/snapIntegration/App.restore) to add createStore + values to idb-keyval mock — direct consequence (Rule 3 Blocking) of picker imports cascading into useUserTextures → userTextureStore. Mock additions are minimal (2 lines each).
+- [Phase 34 Plan 03]: userTextureCache mirrors the Phase 32 wallpaperTextureCache non-disposing pattern (module-level Map, never disposes on unmount). DOES NOT reuse pbrTextureCache's refcount-dispose API — that was the VIZ-10 class root cause. Enforced by tests/userTextureCache.test.tsx VIZ-10 guard + tests/userTextureSnapshot.test.ts 5x stability assertion.
+- [Phase 34 Plan 03]: CeilingMesh sources tileSizeFt via useUserTextures() catalog lookup rather than extending Ceiling schema with scaleFt. Rationale: Plan 02 picker already landed; widening Ceiling would cascade across pickers + cadStore + migration. Hook is memoized (one IDB read per mount). RESEARCH.md §H explicitly recommends this.
+- [Phase 34 Plan 03]: Mesh-contract tests use static-source regex (idiom established by tests/wallMeshDisposeContract.test.ts in Phase 32) instead of @react-three/test-renderer. R3F test renderer is not in package.json; adding it risks Phase 32 fragility. Static tests catch every known VIZ-10 mechanism (bare map={tex}, missing dispose={null}, missing import, missing branch guard).
+- [Phase 34 Plan 03]: Orphan fallback is silent per D-08/D-09 — both the IDB-miss path and the loader-error path resolve to null; meshes guard on `userTex !== null` before rendering the user-texture branch → render falls through to existing base-color / legacy / PBR paths. Zero throws, zero blank scenes.
+- [Phase 34 Plan 03]: Rule 3 auto-fix — ran `npm install --save-dev fake-indexeddb` because tests/setup.ts imports it (Plan 00 added the import and package.json entry but the worktree node_modules was out of sync; every test failed at setup resolve).
 
 ### Pending Todos
 
-- Run Plans 34-01 (upload modal) and 34-02 (picker integration) in Wave 2 (can parallelize against Plan 00's stable API surface)
-- Plan 34-03 (Wave 3: 3D render integration + orphan fallback)
+- Phase 34 verifier next — all 4 plans complete (00 + 01 + 02 + 03)
 - Phase 36 should run EARLY (parallel to Phase 34 or immediately after) — do NOT save for end
 - Phase 37 (Tech-Debt Sweep) sequenced LAST; cuttable under scope pressure
 
@@ -78,6 +82,6 @@ None. Roadmap approved, traceability complete (11/11), ready to plan Phase 34.
 
 ## Session Continuity
 
-Last session: 2026-04-22T22:30:00.000Z
-Stopped at: Completed Phase 34 Plan 00 — data layer shipped (userTextureStore + hook + countTextureRefs + schema extensions)
-Resume file: .planning/phases/34-user-uploaded-textures/34-01-upload-modal-PLAN.md
+Last session: 2026-04-22T19:55:00.000Z
+Stopped at: Completed Phase 34 Plan 03 — all 4 plans of Phase 34 shipped; phase verifier ready
+Resume file: .planning/phases/34-user-uploaded-textures/ (phase verifier should run next)
