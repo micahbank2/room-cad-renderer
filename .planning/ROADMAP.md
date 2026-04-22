@@ -9,7 +9,8 @@
 - ✅ **v1.4 Polish & Tech Debt** — Phases 21–23 (shipped 2026-04-08) — see [milestones/v1.4-ROADMAP.md](milestones/v1.4-ROADMAP.md)
 - ✅ **v1.5 Performance & Tech Debt** — Phases 24–27 (shipped 2026-04-20) — see [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
 - ✅ **v1.6 Editing UX** — Phases 28–31 (shipped 2026-04-21) — see [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
-- 🚧 **v1.7 3D Realism** — Phases 32–35 (in progress) — see below
+- 🟡 **v1.7 3D Realism** — Phase 32 shipped (2026-04-21); remaining phases (User-Uploaded Textures, Camera Presets, Tech-Debt Sweep) deferred to a future milestone
+- 🚧 **v1.7.5 Design System & UI Polish** — Phase 33 (scoping) — see below
 
 ---
 
@@ -66,18 +67,50 @@
 
 ---
 
-## v1.7 3D Realism
+## v1.7.5 Design System & UI Polish
 
-**Goal:** Make Jessica's 3D view feel like the actual room — physically-based materials replace flat-color placeholders, she can drop in textures from photos of real surfaces she's considering, and she can switch camera angles to evaluate the space from multiple vantage points.
+**Goal:** Raise the visual + interaction quality bar to match Pascal Editor-class chrome. Unify typography, collapse panel clutter, add lightweight affordances (floating selection toolbar, gesture hints, rotation presets, inline-editable titles) and normalize library card + spacing/iconography across the app. Polish only — no new capabilities.
 
-**Requirements:** 13 | **Phases:** 4 (32–35)
+**Source:** Pascal Editor competitive audit (`.planning/competitive/pascal-audit.md`) — 8 concrete polish items scoped in GH milestone [v1.7.5](https://github.com/micahbank2/room-cad-renderer/milestone/8) as issues #83–#90.
+
+**Requirements:** 8 GH issues | **Phases:** 1 (33)
+
+### Phases
+
+- [ ] **Phase 33: Design System & UI Polish** — Typography overhaul, collapsible properties sections, floating selection toolbar, canvas gesture hints, rotation preset chips, inline-editable titles, unified library card pattern, spacing + iconography consistency pass
+
+### Phase Details
+
+#### Phase 33: Design System & UI Polish
+**Goal**: Ship 8 polish items from Pascal competitive audit — the app reads as a peer-grade interior design tool (typography, collapsible properties, floating selection toolbar, gesture hints, rotation presets, inline-editable titles, unified library cards, spacing/icon consistency). No new capabilities; existing features only visually refined.
+**Depends on**: Nothing (Phase 32 independent)
+**Requirements**: GH [#83](https://github.com/micahbank2/room-cad-renderer/issues/83) through [#90](https://github.com/micahbank2/room-cad-renderer/issues/90) — all 8 issues in milestone [v1.7.5](https://github.com/micahbank2/room-cad-renderer/milestone/8)
+**Success Criteria** (what must be TRUE):
+  1. #83 — Typography: mixed-case hierarchy replaces blanket UPPERCASE in headers/buttons/labels; monospace reserved for values + identifiers; hierarchy has at least 3 visually distinct levels
+  2. #84 — Properties panel sections collapse/expand via chevron; per-section open state persists across session (NOT across page reload — UI state, not CAD state)
+  3. #85 — Selecting a product/wall/custom-element surfaces a floating mini-toolbar with Move / Duplicate / Delete; positioned relative to selection bbox without occluding handles
+  4. #86 — Canvas displays a gesture affordance chip ("Pan • Rotate • Zoom" with modifier hints) in a non-intrusive corner; hides during active drag
+  5. #87 — PropertiesPanel rotation row has -45° / +45° preset chips beside the numeric input; clicking pushes a single undo entry
+  6. #88 — Document title (in toolbar) and room tab labels are click-to-edit inline (same UX as Phase 31 label override — Enter/blur commits, Escape cancels)
+  7. #89 — Product Library / Art Library / Wainscot Library / Material picker share a unified card + category-tab component; visually identical structure
+  8. #90 — Spacing scale + border-radius + icon size/stroke are audited and normalized across Toolbar / Sidebar / PropertiesPanel / modals; no ad-hoc arbitrary values remain in the 4 highest-traffic files
+**Plans**: TBD
+**UI hint**: yes
+
+---
+
+## v1.7 3D Realism (PARTIAL — remainder deferred)
+
+**Goal:** Make Jessica's 3D view feel like the actual room — physically-based materials, user-uploaded textures, and camera presets.
+
+**Status:** Phase 32 shipped 2026-04-21. Remaining phases paused while v1.7.5 Design System & UI Polish ships. Milestone assignment for Phases 34–36 TBD (likely rolls into a follow-on 3D Realism milestone).
 
 ### Phases
 
 - [x] **Phase 32: PBR Foundation** — WOOD_PLANK / CONCRETE / PLASTER render with bundled albedo + normal + roughness maps; loader is non-blocking and color-space correct (completed 2026-04-21)
-- [ ] **Phase 33: User-Uploaded Textures** — Jessica uploads a photo of a real surface; it appears as a custom material on walls/floors/ceilings; persists locally with dedup + downscale
-- [ ] **Phase 34: Camera Presets** — eye-level / top-down / 3-quarter / corner switchable via toolbar buttons + 1/2/3/4 hotkeys with smooth ~600ms tween
-- [ ] **Phase 35: Tech-Debt Sweep** — close GH #44/#46/#50/#60, delete orphan SaveIndicator, finish resolveEffectiveDims migration, backfill Phase 29 frontmatter
+- [ ] **Phase 34: User-Uploaded Textures** — Jessica uploads a photo of a real surface; it appears as a custom material on walls/floors/ceilings; persists locally with dedup + downscale (was Phase 33)
+- [ ] **Phase 35: Camera Presets** — eye-level / top-down / 3-quarter / corner switchable via toolbar buttons + 1/2/3/4 hotkeys with smooth ~600ms tween (was Phase 34)
+- [ ] **Phase 36: Tech-Debt Sweep** — close GH #44/#46/#50/#60, delete orphan SaveIndicator, finish resolveEffectiveDims migration, backfill Phase 29 frontmatter (was Phase 35)
 
 ### Phase Details
 
@@ -101,7 +134,7 @@
 - [x] 32-05-PLAN.md — GAP CLOSURE: debounced texture disposal (wallpaper/wallArt regression from D-05 cache migration) (wave 4)
 **UI hint**: yes
 
-#### Phase 33: User-Uploaded Textures
+#### Phase 34: User-Uploaded Textures (was Phase 33)
 **Goal**: Jessica uploads a photo of a real surface she's considering and applies it to a wall/floor/ceiling within ~10 seconds; the upload persists across reload and never bloats project snapshots
 **Depends on**: Phase 32 (reuses PBR loader, color-space helper, per-mesh Suspense pattern, refcount dispose API)
 **Requirements**: LIB-06, LIB-07, LIB-08
@@ -115,9 +148,9 @@
 **Plans**: TBD
 **UI hint**: yes
 
-#### Phase 34: Camera Presets
+#### Phase 35: Camera Presets (was Phase 34)
 **Goal**: Jessica can switch between top-down, eye-level, 3/4, and corner views with a single keystroke or click, with a smooth glide between poses
-**Depends on**: Phase 33 (sequencing only — no code coupling; could run after Phase 32)
+**Depends on**: Phase 34 (sequencing only — no code coupling; could run after Phase 32)
 **Requirements**: CAM-01, CAM-02, CAM-03
 **Success Criteria** (what must be TRUE):
   1. Four toolbar buttons and bare `1`/`2`/`3`/`4` hotkeys switch between eye-level (5.5 ft), top-down (Y = 1.5× max(roomWidth, roomLength)), 3/4 (current default), and corner (room corner at ceiling - 0.5 ft, looking at opposite corner)
@@ -129,7 +162,7 @@
 **Plans**: TBD
 **UI hint**: yes
 
-#### Phase 35: Tech-Debt Sweep
+#### Phase 36: Tech-Debt Sweep (was Phase 35)
 **Goal**: v1.6 leftover noise is gone — shipped issues are closed on GitHub, dead code is deleted, the resolver migration is complete, and Phase 29 traceability frontmatter is correct
 **Depends on**: Nothing (independent; recommended last so it can be cut under scope pressure without leaving features half-shipped)
 **Requirements**: DEBT-01, DEBT-02, DEBT-03, DEBT-04
@@ -148,9 +181,10 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 32. PBR Foundation | 7/7 | Complete    | 2026-04-21 |
-| 33. User-Uploaded Textures | 0/0 | Not started | - |
-| 34. Camera Presets | 0/0 | Not started | - |
-| 35. Tech-Debt Sweep | 0/0 | Not started | - |
+| 33. Design System & UI Polish | 0/0 | Scoping     | - |
+| 34. User-Uploaded Textures | 0/0 | Deferred    | - |
+| 35. Camera Presets | 0/0 | Deferred    | - |
+| 36. Tech-Debt Sweep | 0/0 | Deferred    | - |
 
 ## Backlog
 
@@ -168,12 +202,12 @@ Plans:
 
 ### Phase 999.2: Wallpaper + wallArt view-toggle regression (BACKLOG, deferred from Phase 32)
 
-**Goal:** [To be addressed early in Phase 33 — same code paths] Fix the regression where uploaded-image wallpaper and wallArt disappear after a 2D↔3D view toggle. PBR paths, color wallpaper, and paint paths all work — only the cached data-URL texture paths through `<meshStandardMaterial>` fail. Three stacked fix attempts in Phase 32 (Plans 05, 06, 07) landed correct code against known R3F footguns without resolving the underlying issue. Phase 33's first task: build a runtime instrumentation harness (Playwright + instrumented build) that captures the full sequence (first-mount texture upload → unmount → second-mount attempt → pixel diff) to identify the actual cause before a fourth fix.
+**Goal:** [To be addressed early in Phase 34 — same code paths] Fix the regression where uploaded-image wallpaper and wallArt disappear after a 2D↔3D view toggle. PBR paths, color wallpaper, and paint paths all work — only the cached data-URL texture paths through `<meshStandardMaterial>` fail. Three stacked fix attempts in Phase 32 (Plans 05, 06, 07) landed correct code against known R3F footguns without resolving the underlying issue. Phase 34's first task: build a runtime instrumentation harness (Playwright + instrumented build) that captures the full sequence (first-mount texture upload → unmount → second-mount attempt → pixel diff) to identify the actual cause before a fourth fix.
 
 **Requirements:** TBD — see `.planning/phases/32-pbr-foundation/32-HUMAN-UAT.md` Gap 1 and `32-07-SUMMARY.md` "What's left that could cause it" for the still-plausible candidate causes.
 **Plans:** 0 plans
 
 Plans:
-- [ ] TBD (promote early in Phase 33)
+- [ ] TBD (promote early in Phase 34)
 
 **Discovered:** 2026-04-21 Phase 32 T4 human UAT. Deferred rather than attempting a 4th speculative fix. Retained defensive code from 32-06 and 32-07 stays in place (non-disposing caches + `dispose={null}` primitive attach + static regression test).
