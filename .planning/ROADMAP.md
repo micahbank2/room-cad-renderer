@@ -143,7 +143,12 @@
   4. Images larger than 2048 px on the longest edge are auto-downscaled client-side to ≤2048 px before persistence; SHA-256 of the resulting bytes dedups same-image re-uploads to a single IDB entry
   5. `JSON.stringify(snapshot)` contains zero `data:` substrings >10 KB and zero `Blob` instances — `CADSnapshot` references textures by `userTextureId` only; Blobs live in a separate `userTextureStore` IDB keyspace
   6. Deleting a texture from the library while a project still references it leaves the project loadable; the orphan-referenced surface falls back to its base hex color without crash
-**Plans**: TBD (est. 3–4 plans: upload UI + downscale/hash pipeline, IDB userTextureStore + snapshot refactor, material picker integration + 3D rendering, orphan-fallback + delete flow)
+**Plans**: 4 plans
+Plans:
+- [ ] 34-00-data-layer-PLAN.md — UserTexture type + userTextureStore IDB keyspace (SHA-256 dedup, most-recent-first list) + useUserTextures hook + countTextureRefs + cad.ts schema extensions (Wave 1)
+- [ ] 34-01-upload-modal-PLAN.md — processTextureFile pipeline (MIME gate + 2048px downscale + SHA-256) + UploadTextureModal (create + edit modes per UI-SPEC §1) (Wave 2)
+- [ ] 34-02-picker-integration-PLAN.md — MyTexturesList shared component + DeleteTextureDialog (ref-count copy) + MY TEXTURES tab wired into Floor/Ceiling/Wall pickers (Wave 2)
+- [ ] 34-03-render-integration-PLAN.md — userTextureCache (non-disposing per wallpaper pattern) + useUserTexture hook + WallMesh/FloorMesh/CeilingMesh branches + orphan fallback + LIB-08 snapshot assertion + VIZ-10 regression guard (Wave 3)
 **UI hint**: yes
 
 #### Phase 35: Camera Presets
