@@ -64,7 +64,7 @@ export default function ProjectManager() {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+      <h3 className="font-mono text-base font-medium text-text-muted">
         Project
       </h3>
 

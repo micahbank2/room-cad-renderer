@@ -29,7 +29,7 @@ function CollapsibleSection({
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between mb-2 py-1"
       >
-        <h3 className="font-mono text-xs text-text-ghost tracking-widest uppercase">
+        <h3 className="font-mono text-base font-medium text-text-muted">
           {label}
         </h3>
         <span className="font-mono text-sm text-text-ghost">
@@ -57,11 +57,11 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
     <aside className="w-64 shrink-0 bg-obsidian-low flex flex-col overflow-hidden">
       {/* Sidebar header with collapse button */}
       <div className="flex items-center justify-between px-4 pt-3 pb-2">
-        <span className="font-mono text-xs text-text-ghost tracking-widest">PANELS</span>
+        <span className="font-mono text-sm font-medium text-text-muted">Panels</span>
         <button
           onClick={toggleSidebar}
           className="font-mono text-base text-text-ghost hover:text-text-primary px-1"
-          title="COLLAPSE SIDEBAR"
+          title="Collapse sidebar"
         >
           &#x25C0;
         </button>
@@ -69,11 +69,11 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
 
       {/* Scrollable content */}
       <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
-        <CollapsibleSection label="ROOM CONFIG">
+        <CollapsibleSection label="Room config">
           <RoomSettings />
         </CollapsibleSection>
 
-        <CollapsibleSection label="SYSTEM STATS" defaultOpen={false}>
+        <CollapsibleSection label="System stats" defaultOpen={false}>
           <div className="space-y-1.5">
             <div className="flex justify-between">
               <span className="font-mono text-[10px] text-text-dim">AREA</span>
@@ -92,7 +92,7 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
           </div>
         </CollapsibleSection>
 
-        <CollapsibleSection label="LAYERS" defaultOpen={false}>
+        <CollapsibleSection label="Layers" defaultOpen={false}>
           <div className="space-y-1.5">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -106,11 +106,11 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
           </div>
         </CollapsibleSection>
 
-        <CollapsibleSection label="FLOOR MATERIAL">
+        <CollapsibleSection label="Floor material">
           <FloorMaterialPicker />
         </CollapsibleSection>
 
-        <CollapsibleSection label="SNAP" defaultOpen={false}>
+        <CollapsibleSection label="Snap" defaultOpen={false}>
           <select
             value={gridSnap}
             onChange={(e) => setGridSnap(+e.target.value)}
@@ -132,7 +132,7 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
         {/* Wainscoting Style Library (Phase 16) — has its own internal header */}
         <WainscotLibrary />
 
-        <CollapsibleSection label="PRODUCT LIBRARY">
+        <CollapsibleSection label="Product library">
           <SidebarProductPicker />
         </CollapsibleSection>
       </div>
