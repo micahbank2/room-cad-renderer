@@ -23,6 +23,15 @@ interface UIState {
   /** When set, 3D viewport should animate camera to face this wall side. */
   wallSideCameraTarget: { wallId: string; side: WallSide; seq: number } | null;
   showSidebar: boolean;
+  /**
+   * Phase 33 D-13: bridge flag set by selectTool during an active drag.
+   * Used by FloatingSelectionToolbar to hide itself mid-drag so it doesn't
+   * fight the gesture. Mirrors the D-07 bridge pattern (setPendingProduct,
+   * setSelectToolProductLibrary) — selectTool still keeps its module-local
+   * `_dragActive` flag for the Phase 25 PERF-01 fast path; this is the
+   * store-subscribable mirror.
+   */
+  isDragging: boolean;
 
   setTool: (tool: ToolType) => void;
   select: (ids: string[]) => void;
@@ -46,6 +55,8 @@ interface UIState {
   focusWallSide: (wallId: string, side: WallSide) => void;
   clearWallSideCameraTarget: () => void;
   toggleSidebar: () => void;
+  /** Phase 33 D-13: selectTool calls this at drag start/end. */
+  setDragging: (v: boolean) => void;
 }
 
 const MIN_ZOOM = 0.25;
@@ -66,6 +77,7 @@ export const useUIStore = create<UIState>()((set) => ({
   activeWallSide: "A",
   wallSideCameraTarget: null,
   showSidebar: true,
+  isDragging: false,
 
   setTool: (tool) => set({ activeTool: tool, selectedIds: [] }),
   select: (ids) => set({ selectedIds: ids }),
@@ -136,4 +148,5 @@ export const useUIStore = create<UIState>()((set) => ({
     })),
   clearWallSideCameraTarget: () => set({ wallSideCameraTarget: null }),
   toggleSidebar: () => set((s) => ({ showSidebar: !s.showSidebar })),
+  setDragging: (v) => set({ isDragging: v }),
 }));

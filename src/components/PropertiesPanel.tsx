@@ -17,9 +17,60 @@ import { hasDimensions } from "@/types/product";
 import type { PlacedCustomElement } from "@/types/cad";
 import WallSurfacePanel from "./WallSurfacePanel";
 import CeilingPaintSection from "./CeilingPaintSection";
+import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 
 interface Props {
   productLibrary: Product[];
+}
+
+// Phase 33 Plan 08 (GH #87) — rotation preset chips (D-19/D-20/D-21/D-22).
+// 5 presets per D-19. History-pushing action per chip click (D-20): call
+// sites invoke `rotateProduct(id, deg)` for products and
+// `updatePlacedCustomElement(id, { rotation: deg })` for custom elements.
+// Each chip click MUST increment past[] by exactly one.
+// Works for products AND custom elements (D-21). Placed to the RIGHT of the
+// numeric rotation display (D-22).
+const ROTATION_PRESETS = [-90, -45, 0, 45, 90] as const;
+
+function RotationPresetChips({
+  currentRotation,
+  onSelect,
+}: {
+  currentRotation: number;
+  // onSelect is wired to history-pushing store actions at the call site:
+  //   products        → rotateProduct(id, deg)
+  //   custom elements → updatePlacedCustomElement(id, { rotation: deg })
+  onSelect: (deg: number) => void;
+}) {
+  return (
+    <div className="flex items-center gap-1" data-rotation-presets>
+      {ROTATION_PRESETS.map((preset) => {
+        const isActive = Math.abs(currentRotation - preset) < 0.5;
+        const label =
+          preset === 0
+            ? "0\u00b0"
+            : preset > 0
+              ? `+${preset}\u00b0`
+              : `${preset}\u00b0`;
+        return (
+          <button
+            key={preset}
+            type="button"
+            onClick={() => onSelect(preset)}
+            data-rotation-preset={preset}
+            className={
+              "px-2 py-0.5 rounded-sm font-mono text-sm border transition-colors " +
+              (isActive
+                ? "bg-accent/20 text-accent-light border-accent/30"
+                : "bg-obsidian-high text-text-dim border-outline-variant/20 hover:bg-obsidian-highest")
+            }
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 export default function PropertiesPanel({ productLibrary }: Props) {
@@ -61,8 +112,8 @@ export default function PropertiesPanel({ productLibrary }: Props) {
 
     return (
       <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto glass-panel rounded-sm p-4 space-y-3">
-        <h3 className="font-mono text-[11px] text-text-ghost tracking-widest">
-          BULK ACTIONS
+        <h3 id="bulk-actions" className="font-mono text-base font-medium text-text-muted">
+          Bulk actions
         </h3>
         <div className="font-mono text-[11px] text-accent-light">
           {totalCount} ITEMS SELECTED
@@ -71,7 +122,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
 
         {wallIds.length > 0 && (
           <div className="space-y-2 border-t border-outline-variant/20 pt-2">
-            <div className="font-mono text-[11px] text-text-dim">PAINT ALL WALLS</div>
+            <div id="paint-walls" className="font-mono text-sm font-medium text-text-muted">Paint all walls</div>
             <div className="flex items-center gap-2">
               <input
                 type="color"
@@ -94,9 +145,9 @@ export default function PropertiesPanel({ productLibrary }: Props) {
 
         <button
           onClick={handleDelete}
-          className="w-full font-mono text-[11px] text-error tracking-widest py-1 border border-error/30 rounded-sm hover:bg-error/10"
+          className="w-full font-mono text-sm font-normal text-error tracking-widest py-1 border border-error/30 rounded-sm hover:bg-error/10"
         >
-          DELETE ALL ({totalCount})
+          Delete all ({totalCount})
         </button>
       </div>
     );
@@ -106,8 +157,8 @@ export default function PropertiesPanel({ productLibrary }: Props) {
 
   return (
     <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto glass-panel rounded-sm p-4 space-y-3">
-      <h3 className="font-mono text-[11px] text-text-ghost tracking-widest">
-        PROPERTIES
+      <h3 id="properties" aria-label="Properties" className="font-mono text-base font-medium text-text-muted">
+        Properties
       </h3>
 
       {ceiling && (
@@ -115,10 +166,12 @@ export default function PropertiesPanel({ productLibrary }: Props) {
           <div className="font-mono text-xs text-accent-light">
             CEILING {ceiling.id.slice(-4).toUpperCase()}
           </div>
-          <div className="space-y-1.5">
-            <Row label="HEIGHT" value={`${ceiling.height.toFixed(1)} FT`} />
-            <Row label="VERTICES" value={String(ceiling.points.length)} />
-          </div>
+          <CollapsibleSection id="dimensions" label="Dimensions">
+            <div className="space-y-1.5">
+              <Row label="HEIGHT" value={`${ceiling.height.toFixed(1)} FT`} />
+              <Row label="VERTICES" value={String(ceiling.points.length)} />
+            </div>
+          </CollapsibleSection>
           <CeilingPaintSection ceilingId={ceiling.id} ceiling={ceiling} />
         </div>
       )}
@@ -128,39 +181,45 @@ export default function PropertiesPanel({ productLibrary }: Props) {
           <div className="font-mono text-xs text-accent-light">
             WALL SEGMENT {wall.id.slice(-4).toUpperCase()}
           </div>
-          <div className="space-y-1.5">
-            <EditableRow
-              label="LENGTH"
-              value={wallLength(wall)}
-              suffix="FT"
-              onCommit={(v) => resizeWallByLabel(wall.id, v)}
-              min={0.5}
-              parser={validateInput}
-            />
-            <EditableRow
-              label="THICKNESS"
-              value={wall.thickness}
-              suffix="FT"
-              onCommit={(v) => updateWall(wall.id, { thickness: v })}
-              min={0.1}
-              step={0.1}
-            />
-            <EditableRow
-              label="HEIGHT"
-              value={wall.height}
-              suffix="FT"
-              onCommit={(v) => updateWall(wall.id, { height: v })}
-              min={1}
-            />
-            <Row
-              label="START"
-              value={`${wall.start.x.toFixed(1)}, ${wall.start.y.toFixed(1)}`}
-            />
-            <Row
-              label="END"
-              value={`${wall.end.x.toFixed(1)}, ${wall.end.y.toFixed(1)}`}
-            />
-          </div>
+          <CollapsibleSection id="dimensions" label="Dimensions">
+            <div className="space-y-1.5">
+              <EditableRow
+                label="LENGTH"
+                value={wallLength(wall)}
+                suffix="FT"
+                onCommit={(v) => resizeWallByLabel(wall.id, v)}
+                min={0.5}
+                parser={validateInput}
+              />
+              <EditableRow
+                label="THICKNESS"
+                value={wall.thickness}
+                suffix="FT"
+                onCommit={(v) => updateWall(wall.id, { thickness: v })}
+                min={0.1}
+                step={0.1}
+              />
+              <EditableRow
+                label="HEIGHT"
+                value={wall.height}
+                suffix="FT"
+                onCommit={(v) => updateWall(wall.id, { height: v })}
+                min={1}
+              />
+            </div>
+          </CollapsibleSection>
+          <CollapsibleSection id="position" label="Position">
+            <div className="space-y-1.5">
+              <Row
+                label="START"
+                value={`${wall.start.x.toFixed(1)}, ${wall.start.y.toFixed(1)}`}
+              />
+              <Row
+                label="END"
+                value={`${wall.end.x.toFixed(1)}, ${wall.end.y.toFixed(1)}`}
+              />
+            </div>
+          </CollapsibleSection>
           <div className="font-mono text-[11px] text-text-ghost">
             {wall.openings.length} OPENING(S)
           </div>
@@ -177,29 +236,51 @@ export default function PropertiesPanel({ productLibrary }: Props) {
               {product?.name?.toUpperCase() ?? "PRODUCT"}
             </div>
             {product && (
-              <div className="space-y-1.5">
-                {hasDimensions(product) ? (
-                  <>
-                    <Row label="WIDTH" value={`${product.width} FT`} />
-                    <Row label="DEPTH" value={`${product.depth} FT`} />
-                    <Row label="HEIGHT" value={`${product.height} FT`} />
-                  </>
-                ) : (
-                  <Row label="SIZE" value="UNSET" />
-                )}
-                <Row label="CATEGORY" value={product.category.toUpperCase()} />
-                {product.material && (
-                  <Row label="MATERIAL" value={product.material.toUpperCase()} />
-                )}
-              </div>
+              <>
+                <CollapsibleSection id="dimensions" label="Dimensions">
+                  <div className="space-y-1.5">
+                    {hasDimensions(product) ? (
+                      <>
+                        <Row label="WIDTH" value={`${product.width} FT`} />
+                        <Row label="DEPTH" value={`${product.depth} FT`} />
+                        <Row label="HEIGHT" value={`${product.height} FT`} />
+                      </>
+                    ) : (
+                      <Row label="SIZE" value="UNSET" />
+                    )}
+                  </div>
+                </CollapsibleSection>
+                <CollapsibleSection id="material" label="Material">
+                  <div className="space-y-1.5">
+                    <Row label="CATEGORY" value={product.category.toUpperCase()} />
+                    {product.material && (
+                      <Row label="MATERIAL" value={product.material.toUpperCase()} />
+                    )}
+                  </div>
+                </CollapsibleSection>
+              </>
             )}
-            <div className="space-y-1.5">
-              <Row
-                label="POSITION"
-                value={`${pp.position.x.toFixed(1)}, ${pp.position.y.toFixed(1)}`}
-              />
-              <Row label="ROTATION" value={`${pp.rotation.toFixed(0)}°`} />
-            </div>
+            <CollapsibleSection id="position" label="Position">
+              <div className="space-y-1.5">
+                <Row
+                  label="POSITION"
+                  value={`${pp.position.x.toFixed(1)}, ${pp.position.y.toFixed(1)}`}
+                />
+              </div>
+            </CollapsibleSection>
+            <CollapsibleSection id="rotation" label="Rotation">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between gap-2">
+                  <Row label="ROTATION" value={`${pp.rotation.toFixed(0)}°`} />
+                </div>
+                <RotationPresetChips
+                  currentRotation={pp.rotation}
+                  onSelect={(deg) =>
+                    useCADStore.getState().rotateProduct(pp.id, deg)
+                  }
+                />
+              </div>
+            </CollapsibleSection>
             {libProduct && !hasDimensions(libProduct) && (
               <div className="space-y-1.5 pt-2 border-t border-outline-variant/20">
                 <span className="font-mono text-[11px] text-text-ghost tracking-wider">
@@ -233,25 +314,45 @@ export default function PropertiesPanel({ productLibrary }: Props) {
           <div className="font-mono text-xs text-accent-light">
             {ce.name.toUpperCase()}
           </div>
-          <div className="space-y-1.5">
-            <Row label="WIDTH" value={`${ce.width} FT`} />
-            <Row label="DEPTH" value={`${ce.depth} FT`} />
-            <Row label="HEIGHT" value={`${ce.height} FT`} />
-            <Row
-              label="POSITION"
-              value={`${pce.position.x.toFixed(1)}, ${pce.position.y.toFixed(1)}`}
-            />
-            <Row label="ROTATION" value={`${pce.rotation.toFixed(0)}°`} />
-          </div>
+          <CollapsibleSection id="dimensions" label="Dimensions">
+            <div className="space-y-1.5">
+              <Row label="WIDTH" value={`${ce.width} FT`} />
+              <Row label="DEPTH" value={`${ce.depth} FT`} />
+              <Row label="HEIGHT" value={`${ce.height} FT`} />
+            </div>
+          </CollapsibleSection>
+          <CollapsibleSection id="position" label="Position">
+            <div className="space-y-1.5">
+              <Row
+                label="POSITION"
+                value={`${pce.position.x.toFixed(1)}, ${pce.position.y.toFixed(1)}`}
+              />
+            </div>
+          </CollapsibleSection>
+          <CollapsibleSection id="rotation" label="Rotation">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between gap-2">
+                <Row label="ROTATION" value={`${pce.rotation.toFixed(0)}°`} />
+              </div>
+              <RotationPresetChips
+                currentRotation={pce.rotation}
+                onSelect={(deg) =>
+                  useCADStore
+                    .getState()
+                    .updatePlacedCustomElement(pce.id, { rotation: deg })
+                }
+              />
+            </div>
+          </CollapsibleSection>
           <LabelOverrideInput pce={pce} catalogName={ce.name} />
           {(pce.widthFtOverride !== undefined ||
             pce.depthFtOverride !== undefined) && (
             <button
               type="button"
               onClick={() => clearCustomElementOverrides(pce.id)}
-              className="w-full font-mono text-[11px] text-accent hover:text-accent-light tracking-wider py-1 border border-accent/30 rounded-sm"
+              className="w-full font-mono text-sm font-normal text-accent hover:text-accent-light tracking-wider py-1 border border-accent/30 rounded-sm"
             >
-              RESET_SIZE
+              Reset size
             </button>
           )}
         </div>
@@ -262,17 +363,17 @@ export default function PropertiesPanel({ productLibrary }: Props) {
           <button
             type="button"
             onClick={() => clearProductOverrides(pp.id)}
-            className="w-full font-mono text-[11px] text-accent hover:text-accent-light tracking-wider py-1 border border-accent/30 rounded-sm"
+            className="w-full font-mono text-sm font-normal text-accent hover:text-accent-light tracking-wider py-1 border border-accent/30 rounded-sm"
           >
-            RESET_SIZE
+            Reset size
           </button>
         )}
 
       <button
         onClick={handleDelete}
-        className="w-full py-1.5 rounded-sm font-mono text-[11px] tracking-widest bg-red-900/30 text-red-400 border border-red-900/40 hover:bg-red-900/50 transition-colors"
+        className="w-full py-1.5 rounded-sm font-mono text-sm font-normal bg-red-900/30 text-red-400 border border-red-900/40 hover:bg-red-900/50 transition-colors"
       >
-        DELETE ELEMENT
+        Delete element
       </button>
     </div>
   );
@@ -487,4 +588,38 @@ function EditableRow({
       </span>
     </div>
   );
+}
+
+// Phase 33 Plan 08 (GH #87) — test driver for rotation preset chips.
+// Gated by MODE === "test" per Phase 31 driver convention. Exposes click +
+// lookup helpers so RTL specs can exercise the preset block without
+// depending on jsdom hit-tests or Fabric state.
+if (import.meta.env.MODE === "test" && typeof window !== "undefined") {
+  (window as unknown as Record<string, unknown>).__driveRotationPreset = {
+    click: (deg: number) => {
+      const btn = document.querySelector(
+        `[data-rotation-preset="${deg}"]`,
+      ) as HTMLButtonElement | null;
+      btn?.click();
+    },
+    getRotation: (id: string): number | null => {
+      const state = useCADStore.getState() as unknown as {
+        rooms: Record<
+          string,
+          {
+            placedProducts?: Record<string, { rotation: number }>;
+            placedCustomElements?: Record<string, { rotation: number }>;
+          }
+        >;
+        activeRoomId: string | null;
+      };
+      const room = state.activeRoomId ? state.rooms[state.activeRoomId] : undefined;
+      if (!room) return null;
+      if (room.placedProducts?.[id]) return room.placedProducts[id].rotation;
+      if (room.placedCustomElements?.[id])
+        return room.placedCustomElements[id].rotation;
+      return null;
+    },
+    getHistoryLength: () => useCADStore.getState().past.length,
+  };
 }

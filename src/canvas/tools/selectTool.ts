@@ -801,6 +801,7 @@ export function activateSelectTool(
       // during the set() call) sees dragActive=true and skips clearing
       // the canvas mid-gesture.
       _dragActive = true;
+      try { useUIStore.getState().setDragging(true); } catch { /* Phase 33 D-13 bridge; non-fatal */ }
       useUIStore.getState().select([hit.id]);
 
       dragging = true;
@@ -885,6 +886,7 @@ export function activateSelectTool(
     // the drag is live. Otherwise a redraw between mouse:down and mouse:up
     // would fc.clear() and destroy the Fabric object being dragged.
     _dragActive = dragging;
+    try { useUIStore.getState().setDragging(dragging); } catch { /* Phase 33 D-13 bridge; non-fatal */ }
   };
 
   const onMouseMove = (opt: fabric.TEvent) => {
@@ -930,6 +932,7 @@ export function activateSelectTool(
           ? Math.max(0.25, Math.round(result.valueFt / gridSnap) * gridSnap)
           : result.valueFt;
       _dragActive = true;
+      try { useUIStore.getState().setDragging(true); } catch { /* Phase 33 D-13 bridge; non-fatal */ }
       if (edgeDragInfo.isCustom) {
         useCADStore
           .getState()
@@ -1232,6 +1235,7 @@ export function activateSelectTool(
     // the subscription-triggered redraw would see _dragActive=true and
     // no-op, leaving stale selection visuals.
     _dragActive = false;
+    try { useUIStore.getState().setDragging(false); } catch { /* Phase 33 D-13 bridge; non-fatal */ }
     // Determine whether the commit below will trigger a store change (and
     // therefore a subscription-driven redraw). For bare clicks (no drag
     // movement) no commit fires, so we need to explicitly flush the
@@ -1292,6 +1296,7 @@ export function activateSelectTool(
     edgeDragInfo = null;
     dragging = false;
     _dragActive = false;
+    try { useUIStore.getState().setDragging(false); } catch { /* Phase 33 D-13 bridge; non-fatal */ }
     dragId = null;
     dragType = null;
     dragOffsetFeet = null;
@@ -1611,6 +1616,7 @@ export function activateSelectTool(
     lastDragWallStart = null;
     lastDragWallEnd = null;
     _dragActive = false;
+    try { useUIStore.getState().setDragging(false); } catch { /* Phase 33 D-13 bridge; non-fatal */ }
     _redrawPending = false;
     fc.off("mouse:down", onMouseDown);
     fc.off("mouse:move", onMouseMove);

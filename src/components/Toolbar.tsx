@@ -4,6 +4,7 @@ import { useProjectStore } from "@/stores/projectStore";
 import { exportRenderedImage } from "@/lib/export";
 import type { ToolType } from "@/types/cad";
 import Tooltip from "@/components/Tooltip";
+import { InlineEditableText } from "@/components/ui/InlineEditableText";
 
 const tools: { id: ToolType; label: string; icon: string }[] = [
   { id: "select", label: "SELECT", icon: "arrow_selector_tool" },
@@ -31,6 +32,16 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
   const toggleCameraMode = useUIStore((s) => s.toggleCameraMode);
   const openHelp = useUIStore((s) => s.openHelp);
 
+  // Phase 33 GH #88 — inline-edit document title in Toolbar center slot.
+  // Live-preview writes go to `draftName` (auto-save does NOT subscribe);
+  // commit flushes draftName → activeName in a single set() call, so
+  // auto-save fires exactly once per commit (genuine D-23 bypass).
+  const activeName = useProjectStore((s) => s.activeName);
+  const draftName = useProjectStore((s) => s.draftName);
+  const setDraftName = useProjectStore((s) => s.setDraftName);
+  const commitDraftName = useProjectStore((s) => s.commitDraftName);
+  const displayValue = draftName ?? activeName;
+
   return (
     <header className="h-14 bg-obsidian-deepest flex items-center px-4 shrink-0 ghost-border border-0 border-b">
       {/* Brand — click to go home */}
@@ -48,20 +59,20 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
           <Tooltip content="Change floor plan / upload reference image" placement="bottom">
             <button
               onClick={onFloorPlanClick}
-              className="flex items-center gap-1.5 font-mono text-[10px] tracking-widest px-3 py-1 text-text-dim hover:text-accent-light transition-colors duration-150"
+              className="flex items-center gap-1.5 font-mono text-sm font-normal px-2 py-1 text-text-dim hover:text-accent-light transition-colors duration-150"
             >
               <span className="material-symbols-outlined text-[14px]">grid_view</span>
-              FLOOR PLAN
+              Floor plan
             </button>
           </Tooltip>
         )}
         {(["2d", "3d", "library", "split"] as const).map((mode) => {
-          const labels = { "2d": "2D PLAN", "3d": "3D VIEW", library: "LIBRARY", split: "SPLIT" };
+          const labels = { "2d": "2D plan", "3d": "3D view", library: "Library", split: "Split" };
           return (
             <button
               key={mode}
               onClick={() => onViewChange(mode)}
-              className={`font-mono text-[10px] tracking-widest px-3 py-1 transition-colors duration-150 ${
+              className={`font-mono text-sm font-normal px-2 py-1 transition-colors duration-150 ${
                 viewMode === mode
                   ? "text-accent-light border-b-2 border-accent"
                   : "text-text-dim hover:text-accent-light"
@@ -81,27 +92,43 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
         >
           <button
             onClick={toggleCameraMode}
-            className={`flex items-center gap-1.5 font-mono text-[10px] tracking-widest px-3 py-1 transition-colors duration-150 mr-6 ${
+            className={`flex items-center gap-1.5 font-mono text-sm font-normal px-2 py-1 transition-colors duration-150 mr-6 ${
               cameraMode === "walk"
                 ? "text-accent-light border-b-2 border-accent"
                 : "text-text-dim hover:text-accent-light"
             }`}
           >
             <span className="material-symbols-outlined text-[14px]">directions_walk</span>
-            {cameraMode === "orbit" ? "WALK" : "ORBIT"}
+            {cameraMode === "orbit" ? "Walk" : "Orbit"}
           </button>
         </Tooltip>
       )}
 
-      {/* Spacer */}
-      <div className="flex-1" />
+      {/* Document title — inline-editable (Phase 33 GH #88) */}
+      <div className="flex-1 flex items-center justify-center min-w-0 px-4">
+        <InlineEditableText
+          value={displayValue}
+          onLivePreview={(v) => setDraftName(v)}
+          onCommit={(v) => {
+            // InlineEditableText has already trimmed + sliced. Ensure draftName
+            // is set so commitDraftName flushes (edge case: paste + Enter).
+            setDraftName(v);
+            commitDraftName();
+          }}
+          maxLength={60}
+          data-testid="inline-doc-title"
+          placeholder="Untitled Room"
+          className="font-mono text-sm text-text-primary text-center min-w-0 max-w-[320px] truncate"
+        />
+      </div>
 
       {/* Right actions */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <Tooltip content="Undo" shortcut="Ctrl+Z" placement="bottom">
           <button
             onClick={undo}
             disabled={pastLen === 0}
+            aria-label="Undo"
             className="text-text-dim hover:text-text-primary disabled:opacity-20 transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">undo</span>
@@ -111,6 +138,7 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
           <button
             onClick={redo}
             disabled={futureLen === 0}
+            aria-label="Redo"
             className="text-text-dim hover:text-text-primary disabled:opacity-20 transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">redo</span>
@@ -130,9 +158,10 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
               }
               exportRenderedImage();
             }}
-            className="font-mono text-[10px] tracking-widest px-3 py-1 border border-accent text-accent hover:bg-accent/10 transition-colors rounded-sm"
+            className="font-mono text-sm font-normal px-4 py-1 border border-accent text-accent hover:bg-accent/10 transition-colors rounded-sm"
+            aria-label="Export"
           >
-            EXPORT
+            Export
           </button>
         </Tooltip>
 
@@ -172,7 +201,7 @@ function ToolbarSaveStatus() {
   // D-04 / D-04a: SAVE_FAILED surface — persists (no auto-fade) until store leaves "failed"
   if (status === "failed") {
     return (
-      <div className="flex items-center gap-1.5 min-w-[72px]">
+      <div className="flex items-center gap-1.5 min-w-[72px]" aria-label="Save status">
         <span className="material-symbols-outlined text-[14px] text-error">error</span>
         <span className="font-mono text-[10px] tracking-widest text-error">
           SAVE_FAILED
@@ -184,7 +213,7 @@ function ToolbarSaveStatus() {
   const isSaving = status === "saving";
   const isSaved = status === "saved" || status === "idle";
   return (
-    <div className="flex items-center gap-1.5 min-w-[72px]">
+    <div className="flex items-center gap-1.5 min-w-[72px]" aria-label="Save status">
       {isSaving ? (
         <>
           <span className="material-symbols-outlined text-[14px] text-accent-light animate-spin">

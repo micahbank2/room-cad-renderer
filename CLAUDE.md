@@ -155,6 +155,60 @@ Zustand store keeps `past[]` and `future[]` arrays of `CADSnapshot` objects (roo
 - Backend + auth (Fastify + Postgres + R2)
 - Advanced 3D (CSG verification, environment maps, PBR materials)
 
+---
+
+## Design System (Phase 33 — v1.7.5)
+
+### Icon Policy (D-33)
+
+Two icon libraries coexist:
+
+- **lucide-react** — ALL new UI chrome icons (chevrons, Copy, Trash2, X, Check, etc.). Stroke-based, tree-shaken. Introduced Phase 33.
+- **Material Symbols** — RESERVED for the 8 existing files using CAD-domain glyphs:
+  - `src/components/Toolbar.tsx` (grid_view, directions_walk, undo, redo, door_front, window, roofing, zoom_in/out, fit_screen)
+  - `src/components/WelcomeScreen.tsx`
+  - `src/components/TemplatePickerDialog.tsx`
+  - `src/components/HelpModal.tsx`
+  - `src/components/AddProductModal.tsx`
+  - `src/components/HelpSearch.tsx`
+  - `src/components/ProductLibrary.tsx`
+  - `src/index.css`
+
+Do NOT add new `material-symbols-outlined` imports outside the allowlist. Do NOT migrate existing Material Symbols sites — they're CAD-specific glyphs that lucide doesn't have equivalents for.
+
+### Canonical Spacing + Radius (D-34)
+
+Defined in `src/index.css` `@theme {}` block:
+
+| Token | Value | Tailwind utility |
+|-------|-------|------------------|
+| `--spacing-xs` | 4px | `p-1` / `gap-1` |
+| `--spacing-sm` | 8px | `p-2` / `gap-2` |
+| `--spacing-lg` | 16px | `p-4` / `gap-4` |
+| `--spacing-xl` | 24px | `p-6` / `gap-6` |
+| `--spacing-2xl` | 32px | `p-8` / `gap-8` |
+| `--radius-sm` | 2px | `rounded-sm` |
+| `--radius-md` | 4px | `rounded-md` |
+| `--radius-lg` | 8px | `rounded-lg` |
+
+**NOTE:** 12px spacing (`p-3`, `m-3`, `gap-3`) is NOT in the canonical scale. Per-file rule: in `Toolbar.tsx`, `Sidebar.tsx`, `PropertiesPanel.tsx`, `RoomSettings.tsx`, zero `p-[Npx]`/`m-[Npx]`/`gap-[Npx]`/`rounded-[Npx]` arbitrary values should exist. Other files may use Tailwind default spacing (`p-3` compiles to 12px, acceptable outside the 4 target files).
+
+### Typography (D-03)
+
+5-tier ramp, 3 CSS tokens, 2 weights:
+
+- `--font-size-display: 28px` (Space Grotesk 500 — hero)
+- `--font-size-base: 13px` (Inter 400 body / IBM Plex Mono 500 h1)
+- `--font-size-sm: 11px` (IBM Plex Mono 500 h2 / 400 label / 400 value)
+
+UPPERCASE preserved for: dynamic CAD identifiers, status strings, unit value labels, tool mode labels, brand. Mixed-case for: section headers, panel headers, button labels, tab labels.
+
+### Reduced Motion (D-39)
+
+Every new animation in Phase 33 guards on `useReducedMotion()` from `src/hooks/useReducedMotion.ts`. When `matches === true`, snap open/closed instead of animating.
+
+---
+
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
 

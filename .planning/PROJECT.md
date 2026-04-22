@@ -12,6 +12,8 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
+**v1.7.5 Design System & UI Polish — Phase 33 shipped 2026-04-22.** 10 plans across 3 waves. Foundation tokens (`--text-*` / `--spacing-*` / `--radius-*` on Tailwind v4 @theme, `--radius-lg` 6→8px) + `lucide-react` installed. Typography ramp (mixed-case section/panel/button labels; UPPERCASE preserved for dynamic IDs, status strings, unit value labels per D-03/D-04/D-05). Zero arbitrary `p-[Npx]` / `m-[Npx]` / `rounded-[Npx]` / `gap-[Npx]` across Toolbar/Sidebar/PropertiesPanel/RoomSettings. Shared `useReducedMotion` hook, `CollapsibleSection` primitive with localStorage persistence (10 PropertiesPanel sections wrapped), `LibraryCard` + `CategoryTabs` primitives (ProductLibrary + CustomElementsPanel migrated; WainscotLibrary / Paint/Material / FramedArt deferred per D-31), `FloatingSelectionToolbar` (Duplicate + Delete above bbox), `GestureChip` (dismissible, 2D + 3D variants), rotation preset chips `[-90,-45,0,45,90]` with single-undo contract, `InlineEditableText` primitive (doc title + room tabs click-to-edit via Phase 31 LabelOverrideInput pattern). Closes GH #83-#90. Test baseline grew 340 → 424 passing (+45 Phase 33 tests + 39 other net); same pre-existing LIB-03/04/05 + App.restore failures unrelated (now 6, was 8 on main — improved by 2).
+
 **v1.6 Editing UX shipped 2026-04-21.** 4 phases, 17 plans, 11/11 requirements complete (audit `passed`). Auto-save with debounce + SAVING/SAVED/SAVE_FAILED toolbar status + pointer-based silent restore on reload (Phase 28: SAVE-05, SAVE-06). Editable dimension labels via double-click overlay with feet+inches parser, single-undo guard preserved (Phase 29: EDIT-20, EDIT-21). Smart snapping with pure 427-LOC `snapEngine.ts` + Fabric `snapGuides.ts` renderer, edge/midpoint snap, accent-purple axis guides, Alt/Option disables (Phase 30: SNAP-01, SNAP-02, SNAP-03). Drag-to-resize with corner uniform + edge per-axis handles on products and custom elements; wall-endpoint drag with smart-snap closing Phase 30 D-08b deferral; per-placement label override on custom elements via `PropertiesPanel` input + live 2D render via `resolveEffectiveDims` resolver (Phase 31: EDIT-22, EDIT-23, EDIT-24, CUSTOM-06). Phase 25 drag fast-path preserved across all new editing branches (single undo entry per drag op). Test baseline grew 191 → 340 passing; same 6 pre-existing LIB-03/04/05 failures unrelated. 21 perceptual items auto-approved across 4 HUMAN-UAT.md files. Tech debt: orphan `SaveIndicator.tsx`, legacy `effectiveDimensions` coexists with `resolveEffectiveDims` (incremental migration).
 
 **v1.5 Performance & Tech Debt shipped 2026-04-20.** 4 phases, 15 plans. Tool architecture refactored (18 `(fc as any).__xToolCleanup` casts eliminated, closure state across all 6 tools, shared `toolUtils.ts`). Drag fast-path landed (`renderOnAddRemove: false`, mid-drag Fabric-only mutation, single commit on mouse:up — DevTools ~99.9% clean frames over 47.7s). `cadStore.snapshot()` migrated to `structuredClone(toPlain(...))` — D-07 contract met; ≥2× speedup target missed at tested scales (~1.25× slower due to Immer-draft unwrap) but absolute latency <0.3ms, non-user-visible (accepted as tech debt). Both bugs fixed: product thumbnail async render (#42 closed) and ceiling preset material closed as perception-only Outcome A with regression guards (#43 closed). R3F v9 / React 19 upgrade documented in `.planning/codebase/CONCERNS.md` and tracked on GH #56 (execution deferred until R3F v9 stabilizes). Test baseline grew 168 → 191 passing; same 6 pre-existing failures unrelated.
@@ -28,21 +30,18 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 See `.planning/ROADMAP.md` for links to each milestone archive.
 
-## Current Milestone: v1.7 3D Realism
+## Next Milestone Goals
 
-**Goal:** Make Jessica's 3D view feel like the actual room — physically-based materials replace flat-color placeholders, she can drop in textures from photos of real surfaces she's considering, and she can switch camera angles to evaluate the space from multiple vantage points.
+**v1.7.5 Design System & UI Polish shipped 2026-04-22.** Next milestone is TBD — start with `/gsd:new-milestone` to scope.
 
-**Target features:**
-- **PBR material upgrade (#61)** — `WOOD_PLANK`, `CONCRETE`, `PLASTER` get albedo + normal + roughness maps; existing `PAINTED_DRYWALL` keeps current treatment
-- **User-uploaded textures (#47)** — Jessica drops a single image → albedo, with optional advanced pathway to add normal/roughness for full PBR
-- **Camera presets (#45)** — eye-level, top-down, 3/4 (current default), corner; toolbar buttons + `1/2/3/4` keyboard switch with smooth tween
-- **Tech-debt sweep** — close GH #44/#46/#50/#60 (v1.6 commits), delete orphan `SaveIndicator.tsx`, finish `effectiveDimensions` → `resolveEffectiveDims` migration in `productTool` placement, backfill Phase 29 SUMMARY frontmatter
+**Likely candidates** (prioritized by existing GH issues / deferred work):
 
-**Phase numbering:** continues from 32. Estimated 4–5 phases.
+1. **Complete v1.7 3D Realism** — Phase 34 User-Uploaded Textures (LIB-06/07/08), Phase 35 Camera Presets (CAM-01/02/03), Phase 36 Tech-Debt Sweep (DEBT-01..04). Phase 32 PBR Foundation already shipped.
+2. **Library surface migration follow-ups** (GH #89 deferred) — migrate WainscotLibrary, Paint/Material picker, FramedArt library onto the shared `LibraryCard` + `CategoryTabs` primitives from Phase 33. Three separate PRs or one consolidated polish phase.
+3. **Phase 999.2 regression fix** (backlog) — uploaded-image wallpaper + wallArt disappear after 2D↔3D toggle; requires Playwright instrumentation harness before a fourth speculative fix.
+4. **Phase 999.1** (backlog) — ceiling resize handles (extend Phase 31 pattern to customElements with `kind: "ceiling"`).
 
-**Out of v1.7:** GLTF/OBJ upload (#29 — Out of Scope per PROJECT), cloud sync (#30 — Out of Scope), design system redesign (#48 — blocked on mockups), R3F v9 / React 19 (#56 — deferred per D-02). Library overhaul, materials engine, parametric, architectural breadth all queued for v1.8+.
-
-**Why this milestone, why now:** Core Value is "Jessica can SEE her future room with her actual furniture before spending money." v1.0–v1.6 perfected the 2D editing + persistence + interaction layer; the SEEING side is 3D, and the realism gap is now the loudest friction. PBR + user textures compound directly on top of every prior milestone's work.
+**Why this milestone selection matters:** Core Value is "Jessica can SEE her future room with her actual furniture before spending money." v1.0–v1.6 delivered 2D editing + persistence; v1.7.5 closed the visual quality gap to peer-grade chrome; v1.7 remainder finishes the 3D realism story (PBR textures + user uploads + camera presets) that compounds directly on the foundations now in place.
 
 ## Target User
 

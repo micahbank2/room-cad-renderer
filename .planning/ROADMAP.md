@@ -9,7 +9,8 @@
 - ✅ **v1.4 Polish & Tech Debt** — Phases 21–23 (shipped 2026-04-08) — see [milestones/v1.4-ROADMAP.md](milestones/v1.4-ROADMAP.md)
 - ✅ **v1.5 Performance & Tech Debt** — Phases 24–27 (shipped 2026-04-20) — see [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
 - ✅ **v1.6 Editing UX** — Phases 28–31 (shipped 2026-04-21) — see [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
-- 🚧 **v1.7 3D Realism** — Phases 32–35 (in progress) — see below
+- 🟡 **v1.7 3D Realism** — Phase 32 shipped (2026-04-21); remaining phases (User-Uploaded Textures, Camera Presets, Tech-Debt Sweep) deferred to a future milestone
+- ✅ **v1.7.5 Design System & UI Polish** — Phase 33 (shipped 2026-04-22) — see [milestones/v1.7.5-ROADMAP.md](milestones/v1.7.5-ROADMAP.md)
 
 ---
 
@@ -64,25 +65,32 @@
 
 </details>
 
+<details>
+<summary>✅ v1.7.5 Design System & UI Polish (Phase 33) — SHIPPED 2026-04-22</summary>
+
+1 phase, 10 plans, 8/8 requirements complete (GH #83–#90). Canonical design tokens (typography 5-tier + spacing 7-step + radius 3-step in Tailwind v4 @theme), mixed-case typography hierarchy with UPPERCASE preserved for CAD identifiers, zero-arbitrary spacing sweep across Toolbar/Sidebar/PropertiesPanel/RoomSettings, `useReducedMotion` hook, `CollapsibleSection` primitive (10 PropertiesPanel sections + localStorage persistence), `LibraryCard` + `CategoryTabs` primitives (ProductLibrary + CustomElementsPanel migrated), `FloatingSelectionToolbar` with `uiStore.isDragging` bridge, dismissible `GestureChip` 2D/3D, rotation preset chips (-90/-45/0/+45/+90) with single-undo, `InlineEditableText` primitive for doc title + room tabs. Lucide-react chrome icons alongside 8-file Material Symbols CAD-glyph allowlist. 90 commits, +15,569/-908 LOC. Audit passed (8/8 reqs, 10/10 wirings, 5/5 E2E flows). See [milestones/v1.7.5-ROADMAP.md](milestones/v1.7.5-ROADMAP.md).
+
+</details>
+
 ---
 
-## v1.7 3D Realism
+## v1.7 3D Realism (PARTIAL — remainder deferred)
 
-**Goal:** Make Jessica's 3D view feel like the actual room — physically-based materials replace flat-color placeholders, she can drop in textures from photos of real surfaces she's considering, and she can switch camera angles to evaluate the space from multiple vantage points.
+**Goal:** Make Jessica's 3D view feel like the actual room — physically-based materials, user-uploaded textures, and camera presets.
 
-**Requirements:** 13 | **Phases:** 4 (32–35)
+**Status:** Phase 32 shipped 2026-04-21. Remaining phases paused while v1.7.5 Design System & UI Polish ships. Milestone assignment for Phases 34–36 TBD (likely rolls into a follow-on 3D Realism milestone).
 
 ### Phases
 
 - [x] **Phase 32: PBR Foundation** — WOOD_PLANK / CONCRETE / PLASTER render with bundled albedo + normal + roughness maps; loader is non-blocking and color-space correct (completed 2026-04-21)
-- [ ] **Phase 33: User-Uploaded Textures** — Jessica uploads a photo of a real surface; it appears as a custom material on walls/floors/ceilings; persists locally with dedup + downscale
-- [ ] **Phase 34: Camera Presets** — eye-level / top-down / 3-quarter / corner switchable via toolbar buttons + 1/2/3/4 hotkeys with smooth ~600ms tween
-- [ ] **Phase 35: Tech-Debt Sweep** — close GH #44/#46/#50/#60, delete orphan SaveIndicator, finish resolveEffectiveDims migration, backfill Phase 29 frontmatter
+- [ ] **Phase 34: User-Uploaded Textures** — Jessica uploads a photo of a real surface; it appears as a custom material on walls/floors/ceilings; persists locally with dedup + downscale (was Phase 33)
+- [ ] **Phase 35: Camera Presets** — eye-level / top-down / 3-quarter / corner switchable via toolbar buttons + 1/2/3/4 hotkeys with smooth ~600ms tween (was Phase 34)
+- [ ] **Phase 36: Tech-Debt Sweep** — close GH #44/#46/#50/#60, delete orphan SaveIndicator, finish resolveEffectiveDims migration, backfill Phase 29 frontmatter (was Phase 35)
 
 ### Phase Details
 
 #### Phase 32: PBR Foundation
-**Plans:** 7/7 plans complete
+**Plans:** 10/10 plans complete
 **Goal**: Jessica's WOOD_PLANK, CONCRETE, and PLASTER walls/floors/ceilings read as believable surfaces in 3D — wood shows plank seams + grain, concrete shows aggregate roughness, plaster shows subtle surface variation
 **Depends on**: Nothing (first v1.7 phase)
 **Requirements**: VIZ-07, VIZ-08, VIZ-09
@@ -101,7 +109,7 @@
 - [x] 32-05-PLAN.md — GAP CLOSURE: debounced texture disposal (wallpaper/wallArt regression from D-05 cache migration) (wave 4)
 **UI hint**: yes
 
-#### Phase 33: User-Uploaded Textures
+#### Phase 34: User-Uploaded Textures (was Phase 33)
 **Goal**: Jessica uploads a photo of a real surface she's considering and applies it to a wall/floor/ceiling within ~10 seconds; the upload persists across reload and never bloats project snapshots
 **Depends on**: Phase 32 (reuses PBR loader, color-space helper, per-mesh Suspense pattern, refcount dispose API)
 **Requirements**: LIB-06, LIB-07, LIB-08
@@ -115,9 +123,9 @@
 **Plans**: TBD
 **UI hint**: yes
 
-#### Phase 34: Camera Presets
+#### Phase 35: Camera Presets (was Phase 34)
 **Goal**: Jessica can switch between top-down, eye-level, 3/4, and corner views with a single keystroke or click, with a smooth glide between poses
-**Depends on**: Phase 33 (sequencing only — no code coupling; could run after Phase 32)
+**Depends on**: Phase 34 (sequencing only — no code coupling; could run after Phase 32)
 **Requirements**: CAM-01, CAM-02, CAM-03
 **Success Criteria** (what must be TRUE):
   1. Four toolbar buttons and bare `1`/`2`/`3`/`4` hotkeys switch between eye-level (5.5 ft), top-down (Y = 1.5× max(roomWidth, roomLength)), 3/4 (current default), and corner (room corner at ceiling - 0.5 ft, looking at opposite corner)
@@ -129,7 +137,7 @@
 **Plans**: TBD
 **UI hint**: yes
 
-#### Phase 35: Tech-Debt Sweep
+#### Phase 36: Tech-Debt Sweep (was Phase 35)
 **Goal**: v1.6 leftover noise is gone — shipped issues are closed on GitHub, dead code is deleted, the resolver migration is complete, and Phase 29 traceability frontmatter is correct
 **Depends on**: Nothing (independent; recommended last so it can be cut under scope pressure without leaving features half-shipped)
 **Requirements**: DEBT-01, DEBT-02, DEBT-03, DEBT-04
@@ -148,9 +156,10 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 32. PBR Foundation | 7/7 | Complete    | 2026-04-21 |
-| 33. User-Uploaded Textures | 0/0 | Not started | - |
-| 34. Camera Presets | 0/0 | Not started | - |
-| 35. Tech-Debt Sweep | 0/0 | Not started | - |
+| 33. Design System & UI Polish | 10/10 | Complete    | 2026-04-22 |
+| 34. User-Uploaded Textures | 0/0 | Deferred    | - |
+| 35. Camera Presets | 0/0 | Deferred    | - |
+| 36. Tech-Debt Sweep | 0/0 | Deferred    | - |
 
 ## Backlog
 
@@ -168,12 +177,12 @@ Plans:
 
 ### Phase 999.2: Wallpaper + wallArt view-toggle regression (BACKLOG, deferred from Phase 32)
 
-**Goal:** [To be addressed early in Phase 33 — same code paths] Fix the regression where uploaded-image wallpaper and wallArt disappear after a 2D↔3D view toggle. PBR paths, color wallpaper, and paint paths all work — only the cached data-URL texture paths through `<meshStandardMaterial>` fail. Three stacked fix attempts in Phase 32 (Plans 05, 06, 07) landed correct code against known R3F footguns without resolving the underlying issue. Phase 33's first task: build a runtime instrumentation harness (Playwright + instrumented build) that captures the full sequence (first-mount texture upload → unmount → second-mount attempt → pixel diff) to identify the actual cause before a fourth fix.
+**Goal:** [To be addressed early in Phase 34 — same code paths] Fix the regression where uploaded-image wallpaper and wallArt disappear after a 2D↔3D view toggle. PBR paths, color wallpaper, and paint paths all work — only the cached data-URL texture paths through `<meshStandardMaterial>` fail. Three stacked fix attempts in Phase 32 (Plans 05, 06, 07) landed correct code against known R3F footguns without resolving the underlying issue. Phase 34's first task: build a runtime instrumentation harness (Playwright + instrumented build) that captures the full sequence (first-mount texture upload → unmount → second-mount attempt → pixel diff) to identify the actual cause before a fourth fix.
 
 **Requirements:** TBD — see `.planning/phases/32-pbr-foundation/32-HUMAN-UAT.md` Gap 1 and `32-07-SUMMARY.md` "What's left that could cause it" for the still-plausible candidate causes.
 **Plans:** 0 plans
 
 Plans:
-- [ ] TBD (promote early in Phase 33)
+- [ ] TBD (promote early in Phase 34)
 
 **Discovered:** 2026-04-21 Phase 32 T4 human UAT. Deferred rather than attempting a 4th speculative fix. Retained defensive code from 32-06 and 32-07 stays in place (non-disposing caches + `dispose={null}` primitive attach + static regression test).

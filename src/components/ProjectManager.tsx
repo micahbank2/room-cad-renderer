@@ -18,7 +18,8 @@ export default function ProjectManager() {
   const projectName = useProjectStore((s) => s.activeName);
   const setActive = useProjectStore((s) => s.setActive);
   const clearActive = useProjectStore((s) => s.clearActive);
-  const setActiveName = useProjectStore((s) => s.setActiveName);
+  // Phase 33 GH #88: document title is now edited inline in the Toolbar.
+  // ProjectManager shows it read-only; setActiveName is no longer wired here.
 
   const loadSnapshot = useCADStore((s) => s.loadSnapshot);
 
@@ -64,17 +65,17 @@ export default function ProjectManager() {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+      <h3 className="font-mono text-base font-medium text-text-muted">
         Project
       </h3>
 
-      <input
-        type="text"
-        value={projectName}
-        onChange={(e) => setActiveName(e.target.value)}
-        className="w-full px-2 py-1.5 rounded border border-gray-200 text-sm focus:outline-none focus:border-cad-accent"
-        placeholder="Project name"
-      />
+      {/* Phase 33 GH #88 — inline editing relocated to Toolbar. Read-only here. */}
+      <div
+        className="w-full px-2 py-1.5 font-mono text-sm text-text-dim truncate"
+        title={projectName}
+      >
+        Editing: <span className="text-text-primary">{projectName}</span>
+      </div>
 
       <div className="flex gap-1.5">
         <button

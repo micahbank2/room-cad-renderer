@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.7
-milestone_name: 3D Realism
-status: verifying
-stopped_at: Completed Phase 32 Plan 04 — regression guards landed, phase ready for closeout
-last_updated: "2026-04-21T21:32:02.917Z"
-last_activity: 2026-04-21
+milestone: v1.7.5
+milestone_name: Design System & UI Polish
+status: executing
+stopped_at: Completed 33-07-gesture-chip-PLAN.md
+last_updated: "2026-04-22T14:20:17.387Z"
+last_activity: 2026-04-22
 progress:
-  total_phases: 6
+  total_phases: 1
   completed_phases: 1
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 10
+  completed_plans: 10
 ---
 
 # Project State
@@ -20,17 +20,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 32 — pbr-foundation
+**Current focus:** Phase 33 — design-system-ui-polish
 
 ## Current Position
 
-Milestone: v1.7 3D Realism
-Phase: 999.1
+Milestone: v1.7.5 Design System & UI Polish
+Phase: 33
 Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-04-21
+Status: Ready to execute
+Last activity: 2026-04-22
 
-[░░░░░░░░░░] 0% (0/0 phases — roadmap pending)
+Completed: Phase 32 PBR Foundation (shipped with carry-over → 999.2 wallpaper regression)
+Backlog: 999.1 ceiling resize, 999.2 wallpaper view-toggle regression
 
 ## Accumulated Context
 
@@ -65,10 +66,18 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 32-pbr-foundation]: Plan 03: Wired PBR into CeilingMesh/FloorMesh via new PbrSurface wrapper (Suspense+ErrorBoundary); swapped Environment to bundled /hdr/studio_small_09_1k.hdr; registered renderer with pbrTextureCache for device anisotropy; migrated wallpaper/wallArt/floorTexture caches to shared acquireTexture (D-05). FloorMesh customTextureCache deferred to Phase 33.
 - [Phase 32-pbr-foundation]: D-06 fix-not-rollback: wallpaper loader previously defaulted to NoColorSpace (wrong for sRGB JPGs); shared cache now sets SRGBColorSpace — documented as a correctness fix, not reverted.
 - [Phase 32-pbr-foundation]: Plan 04: Locked Phase 32 PBR behavior with +12 vitest assertions (9 integration + 3 boundary) + gated __getPbrCacheState test driver. VIZ-07/VIZ-08 closed with automated regression guards. Zero regressions (367 → 379 passing).
+- [Phase 33-design-system-ui-polish]: Plan 33-01: installed lucide-react@1.8.0 + added Phase 33 tokens to src/index.css using v4 --text-*/--spacing-* prefix; --radius-lg canonicalized 6px→8px; 6 12px-spacing sites audited for Plan 03
+- [Phase 33]: Plan 33-00: 11 RED test scaffolds + driver contract README locking every Wave 1/2/3 plan; baseline 31 failing/13 passing; tokens+spacingAudit already green serve as regression guards
+- [Phase 33]: Plan 33-03: Shipped useReducedMotion hook + 6 canonical spacing remaps (5 Toolbar + 1 Sidebar) + CLAUDE.md design system docs; 0 arbitrary p/m/gap/rounded-[Npx] in 4 target files; Plan 02 typography preserved
+- [Phase 33-design-system-ui-polish]: Plan 33-05: Extracted LibraryCard + CategoryTabs primitives (shape-agnostic per D-29); migrated ProductLibrary + CustomElementsPanel; count-regression test locked (3 real assertions); WainscotLibrary/Paint/FramedArt deferred to follow-up PRs under GH #89 per D-31
+- [Phase 33]: Plan 33-08: RotationPresetChips inline helper — 5 presets, history-pushing actions only, single-undo invariant locked by store-level behavior test with concrete seed (no .todo fallback)
+- [Phase 33]: Plan 33-06: FloatingSelectionToolbar shipped for GH #85 — 2D only (D-10); duplicate via placeProduct (rotation resets; D-40 candidate); uiStore.isDragging bridge mirrors D-07 pattern; 6 selectTool bridge sites preserve _dragActive fast path
 
 ### Pending Todos
 
-- Run `/gsd:plan-phase 28` to begin Phase 28 (Auto-Save)
+- Run `/gsd:discuss-phase` in fresh chat to scope v1.7.5 as a proper phase
+- Issues #83–#90 assigned to v1.7.5 milestone — 8 UI polish items from Pascal audit
+- Pre-existing Pascal insights #72–#81 remain unscheduled (keep separate from v1.7.5)
 
 ### Open Blockers/Concerns
 
@@ -83,6 +92,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-21T21:23:22.143Z
-Stopped at: Completed Phase 32 Plan 04 — regression guards landed, phase ready for closeout
+Last session: 2026-04-22T14:14:21.996Z
+Stopped at: Completed 33-07-gesture-chip-PLAN.md
 Resume file: None

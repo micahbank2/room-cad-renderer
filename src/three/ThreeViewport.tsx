@@ -15,6 +15,7 @@ import CustomElementMesh from "./CustomElementMesh";
 import Lighting from "./Lighting";
 import WalkCameraController from "./WalkCameraController";
 import { getFloorTexture } from "./floorTexture";
+import { GestureChip } from "@/components/ui/GestureChip";
 
 interface Props {
   productLibrary: Product[];
@@ -241,6 +242,10 @@ export default function ThreeViewport({ productLibrary }: Props) {
           WALK MODE · WASD to move · Mouse to look · ESC to exit
         </div>
       )}
+      {/* Phase 33 GH #86 — persistent gesture hint chip (3D variant).
+          Rendered as DOM overlay sibling of the R3F Canvas, not inside the
+          3D scene. */}
+      <GestureChip mode="3d" />
     </div>
   );
 }
