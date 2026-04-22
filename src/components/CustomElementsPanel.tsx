@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useCADStore, useCustomElements, useActiveRoom } from "@/stores/cadStore";
 import type { CustomElement } from "@/types/cad";
+import { LibraryCard } from "@/components/library";
 
 export default function CustomElementsPanel() {
   const elements = useCustomElements();
@@ -15,6 +16,7 @@ export default function CustomElementsPanel() {
   const [depth, setDepth] = useState(2);
   const [height, setHeight] = useState(2.5);
   const [color, setColor] = useState("#8a7b65");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const items = Object.values(elements);
 
@@ -33,7 +35,18 @@ export default function CustomElementsPanel() {
   };
 
   const handlePlace = (el: CustomElement) => {
+    setSelectedId(el.id);
     placeCustomElement(el.id, { x: room.width / 2, y: room.length / 2 });
+  };
+
+  /**
+   * Build a tiny inline SVG data URL for the color preview thumbnail.
+   * Custom elements don't have images; they have a color swatch.
+   */
+  const buildColorThumb = (hex: string): string => {
+    const safe = hex.replace("#", "");
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><rect width="1" height="1" fill="%23${safe}"/></svg>`;
+    return `data:image/svg+xml;utf8,${svg}`;
   };
 
   return (
@@ -110,46 +123,19 @@ export default function CustomElementsPanel() {
           NO CUSTOM ELEMENTS YET
         </div>
       ) : (
-        <ul className="space-y-1">
+        <div className="space-y-1">
           {items.map((el) => (
-            <li
+            <LibraryCard
               key={el.id}
-              className="flex items-center justify-between bg-obsidian-high rounded-sm px-2 py-1.5"
-            >
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                <div
-                  className="w-3 h-3 rounded-sm border border-outline-variant/30 shrink-0"
-                  style={{ backgroundColor: el.color }}
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="font-mono text-[10px] text-text-primary truncate">
-                    {el.name.toUpperCase()}
-                  </div>
-                  <div className="font-mono text-[8px] text-text-ghost">
-                    {el.shape} · {el.width}'×{el.depth}'
-                    {el.shape === "box" ? `×${el.height}'` : ""}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-1 shrink-0">
-                <button
-                  onClick={() => handlePlace(el)}
-                  title="Place in room"
-                  className="font-mono text-[9px] text-accent-light hover:text-accent px-1"
-                >
-                  +
-                </button>
-                <button
-                  onClick={() => removeCustomElement(el.id)}
-                  title="Delete from library"
-                  className="font-mono text-[9px] text-text-ghost hover:text-text-primary px-1"
-                >
-                  ✕
-                </button>
-              </div>
-            </li>
+              thumbnail={buildColorThumb(el.color)}
+              label={`${el.name} · ${el.shape} · ${el.width}'×${el.depth}'${el.shape === "box" ? `×${el.height}'` : ""}`}
+              selected={selectedId === el.id}
+              onClick={() => handlePlace(el)}
+              onRemove={() => removeCustomElement(el.id)}
+              variant="list"
+            />
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
