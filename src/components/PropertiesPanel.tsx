@@ -61,8 +61,8 @@ export default function PropertiesPanel({ productLibrary }: Props) {
 
     return (
       <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto glass-panel rounded-sm p-4 space-y-3">
-        <h3 className="font-mono text-[11px] text-text-ghost tracking-widest">
-          BULK ACTIONS
+        <h3 id="bulk-actions" className="font-mono text-base font-medium text-text-muted">
+          Bulk actions
         </h3>
         <div className="font-mono text-[11px] text-accent-light">
           {totalCount} ITEMS SELECTED
@@ -71,7 +71,7 @@ export default function PropertiesPanel({ productLibrary }: Props) {
 
         {wallIds.length > 0 && (
           <div className="space-y-2 border-t border-outline-variant/20 pt-2">
-            <div className="font-mono text-[11px] text-text-dim">PAINT ALL WALLS</div>
+            <div id="paint-walls" className="font-mono text-sm font-medium text-text-muted">Paint all walls</div>
             <div className="flex items-center gap-2">
               <input
                 type="color"
@@ -94,9 +94,9 @@ export default function PropertiesPanel({ productLibrary }: Props) {
 
         <button
           onClick={handleDelete}
-          className="w-full font-mono text-[11px] text-error tracking-widest py-1 border border-error/30 rounded-sm hover:bg-error/10"
+          className="w-full font-mono text-sm font-normal text-error tracking-widest py-1 border border-error/30 rounded-sm hover:bg-error/10"
         >
-          DELETE ALL ({totalCount})
+          Delete all ({totalCount})
         </button>
       </div>
     );
@@ -106,8 +106,8 @@ export default function PropertiesPanel({ productLibrary }: Props) {
 
   return (
     <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto glass-panel rounded-sm p-4 space-y-3">
-      <h3 className="font-mono text-[11px] text-text-ghost tracking-widest">
-        PROPERTIES
+      <h3 id="properties" aria-label="Properties" className="font-mono text-base font-medium text-text-muted">
+        Properties
       </h3>
 
       {ceiling && (
@@ -115,6 +115,9 @@ export default function PropertiesPanel({ productLibrary }: Props) {
           <div className="font-mono text-xs text-accent-light">
             CEILING {ceiling.id.slice(-4).toUpperCase()}
           </div>
+          <h4 id="dimensions" aria-label="Dimensions" className="font-mono text-sm font-medium text-text-muted">
+            Dimensions
+          </h4>
           <div className="space-y-1.5">
             <Row label="HEIGHT" value={`${ceiling.height.toFixed(1)} FT`} />
             <Row label="VERTICES" value={String(ceiling.points.length)} />
@@ -128,6 +131,9 @@ export default function PropertiesPanel({ productLibrary }: Props) {
           <div className="font-mono text-xs text-accent-light">
             WALL SEGMENT {wall.id.slice(-4).toUpperCase()}
           </div>
+          <h4 id="dimensions" className="font-mono text-sm font-medium text-text-muted">
+            Dimensions
+          </h4>
           <div className="space-y-1.5">
             <EditableRow
               label="LENGTH"
@@ -152,6 +158,11 @@ export default function PropertiesPanel({ productLibrary }: Props) {
               onCommit={(v) => updateWall(wall.id, { height: v })}
               min={1}
             />
+          </div>
+          <h4 id="position" aria-label="Position" className="font-mono text-sm font-medium text-text-muted">
+            Position
+          </h4>
+          <div className="space-y-1.5">
             <Row
               label="START"
               value={`${wall.start.x.toFixed(1)}, ${wall.start.y.toFixed(1)}`}
@@ -177,27 +188,45 @@ export default function PropertiesPanel({ productLibrary }: Props) {
               {product?.name?.toUpperCase() ?? "PRODUCT"}
             </div>
             {product && (
-              <div className="space-y-1.5">
-                {hasDimensions(product) ? (
-                  <>
-                    <Row label="WIDTH" value={`${product.width} FT`} />
-                    <Row label="DEPTH" value={`${product.depth} FT`} />
-                    <Row label="HEIGHT" value={`${product.height} FT`} />
-                  </>
-                ) : (
-                  <Row label="SIZE" value="UNSET" />
-                )}
-                <Row label="CATEGORY" value={product.category.toUpperCase()} />
-                {product.material && (
-                  <Row label="MATERIAL" value={product.material.toUpperCase()} />
-                )}
-              </div>
+              <>
+                <h4 id="dimensions" className="font-mono text-sm font-medium text-text-muted">
+                  Dimensions
+                </h4>
+                <div className="space-y-1.5">
+                  {hasDimensions(product) ? (
+                    <>
+                      <Row label="WIDTH" value={`${product.width} FT`} />
+                      <Row label="DEPTH" value={`${product.depth} FT`} />
+                      <Row label="HEIGHT" value={`${product.height} FT`} />
+                    </>
+                  ) : (
+                    <Row label="SIZE" value="UNSET" />
+                  )}
+                </div>
+                <h4 id="material" aria-label="Material" className="font-mono text-sm font-medium text-text-muted">
+                  Material
+                </h4>
+                <div className="space-y-1.5">
+                  <Row label="CATEGORY" value={product.category.toUpperCase()} />
+                  {product.material && (
+                    <Row label="MATERIAL" value={product.material.toUpperCase()} />
+                  )}
+                </div>
+              </>
             )}
+            <h4 id="position" className="font-mono text-sm font-medium text-text-muted">
+              Position
+            </h4>
             <div className="space-y-1.5">
               <Row
                 label="POSITION"
                 value={`${pp.position.x.toFixed(1)}, ${pp.position.y.toFixed(1)}`}
               />
+            </div>
+            <h4 id="rotation" aria-label="Rotation" className="font-mono text-sm font-medium text-text-muted">
+              Rotation
+            </h4>
+            <div className="space-y-1.5">
               <Row label="ROTATION" value={`${pp.rotation.toFixed(0)}°`} />
             </div>
             {libProduct && !hasDimensions(libProduct) && (
@@ -233,14 +262,27 @@ export default function PropertiesPanel({ productLibrary }: Props) {
           <div className="font-mono text-xs text-accent-light">
             {ce.name.toUpperCase()}
           </div>
+          <h4 id="dimensions" className="font-mono text-sm font-medium text-text-muted">
+            Dimensions
+          </h4>
           <div className="space-y-1.5">
             <Row label="WIDTH" value={`${ce.width} FT`} />
             <Row label="DEPTH" value={`${ce.depth} FT`} />
             <Row label="HEIGHT" value={`${ce.height} FT`} />
+          </div>
+          <h4 id="position" className="font-mono text-sm font-medium text-text-muted">
+            Position
+          </h4>
+          <div className="space-y-1.5">
             <Row
               label="POSITION"
               value={`${pce.position.x.toFixed(1)}, ${pce.position.y.toFixed(1)}`}
             />
+          </div>
+          <h4 id="rotation" className="font-mono text-sm font-medium text-text-muted">
+            Rotation
+          </h4>
+          <div className="space-y-1.5">
             <Row label="ROTATION" value={`${pce.rotation.toFixed(0)}°`} />
           </div>
           <LabelOverrideInput pce={pce} catalogName={ce.name} />
@@ -249,9 +291,9 @@ export default function PropertiesPanel({ productLibrary }: Props) {
             <button
               type="button"
               onClick={() => clearCustomElementOverrides(pce.id)}
-              className="w-full font-mono text-[11px] text-accent hover:text-accent-light tracking-wider py-1 border border-accent/30 rounded-sm"
+              className="w-full font-mono text-sm font-normal text-accent hover:text-accent-light tracking-wider py-1 border border-accent/30 rounded-sm"
             >
-              RESET_SIZE
+              Reset size
             </button>
           )}
         </div>
@@ -262,17 +304,17 @@ export default function PropertiesPanel({ productLibrary }: Props) {
           <button
             type="button"
             onClick={() => clearProductOverrides(pp.id)}
-            className="w-full font-mono text-[11px] text-accent hover:text-accent-light tracking-wider py-1 border border-accent/30 rounded-sm"
+            className="w-full font-mono text-sm font-normal text-accent hover:text-accent-light tracking-wider py-1 border border-accent/30 rounded-sm"
           >
-            RESET_SIZE
+            Reset size
           </button>
         )}
 
       <button
         onClick={handleDelete}
-        className="w-full py-1.5 rounded-sm font-mono text-[11px] tracking-widest bg-red-900/30 text-red-400 border border-red-900/40 hover:bg-red-900/50 transition-colors"
+        className="w-full py-1.5 rounded-sm font-mono text-sm font-normal bg-red-900/30 text-red-400 border border-red-900/40 hover:bg-red-900/50 transition-colors"
       >
-        DELETE ELEMENT
+        Delete element
       </button>
     </div>
   );
