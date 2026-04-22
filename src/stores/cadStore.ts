@@ -101,6 +101,12 @@ interface CADState {
   // NEW: room-management actions
   addRoom: (name: string, templateId?: RoomTemplateId) => string;
   renameRoom: (id: string, name: string) => void;
+  /**
+   * Phase 33 GH #88 — live-preview keystroke variant of renameRoom.
+   * Identical mutation but skips `pushHistory(s)` so typing does not flood
+   * undo. Commit via `renameRoom` pushes exactly one history entry.
+   */
+  renameRoomNoHistory: (id: string, name: string) => void;
   removeRoom: (id: string) => void;
   switchRoom: (id: string) => void;
 }
@@ -1033,6 +1039,15 @@ export const useCADStore = create<CADState>()((set) => ({
       produce((s: CADState) => {
         if (!s.rooms[id]) return;
         pushHistory(s);
+        s.rooms[id].name = name;
+      })
+    ),
+
+  renameRoomNoHistory: (id, name) =>
+    set(
+      produce((s: CADState) => {
+        if (!s.rooms[id]) return;
+        // NOTE: No pushHistory(s) — genuine bypass for live-preview keystrokes.
         s.rooms[id].name = name;
       })
     ),
