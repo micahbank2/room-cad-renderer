@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.7.5
 milestone_name: Design System & UI Polish
 status: executing
-stopped_at: Completed 33-05-unified-library-PLAN.md
-last_updated: "2026-04-22T14:04:18.234Z"
+stopped_at: Completed 33-08-rotation-presets-PLAN.md
+last_updated: "2026-04-22T14:09:08.989Z"
 last_activity: 2026-04-22
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 10
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 Milestone: v1.7.5 Design System & UI Polish
 Phase: 33 (design-system-ui-polish) — EXECUTING
-Plan: 6 of 10
+Plan: 7 of 10
 Status: Ready to execute
 Last activity: 2026-04-22
 
@@ -70,6 +70,7 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 33]: Plan 33-00: 11 RED test scaffolds + driver contract README locking every Wave 1/2/3 plan; baseline 31 failing/13 passing; tokens+spacingAudit already green serve as regression guards
 - [Phase 33]: Plan 33-03: Shipped useReducedMotion hook + 6 canonical spacing remaps (5 Toolbar + 1 Sidebar) + CLAUDE.md design system docs; 0 arbitrary p/m/gap/rounded-[Npx] in 4 target files; Plan 02 typography preserved
 - [Phase 33-design-system-ui-polish]: Plan 33-05: Extracted LibraryCard + CategoryTabs primitives (shape-agnostic per D-29); migrated ProductLibrary + CustomElementsPanel; count-regression test locked (3 real assertions); WainscotLibrary/Paint/FramedArt deferred to follow-up PRs under GH #89 per D-31
+- [Phase 33]: Plan 33-08: RotationPresetChips inline helper — 5 presets, history-pushing actions only, single-undo invariant locked by store-level behavior test with concrete seed (no .todo fallback)
 
 ### Pending Todos
 
@@ -90,6 +91,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-22T14:04:18.231Z
-Stopped at: Completed 33-05-unified-library-PLAN.md
+Last session: 2026-04-22T14:09:08.979Z
+Stopped at: Completed 33-08-rotation-presets-PLAN.md
 Resume file: None
