@@ -17,6 +17,7 @@ import { hasDimensions } from "@/types/product";
 import type { PlacedCustomElement } from "@/types/cad";
 import WallSurfacePanel from "./WallSurfacePanel";
 import CeilingPaintSection from "./CeilingPaintSection";
+import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 
 interface Props {
   productLibrary: Product[];
@@ -115,13 +116,12 @@ export default function PropertiesPanel({ productLibrary }: Props) {
           <div className="font-mono text-xs text-accent-light">
             CEILING {ceiling.id.slice(-4).toUpperCase()}
           </div>
-          <h4 id="dimensions" aria-label="Dimensions" className="font-mono text-sm font-medium text-text-muted">
-            Dimensions
-          </h4>
-          <div className="space-y-1.5">
-            <Row label="HEIGHT" value={`${ceiling.height.toFixed(1)} FT`} />
-            <Row label="VERTICES" value={String(ceiling.points.length)} />
-          </div>
+          <CollapsibleSection id="dimensions" label="Dimensions">
+            <div className="space-y-1.5">
+              <Row label="HEIGHT" value={`${ceiling.height.toFixed(1)} FT`} />
+              <Row label="VERTICES" value={String(ceiling.points.length)} />
+            </div>
+          </CollapsibleSection>
           <CeilingPaintSection ceilingId={ceiling.id} ceiling={ceiling} />
         </div>
       )}
@@ -131,47 +131,45 @@ export default function PropertiesPanel({ productLibrary }: Props) {
           <div className="font-mono text-xs text-accent-light">
             WALL SEGMENT {wall.id.slice(-4).toUpperCase()}
           </div>
-          <h4 id="dimensions" className="font-mono text-sm font-medium text-text-muted">
-            Dimensions
-          </h4>
-          <div className="space-y-1.5">
-            <EditableRow
-              label="LENGTH"
-              value={wallLength(wall)}
-              suffix="FT"
-              onCommit={(v) => resizeWallByLabel(wall.id, v)}
-              min={0.5}
-              parser={validateInput}
-            />
-            <EditableRow
-              label="THICKNESS"
-              value={wall.thickness}
-              suffix="FT"
-              onCommit={(v) => updateWall(wall.id, { thickness: v })}
-              min={0.1}
-              step={0.1}
-            />
-            <EditableRow
-              label="HEIGHT"
-              value={wall.height}
-              suffix="FT"
-              onCommit={(v) => updateWall(wall.id, { height: v })}
-              min={1}
-            />
-          </div>
-          <h4 id="position" aria-label="Position" className="font-mono text-sm font-medium text-text-muted">
-            Position
-          </h4>
-          <div className="space-y-1.5">
-            <Row
-              label="START"
-              value={`${wall.start.x.toFixed(1)}, ${wall.start.y.toFixed(1)}`}
-            />
-            <Row
-              label="END"
-              value={`${wall.end.x.toFixed(1)}, ${wall.end.y.toFixed(1)}`}
-            />
-          </div>
+          <CollapsibleSection id="dimensions" label="Dimensions">
+            <div className="space-y-1.5">
+              <EditableRow
+                label="LENGTH"
+                value={wallLength(wall)}
+                suffix="FT"
+                onCommit={(v) => resizeWallByLabel(wall.id, v)}
+                min={0.5}
+                parser={validateInput}
+              />
+              <EditableRow
+                label="THICKNESS"
+                value={wall.thickness}
+                suffix="FT"
+                onCommit={(v) => updateWall(wall.id, { thickness: v })}
+                min={0.1}
+                step={0.1}
+              />
+              <EditableRow
+                label="HEIGHT"
+                value={wall.height}
+                suffix="FT"
+                onCommit={(v) => updateWall(wall.id, { height: v })}
+                min={1}
+              />
+            </div>
+          </CollapsibleSection>
+          <CollapsibleSection id="position" label="Position">
+            <div className="space-y-1.5">
+              <Row
+                label="START"
+                value={`${wall.start.x.toFixed(1)}, ${wall.start.y.toFixed(1)}`}
+              />
+              <Row
+                label="END"
+                value={`${wall.end.x.toFixed(1)}, ${wall.end.y.toFixed(1)}`}
+              />
+            </div>
+          </CollapsibleSection>
           <div className="font-mono text-[11px] text-text-ghost">
             {wall.openings.length} OPENING(S)
           </div>
@@ -189,46 +187,42 @@ export default function PropertiesPanel({ productLibrary }: Props) {
             </div>
             {product && (
               <>
-                <h4 id="dimensions" className="font-mono text-sm font-medium text-text-muted">
-                  Dimensions
-                </h4>
-                <div className="space-y-1.5">
-                  {hasDimensions(product) ? (
-                    <>
-                      <Row label="WIDTH" value={`${product.width} FT`} />
-                      <Row label="DEPTH" value={`${product.depth} FT`} />
-                      <Row label="HEIGHT" value={`${product.height} FT`} />
-                    </>
-                  ) : (
-                    <Row label="SIZE" value="UNSET" />
-                  )}
-                </div>
-                <h4 id="material" aria-label="Material" className="font-mono text-sm font-medium text-text-muted">
-                  Material
-                </h4>
-                <div className="space-y-1.5">
-                  <Row label="CATEGORY" value={product.category.toUpperCase()} />
-                  {product.material && (
-                    <Row label="MATERIAL" value={product.material.toUpperCase()} />
-                  )}
-                </div>
+                <CollapsibleSection id="dimensions" label="Dimensions">
+                  <div className="space-y-1.5">
+                    {hasDimensions(product) ? (
+                      <>
+                        <Row label="WIDTH" value={`${product.width} FT`} />
+                        <Row label="DEPTH" value={`${product.depth} FT`} />
+                        <Row label="HEIGHT" value={`${product.height} FT`} />
+                      </>
+                    ) : (
+                      <Row label="SIZE" value="UNSET" />
+                    )}
+                  </div>
+                </CollapsibleSection>
+                <CollapsibleSection id="material" label="Material">
+                  <div className="space-y-1.5">
+                    <Row label="CATEGORY" value={product.category.toUpperCase()} />
+                    {product.material && (
+                      <Row label="MATERIAL" value={product.material.toUpperCase()} />
+                    )}
+                  </div>
+                </CollapsibleSection>
               </>
             )}
-            <h4 id="position" className="font-mono text-sm font-medium text-text-muted">
-              Position
-            </h4>
-            <div className="space-y-1.5">
-              <Row
-                label="POSITION"
-                value={`${pp.position.x.toFixed(1)}, ${pp.position.y.toFixed(1)}`}
-              />
-            </div>
-            <h4 id="rotation" aria-label="Rotation" className="font-mono text-sm font-medium text-text-muted">
-              Rotation
-            </h4>
-            <div className="space-y-1.5">
-              <Row label="ROTATION" value={`${pp.rotation.toFixed(0)}°`} />
-            </div>
+            <CollapsibleSection id="position" label="Position">
+              <div className="space-y-1.5">
+                <Row
+                  label="POSITION"
+                  value={`${pp.position.x.toFixed(1)}, ${pp.position.y.toFixed(1)}`}
+                />
+              </div>
+            </CollapsibleSection>
+            <CollapsibleSection id="rotation" label="Rotation">
+              <div className="space-y-1.5">
+                <Row label="ROTATION" value={`${pp.rotation.toFixed(0)}°`} />
+              </div>
+            </CollapsibleSection>
             {libProduct && !hasDimensions(libProduct) && (
               <div className="space-y-1.5 pt-2 border-t border-outline-variant/20">
                 <span className="font-mono text-[11px] text-text-ghost tracking-wider">
@@ -262,29 +256,26 @@ export default function PropertiesPanel({ productLibrary }: Props) {
           <div className="font-mono text-xs text-accent-light">
             {ce.name.toUpperCase()}
           </div>
-          <h4 id="dimensions" className="font-mono text-sm font-medium text-text-muted">
-            Dimensions
-          </h4>
-          <div className="space-y-1.5">
-            <Row label="WIDTH" value={`${ce.width} FT`} />
-            <Row label="DEPTH" value={`${ce.depth} FT`} />
-            <Row label="HEIGHT" value={`${ce.height} FT`} />
-          </div>
-          <h4 id="position" className="font-mono text-sm font-medium text-text-muted">
-            Position
-          </h4>
-          <div className="space-y-1.5">
-            <Row
-              label="POSITION"
-              value={`${pce.position.x.toFixed(1)}, ${pce.position.y.toFixed(1)}`}
-            />
-          </div>
-          <h4 id="rotation" className="font-mono text-sm font-medium text-text-muted">
-            Rotation
-          </h4>
-          <div className="space-y-1.5">
-            <Row label="ROTATION" value={`${pce.rotation.toFixed(0)}°`} />
-          </div>
+          <CollapsibleSection id="dimensions" label="Dimensions">
+            <div className="space-y-1.5">
+              <Row label="WIDTH" value={`${ce.width} FT`} />
+              <Row label="DEPTH" value={`${ce.depth} FT`} />
+              <Row label="HEIGHT" value={`${ce.height} FT`} />
+            </div>
+          </CollapsibleSection>
+          <CollapsibleSection id="position" label="Position">
+            <div className="space-y-1.5">
+              <Row
+                label="POSITION"
+                value={`${pce.position.x.toFixed(1)}, ${pce.position.y.toFixed(1)}`}
+              />
+            </div>
+          </CollapsibleSection>
+          <CollapsibleSection id="rotation" label="Rotation">
+            <div className="space-y-1.5">
+              <Row label="ROTATION" value={`${pce.rotation.toFixed(0)}°`} />
+            </div>
+          </CollapsibleSection>
           <LabelOverrideInput pce={pce} catalogName={ce.name} />
           {(pce.widthFtOverride !== undefined ||
             pce.depthFtOverride !== undefined) && (
