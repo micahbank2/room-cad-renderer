@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: 3D Realism Completion
-status: Phase 34 Plan 00 complete — data layer ready for Wave 2
-stopped_at: Completed Phase 34 Plan 00 — userTextureStore + useUserTextures + countTextureRefs + schema extensions shipped
-last_updated: "2026-04-22T22:30:00.000Z"
-last_activity: "2026-04-22 — Plan 34-00 complete (3 tasks, 27 new tests passing, LIB-08 foundation — snapshot carries userTextureId strings only)"
+status: Phase 34 Plan 01 complete — upload modal + processTextureFile pipeline shipped
+stopped_at: Completed Phase 34 Plan 01 — UploadTextureModal + processTextureFile + 27 new tests green
+last_updated: "2026-04-22T15:30:00.000Z"
+last_activity: "2026-04-22 — Plan 34-01 complete (2 tasks, 27 new tests passing, LIB-06/LIB-07 MIME gate + 2048px downscale + SHA-256 + dual-mode modal)"
 progress:
   total_phases: 1
   completed_phases: 1
   total_plans: 8
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -48,6 +48,11 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 34 Plan 00]: Dedup preserves first upload's metadata (name, tileSizeFt). Second upload with same SHA-256 returns existing id without overwrite. Renames flow through the Edit (D-11) path, not re-upload.
 - [Phase 34 Plan 00]: countTextureRefs is a pure snapshot-shaped function; callers pass useCADStore.getState() at the call site. Keeps it easy to test and reusable from non-React contexts.
 - [Phase 34 Plan 00]: Added fake-indexeddb/auto to tests/setup.ts so idb-keyval tests run against real IDB semantics under happy-dom (existing vi.mock callers unaffected).
+- [Phase 34 Plan 01]: Injectable-seam pattern (ProcessTextureDeps.decode + drawToBlob) keeps the processTextureFile pipeline testable under happy-dom (no createImageBitmap / OffscreenCanvas shim needed). Reusable pattern for future jsdom-hostile pipelines.
+- [Phase 34 Plan 01]: SHA-256 computed on DOWNSCALED JPEG bytes (not source File) so the LIB-07 dedup key is deterministic regardless of source format/dimensions — same visual output always hashes the same.
+- [Phase 34 Plan 01]: UploadTextureModal is a single dual-mode component (create + edit) per D-11. Edit mode hides the drop zone, autoFocuses Name, and calls useUserTextures().update instead of .save.
+- [Phase 34 Plan 01]: sonner is not in package.json. Inlined a console.info toast shim behind a single call site (toastSuccess) and kept the "Texture saved." copy in a centralized COPY constant — one-line swap to real sonner when Plan 02/03 adopts it.
+- [Phase 34 Plan 01]: window.__driveTextureUpload(file, name, tileSizeFt) test driver (import.meta.env.MODE === "test" gated) bypasses the React tree — happy-dom cannot cleanly synthesize a native <input type="file"> change event. Plan 02 picker tests can seed textures via this bridge.
 
 ### Pending Todos
 
