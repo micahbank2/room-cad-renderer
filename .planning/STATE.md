@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.7.5
 milestone_name: Design System & UI Polish
 status: executing
-stopped_at: Completed 33-08-rotation-presets-PLAN.md
-last_updated: "2026-04-22T14:09:08.989Z"
+stopped_at: Completed 33-06-floating-toolbar-PLAN.md
+last_updated: "2026-04-22T14:09:40.210Z"
 last_activity: 2026-04-22
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 10
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 Milestone: v1.7.5 Design System & UI Polish
 Phase: 33 (design-system-ui-polish) — EXECUTING
-Plan: 7 of 10
+Plan: 8 of 10
 Status: Ready to execute
 Last activity: 2026-04-22
 
@@ -71,6 +71,7 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 33]: Plan 33-03: Shipped useReducedMotion hook + 6 canonical spacing remaps (5 Toolbar + 1 Sidebar) + CLAUDE.md design system docs; 0 arbitrary p/m/gap/rounded-[Npx] in 4 target files; Plan 02 typography preserved
 - [Phase 33-design-system-ui-polish]: Plan 33-05: Extracted LibraryCard + CategoryTabs primitives (shape-agnostic per D-29); migrated ProductLibrary + CustomElementsPanel; count-regression test locked (3 real assertions); WainscotLibrary/Paint/FramedArt deferred to follow-up PRs under GH #89 per D-31
 - [Phase 33]: Plan 33-08: RotationPresetChips inline helper — 5 presets, history-pushing actions only, single-undo invariant locked by store-level behavior test with concrete seed (no .todo fallback)
+- [Phase 33]: Plan 33-06: FloatingSelectionToolbar shipped for GH #85 — 2D only (D-10); duplicate via placeProduct (rotation resets; D-40 candidate); uiStore.isDragging bridge mirrors D-07 pattern; 6 selectTool bridge sites preserve _dragActive fast path
 
 ### Pending Todos
 
@@ -91,6 +92,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-22T14:09:08.979Z
-Stopped at: Completed 33-08-rotation-presets-PLAN.md
+Last session: 2026-04-22T14:09:40.207Z
+Stopped at: Completed 33-06-floating-toolbar-PLAN.md
 Resume file: None
