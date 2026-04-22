@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: 3D Realism Completion
-status: Roadmap approved, awaiting plan-phase
-stopped_at: Phase 34 context gathered
-last_updated: "2026-04-22T17:51:52.601Z"
-last_activity: "2026-04-22 — v1.8 roadmap created (4 phases: 34 User-Uploaded Textures, 35 Camera Presets, 36 VIZ-10 Regression, 37 Tech-Debt Sweep; 11/11 requirements mapped)"
+status: Phase 34 Plan 00 complete — data layer ready for Wave 2
+stopped_at: Completed Phase 34 Plan 00 — userTextureStore + useUserTextures + countTextureRefs + schema extensions shipped
+last_updated: "2026-04-22T22:30:00.000Z"
+last_activity: "2026-04-22 — Plan 34-00 complete (3 tasks, 27 new tests passing, LIB-08 foundation — snapshot carries userTextureId strings only)"
 progress:
   total_phases: 1
   completed_phases: 1
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 8
+  completed_plans: 8
 ---
 
 # Project State
@@ -20,15 +20,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-22 — v1.8 3D Realism Completion started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Milestone v1.8 — roadmap approved; next action = `/gsd:plan-phase 34` (User-Uploaded Textures)
+**Current focus:** Milestone v1.8 — Phase 34 (User-Uploaded Textures) in execution; Wave 1 (Plan 00 data layer) complete; Wave 2 (Plans 01 upload modal + 02 picker integration) next
 
 ## Current Position
 
 Milestone: v1.8 3D Realism Completion
-Phase: 34 (next — User-Uploaded Textures)
-Plan: —
-Status: Roadmap approved, awaiting plan-phase
-Last activity: 2026-04-22 — v1.8 roadmap created (4 phases: 34 User-Uploaded Textures, 35 Camera Presets, 36 VIZ-10 Regression, 37 Tech-Debt Sweep; 11/11 requirements mapped)
+Phase: 34 User-Uploaded Textures
+Plan: 00-data-layer — COMPLETE
+Status: Wave 1 complete; Plans 01/02 (Wave 2) can now begin in parallel
+Last activity: 2026-04-22 — Plan 34-00 shipped (UserTexture type, userTextureStore, useUserTextures hook, countTextureRefs utility, Wallpaper/FloorMaterial/Ceiling userTextureId schema)
 
 Completed milestones: v1.0, v1.1, v1.2, v1.3, v1.4, v1.5, v1.6, v1.7.5 (all archived in `.planning/milestones/`)
 Partial: v1.7 3D Realism — Phase 32 PBR Foundation shipped 2026-04-21; remainder absorbed into v1.8 as Phases 34–37
@@ -44,10 +44,15 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [v1.8 roadmap]: Phases 34/35/36/37 derived from requirement clustering: LIB-* → 34, CAM-* → 35, VIZ-10 → 36, DEBT-* → 37. Vertical-slice per capability, no horizontal layers.
 - [v1.8 roadmap]: Phase numbering continues from 33; no reset. Last shipped = 33 (v1.7.5 Design System), first new = 34.
 - [v1.8 roadmap]: Phase 36 sequencing: "DO NOT schedule fix plans before root-cause plan lands" is baked into plan-count estimate (2 plans: instrumentation + fix).
+- [Phase 34 Plan 00]: Physically isolate user-texture IDB via createStore("room-cad-user-textures", "textures") — not a key prefix in the default store — so listProjects() filter paths never couple to user-texture keys.
+- [Phase 34 Plan 00]: Dedup preserves first upload's metadata (name, tileSizeFt). Second upload with same SHA-256 returns existing id without overwrite. Renames flow through the Edit (D-11) path, not re-upload.
+- [Phase 34 Plan 00]: countTextureRefs is a pure snapshot-shaped function; callers pass useCADStore.getState() at the call site. Keeps it easy to test and reusable from non-React contexts.
+- [Phase 34 Plan 00]: Added fake-indexeddb/auto to tests/setup.ts so idb-keyval tests run against real IDB semantics under happy-dom (existing vi.mock callers unaffected).
 
 ### Pending Todos
 
-- Run `/gsd:plan-phase 34` to decompose User-Uploaded Textures into plans (est. 3–4)
+- Run Plans 34-01 (upload modal) and 34-02 (picker integration) in Wave 2 (can parallelize against Plan 00's stable API surface)
+- Plan 34-03 (Wave 3: 3D render integration + orphan fallback)
 - Phase 36 should run EARLY (parallel to Phase 34 or immediately after) — do NOT save for end
 - Phase 37 (Tech-Debt Sweep) sequenced LAST; cuttable under scope pressure
 
@@ -65,6 +70,6 @@ None. Roadmap approved, traceability complete (11/11), ready to plan Phase 34.
 
 ## Session Continuity
 
-Last session: 2026-04-22T17:51:52.594Z
-Stopped at: Phase 34 context gathered
-Resume file: .planning/phases/34-user-uploaded-textures/34-CONTEXT.md
+Last session: 2026-04-22T22:30:00.000Z
+Stopped at: Completed Phase 34 Plan 00 — data layer shipped (userTextureStore + hook + countTextureRefs + schema extensions)
+Resume file: .planning/phases/34-user-uploaded-textures/34-01-upload-modal-PLAN.md

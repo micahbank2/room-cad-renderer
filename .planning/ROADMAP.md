@@ -145,7 +145,7 @@
   6. Deleting a texture from the library while a project still references it leaves the project loadable; the orphan-referenced surface falls back to its base hex color without crash
 **Plans**: 4 plans
 Plans:
-- [ ] 34-00-data-layer-PLAN.md — UserTexture type + userTextureStore IDB keyspace (SHA-256 dedup, most-recent-first list) + useUserTextures hook + countTextureRefs + cad.ts schema extensions (Wave 1)
+- [x] 34-00-data-layer-PLAN.md — UserTexture type + userTextureStore IDB keyspace (SHA-256 dedup, most-recent-first list) + useUserTextures hook + countTextureRefs + cad.ts schema extensions (Wave 1) — SHIPPED 2026-04-22 (27 tests green; see 34-00-SUMMARY.md)
 - [ ] 34-01-upload-modal-PLAN.md — processTextureFile pipeline (MIME gate + 2048px downscale + SHA-256) + UploadTextureModal (create + edit modes per UI-SPEC §1) (Wave 2)
 - [ ] 34-02-picker-integration-PLAN.md — MyTexturesList shared component + DeleteTextureDialog (ref-count copy) + MY TEXTURES tab wired into Floor/Ceiling/Wall pickers (Wave 2)
 - [ ] 34-03-render-integration-PLAN.md — userTextureCache (non-disposing per wallpaper pattern) + useUserTexture hook + WallMesh/FloorMesh/CeilingMesh branches + orphan fallback + LIB-08 snapshot assertion + VIZ-10 regression guard (Wave 3)
@@ -198,7 +198,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 32. PBR Foundation | 7/7 | Complete    | 2026-04-21 |
 | 33. Design System & UI Polish | 10/10 | Complete    | 2026-04-22 |
-| 34. User-Uploaded Textures | 0/0 | Not started | - |
+| 34. User-Uploaded Textures | 1/4 | In progress | - |
 | 35. Camera Presets | 0/0 | Not started | - |
 | 36. Wallpaper/wallArt Regression (VIZ-10) | 0/0 | Not started | - |
 | 37. Tech-Debt Sweep | 0/0 | Not started | - |
