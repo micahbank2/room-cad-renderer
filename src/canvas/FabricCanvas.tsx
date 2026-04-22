@@ -32,6 +32,7 @@ import { attachDragDropHandlers } from "./dragDrop";
 import { computeLabelPx, hitTestDimLabel, validateInput } from "./dimensionEditor";
 import { closestPointOnWall, distance, formatFeet } from "@/lib/geometry";
 import { WainscotPopover } from "@/components/WainscotPopover";
+import { FloatingSelectionToolbar } from "@/components/ui/FloatingSelectionToolbar";
 import type { WallSide } from "@/types/cad";
 import type { Product } from "@/types/product";
 
@@ -538,6 +539,8 @@ export default function FabricCanvas({ productLibrary }: Props) {
           onClose={() => setWainscotEditWallId(null)}
         />
       )}
+      {/* Phase 33 GH #85 — floating toolbar anchors to selection bbox (D-10/D-12). */}
+      <FloatingSelectionToolbar fc={fcRef.current} wrapperRef={wrapperRef} />
     </div>
   );
 }
