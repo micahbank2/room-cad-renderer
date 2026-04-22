@@ -10,7 +10,7 @@
 - ✅ **v1.5 Performance & Tech Debt** — Phases 24–27 (shipped 2026-04-20) — see [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
 - ✅ **v1.6 Editing UX** — Phases 28–31 (shipped 2026-04-21) — see [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
 - 🟡 **v1.7 3D Realism** — Phase 32 shipped (2026-04-21); remaining phases (User-Uploaded Textures, Camera Presets, Tech-Debt Sweep) deferred to a future milestone
-- 🚧 **v1.7.5 Design System & UI Polish** — Phase 33 (scoping) — see below
+- ✅ **v1.7.5 Design System & UI Polish** — Phase 33 (shipped 2026-04-22) — see [milestones/v1.7.5-ROADMAP.md](milestones/v1.7.5-ROADMAP.md)
 
 ---
 
@@ -65,47 +65,12 @@
 
 </details>
 
----
+<details>
+<summary>✅ v1.7.5 Design System & UI Polish (Phase 33) — SHIPPED 2026-04-22</summary>
 
-## v1.7.5 Design System & UI Polish
+1 phase, 10 plans, 8/8 requirements complete (GH #83–#90). Canonical design tokens (typography 5-tier + spacing 7-step + radius 3-step in Tailwind v4 @theme), mixed-case typography hierarchy with UPPERCASE preserved for CAD identifiers, zero-arbitrary spacing sweep across Toolbar/Sidebar/PropertiesPanel/RoomSettings, `useReducedMotion` hook, `CollapsibleSection` primitive (10 PropertiesPanel sections + localStorage persistence), `LibraryCard` + `CategoryTabs` primitives (ProductLibrary + CustomElementsPanel migrated), `FloatingSelectionToolbar` with `uiStore.isDragging` bridge, dismissible `GestureChip` 2D/3D, rotation preset chips (-90/-45/0/+45/+90) with single-undo, `InlineEditableText` primitive for doc title + room tabs. Lucide-react chrome icons alongside 8-file Material Symbols CAD-glyph allowlist. 90 commits, +15,569/-908 LOC. Audit passed (8/8 reqs, 10/10 wirings, 5/5 E2E flows). See [milestones/v1.7.5-ROADMAP.md](milestones/v1.7.5-ROADMAP.md).
 
-**Goal:** Raise the visual + interaction quality bar to match Pascal Editor-class chrome. Unify typography, collapse panel clutter, add lightweight affordances (floating selection toolbar, gesture hints, rotation presets, inline-editable titles) and normalize library card + spacing/iconography across the app. Polish only — no new capabilities.
-
-**Source:** Pascal Editor competitive audit (`.planning/competitive/pascal-audit.md`) — 8 concrete polish items scoped in GH milestone [v1.7.5](https://github.com/micahbank2/room-cad-renderer/milestone/8) as issues #83–#90.
-
-**Requirements:** 8 GH issues | **Phases:** 1 (33)
-
-### Phases
-
-- [x] **Phase 33: Design System & UI Polish** — Typography overhaul, collapsible properties sections, floating selection toolbar, canvas gesture hints, rotation preset chips, inline-editable titles, unified library card pattern, spacing + iconography consistency pass (completed 2026-04-22)
-
-### Phase Details
-
-#### Phase 33: Design System & UI Polish
-**Goal**: Ship 8 polish items from Pascal competitive audit — the app reads as a peer-grade interior design tool (typography, collapsible properties, floating selection toolbar, gesture hints, rotation presets, inline-editable titles, unified library cards, spacing/icon consistency). No new capabilities; existing features only visually refined.
-**Depends on**: Nothing (Phase 32 independent)
-**Requirements**: GH [#83](https://github.com/micahbank2/room-cad-renderer/issues/83) through [#90](https://github.com/micahbank2/room-cad-renderer/issues/90) — all 8 issues in milestone [v1.7.5](https://github.com/micahbank2/room-cad-renderer/milestone/8)
-**Success Criteria** (what must be TRUE):
-  1. #83 — Typography: mixed-case hierarchy replaces blanket UPPERCASE in headers/buttons/labels; monospace reserved for values + identifiers; hierarchy has at least 3 visually distinct levels
-  2. #84 — Properties panel sections collapse/expand via chevron; per-section open state persists across session (NOT across page reload — UI state, not CAD state)
-  3. #85 — Selecting a product/wall/custom-element surfaces a floating mini-toolbar with Move / Duplicate / Delete; positioned relative to selection bbox without occluding handles
-  4. #86 — Canvas displays a gesture affordance chip ("Pan • Rotate • Zoom" with modifier hints) in a non-intrusive corner; hides during active drag
-  5. #87 — PropertiesPanel rotation row has -45° / +45° preset chips beside the numeric input; clicking pushes a single undo entry
-  6. #88 — Document title (in toolbar) and room tab labels are click-to-edit inline (same UX as Phase 31 label override — Enter/blur commits, Escape cancels)
-  7. #89 — Product Library / Art Library / Wainscot Library / Material picker share a unified card + category-tab component; visually identical structure
-  8. #90 — Spacing scale + border-radius + icon size/stroke are audited and normalized across Toolbar / Sidebar / PropertiesPanel / modals; no ad-hoc arbitrary values remain in the 4 highest-traffic files
-**Plans**: 10 plans
-  - [x] 33-00-PLAN.md — Wave 0 TDD test scaffolds (10 RED tests + driver README)
-  - [x] 33-01-PLAN.md — Foundation: lucide-react install + canonical typography/spacing/radius tokens + radius-lg sweep
-  - [x] 33-02-PLAN.md — #83 Typography: mixed-case hierarchy for headers + button labels; UPPERCASE preserved for identifiers/status/units
-  - [x] 33-03-PLAN.md — #90 Spacing audit (4 target files zero-arbitrary) + useReducedMotion hook + CLAUDE.md icon policy
-  - [x] 33-04-PLAN.md — #84 CollapsibleSection primitive + PropertiesPanel section wrappers + localStorage persistence
-  - [x] 33-05-PLAN.md — #89 LibraryCard + CategoryTabs primitives + ProductLibrary/CustomElementsPanel migration
-  - [x] 33-06-PLAN.md — #85 FloatingSelectionToolbar + uiStore isDragging bridge (selectTool wiring)
-  - [x] 33-07-PLAN.md — #86 GestureChip 2D/3D mounts with localStorage dismiss
-  - [x] 33-08-PLAN.md — #87 Rotation preset chips (-90/-45/0/+45/+90) in PropertiesPanel for products + custom elements
-  - [x] 33-09-PLAN.md — #88 InlineEditableText primitive + Toolbar doc title relocation + RoomTabs inline-edit
-**UI hint**: yes
+</details>
 
 ---
 

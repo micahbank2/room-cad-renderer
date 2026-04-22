@@ -30,21 +30,18 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 See `.planning/ROADMAP.md` for links to each milestone archive.
 
-## Current Milestone: v1.7 3D Realism
+## Next Milestone Goals
 
-**Goal:** Make Jessica's 3D view feel like the actual room — physically-based materials replace flat-color placeholders, she can drop in textures from photos of real surfaces she's considering, and she can switch camera angles to evaluate the space from multiple vantage points.
+**v1.7.5 Design System & UI Polish shipped 2026-04-22.** Next milestone is TBD — start with `/gsd:new-milestone` to scope.
 
-**Target features:**
-- **PBR material upgrade (#61)** — `WOOD_PLANK`, `CONCRETE`, `PLASTER` get albedo + normal + roughness maps; existing `PAINTED_DRYWALL` keeps current treatment
-- **User-uploaded textures (#47)** — Jessica drops a single image → albedo, with optional advanced pathway to add normal/roughness for full PBR
-- **Camera presets (#45)** — eye-level, top-down, 3/4 (current default), corner; toolbar buttons + `1/2/3/4` keyboard switch with smooth tween
-- **Tech-debt sweep** — close GH #44/#46/#50/#60 (v1.6 commits), delete orphan `SaveIndicator.tsx`, finish `effectiveDimensions` → `resolveEffectiveDims` migration in `productTool` placement, backfill Phase 29 SUMMARY frontmatter
+**Likely candidates** (prioritized by existing GH issues / deferred work):
 
-**Phase numbering:** continues from 32. Estimated 4–5 phases.
+1. **Complete v1.7 3D Realism** — Phase 34 User-Uploaded Textures (LIB-06/07/08), Phase 35 Camera Presets (CAM-01/02/03), Phase 36 Tech-Debt Sweep (DEBT-01..04). Phase 32 PBR Foundation already shipped.
+2. **Library surface migration follow-ups** (GH #89 deferred) — migrate WainscotLibrary, Paint/Material picker, FramedArt library onto the shared `LibraryCard` + `CategoryTabs` primitives from Phase 33. Three separate PRs or one consolidated polish phase.
+3. **Phase 999.2 regression fix** (backlog) — uploaded-image wallpaper + wallArt disappear after 2D↔3D toggle; requires Playwright instrumentation harness before a fourth speculative fix.
+4. **Phase 999.1** (backlog) — ceiling resize handles (extend Phase 31 pattern to customElements with `kind: "ceiling"`).
 
-**Out of v1.7:** GLTF/OBJ upload (#29 — Out of Scope per PROJECT), cloud sync (#30 — Out of Scope), design system redesign (#48 — blocked on mockups), R3F v9 / React 19 (#56 — deferred per D-02). Library overhaul, materials engine, parametric, architectural breadth all queued for v1.8+.
-
-**Why this milestone, why now:** Core Value is "Jessica can SEE her future room with her actual furniture before spending money." v1.0–v1.6 perfected the 2D editing + persistence + interaction layer; the SEEING side is 3D, and the realism gap is now the loudest friction. PBR + user textures compound directly on top of every prior milestone's work.
+**Why this milestone selection matters:** Core Value is "Jessica can SEE her future room with her actual furniture before spending money." v1.0–v1.6 delivered 2D editing + persistence; v1.7.5 closed the visual quality gap to peer-grade chrome; v1.7 remainder finishes the 3D realism story (PBR textures + user uploads + camera presets) that compounds directly on the foundations now in place.
 
 ## Target User
 
