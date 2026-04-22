@@ -22,6 +22,8 @@ vi.mock("idb-keyval", () => ({
   set: vi.fn().mockResolvedValue(undefined),
   del: vi.fn().mockResolvedValue(undefined),
   keys: vi.fn().mockResolvedValue([]),
+  values: vi.fn().mockResolvedValue([]),
+  createStore: vi.fn(() => ({})),
 }));
 
 // Mock serialization to stub loadProject / listProjects / getLastProjectId.
