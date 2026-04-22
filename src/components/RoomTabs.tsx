@@ -1,4 +1,5 @@
 import { useCADStore } from "@/stores/cadStore";
+import { InlineEditableText } from "@/components/ui/InlineEditableText";
 
 interface Props {
   onAddClick: () => void;
@@ -29,18 +30,37 @@ export default function RoomTabs({ onAddClick }: Props) {
     >
       {roomList.map((room) => {
         const isActive = room.id === activeRoomId;
-        const label = room.name.toUpperCase();
+        // Phase 33 GH #88: active tab is inline-editable; inactive tabs switch on click.
+        // Phase 02 D-04 note: UPPERCASE transform dropped for editable labels — edits
+        // reflect literal user input. Users wanting uppercase can type it.
         return (
           <div
             key={room.id}
-            onClick={() => handleSwitch(room.id)}
-            className={`group flex items-center gap-1.5 px-2 h-10 -mb-px cursor-pointer font-mono text-[10px] tracking-wider transition-colors ${
+            onClick={() => {
+              if (!isActive) handleSwitch(room.id);
+            }}
+            className={`group flex items-center gap-1.5 px-2 h-10 -mb-px font-mono text-[10px] tracking-wider transition-colors ${
               isActive
-                ? "text-accent-light border-b-2 border-accent-light"
-                : "text-text-dim hover:text-text-muted"
+                ? "text-accent-light border-b-2 border-accent-light cursor-text"
+                : "text-text-dim hover:text-text-muted cursor-pointer"
             }`}
           >
-            <span>{label}</span>
+            {isActive ? (
+              <InlineEditableText
+                value={room.name}
+                onLivePreview={(v) =>
+                  useCADStore.getState().renameRoomNoHistory(room.id, v)
+                }
+                onCommit={(v) =>
+                  useCADStore.getState().renameRoom(room.id, v)
+                }
+                maxLength={60}
+                data-testid={`inline-room-tab-${room.id}`}
+                className="font-mono text-[10px] tracking-wider min-w-[40px] max-w-[200px]"
+              />
+            ) : (
+              <span>{room.name}</span>
+            )}
             {canDelete && (
               <button
                 onClick={(e) => handleDelete(e, room.id, room.name)}

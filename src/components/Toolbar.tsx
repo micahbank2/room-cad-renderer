@@ -4,6 +4,7 @@ import { useProjectStore } from "@/stores/projectStore";
 import { exportRenderedImage } from "@/lib/export";
 import type { ToolType } from "@/types/cad";
 import Tooltip from "@/components/Tooltip";
+import { InlineEditableText } from "@/components/ui/InlineEditableText";
 
 const tools: { id: ToolType; label: string; icon: string }[] = [
   { id: "select", label: "SELECT", icon: "arrow_selector_tool" },
@@ -30,6 +31,16 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
   const cameraMode = useUIStore((s) => s.cameraMode);
   const toggleCameraMode = useUIStore((s) => s.toggleCameraMode);
   const openHelp = useUIStore((s) => s.openHelp);
+
+  // Phase 33 GH #88 — inline-edit document title in Toolbar center slot.
+  // Live-preview writes go to `draftName` (auto-save does NOT subscribe);
+  // commit flushes draftName → activeName in a single set() call, so
+  // auto-save fires exactly once per commit (genuine D-23 bypass).
+  const activeName = useProjectStore((s) => s.activeName);
+  const draftName = useProjectStore((s) => s.draftName);
+  const setDraftName = useProjectStore((s) => s.setDraftName);
+  const commitDraftName = useProjectStore((s) => s.commitDraftName);
+  const displayValue = draftName ?? activeName;
 
   return (
     <header className="h-14 bg-obsidian-deepest flex items-center px-4 shrink-0 ghost-border border-0 border-b">
@@ -93,8 +104,23 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
         </Tooltip>
       )}
 
-      {/* Spacer */}
-      <div className="flex-1" />
+      {/* Document title — inline-editable (Phase 33 GH #88) */}
+      <div className="flex-1 flex items-center justify-center min-w-0 px-4">
+        <InlineEditableText
+          value={displayValue}
+          onLivePreview={(v) => setDraftName(v)}
+          onCommit={(v) => {
+            // InlineEditableText has already trimmed + sliced. Ensure draftName
+            // is set so commitDraftName flushes (edge case: paste + Enter).
+            setDraftName(v);
+            commitDraftName();
+          }}
+          maxLength={60}
+          data-testid="inline-doc-title"
+          placeholder="Untitled Room"
+          className="font-mono text-sm text-text-primary text-center min-w-0 max-w-[320px] truncate"
+        />
+      </div>
 
       {/* Right actions */}
       <div className="flex items-center gap-2">
