@@ -4,6 +4,7 @@ import type { FloorMaterial } from "@/types/cad";
 import { FLOOR_PRESETS, type FloorPresetId } from "@/data/floorMaterials";
 import { SURFACE_MATERIALS } from "@/data/surfaceMaterials";
 import { PbrSurface } from "./PbrSurface";
+import { useUserTexture } from "@/hooks/useUserTexture";
 
 interface Props {
   width: number;
@@ -44,6 +45,14 @@ export default function FloorMesh({ width, length, halfW, halfL, material, fallb
     return surf?.pbr ? { mat: surf, pbr: surf.pbr } : null;
   }, [material]);
 
+  // Phase 34 — user-texture floor branch. When `kind === "user-texture"` AND
+  // the hook returns a THREE.Texture (not null), this branch renders. Null
+  // (orphan: the id was deleted from IDB) falls through to the flat-color
+  // fallback below (D-08/D-09).
+  const userTexId =
+    material?.kind === "user-texture" ? material.userTextureId : undefined;
+  const userTex = useUserTexture(userTexId);
+
   // Determine rendering path
   const { texture, color, roughness } = useMemo(() => {
     if (!material) {
@@ -63,6 +72,22 @@ export default function FloorMesh({ width, length, halfW, halfL, material, fallb
     return { texture: fallbackTexture, color: "#ffffff", roughness: 0.75 };
   }, [material, fallbackTexture, width, length]);
 
+  // Apply repeat/rotation to the user texture each render. The cache returns
+  // the singleton THREE.Texture, so mutation is safe (per-render is the
+  // same pattern wallpaper/art use).
+  if (material?.kind === "user-texture" && userTex) {
+    const s = Math.max(0.1, material.scaleFt);
+    userTex.repeat.set(width / s, length / s);
+    userTex.center.set(0.5, 0.5);
+    userTex.rotation = (material.rotationDeg * Math.PI) / 180;
+    userTex.needsUpdate = true;
+  }
+
+  // Phase 34 — user-texture branch wins over PBR/preset when present AND loaded.
+  // When userTex === null (orphan or still loading) → PBR/preset branch handles it.
+  const useUserTextureBranch =
+    material?.kind === "user-texture" && userTex !== null;
+
   return (
     <mesh
       position={[halfW, 0, halfL]}
@@ -70,7 +95,13 @@ export default function FloorMesh({ width, length, halfW, halfL, material, fallb
       receiveShadow
     >
       <planeGeometry args={[width, length]} />
-      {pbrMaterial ? (
+      {useUserTextureBranch ? (
+        // Phase 34 user-texture: non-disposing cache (userTextureCache.ts).
+        // `userTex` is guaranteed non-null by `useUserTextureBranch`.
+        <meshStandardMaterial color="#ffffff" roughness={0.75} metalness={0}>
+          <primitive attach="map" object={userTex!} dispose={null} />
+        </meshStandardMaterial>
+      ) : pbrMaterial ? (
         <PbrSurface
           pbr={pbrMaterial.pbr}
           widthFt={width}
