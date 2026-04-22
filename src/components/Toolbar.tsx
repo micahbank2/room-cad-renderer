@@ -48,20 +48,20 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
           <Tooltip content="Change floor plan / upload reference image" placement="bottom">
             <button
               onClick={onFloorPlanClick}
-              className="flex items-center gap-1.5 font-mono text-[10px] tracking-widest px-3 py-1 text-text-dim hover:text-accent-light transition-colors duration-150"
+              className="flex items-center gap-1.5 font-mono text-sm font-normal px-3 py-1 text-text-dim hover:text-accent-light transition-colors duration-150"
             >
               <span className="material-symbols-outlined text-[14px]">grid_view</span>
-              FLOOR PLAN
+              Floor plan
             </button>
           </Tooltip>
         )}
         {(["2d", "3d", "library", "split"] as const).map((mode) => {
-          const labels = { "2d": "2D PLAN", "3d": "3D VIEW", library: "LIBRARY", split: "SPLIT" };
+          const labels = { "2d": "2D plan", "3d": "3D view", library: "Library", split: "Split" };
           return (
             <button
               key={mode}
               onClick={() => onViewChange(mode)}
-              className={`font-mono text-[10px] tracking-widest px-3 py-1 transition-colors duration-150 ${
+              className={`font-mono text-sm font-normal px-3 py-1 transition-colors duration-150 ${
                 viewMode === mode
                   ? "text-accent-light border-b-2 border-accent"
                   : "text-text-dim hover:text-accent-light"
@@ -81,14 +81,14 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
         >
           <button
             onClick={toggleCameraMode}
-            className={`flex items-center gap-1.5 font-mono text-[10px] tracking-widest px-3 py-1 transition-colors duration-150 mr-6 ${
+            className={`flex items-center gap-1.5 font-mono text-sm font-normal px-3 py-1 transition-colors duration-150 mr-6 ${
               cameraMode === "walk"
                 ? "text-accent-light border-b-2 border-accent"
                 : "text-text-dim hover:text-accent-light"
             }`}
           >
             <span className="material-symbols-outlined text-[14px]">directions_walk</span>
-            {cameraMode === "orbit" ? "WALK" : "ORBIT"}
+            {cameraMode === "orbit" ? "Walk" : "Orbit"}
           </button>
         </Tooltip>
       )}
@@ -102,6 +102,7 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
           <button
             onClick={undo}
             disabled={pastLen === 0}
+            aria-label="Undo"
             className="text-text-dim hover:text-text-primary disabled:opacity-20 transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">undo</span>
@@ -111,6 +112,7 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
           <button
             onClick={redo}
             disabled={futureLen === 0}
+            aria-label="Redo"
             className="text-text-dim hover:text-text-primary disabled:opacity-20 transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">redo</span>
@@ -130,9 +132,10 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
               }
               exportRenderedImage();
             }}
-            className="font-mono text-[10px] tracking-widest px-3 py-1 border border-accent text-accent hover:bg-accent/10 transition-colors rounded-sm"
+            className="font-mono text-sm font-normal px-3 py-1 border border-accent text-accent hover:bg-accent/10 transition-colors rounded-sm"
+            aria-label="Export"
           >
-            EXPORT
+            Export
           </button>
         </Tooltip>
 
@@ -172,7 +175,7 @@ function ToolbarSaveStatus() {
   // D-04 / D-04a: SAVE_FAILED surface — persists (no auto-fade) until store leaves "failed"
   if (status === "failed") {
     return (
-      <div className="flex items-center gap-1.5 min-w-[72px]">
+      <div className="flex items-center gap-1.5 min-w-[72px]" aria-label="Save status">
         <span className="material-symbols-outlined text-[14px] text-error">error</span>
         <span className="font-mono text-[10px] tracking-widest text-error">
           SAVE_FAILED
@@ -184,7 +187,7 @@ function ToolbarSaveStatus() {
   const isSaving = status === "saving";
   const isSaved = status === "saved" || status === "idle";
   return (
-    <div className="flex items-center gap-1.5 min-w-[72px]">
+    <div className="flex items-center gap-1.5 min-w-[72px]" aria-label="Save status">
       {isSaving ? (
         <>
           <span className="material-symbols-outlined text-[14px] text-accent-light animate-spin">
