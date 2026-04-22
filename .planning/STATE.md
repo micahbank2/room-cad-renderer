@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.7.5
 milestone_name: Design System & UI Polish
 status: executing
-stopped_at: Completed 33-01-PLAN.md (foundation tokens)
-last_updated: "2026-04-22T13:44:28.487Z"
+stopped_at: Completed 33-00-PLAN.md (test scaffolding)
+last_updated: "2026-04-22T13:46:08.050Z"
 last_activity: 2026-04-22
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 10
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
 
 Milestone: v1.7.5 Design System & UI Polish
 Phase: 33 (design-system-ui-polish) — EXECUTING
-Plan: 2 of 10
+Plan: 3 of 10
 Status: Ready to execute
 Last activity: 2026-04-22
 
@@ -67,6 +67,7 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 32-pbr-foundation]: D-06 fix-not-rollback: wallpaper loader previously defaulted to NoColorSpace (wrong for sRGB JPGs); shared cache now sets SRGBColorSpace — documented as a correctness fix, not reverted.
 - [Phase 32-pbr-foundation]: Plan 04: Locked Phase 32 PBR behavior with +12 vitest assertions (9 integration + 3 boundary) + gated __getPbrCacheState test driver. VIZ-07/VIZ-08 closed with automated regression guards. Zero regressions (367 → 379 passing).
 - [Phase 33-design-system-ui-polish]: Plan 33-01: installed lucide-react@1.8.0 + added Phase 33 tokens to src/index.css using v4 --text-*/--spacing-* prefix; --radius-lg canonicalized 6px→8px; 6 12px-spacing sites audited for Plan 03
+- [Phase 33]: Plan 33-00: 11 RED test scaffolds + driver contract README locking every Wave 1/2/3 plan; baseline 31 failing/13 passing; tokens+spacingAudit already green serve as regression guards
 
 ### Pending Todos
 
@@ -87,6 +88,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-22T13:44:28.482Z
-Stopped at: Completed 33-01-PLAN.md (foundation tokens)
+Last session: 2026-04-22T13:46:08.048Z
+Stopped at: Completed 33-00-PLAN.md (test scaffolding)
 Resume file: None
