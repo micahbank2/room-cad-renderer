@@ -75,9 +75,9 @@ Obsidian CAD palette from `src/index.css`. 60/30/10 split:
 | Tertiary surface | `#1b1a26` `--color-obsidian-low` | `bg-obsidian-low` | MY TEXTURES grid container background; picker tab panel background |
 | Hover states | `#292935` `--color-obsidian-high` | `bg-obsidian-high` | LibraryCard hover, ⋮ menu item hover, Upload tile hover |
 | Elevated | `#343440` `--color-obsidian-highest` | `bg-obsidian-highest` | ⋮ dropdown menu background |
-| Accent (10%) | `#7c5bf0` `--color-accent` | `bg-accent` / `text-accent` | Reserved for: (1) selected LibraryCard ring, (2) active "MY TEXTURES" tab indicator, (3) Save button background, (4) drag-over zone border highlight, (5) Upload tile `+` icon on hover |
+| Accent (10%) | `#7c5bf0` `--color-accent` | `bg-accent` / `text-accent` | Reserved for: (1) selected LibraryCard ring, (2) active "MY TEXTURES" tab indicator, (3) Upload Texture / Save Changes button background, (4) drag-over zone border highlight, (5) Upload tile `+` icon on hover |
 | Accent light | `#ccbeff` `--color-accent-light` | `text-accent-light` | Tile size value display in card, active tab label text |
-| Destructive | `#ffb4ab` `--color-error` | `text-error` | Delete button text in confirm dialog; inline MIME/size error copy under file field |
+| Destructive | `#ffb4ab` `--color-error` | `text-error` | Delete Texture button text in confirm dialog; inline MIME/size error copy under file field |
 | Text primary | `#e3e0f1` | `text-text-primary` | Texture name in card, modal heading, field input text |
 | Text muted | `#cac3d7` | `text-text-muted` | Helper text, ref-count prose in delete dialog |
 | Text dim | `#938ea0` | `text-text-dim` | Tile size label in card, field label secondary |
@@ -103,11 +103,15 @@ New components to create in Phase 34. Each has its own visual contract:
 
 **Layout:** Fixed-position centered modal, `w-[520px]`. Same shape as `AddProductModal`: `fixed inset-0 z-50 flex items-center justify-center`.
 
-**Backdrop:** `bg-obsidian-deepest/80 backdrop-blur-sm`. Click to dismiss = Cancel.
+**Backdrop:** `bg-obsidian-deepest/80 backdrop-blur-sm`. Click to dismiss = Discard.
 
 **Modal surface:** `bg-obsidian-mid/90 backdrop-blur-xl border border-outline-variant/20 rounded-sm shadow-2xl`.
 
 **Header:** `p-6 pb-4`. Label: `UPLOAD TEXTURE` (create mode) / `EDIT TEXTURE` (edit mode). Font: IBM Plex Mono 13px 500 UPPERCASE tracking-widest, `text-text-primary`. Close button: lucide `X` icon, 16px, `text-text-ghost hover:text-text-primary`.
+
+**Focal Point:**
+- Create mode: the drop zone is the primary visual anchor. It occupies the full modal width, uses 2xl inner padding, and is the first interactive element after the header. All other fields (Name, Tile Size) sit below it.
+- Edit mode: the Name field is the primary visual anchor. It renders at the top of the form body (no drop zone), receives `autoFocus` on modal open, and its label is rendered with `text-text-primary` (elevated vs. the `text-text-dim` used for Tile Size label).
 
 **Drop zone (create mode only):**
 - Idle: `rounded-md border-2 border-dashed border-outline-variant/40 bg-obsidian-low` with `p-8` internal padding. Centered content: lucide `Upload` icon (24px, `text-text-dim`) + prose text "Drag and drop a photo, or click to browse." (Inter 13px, `text-text-muted`). Click opens file picker.
@@ -122,7 +126,7 @@ New components to create in Phase 34. Each has its own visual contract:
 - "Change" link (11px, `text-accent`) below thumbnail to re-open file picker.
 
 **Name input:**
-- Label: `NAME` (IBM Plex Mono 11px 500 UPPERCASE `text-text-dim`).
+- Label: `NAME` (IBM Plex Mono 11px 500 UPPERCASE `text-text-dim`). In edit mode, label renders as `text-text-primary` (focal point elevation).
 - Input: `bg-obsidian-low border border-outline-variant/20 rounded-sm px-2 py-1 text-sm font-mono text-text-primary w-full placeholder:text-text-ghost`.
 - Placeholder: `"e.g. Oak Floor"`
 - Max length: 40 characters (matches `labelOverride` cap from Phase 31).
@@ -130,19 +134,21 @@ New components to create in Phase 34. Each has its own visual contract:
 **Tile size input:**
 - Label: `TILE SIZE` (same style as Name label). Helper: `"Real-world repeat (e.g. 2'6\")"` — Inter 11px `text-text-ghost`.
 - Input: same style as Name. Placeholder: `"2'"`. Default pre-fill: `"2'"` (2.0 ft).
-- Parsed via `validateInput` from `src/canvas/dimensionEditor.ts` on blur + on Save attempt.
+- Parsed via `validateInput` from `src/canvas/dimensionEditor.ts` on blur + on Upload Texture / Save Changes attempt.
 - Invalid state: red underline `border-error` + inline error below: `"Enter a valid size like 2', 1'6\", or 0.5"` — IBM Plex Mono 11px `text-error`.
 
 **Inline MIME error (create mode):** Rendered below the drop zone, NOT as a toast. Copy: `"Only JPEG, PNG, and WebP are supported."` — IBM Plex Mono 11px `text-error`.
 
 **Inline oversize/decode error:** `"This file couldn't be processed. Try a different image."` — same style.
 
-**Progress state:** Save button shows spinner (lucide `Loader2` 14px with `animate-spin`) + label `"Saving…"`. Button disabled during processing. Reduced-motion guard: when `useReducedMotion()` is true, no spin animation — show static `Loader2` icon.
+**Progress state (create mode):** Upload Texture button shows spinner (lucide `Loader2` 14px with `animate-spin`) + label `"Uploading…"`. Button disabled during processing. Reduced-motion guard: when `useReducedMotion()` is true, no spin animation — show static `Loader2` icon.
+
+**Progress state (edit mode):** Save Changes button shows spinner + label `"Saving Changes…"`. Same disabled and reduced-motion behavior.
 
 **Footer:** `flex justify-end gap-2 p-6 pt-4`.
-- Cancel: `rounded-sm px-4 py-1 font-mono text-sm text-text-muted hover:text-text-primary bg-obsidian-high hover:bg-obsidian-highest border border-outline-variant/20`.
-- Save: `rounded-sm px-4 py-1 font-mono text-sm text-text-primary bg-accent hover:bg-accent/90 border-0`. Disabled state: `opacity-50 cursor-not-allowed`.
-- Save disabled when: no file selected (create mode), name is empty, tile size is invalid, or processing is in flight.
+- Discard: `rounded-sm px-4 py-1 font-mono text-sm text-text-muted hover:text-text-primary bg-obsidian-high hover:bg-obsidian-highest border border-outline-variant/20`.
+- Upload Texture (create) / Save Changes (edit): `rounded-sm px-4 py-1 font-mono text-sm text-text-primary bg-accent hover:bg-accent/90 border-0`. Disabled state: `opacity-50 cursor-not-allowed`.
+- Primary CTA disabled when: no file selected (create mode), name is empty, tile size is invalid, or processing is in flight.
 
 **Toast on success:** `"Texture saved."` — uses existing `sonner` toast infrastructure. No details needed.
 
@@ -169,7 +175,7 @@ New components to create in Phase 34. Each has its own visual contract:
 - Bottom overlay: two lines — texture name (IBM Plex Mono 11px 500 UPPERCASE `text-text-primary`), tile size (IBM Plex Mono 11px 400 `text-accent-light` e.g. `"2'0"`).
 - Selected state: `ring-2 ring-accent ring-offset-1 ring-offset-obsidian-low`.
 - Click to apply: clicking card calls picker's `onSelect(userTextureId)` action. This is the primary apply gesture.
-- ⋮ menu: `MoreHorizontal` lucide icon (14px), revealed on card hover (not always visible). Position: top-right corner of card, `absolute top-1 right-1`. Opens dropdown with two items:
+- ⋮ menu: `MoreHorizontal` lucide icon (14px), revealed on card hover (not always visible). Position: top-right corner of card, `absolute top-1 right-1`. The ⋮ button MUST include `aria-label="Texture options"` — it is icon-only with no visible text label. Opens dropdown with two items:
   - `Edit` — opens UploadTextureModal in `mode="edit"` with current name + tile size pre-filled.
   - `Delete` — opens DeleteTextureDialog.
 - ⋮ dropdown menu: `bg-obsidian-highest border border-outline-variant/20 rounded-sm shadow-lg`. Items: `px-2 py-1 font-mono text-[11px] text-text-muted hover:bg-obsidian-high hover:text-text-primary cursor-pointer`. Delete item: `text-error hover:text-error`.
@@ -190,7 +196,7 @@ New components to create in Phase 34. Each has its own visual contract:
 
 **Layout:** Centered modal, `w-[400px]`. Same modal shell as UploadTextureModal.
 
-**Header:** `"DELETE TEXTURE"` — IBM Plex Mono 13px 500 UPPERCASE tracking-widest `text-text-primary`. No close button (use Cancel button).
+**Header:** `"DELETE TEXTURE"` — IBM Plex Mono 13px 500 UPPERCASE tracking-widest `text-text-primary`. No close button (use Discard button).
 
 **Body copy:**
 
@@ -206,8 +212,8 @@ Delete {TEXTURE_NAME}? This texture isn't used by any surface.
 ```
 
 **Footer:** `flex justify-end gap-2`.
-- Cancel: same Cancel style as UploadTextureModal.
-- Delete: `rounded-sm px-4 py-1 font-mono text-sm text-error bg-obsidian-high hover:bg-error/10 border border-error/30`.
+- Discard: same Discard style as UploadTextureModal.
+- Delete Texture: `rounded-sm px-4 py-1 font-mono text-sm text-error bg-obsidian-high hover:bg-error/10 border border-error/30`.
 
 Source: D-07 (exact copy shape locked).
 
@@ -222,11 +228,12 @@ All copy is pre-locked by D-03a and D-07. No ambiguity.
 | Modal title (create) | `UPLOAD TEXTURE` |
 | Modal title (edit) | `EDIT TEXTURE` |
 | Modal title (delete) | `DELETE TEXTURE` |
-| Primary CTA (create) | `Save` |
-| Primary CTA (edit) | `Save` |
-| Destructive CTA | `Delete` |
-| Cancel CTA | `Cancel` |
-| Progress label (Save button) | `Saving…` |
+| Primary CTA (create) | `Upload Texture` |
+| Primary CTA (edit) | `Save Changes` |
+| Destructive CTA | `Delete Texture` |
+| Dismiss CTA (modal + dialog) | `Discard` |
+| Progress label (create, primary button) | `Uploading…` |
+| Progress label (edit, primary button) | `Saving Changes…` |
 | Empty state heading | `NO CUSTOM TEXTURES` |
 | Empty state body | `Upload a photo of a surface to use it on walls, floors, and ceilings.` |
 | MIME error (inline) | `Only JPEG, PNG, and WebP are supported.` |
@@ -253,13 +260,21 @@ Source: D-03a (MIME copy), D-07 (delete dialog copy). All other copy follows CAD
 
 | State | Visual |
 |-------|--------|
-| Idle (no file) | Drop zone visible, Save disabled |
+| Idle (no file) | Drop zone visible, Upload Texture disabled |
 | Drag-over | Drop zone border → solid accent, bg-accent/5 |
-| File selected (processing) | Drop zone replaced by thumbnail, Save shows spinner (`Saving…`), inputs locked |
+| File selected (processing) | Drop zone replaced by thumbnail, Upload Texture shows spinner (`Uploading…`), inputs locked |
 | MIME rejected | Inline error under drop zone, drop zone resets to idle |
 | Decode failure | Inline error under drop zone |
-| Ready to save | Preview + filled name + valid tile size → Save enabled |
-| Saving in flight | Save button spinner, all inputs + Cancel disabled |
+| Ready to save | Preview + filled name + valid tile size → Upload Texture enabled |
+| Uploading in flight | Upload Texture button spinner, all inputs + Discard disabled |
+| Upload success | Modal closes, toast appears |
+
+### Edit flow (edit mode)
+
+| State | Visual |
+|-------|--------|
+| Idle | Name field focused (autoFocus), Save Changes enabled if no validation errors |
+| Saving in flight | Save Changes button shows spinner (`Saving Changes…`), all inputs + Discard disabled |
 | Save success | Modal closes, toast appears |
 
 ### MY TEXTURES tab states
@@ -277,9 +292,9 @@ Source: D-03a (MIME copy), D-07 (delete dialog copy). All other copy follows CAD
 
 | State | Visual |
 |-------|--------|
-| Loading ref-count | Delete button shows `Loader2` spinner, disabled |
-| Count resolved | Full copy rendered, Delete enabled |
-| Deleting | Delete button spinner (`Deleting…`), both buttons disabled |
+| Loading ref-count | Delete Texture button shows `Loader2` spinner, disabled |
+| Count resolved | Full copy rendered, Delete Texture enabled |
+| Deleting | Delete Texture button spinner (`Deleting…`), both buttons disabled |
 | Complete | Dialog closes, texture disappears from grid |
 
 ---
@@ -294,7 +309,7 @@ All animations guard on `useReducedMotion()` from `src/hooks/useReducedMotion.ts
 | Modal close | Fade-out + scale (`opacity-100 scale-100` → `opacity-0 scale-95`, 100ms ease-in) | Snap close |
 | Drop zone drag-over | Border color + bg transition (100ms) | Snap |
 | Skeleton loading pulse | `animate-pulse` | Static bg |
-| Save button spinner | `animate-spin` | Static icon |
+| Button spinner | `animate-spin` | Static icon |
 | ⋮ menu open | Fade-in (100ms) | Snap |
 
 Implementation: use `transition-[opacity,transform]` Tailwind utilities, not custom keyframe CSS, to stay within the design system.
@@ -388,3 +403,22 @@ No third-party component registries used. No shadcn. All components are bespoke 
 - [ ] Dimension 6 Registry Safety: PASS
 
 **Approval:** pending
+
+---
+
+## UI-SPEC COMPLETE
+
+### What Changed (revision pass)
+
+**Dimension 1 — Copywriting (blocking fixes):**
+- `Save` (create CTA) → `Upload Texture` — updated in Copywriting Contract table, UploadTextureModal footer spec, progress state label, Interaction States table
+- `Save` (edit CTA) → `Save Changes` — same locations; progress label set to `Saving Changes…`
+- `Cancel` (both modals) → `Discard` — updated in Copywriting Contract table, UploadTextureModal footer spec, DeleteTextureDialog footer spec, backdrop click description, header description
+- `Saving…` (create progress) → `Uploading…` — updated in Progress state spec and Interaction States table
+- `Delete` (destructive CTA) → `Delete Texture` — updated in Copywriting Contract table, DeleteTextureDialog footer spec, Delete dialog states table
+- Color section accent entry updated: "Save button" reference → "Upload Texture / Save Changes button"
+
+**Dimension 2 — Visuals (non-blocking recommendations):**
+- Added "Focal Point" sub-section to UploadTextureModal: create mode = drop zone; edit mode = Name field (with `autoFocus` and elevated label color spec)
+- Added edit-mode interaction state row to Interaction States table
+- Added `aria-label="Texture options"` requirement to the ⋮ button in MyTexturesList texture card spec
