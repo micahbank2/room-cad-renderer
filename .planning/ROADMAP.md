@@ -77,7 +77,7 @@
 
 ### Phases
 
-- [ ] **Phase 33: Design System & UI Polish** — Typography overhaul, collapsible properties sections, floating selection toolbar, canvas gesture hints, rotation preset chips, inline-editable titles, unified library card pattern, spacing + iconography consistency pass
+- [x] **Phase 33: Design System & UI Polish** — Typography overhaul, collapsible properties sections, floating selection toolbar, canvas gesture hints, rotation preset chips, inline-editable titles, unified library card pattern, spacing + iconography consistency pass (completed 2026-04-22)
 
 ### Phase Details
 
@@ -102,7 +102,7 @@
   - [x] 33-04-PLAN.md — #84 CollapsibleSection primitive + PropertiesPanel section wrappers + localStorage persistence
   - [x] 33-05-PLAN.md — #89 LibraryCard + CategoryTabs primitives + ProductLibrary/CustomElementsPanel migration
   - [x] 33-06-PLAN.md — #85 FloatingSelectionToolbar + uiStore isDragging bridge (selectTool wiring)
-  - [ ] 33-07-PLAN.md — #86 GestureChip 2D/3D mounts with localStorage dismiss
+  - [x] 33-07-PLAN.md — #86 GestureChip 2D/3D mounts with localStorage dismiss
   - [x] 33-08-PLAN.md — #87 Rotation preset chips (-90/-45/0/+45/+90) in PropertiesPanel for products + custom elements
   - [x] 33-09-PLAN.md — #88 InlineEditableText primitive + Toolbar doc title relocation + RoomTabs inline-edit
 **UI hint**: yes
@@ -125,7 +125,7 @@
 ### Phase Details
 
 #### Phase 32: PBR Foundation
-**Plans:** 9/10 plans executed
+**Plans:** 10/10 plans complete
 **Goal**: Jessica's WOOD_PLANK, CONCRETE, and PLASTER walls/floors/ceilings read as believable surfaces in 3D — wood shows plank seams + grain, concrete shows aggregate roughness, plaster shows subtle surface variation
 **Depends on**: Nothing (first v1.7 phase)
 **Requirements**: VIZ-07, VIZ-08, VIZ-09
@@ -191,7 +191,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 32. PBR Foundation | 7/7 | Complete    | 2026-04-21 |
-| 33. Design System & UI Polish | 9/10 | In Progress|  |
+| 33. Design System & UI Polish | 10/10 | Complete   | 2026-04-22 |
 | 34. User-Uploaded Textures | 0/0 | Deferred    | - |
 | 35. Camera Presets | 0/0 | Deferred    | - |
 | 36. Tech-Debt Sweep | 0/0 | Deferred    | - |
