@@ -57,14 +57,6 @@
   --text-display: 28px;
   --text-base: 13px;
   --text-sm: 11px;
-
-  /* Phase 33 — Canonical spacing scale (D-34; 12px dropped per checker D5).
-     v4 naming: --spacing-* exposes as p-{name}/m-{name}/gap-{name}. */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-lg: 16px;
-  --spacing-xl: 24px;
-  --spacing-2xl: 32px;
 }
 
 /* ── Base styles ── */
