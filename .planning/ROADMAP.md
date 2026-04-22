@@ -98,7 +98,7 @@
   - [x] 33-00-PLAN.md — Wave 0 TDD test scaffolds (10 RED tests + driver README)
   - [x] 33-01-PLAN.md — Foundation: lucide-react install + canonical typography/spacing/radius tokens + radius-lg sweep
   - [x] 33-02-PLAN.md — #83 Typography: mixed-case hierarchy for headers + button labels; UPPERCASE preserved for identifiers/status/units
-  - [ ] 33-03-PLAN.md — #90 Spacing audit (4 target files zero-arbitrary) + useReducedMotion hook + CLAUDE.md icon policy
+  - [x] 33-03-PLAN.md — #90 Spacing audit (4 target files zero-arbitrary) + useReducedMotion hook + CLAUDE.md icon policy
   - [ ] 33-04-PLAN.md — #84 CollapsibleSection primitive + PropertiesPanel section wrappers + localStorage persistence
   - [ ] 33-05-PLAN.md — #89 LibraryCard + CategoryTabs primitives + ProductLibrary/CustomElementsPanel migration
   - [ ] 33-06-PLAN.md — #85 FloatingSelectionToolbar + uiStore isDragging bridge (selectTool wiring)
@@ -125,7 +125,7 @@
 ### Phase Details
 
 #### Phase 32: PBR Foundation
-**Plans:** 3/10 plans executed
+**Plans:** 4/10 plans executed
 **Goal**: Jessica's WOOD_PLANK, CONCRETE, and PLASTER walls/floors/ceilings read as believable surfaces in 3D — wood shows plank seams + grain, concrete shows aggregate roughness, plaster shows subtle surface variation
 **Depends on**: Nothing (first v1.7 phase)
 **Requirements**: VIZ-07, VIZ-08, VIZ-09
@@ -191,7 +191,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 32. PBR Foundation | 7/7 | Complete    | 2026-04-21 |
-| 33. Design System & UI Polish | 3/10 | In Progress|  |
+| 33. Design System & UI Polish | 4/10 | In Progress|  |
 | 34. User-Uploaded Textures | 0/0 | Deferred    | - |
 | 35. Camera Presets | 0/0 | Deferred    | - |
 | 36. Tech-Debt Sweep | 0/0 | Deferred    | - |
