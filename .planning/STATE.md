@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: 3D Realism Completion
-status: Phase 34 Plan 01 complete — upload modal + processTextureFile pipeline shipped
-stopped_at: Completed Phase 34 Plan 01 — UploadTextureModal + processTextureFile + 27 new tests green
-last_updated: "2026-04-22T15:30:00.000Z"
-last_activity: "2026-04-22 — Plan 34-01 complete (2 tasks, 27 new tests passing, LIB-06/LIB-07 MIME gate + 2048px downscale + SHA-256 + dual-mode modal)"
+status: Phase 34 Plan 02 complete — MY TEXTURES pickers + delete dialog shipped
+stopped_at: Completed Phase 34 Plan 02 — MyTexturesList + DeleteTextureDialog + 3 picker integrations + 22 new tests green
+last_updated: "2026-04-22T15:45:00.000Z"
+last_activity: "2026-04-22 — Plan 34-02 complete (3 tasks, 22 new tests passing, MY TEXTURES tab in floor/ceiling/wall pickers, user-texture-deleted CustomEvent contract for Plan 03)"
 progress:
   total_phases: 1
   completed_phases: 1
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-22 — v1.8 3D Realism Completion sta
 
 Milestone: v1.8 3D Realism Completion
 Phase: 34 User-Uploaded Textures
-Plan: 00-data-layer — COMPLETE
-Status: Wave 1 complete; Plans 01/02 (Wave 2) can now begin in parallel
-Last activity: 2026-04-22 — Plan 34-00 shipped (UserTexture type, userTextureStore, useUserTextures hook, countTextureRefs utility, Wallpaper/FloorMaterial/Ceiling userTextureId schema)
+Plan: 00-data-layer — COMPLETE; 01-upload-modal — COMPLETE; 02-picker-integration — COMPLETE
+Status: Waves 1 + 2 complete; Plan 34-03 (Wave 3: 3D render integration + orphan fallback + user-texture-deleted cache subscription) ready to begin
+Last activity: 2026-04-22 — Plan 34-02 shipped (MyTexturesList, DeleteTextureDialog with locked D-07 copy, MY TEXTURES tab wired into floor/ceiling/wall pickers, user-texture-deleted CustomEvent contract published for Plan 03)
 
 Completed milestones: v1.0, v1.1, v1.2, v1.3, v1.4, v1.5, v1.6, v1.7.5 (all archived in `.planning/milestones/`)
 Partial: v1.7 3D Realism — Phase 32 PBR Foundation shipped 2026-04-21; remainder absorbed into v1.8 as Phases 34–37
@@ -53,6 +53,9 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 34 Plan 01]: UploadTextureModal is a single dual-mode component (create + edit) per D-11. Edit mode hides the drop zone, autoFocuses Name, and calls useUserTextures().update instead of .save.
 - [Phase 34 Plan 01]: sonner is not in package.json. Inlined a console.info toast shim behind a single call site (toastSuccess) and kept the "Texture saved." copy in a centralized COPY constant — one-line swap to real sonner when Plan 02/03 adopts it.
 - [Phase 34 Plan 01]: window.__driveTextureUpload(file, name, tileSizeFt) test driver (import.meta.env.MODE === "test" gated) bypasses the React tree — happy-dom cannot cleanly synthesize a native <input type="file"> change event. Plan 02 picker tests can seed textures via this bridge.
+- [Phase 34 Plan 02]: MyTexturesList + DeleteTextureDialog ship the LIB-06 picker surface — MY TEXTURES tab lands in FloorMaterialPicker, SurfaceMaterialPicker (ceiling via CeilingPaintSection), and WallSurfacePanel. No cadStore action changes needed (Plan 00 widened types so setFloorMaterial/updateCeiling/setWallpaper accept userTextureId via pass-through).
+- [Phase 34 Plan 02]: DeleteTextureDialog emits window.dispatchEvent(new CustomEvent("user-texture-deleted", { detail: { id } })) after successful remove(). Plan 03 userTextureCache MUST addEventListener on "user-texture-deleted" to invalidate cached THREE.Texture entries. Contract is DOM-event-based to keep Plan 02 dependency-free from Plan 03's cache module.
+- [Phase 34 Plan 02]: Auto-fixed 6 test mocks (phase31*/snapIntegration/App.restore) to add createStore + values to idb-keyval mock — direct consequence (Rule 3 Blocking) of picker imports cascading into useUserTextures → userTextureStore. Mock additions are minimal (2 lines each).
 
 ### Pending Todos
 

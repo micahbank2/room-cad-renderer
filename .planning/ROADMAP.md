@@ -147,7 +147,7 @@
 Plans:
 - [x] 34-00-data-layer-PLAN.md — UserTexture type + userTextureStore IDB keyspace (SHA-256 dedup, most-recent-first list) + useUserTextures hook + countTextureRefs + cad.ts schema extensions (Wave 1) — SHIPPED 2026-04-22 (27 tests green; see 34-00-SUMMARY.md)
 - [x] 34-01-upload-modal-PLAN.md — processTextureFile pipeline (MIME gate + 2048px downscale + SHA-256) + UploadTextureModal (create + edit modes per UI-SPEC §1) (Wave 2) — SHIPPED 2026-04-22 (27 new tests green; see 34-01-upload-modal-SUMMARY.md)
-- [ ] 34-02-picker-integration-PLAN.md — MyTexturesList shared component + DeleteTextureDialog (ref-count copy) + MY TEXTURES tab wired into Floor/Ceiling/Wall pickers (Wave 2)
+- [x] 34-02-picker-integration-PLAN.md — MyTexturesList shared component + DeleteTextureDialog (ref-count copy) + MY TEXTURES tab wired into Floor/Ceiling/Wall pickers (Wave 2) — SHIPPED 2026-04-22 (22 new tests green; user-texture-deleted CustomEvent contract published; see 34-02-picker-integration-SUMMARY.md)
 - [ ] 34-03-render-integration-PLAN.md — userTextureCache (non-disposing per wallpaper pattern) + useUserTexture hook + WallMesh/FloorMesh/CeilingMesh branches + orphan fallback + LIB-08 snapshot assertion + VIZ-10 regression guard (Wave 3)
 **UI hint**: yes
 
