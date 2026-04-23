@@ -43,22 +43,16 @@ export function DeleteTextureDialog(props: DeleteTextureDialogProps): JSX.Elemen
   const reducedMotion = useReducedMotion();
   const { remove } = useUserTextures();
 
-  // Pull a minimal snapshot-shaped object off the store. Only the fields
-  // countTextureRefs reads (rooms) are actually consulted; the rest are
-  // included for forward-compat with the CADSnapshot type.
-  const snapshot = useCADStore((s: any) => ({
-    version: 2 as const,
-    rooms: s.rooms ?? {},
-    activeRoomId: s.activeRoomId ?? null,
-    customElements: s.customElements,
-    customPaints: s.customPaints,
-    recentPaints: s.recentPaints,
-  })) as CADSnapshot;
+  // countTextureRefs only reads snapshot.rooms; subscribe to just that slice
+  // so the selector returns a stable reference and doesn't trigger React 18's
+  // "getSnapshot should be cached" infinite loop.
+  const rooms = useCADStore((s: any) => s.rooms);
 
   const count = useMemo(() => {
     if (!texture) return 0;
+    const snapshot = { rooms: rooms ?? {} } as unknown as CADSnapshot;
     return countTextureRefs(snapshot, texture.id);
-  }, [snapshot, texture]);
+  }, [rooms, texture]);
 
   const [deleting, setDeleting] = useState(false);
 

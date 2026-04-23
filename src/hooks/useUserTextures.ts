@@ -5,16 +5,10 @@
  * (Plan 01), the MY TEXTURES picker tab (Plan 02), and the delete-confirm
  * flow (Plan 03). Mirrors the shape of useProductStore for consistency.
  *
- * Lifecycle:
- *   - On mount: calls listUserTextures() → sets textures state → flips
- *     loading to false. Cancel-guard prevents setState on an unmounted host.
- *   - save/update/remove: mutate IDB, then call reload() to refresh the list.
- *     Callers don't need to re-subscribe; state update is driven by the hook.
- *
- * NOTE: This is a *local* React state hook, NOT a Zustand store. Each
- * consumer gets its own copy of `textures`. For Plan 01/02/03 usage (one
- * mount site per picker) this is fine; if cross-component propagation
- * becomes needed later, promote to a Zustand store using the same API.
+ * Cross-instance sync: every hook instance subscribes to window
+ * `user-texture-saved`/`user-texture-updated`/`user-texture-deleted` events
+ * and reloads on receipt. Any mutator (save/update/remove) dispatches the
+ * matching event so peers in other pickers stay in sync.
  */
 import { useCallback, useEffect, useState } from "react";
 import { set } from "idb-keyval";
@@ -45,6 +39,14 @@ export interface UseUserTexturesResult {
   reload: () => Promise<void>;
 }
 
+export const USER_TEXTURE_SAVED_EVENT = "user-texture-saved";
+export const USER_TEXTURE_UPDATED_EVENT = "user-texture-updated";
+
+function notify(event: string, id: string) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(event, { detail: { id } }));
+}
+
 export function useUserTextures(): UseUserTexturesResult {
   const [textures, setTextures] = useState<UserTexture[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,15 +65,33 @@ export function useUserTextures(): UseUserTexturesResult {
         setLoading(false);
       }
     })();
+
+    // Cross-instance sync: reload whenever any sibling hook mutates IDB.
+    const onMutation = () => {
+      if (!cancelled) reload();
+    };
+    const events = [
+      USER_TEXTURE_SAVED_EVENT,
+      USER_TEXTURE_UPDATED_EVENT,
+      "user-texture-deleted",
+    ];
+    if (typeof window !== "undefined") {
+      events.forEach((e) => window.addEventListener(e, onMutation));
+    }
+
     return () => {
       cancelled = true;
+      if (typeof window !== "undefined") {
+        events.forEach((e) => window.removeEventListener(e, onMutation));
+      }
     };
-  }, []);
+  }, [reload]);
 
   const save = useCallback(
     async (input: SaveTextureInput, sha256: string) => {
       const { id } = await saveUserTextureWithDedup(input, sha256);
       await reload();
+      notify(USER_TEXTURE_SAVED_EVENT, id);
       return id;
     },
     [reload],
@@ -86,6 +106,7 @@ export function useUserTextures(): UseUserTexturesResult {
       if (!existing) return;
       await set(id, { ...existing, ...changes }, userTextureIdbStore);
       await reload();
+      notify(USER_TEXTURE_UPDATED_EVENT, id);
     },
     [reload],
   );
@@ -94,6 +115,9 @@ export function useUserTextures(): UseUserTexturesResult {
     async (id: string) => {
       await deleteUserTexture(id);
       await reload();
+      // DeleteTextureDialog dispatches user-texture-deleted itself (it needs
+      // to fire even when called outside the hook's scope for cache
+      // invalidation). We don't re-dispatch here to avoid doubles.
     },
     [reload],
   );
