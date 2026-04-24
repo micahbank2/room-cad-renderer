@@ -20,6 +20,9 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   retries: process.env.CI ? 1 : 0,
+  // 5-cycle toggle tests include 5x mount/unmount + screenshot + diff; CI
+  // runners are ~2x slower than local macOS so default 30s is insufficient.
+  timeout: process.env.CI ? 90_000 : 60_000,
   reporter: [["html", { open: "never" }], ["list"]],
   use: {
     viewport: { width: 1280, height: 720 },
@@ -34,13 +37,20 @@ export default defineConfig({
   projects: [
     {
       name: "chromium-dev",
-      use: { ...devices["Desktop Chrome"] },
+      use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:5173" },
       // Dev-mode Vite w/ --mode test: Playwright process sets MODE=test so
       // `import.meta.env.MODE === "test"` gates activate. Phase 31 pattern.
     },
-    // Plan 36-02 wires the preview webServer + activates chromium-preview project.
-    // Left scaffolded (not in `projects` list) until prod-mode test-globals
-    // behavior is characterized. See 36-RESEARCH.md Open Question 1.
+    {
+      name: "chromium-preview",
+      use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:4173" },
+      // Plan 36-02: production-minified bundle test. `vite build --mode test`
+      // + `vite preview --mode test` preserves `import.meta.env.MODE === "test"`
+      // through minification so test-mode globals (__setTestCamera,
+      // __driveTextureUpload) still install. If the minifier strips the
+      // test-mode branches, this project will fail where chromium-dev passes —
+      // a diagnostic signal per 36-RESEARCH Open Question Q1.
+    },
   ],
   webServer: [
     {
@@ -57,7 +67,15 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
       timeout: 60_000,
     },
-    // Plan 36-02 adds preview server here:
-    // { command: "npx vite preview --mode test --port 4173", port: 4173, ... }
+    {
+      // Production-minified bundle served by `vite preview`. Build step must
+      // also run in `--mode test` so `import.meta.env.MODE === "test"` gates
+      // survive bundling — the preview server only serves pre-built dist/.
+      // Equivalent: npm run build -- --mode test && npm run preview -- --port 4173
+      command: "npx vite build --mode test && npx vite preview --mode test --port 4173 --strictPort",
+      port: 4173,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
   ],
 });

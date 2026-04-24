@@ -14,6 +14,7 @@ import { toggleViewMode } from "../playwright-helpers/toggleViewMode";
 import { settle } from "../playwright-helpers/settle";
 import { getLifecycleEvents } from "../playwright-helpers/lifecycleEvents";
 import { setupPage } from "../playwright-helpers/setupPage";
+import { comparePng } from "../playwright-helpers/pixelDiff";
 
 const CAMERA: CameraPose = {
   position: [25, 10, 25],
@@ -30,9 +31,11 @@ test.describe("VIZ-10 — wallpaper survives 5x 2D↔3D toggle", () => {
     //    the wallCount>0 effect in App.tsx → setHasStarted(true) → skips
     //    WelcomeScreen.
     await page.evaluate(async () => {
-      const mod = await import(/* @vite-ignore */ "/src/stores/cadStore.ts");
-      // @ts-expect-error — dev bundle has useCADStore export
-      mod.useCADStore.getState().loadSnapshot({
+      // Use window.__cadStore — test-mode handle installed by src/stores/cadStore.ts.
+      // Works in both chromium-dev (Vite dev server) and chromium-preview
+      // (production-minified bundle with hashed chunk names). Plan 36-02.
+      // @ts-expect-error — window.__cadStore installed in test mode
+      (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } }).__cadStore.getState().loadSnapshot({
         version: 2,
         rooms: {
           room_main: {
@@ -71,11 +74,8 @@ test.describe("VIZ-10 — wallpaper survives 5x 2D↔3D toggle", () => {
     // 3. Apply as wallpaper on side A of wall_1.
     await page.evaluate(
       async (args: { id: string }) => {
-        const mod = await import(
-          /* @vite-ignore */ "/src/stores/cadStore.ts"
-        );
-        // @ts-expect-error
-        mod.useCADStore.getState().setWallpaper("wall_1", "A", {
+        // @ts-expect-error — window.__cadStore installed in test mode
+        (window as unknown as { __cadStore: { getState: () => { setWallpaper: (id: string, side: string, wp: unknown) => void } } }).__cadStore.getState().setWallpaper("wall_1", "A", {
           kind: "pattern",
           userTextureId: args.id,
           scaleFt: 4,
@@ -84,7 +84,10 @@ test.describe("VIZ-10 — wallpaper survives 5x 2D↔3D toggle", () => {
       { id: textureId },
     );
 
-    // 4. Run 5 toggle cycles, screenshotting each 3D mount.
+    // 4. Run 5 toggle cycles. Cycle 1 establishes the baseline buffer; cycles
+    //    2..5 must match it within ≤1% pixel delta. Within-run comparison —
+    //    no stored goldens, so no platform-specific snapshot coupling.
+    let baseline: Buffer | null = null;
     for (let cycle = 1; cycle <= 5; cycle++) {
       await toggleViewMode(page, "3d");
       // Wait for Three canvas to mount (Scene effect installs __setTestCamera).
@@ -94,9 +97,17 @@ test.describe("VIZ-10 — wallpaper survives 5x 2D↔3D toggle", () => {
       );
       await setTestCamera(page, CAMERA);
       await settle(page);
-      await expect(page).toHaveScreenshot(`wallpaper-cycle-${cycle}.png`, {
-        maxDiffPixelRatio: 0.01,
-      });
+      const actual = await page.screenshot({ fullPage: false });
+      if (cycle === 1) {
+        baseline = actual;
+      } else {
+        const diff = comparePng(actual, baseline!);
+        expect(
+          diff.mismatchRatio,
+          `cycle ${cycle} drifted from cycle 1 by ${(diff.mismatchRatio * 100).toFixed(3)}% ` +
+            `(${diff.diffPixels}/${diff.totalPixels} px) — VIZ-10 regression signal`,
+        ).toBeLessThanOrEqual(0.01);
+      }
       await toggleViewMode(page, "2d");
       await page.waitForTimeout(100);
     }

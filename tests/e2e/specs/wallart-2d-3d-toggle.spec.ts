@@ -9,6 +9,7 @@ import { toggleViewMode } from "../playwright-helpers/toggleViewMode";
 import { settle } from "../playwright-helpers/settle";
 import { getLifecycleEvents } from "../playwright-helpers/lifecycleEvents";
 import { setupPage } from "../playwright-helpers/setupPage";
+import { comparePng } from "../playwright-helpers/pixelDiff";
 import { readFileSync } from "node:fs";
 
 const CAMERA: CameraPose = {
@@ -24,9 +25,9 @@ test.describe("VIZ-10 — wallArt survives 5x 2D↔3D toggle", () => {
   test("uploaded wallArt survives 5 mount cycles", async ({ page }) => {
     // Seed room + wall.
     await page.evaluate(async () => {
-      const mod = await import(/* @vite-ignore */ "/src/stores/cadStore.ts");
-      // @ts-expect-error — dev bundle has useCADStore export
-      mod.useCADStore.getState().loadSnapshot({
+      // Use window.__cadStore — test-mode handle works in both dev + preview (Plan 36-02).
+      // @ts-expect-error — window.__cadStore installed in test mode
+      (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } }).__cadStore.getState().loadSnapshot({
         version: 2,
         rooms: {
           room_main: {
@@ -60,9 +61,8 @@ test.describe("VIZ-10 — wallArt survives 5x 2D↔3D toggle", () => {
 
     await page.evaluate(
       async (url: string) => {
-        const mod = await import(/* @vite-ignore */ "/src/stores/cadStore.ts");
-        // @ts-expect-error
-        mod.useCADStore.getState().addWallArt("wall_1", {
+        // @ts-expect-error — window.__cadStore installed in test mode
+        (window as unknown as { __cadStore: { getState: () => { addWallArt: (id: string, art: unknown) => void } } }).__cadStore.getState().addWallArt("wall_1", {
           offset: 8,
           centerY: 4,
           width: 3,
@@ -74,6 +74,7 @@ test.describe("VIZ-10 — wallArt survives 5x 2D↔3D toggle", () => {
       dataUrl,
     );
 
+    let baseline: Buffer | null = null;
     for (let cycle = 1; cycle <= 5; cycle++) {
       await toggleViewMode(page, "3d");
       await page.waitForFunction(
@@ -82,9 +83,17 @@ test.describe("VIZ-10 — wallArt survives 5x 2D↔3D toggle", () => {
       );
       await setTestCamera(page, CAMERA);
       await settle(page);
-      await expect(page).toHaveScreenshot(`wallart-cycle-${cycle}.png`, {
-        maxDiffPixelRatio: 0.01,
-      });
+      const actual = await page.screenshot({ fullPage: false });
+      if (cycle === 1) {
+        baseline = actual;
+      } else {
+        const diff = comparePng(actual, baseline!);
+        expect(
+          diff.mismatchRatio,
+          `cycle ${cycle} drifted from cycle 1 by ${(diff.mismatchRatio * 100).toFixed(3)}% ` +
+            `(${diff.diffPixels}/${diff.totalPixels} px) — VIZ-10 regression signal`,
+        ).toBeLessThanOrEqual(0.01);
+      }
       await toggleViewMode(page, "2d");
       await page.waitForTimeout(100);
     }

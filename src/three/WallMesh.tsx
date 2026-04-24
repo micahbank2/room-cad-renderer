@@ -1,3 +1,14 @@
+// VIZ-10 audit — every `<primitive attach="map" object={tex} dispose={null} />`
+// in this file is KEPT per .planning/phases/36-viz-10-regression/ROOT-CAUSE.md §4.2.
+// Evidence: Phase 36-01 harness shows identical `tex.uuid` across 5 ThreeViewport
+// mount cycles. That invariant holds ONLY because `dispose={null}` opts the
+// cached Texture out of R3F's default auto-dispose traversal on mesh unmount.
+// Removing the prop re-enters R3F dispose logic, which calls `tex.dispose()`
+// on the module-level cache's stored reference and re-opens VIZ-10. Do NOT
+// remove without landing a reproducer in the harness first.
+// Sites: lines 136 (user-texture wallpaper), 182 (pattern/imageUrl wallpaper),
+// 268 + 288 (wall art framed + unframed).
+
 import { useEffect, useMemo } from "react";
 import * as THREE from "three";
 import type { WallSegment, Wallpaper, WainscotConfig, CrownConfig, WallArt } from "@/types/cad";

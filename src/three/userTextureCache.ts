@@ -28,6 +28,12 @@
 import * as THREE from "three";
 import { getUserTexture } from "@/lib/userTextureStore";
 
+// Non-disposing per .planning/phases/36-viz-10-regression/ROOT-CAUSE.md §4.1 —
+// load-bearing: Phase 36-01 harness evidence shows `userTex:load-start` fires
+// exactly once across 5 ThreeViewport mount cycles while same `tex.uuid` is
+// returned on every resolve. Removing the non-disposing contract would force
+// a per-mount decode and re-open the VIZ-10 failure surface. Do NOT change
+// to refcount disposal without first landing a reproducer in the harness.
 const cache = new Map<string, Promise<THREE.Texture | null>>();
 const objectUrls = new Map<string, string>();
 

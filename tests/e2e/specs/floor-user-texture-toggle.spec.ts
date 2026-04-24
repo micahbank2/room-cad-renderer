@@ -10,6 +10,7 @@ import { toggleViewMode } from "../playwright-helpers/toggleViewMode";
 import { settle } from "../playwright-helpers/settle";
 import { getLifecycleEvents } from "../playwright-helpers/lifecycleEvents";
 import { setupPage } from "../playwright-helpers/setupPage";
+import { comparePng } from "../playwright-helpers/pixelDiff";
 
 const CAMERA: CameraPose = {
   position: [20, 12, 20],
@@ -23,9 +24,9 @@ test.describe("VIZ-10 — floor user-texture 2-cycle smoke", () => {
 
   test("floor user-texture survives 2 mount cycles", async ({ page }) => {
     await page.evaluate(async () => {
-      const mod = await import(/* @vite-ignore */ "/src/stores/cadStore.ts");
-      // @ts-expect-error
-      mod.useCADStore.getState().loadSnapshot({
+      // Use window.__cadStore — test-mode handle works in both dev + preview (Plan 36-02).
+      // @ts-expect-error — window.__cadStore installed in test mode
+      (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } }).__cadStore.getState().loadSnapshot({
         version: 2,
         rooms: {
           room_main: {
@@ -61,9 +62,8 @@ test.describe("VIZ-10 — floor user-texture 2-cycle smoke", () => {
 
     await page.evaluate(
       async (args: { id: string }) => {
-        const mod = await import(/* @vite-ignore */ "/src/stores/cadStore.ts");
-        // @ts-expect-error
-        mod.useCADStore.getState().setFloorMaterial({
+        // @ts-expect-error — window.__cadStore installed in test mode
+        (window as unknown as { __cadStore: { getState: () => { setFloorMaterial: (m: unknown) => void } } }).__cadStore.getState().setFloorMaterial({
           kind: "user-texture",
           userTextureId: args.id,
           scaleFt: 4,
@@ -73,6 +73,7 @@ test.describe("VIZ-10 — floor user-texture 2-cycle smoke", () => {
       { id: textureId },
     );
 
+    let baseline: Buffer | null = null;
     for (let cycle = 1; cycle <= 2; cycle++) {
       await toggleViewMode(page, "3d");
       await page.waitForFunction(
@@ -81,9 +82,17 @@ test.describe("VIZ-10 — floor user-texture 2-cycle smoke", () => {
       );
       await setTestCamera(page, CAMERA);
       await settle(page);
-      await expect(page).toHaveScreenshot(`floor-cycle-${cycle}.png`, {
-        maxDiffPixelRatio: 0.01,
-      });
+      const actual = await page.screenshot({ fullPage: false });
+      if (cycle === 1) {
+        baseline = actual;
+      } else {
+        const diff = comparePng(actual, baseline!);
+        expect(
+          diff.mismatchRatio,
+          `cycle ${cycle} drifted from cycle 1 by ${(diff.mismatchRatio * 100).toFixed(3)}% ` +
+            `(${diff.diffPixels}/${diff.totalPixels} px) — VIZ-10 regression signal`,
+        ).toBeLessThanOrEqual(0.01);
+      }
       await toggleViewMode(page, "2d");
       await page.waitForTimeout(100);
     }

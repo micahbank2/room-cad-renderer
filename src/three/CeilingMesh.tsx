@@ -1,3 +1,9 @@
+// VIZ-10 audit — `<primitive attach="map" object={tex} dispose={null} />` in
+// this file is KEPT per .planning/phases/36-viz-10-regression/ROOT-CAUSE.md §4.2.
+// Same rationale as WallMesh.tsx header: `dispose={null}` prevents R3F from
+// disposing the cached Texture on mesh unmount. Harness evidence: same
+// `tex.uuid` across 5 cycles. Site in this file: line 110 (user-texture ceiling).
+
 import { useMemo } from "react";
 import * as THREE from "three";
 import type { Ceiling } from "@/types/cad";
