@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import * as THREE from "three";
 import type { WallSegment, Wallpaper, WainscotConfig, CrownConfig, WallArt } from "@/types/cad";
 import { wallLength, angle } from "@/lib/geometry";
@@ -10,6 +10,7 @@ import { resolvePaintHex } from "@/lib/colorUtils";
 import { usePaintStore } from "@/stores/paintStore";
 import { useWallpaperTexture } from "./wallpaperTextureCache";
 import { useWallArtTextures } from "./wallArtTextureCache";
+import { useUserTexture } from "@/hooks/useUserTexture";
 
 interface Props {
   wall: WallSegment;
@@ -73,6 +74,34 @@ export default function WallMesh({ wall, isSelected }: Props) {
   const wallpaperATex = useWallpaperTexture(wpAUrl);
   const wallpaperBTex = useWallpaperTexture(wpBUrl);
 
+  // Phase 34 — user-texture lookup per side. `useUserTexture` returns null on
+  // orphan (texture deleted but surface still references it) → overlay
+  // skipped → base drywall color renders (D-08/D-09).
+  const userTexA = useUserTexture(wall.wallpaper?.A?.userTextureId);
+  const userTexB = useUserTexture(wall.wallpaper?.B?.userTextureId);
+
+  // Apply repeat for user-texture side A on change.
+  useEffect(() => {
+    if (userTexA && wall.wallpaper?.A) {
+      const s = wall.wallpaper.A.scaleFt ?? 2;
+      if (s > 0) {
+        userTexA.repeat.set(length / s, height / s);
+        userTexA.needsUpdate = true;
+      }
+    }
+  }, [userTexA, wall.wallpaper?.A?.scaleFt, length, height]);
+
+  // Apply repeat for user-texture side B on change.
+  useEffect(() => {
+    if (userTexB && wall.wallpaper?.B) {
+      const s = wall.wallpaper.B.scaleFt ?? 2;
+      if (s > 0) {
+        userTexB.repeat.set(length / s, height / s);
+        userTexB.needsUpdate = true;
+      }
+    }
+  }, [userTexB, wall.wallpaper?.B?.scaleFt, length, height]);
+
   const artA = (wall.wallArt ?? []).filter((a) => (a.side ?? "A") === "A");
   const artB = (wall.wallArt ?? []).filter((a) => (a.side ?? "A") === "B");
   const allArt = useMemo(
@@ -83,8 +112,32 @@ export default function WallMesh({ wall, isSelected }: Props) {
   const artTextures = useWallArtTextures(allArt);
 
   // Build a wallpaper overlay plane for one face (null if no wallpaper on that side)
-  const renderWallpaperOverlay = (wp: Wallpaper | undefined, tex: THREE.Texture | null, key: string) => {
+  const renderWallpaperOverlay = (
+    wp: Wallpaper | undefined,
+    tex: THREE.Texture | null,
+    userTex: THREE.Texture | null,
+    key: string,
+  ) => {
     if (!wp) return null;
+
+    // Phase 34 priority: user-uploaded texture beats the legacy data-URL
+    // path when both are set. Null userTex (orphan) falls through to the
+    // legacy branches below → base drywall color if nothing else matches.
+    if (wp.userTextureId && userTex) {
+      return (
+        <mesh key={key} position={[0, 0, thickness / 2 + bandOffset / 2]}>
+          <planeGeometry args={[length, height]} />
+          <meshStandardMaterial
+            color="#ffffff"
+            roughness={0.85}
+            metalness={0}
+            side={THREE.DoubleSide}
+          >
+            <primitive attach="map" object={userTex} dispose={null} />
+          </meshStandardMaterial>
+        </mesh>
+      );
+    }
 
     // kind="paint" branch — must come before kind="color" to avoid fall-through
     if (wp.kind === "paint" && wp.paintId) {
@@ -272,13 +325,13 @@ export default function WallMesh({ wall, isSelected }: Props) {
 
       {/* Side B — positive Z face (matches +perp / right side in 2D) */}
       <group>
-        {renderWallpaperOverlay(wall.wallpaper?.B, wallpaperBTex, "wp-B")}
+        {renderWallpaperOverlay(wall.wallpaper?.B, wallpaperBTex, userTexB, "wp-B")}
         {renderSideDecor(wall.wainscoting?.B, wall.crownMolding?.B, artB)}
       </group>
 
       {/* Side A — flip 180° around Y to -Z face (matches -perp / left side in 2D) */}
       <group rotation={[0, Math.PI, 0]}>
-        {renderWallpaperOverlay(wall.wallpaper?.A, wallpaperATex, "wp-A")}
+        {renderWallpaperOverlay(wall.wallpaper?.A, wallpaperATex, userTexA, "wp-A")}
         {renderSideDecor(wall.wainscoting?.A, wall.crownMolding?.A, artA)}
       </group>
     </group>

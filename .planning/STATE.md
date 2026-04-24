@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.7.5
-milestone_name: Design System & UI Polish
-status: executing
-stopped_at: Completed 33-07-gesture-chip-PLAN.md
-last_updated: "2026-04-22T14:20:17.387Z"
-last_activity: 2026-04-22
+milestone: v1.8
+milestone_name: 3D Realism Completion
+status: Phase 34 COMPLETE — verification PASS 8/8; LIB-06 / LIB-07 / LIB-08 delivered
+stopped_at: Phase 34 User-Uploaded Textures complete; ready for Phase 35 (Camera Presets)
+last_updated: "2026-04-22T20:10:00.000Z"
+last_activity: "2026-04-22 — Phase 34 verified (107/107 phase tests green, VIZ-10 guard installed, snapshot purity asserted); VERIFICATION.md written"
 progress:
   total_phases: 1
   completed_phases: 1
-  total_plans: 10
+  total_plans: 8
   completed_plans: 10
 ---
 
@@ -17,21 +17,22 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-20 — v1.6 scoping started)
+See: .planning/PROJECT.md (updated 2026-04-22 — v1.8 3D Realism Completion started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 33 — design-system-ui-polish
+**Current focus:** Milestone v1.8 — Phase 34 shipped and verified. Next up: Phase 35 (Camera Presets) or Phase 36 (VIZ-10 regression), either runnable next per roadmap sequencing notes.
 
 ## Current Position
 
-Milestone: v1.7.5 Design System & UI Polish
-Phase: 33
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-04-22
+Milestone: v1.8 3D Realism Completion
+Phase: 34 User-Uploaded Textures — COMPLETE (2026-04-22)
+Plan: all 4 plans shipped (34-00 data / 34-01 modal / 34-02 picker / 34-03 render)
+Status: Phase 34 verification PASS 8/8; LIB-06 / LIB-07 / LIB-08 delivered; ready for Phase 35 (Camera Presets)
+Last activity: 2026-04-22 — Phase 34 verifier passed (107/107 Phase 34 tests, VIZ-10 guard installed, LIB-08 snapshot purity asserted); VERIFICATION.md written
 
-Completed: Phase 32 PBR Foundation (shipped with carry-over → 999.2 wallpaper regression)
-Backlog: 999.1 ceiling resize, 999.2 wallpaper view-toggle regression
+Completed milestones: v1.0, v1.1, v1.2, v1.3, v1.4, v1.5, v1.6, v1.7.5 (all archived in `.planning/milestones/`)
+Partial: v1.7 3D Realism — Phase 32 PBR Foundation shipped 2026-04-21; remainder absorbed into v1.8 as Phases 34–37
+Backlog: 999.1 ceiling resize handles (unchanged); 999.2 wallpaper/wallArt regression PROMOTED into v1.8 Phase 36
 
 ## Accumulated Context
 
@@ -39,59 +40,48 @@ Backlog: 999.1 ceiling resize, 999.2 wallpaper view-toggle regression
 
 Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarized in `.planning/RETROSPECTIVE.md § v1.5`.
 
-- [Phase 28]: Phase 28 Plan 01: Created Wave 0 TDD red stubs (6 useAutoSave + 4 App.restore) for SAVE-05/SAVE-06; 6 fail describing Plan 02/03 behavior, 7 pass
-- [Phase 28-auto-save]: Phase 28 Plan 02: Extended SaveStatus with 'failed', added try/catch + rename trigger to useAutoSave; 6 red stubs green, Phase 25 drag fast-path filter preserved, no ui-store watching
-- [Phase 28-auto-save]: Phase 28 Plan 03: Pointer-based silent restore (D-02/D-02a/D-02b) — single write site in useAutoSave, mount-time read in App.tsx; all 4 App.restore red stubs green; SAVE-05 reload-restore closed
-- [Phase 28-auto-save]: Phase 28 Plan 04: Signed VALIDATION.md (nyquist_compliant true, wave_0_complete true); full vitest 201/6pre-existing/3todo; Phase 28 stubs 10/10 green; manual smoke auto-approved per orchestrator auto-mode, deferred to HUMAN-UAT
-- [Phase 28]: Option A: inline failed branch in ToolbarSaveStatus; leave orphaned SaveIndicator.tsx for follow-up cleanup
-- [Phase 29]: Wave 0 red stubs (4 test files) locked parser grammar, overlay UX, PropertiesPanel LENGTH, and EDIT-21 single-undo guard
-- [Phase 29]: Used three-branch ordered regex for feet+inches parser; 'first match wins' cleanly rejects ambiguous forms like '12 6' while accepting liberal spellings.
-- [Phase 29]: Added window.__openDimensionEditor(wallId) test driver to bypass jsdom+fabric hit-test fragility (Plan 01 explicitly sanctioned this pattern).
-- [Phase 29]: Phase 29 Plan 04: Final gate passed — 37/37 Phase 29 tests green, tsc clean (only pre-existing baseUrl deprecation), human-verify auto-approved, nyquist_compliant flipped true. Phase 29 signed off.
-- [Phase 30-smart-snapping]: Plan 30-01 locks SNAP-01/02/03 via 29 red test assertions across unit+Fabric+RTL layers; Plan 03 driver contract (window.__driveSnap / __getSnapGuides) documented in test headers
-- [Phase 30-smart-snapping]: Midpoint snap targets require both center.x and center.y within tolerance — preserves "centered on this wall" semantics of midpoint-dot guide
-- [Phase 30-smart-snapping]: Diagonal walls contribute endpoint X/Y targets only in v1 (full perpendicular-projection snap deferred)
-- [Phase 30]: Wall-endpoint drag path deliberately untouched per D-08b (Phase 31 owns smart snap for wall endpoints)
-- [Phase 30]: productTool driver auto-seeds default test product when pendingProductId is unset (gated by import.meta.env.MODE === test)
-- [Phase 30-smart-snapping]: Plan 04 gate signed off — nyquist_compliant true, full suite green, Alt/Option documented in CLAUDE.md; perceptual items persisted to 30-HUMAN-UAT.md
-- [Phase 31]: Driver bridges (__driveResize/__driveWallEndpoint/__driveLabelOverride) advertised in-file for Wave 2; locked Phase 29/30 TDD shape
-- [Phase 31]: Plan 31-02 (Wave 1 pure modules): 5 schema fields + resolver + edge handles + restricted snap scene + 8 store actions. 43 Wave 0 unit tests RED->GREEN; integration tests still RED awaiting Wave 2 drivers
-- [Phase 31]: Pitfall 4 separation: updateCustomElement (catalog) + updatePlacedCustomElement (placement) coexist with clear naming; placement actions write to rooms[active].placedCustomElements[id] not root.customElements
-- [Phase 31]: Plan 31-03 wired all Wave 1 pure modules into selectTool + PropertiesPanel + fabricSync; all 4 RTL specs green; +27 assertions
-- [Phase 31]: Phase 31 closure: VALIDATION signed (nyquist_compliant=true, wave_0_complete=true), 28/28 RTL assertions green, 6 pre-existing LIB-03/04/05 failures documented out-of-scope, EDIT-22/23/24/CUSTOM-06 closed
-- [Phase 32-pbr-foundation]: Plan 02: Centralized PBR loader infrastructure — applyColorSpace helper (D-18), refcount acquireTexture/releaseTexture cache with imperative THREE.TextureLoader (D-12/16/17), PbrErrorBoundary (D-15). +14 tests, zero regressions. Plan 03 will wire into meshes and migrate legacy caches.
-- [Phase 32-pbr-foundation]: Tests placed in tests/ (not colocated) because vitest.config include pattern only covers tests/** and src/__tests__/** — auto-fixed per Rule 3 (blocking: would be silently skipped otherwise).
-- [Phase 32-pbr-foundation]: Chose oak_veneer_01 / concrete_floor_worn_001 / beige_wall_001 from Poly Haven CC0 for PBR texture sets
-- [Phase 32-pbr-foundation]: HDR 1.58 MB exceeds plan 700KB ceiling; Poly Haven smallest 1k HDR is 1.2MB — accepted named asset, documented in LICENSE and SUMMARY
-- [Phase 32-pbr-foundation]: Plan 03: Wired PBR into CeilingMesh/FloorMesh via new PbrSurface wrapper (Suspense+ErrorBoundary); swapped Environment to bundled /hdr/studio_small_09_1k.hdr; registered renderer with pbrTextureCache for device anisotropy; migrated wallpaper/wallArt/floorTexture caches to shared acquireTexture (D-05). FloorMesh customTextureCache deferred to Phase 33.
-- [Phase 32-pbr-foundation]: D-06 fix-not-rollback: wallpaper loader previously defaulted to NoColorSpace (wrong for sRGB JPGs); shared cache now sets SRGBColorSpace — documented as a correctness fix, not reverted.
-- [Phase 32-pbr-foundation]: Plan 04: Locked Phase 32 PBR behavior with +12 vitest assertions (9 integration + 3 boundary) + gated __getPbrCacheState test driver. VIZ-07/VIZ-08 closed with automated regression guards. Zero regressions (367 → 379 passing).
-- [Phase 33-design-system-ui-polish]: Plan 33-01: installed lucide-react@1.8.0 + added Phase 33 tokens to src/index.css using v4 --text-*/--spacing-* prefix; --radius-lg canonicalized 6px→8px; 6 12px-spacing sites audited for Plan 03
-- [Phase 33]: Plan 33-00: 11 RED test scaffolds + driver contract README locking every Wave 1/2/3 plan; baseline 31 failing/13 passing; tokens+spacingAudit already green serve as regression guards
-- [Phase 33]: Plan 33-03: Shipped useReducedMotion hook + 6 canonical spacing remaps (5 Toolbar + 1 Sidebar) + CLAUDE.md design system docs; 0 arbitrary p/m/gap/rounded-[Npx] in 4 target files; Plan 02 typography preserved
-- [Phase 33-design-system-ui-polish]: Plan 33-05: Extracted LibraryCard + CategoryTabs primitives (shape-agnostic per D-29); migrated ProductLibrary + CustomElementsPanel; count-regression test locked (3 real assertions); WainscotLibrary/Paint/FramedArt deferred to follow-up PRs under GH #89 per D-31
-- [Phase 33]: Plan 33-08: RotationPresetChips inline helper — 5 presets, history-pushing actions only, single-undo invariant locked by store-level behavior test with concrete seed (no .todo fallback)
-- [Phase 33]: Plan 33-06: FloatingSelectionToolbar shipped for GH #85 — 2D only (D-10); duplicate via placeProduct (rotation resets; D-40 candidate); uiStore.isDragging bridge mirrors D-07 pattern; 6 selectTool bridge sites preserve _dragActive fast path
+- [v1.8 roadmap]: Split legacy "Tech-Debt Sweep" Phase 36 into two phases — Phase 36 (VIZ-10 regression, instrumentation-first) and Phase 37 (Tech-Debt Sweep). Rationale: VIZ-10 is a correctness investigation whose findings may reshape Phase 34's cache strategy; it must run EARLY, not last. Tech-debt sweep stays positioned last so it can be cut under scope pressure.
+- [v1.8 roadmap]: Phases 34/35/36/37 derived from requirement clustering: LIB-* → 34, CAM-* → 35, VIZ-10 → 36, DEBT-* → 37. Vertical-slice per capability, no horizontal layers.
+- [v1.8 roadmap]: Phase numbering continues from 33; no reset. Last shipped = 33 (v1.7.5 Design System), first new = 34.
+- [v1.8 roadmap]: Phase 36 sequencing: "DO NOT schedule fix plans before root-cause plan lands" is baked into plan-count estimate (2 plans: instrumentation + fix).
+- [Phase 34 Plan 00]: Physically isolate user-texture IDB via createStore("room-cad-user-textures", "textures") — not a key prefix in the default store — so listProjects() filter paths never couple to user-texture keys.
+- [Phase 34 Plan 00]: Dedup preserves first upload's metadata (name, tileSizeFt). Second upload with same SHA-256 returns existing id without overwrite. Renames flow through the Edit (D-11) path, not re-upload.
+- [Phase 34 Plan 00]: countTextureRefs is a pure snapshot-shaped function; callers pass useCADStore.getState() at the call site. Keeps it easy to test and reusable from non-React contexts.
+- [Phase 34 Plan 00]: Added fake-indexeddb/auto to tests/setup.ts so idb-keyval tests run against real IDB semantics under happy-dom (existing vi.mock callers unaffected).
+- [Phase 34 Plan 01]: Injectable-seam pattern (ProcessTextureDeps.decode + drawToBlob) keeps the processTextureFile pipeline testable under happy-dom (no createImageBitmap / OffscreenCanvas shim needed). Reusable pattern for future jsdom-hostile pipelines.
+- [Phase 34 Plan 01]: SHA-256 computed on DOWNSCALED JPEG bytes (not source File) so the LIB-07 dedup key is deterministic regardless of source format/dimensions — same visual output always hashes the same.
+- [Phase 34 Plan 01]: UploadTextureModal is a single dual-mode component (create + edit) per D-11. Edit mode hides the drop zone, autoFocuses Name, and calls useUserTextures().update instead of .save.
+- [Phase 34 Plan 01]: sonner is not in package.json. Inlined a console.info toast shim behind a single call site (toastSuccess) and kept the "Texture saved." copy in a centralized COPY constant — one-line swap to real sonner when Plan 02/03 adopts it.
+- [Phase 34 Plan 01]: window.__driveTextureUpload(file, name, tileSizeFt) test driver (import.meta.env.MODE === "test" gated) bypasses the React tree — happy-dom cannot cleanly synthesize a native <input type="file"> change event. Plan 02 picker tests can seed textures via this bridge.
+- [Phase 34 Plan 02]: MyTexturesList + DeleteTextureDialog ship the LIB-06 picker surface — MY TEXTURES tab lands in FloorMaterialPicker, SurfaceMaterialPicker (ceiling via CeilingPaintSection), and WallSurfacePanel. No cadStore action changes needed (Plan 00 widened types so setFloorMaterial/updateCeiling/setWallpaper accept userTextureId via pass-through).
+- [Phase 34 Plan 02]: DeleteTextureDialog emits window.dispatchEvent(new CustomEvent("user-texture-deleted", { detail: { id } })) after successful remove(). Plan 03 userTextureCache MUST addEventListener on "user-texture-deleted" to invalidate cached THREE.Texture entries. Contract is DOM-event-based to keep Plan 02 dependency-free from Plan 03's cache module.
+- [Phase 34 Plan 02]: Auto-fixed 6 test mocks (phase31*/snapIntegration/App.restore) to add createStore + values to idb-keyval mock — direct consequence (Rule 3 Blocking) of picker imports cascading into useUserTextures → userTextureStore. Mock additions are minimal (2 lines each).
+- [Phase 34 Plan 03]: userTextureCache mirrors the Phase 32 wallpaperTextureCache non-disposing pattern (module-level Map, never disposes on unmount). DOES NOT reuse pbrTextureCache's refcount-dispose API — that was the VIZ-10 class root cause. Enforced by tests/userTextureCache.test.tsx VIZ-10 guard + tests/userTextureSnapshot.test.ts 5x stability assertion.
+- [Phase 34 Plan 03]: CeilingMesh sources tileSizeFt via useUserTextures() catalog lookup rather than extending Ceiling schema with scaleFt. Rationale: Plan 02 picker already landed; widening Ceiling would cascade across pickers + cadStore + migration. Hook is memoized (one IDB read per mount). RESEARCH.md §H explicitly recommends this.
+- [Phase 34 Plan 03]: Mesh-contract tests use static-source regex (idiom established by tests/wallMeshDisposeContract.test.ts in Phase 32) instead of @react-three/test-renderer. R3F test renderer is not in package.json; adding it risks Phase 32 fragility. Static tests catch every known VIZ-10 mechanism (bare map={tex}, missing dispose={null}, missing import, missing branch guard).
+- [Phase 34 Plan 03]: Orphan fallback is silent per D-08/D-09 — both the IDB-miss path and the loader-error path resolve to null; meshes guard on `userTex !== null` before rendering the user-texture branch → render falls through to existing base-color / legacy / PBR paths. Zero throws, zero blank scenes.
+- [Phase 34 Plan 03]: Rule 3 auto-fix — ran `npm install --save-dev fake-indexeddb` because tests/setup.ts imports it (Plan 00 added the import and package.json entry but the worktree node_modules was out of sync; every test failed at setup resolve).
 
 ### Pending Todos
 
-- Run `/gsd:discuss-phase` in fresh chat to scope v1.7.5 as a proper phase
-- Issues #83–#90 assigned to v1.7.5 milestone — 8 UI polish items from Pascal audit
-- Pre-existing Pascal insights #72–#81 remain unscheduled (keep separate from v1.7.5)
+- Phase 35 (Camera Presets) OR Phase 36 (VIZ-10 regression) — either can run next per roadmap
+- Phase 36 should run EARLY (instrumentation-first) — do NOT save for end
+- Phase 37 (Tech-Debt Sweep) sequenced LAST; cuttable under scope pressure
 
 ### Open Blockers/Concerns
 
-None.
+None. Roadmap approved, traceability complete (11/11), ready to plan Phase 34.
 
 ### Known Gaps Carried Forward
 
 - **PERF-02 speedup target missed** — `structuredClone(toPlain(...))` contract met but ~1.25× slower than JSON roundtrip at 50W/30P (absolute <0.3ms, non-user-visible). Accepted; documented in `milestones/v1.5-MILESTONE-AUDIT.md` and `25-VERIFICATION.md`. No revisit unless scene scale grows to user-visible impact.
 - **R3F v9 / React 19 upgrade execution deferred** — docs shipped (TRACK-01). Upgrade itself waits for R3F v9 to exit beta. Tracked on GH #56.
-- **#61 WOOD_PLANK PBR realism** — not in v1.6 scope. Belongs to a future "3D realism" milestone.
-- **Traceability table drift (cosmetic)** — v1.5 requirements archive preserves "Pending" strings in 4 rows where checkboxes are `[x]`. Fix at execute-time in v1.6.
+- **#61 WOOD_PLANK PBR realism** — closed in spirit by Phase 32 PBR Foundation; remaining polish (if any) tracked under user-uploaded-texture workflow in Phase 34.
+- **Traceability table drift (cosmetic)** — v1.5 requirements archive preserves "Pending" strings in 4 rows where checkboxes are `[x]`. Cosmetic only.
+- **Phase 32 wallpaper/wallArt 2D↔3D regression** — promoted into v1.8 Phase 36 (VIZ-10) with instrumentation-first approach. Three prior fix attempts (Phase 32 Plans 05/06/07) retained as defensive code.
 
 ## Session Continuity
 
-Last session: 2026-04-22T14:14:21.996Z
-Stopped at: Completed 33-07-gesture-chip-PLAN.md
-Resume file: None
+Last session: 2026-04-22T20:10:00.000Z
+Stopped at: Phase 34 complete and verified (PASS 8/8); ready for Phase 35 or 36
+Resume file: .planning/ROADMAP.md (next phase selection)

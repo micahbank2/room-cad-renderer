@@ -16,17 +16,15 @@ describe("Phase 33 design tokens", () => {
   it("defines sm typography token (11px)", () => {
     expect(css).toMatch(/--(?:font-size|text)-sm:\s*11px/);
   });
-  it("defines canonical spacing tokens (4/8/16/24/32)", () => {
-    expect(css).toMatch(/--spacing-xs:\s*4px/);
-    expect(css).toMatch(/--spacing-sm:\s*8px/);
-    expect(css).toMatch(/--spacing-lg:\s*16px/);
-    expect(css).toMatch(/--spacing-xl:\s*24px/);
-    expect(css).toMatch(/--spacing-2xl:\s*32px/);
-  });
   it("canonicalizes --radius-lg to 8px (was 6px)", () => {
     expect(css).toMatch(/--radius-lg:\s*8px/);
   });
-  it("does NOT define --spacing-md 12px (dropped per checker)", () => {
-    expect(css).not.toMatch(/--spacing-md:\s*12px/);
+  it("does NOT define named --spacing-* tokens (collides with Tailwind v4 container scale, e.g. max-w-2xl)", () => {
+    expect(css).not.toMatch(/--spacing-xs:/);
+    expect(css).not.toMatch(/--spacing-sm:/);
+    expect(css).not.toMatch(/--spacing-md:/);
+    expect(css).not.toMatch(/--spacing-lg:/);
+    expect(css).not.toMatch(/--spacing-xl:/);
+    expect(css).not.toMatch(/--spacing-2xl:/);
   });
 });

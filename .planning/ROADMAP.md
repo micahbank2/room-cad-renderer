@@ -9,8 +9,9 @@
 - ✅ **v1.4 Polish & Tech Debt** — Phases 21–23 (shipped 2026-04-08) — see [milestones/v1.4-ROADMAP.md](milestones/v1.4-ROADMAP.md)
 - ✅ **v1.5 Performance & Tech Debt** — Phases 24–27 (shipped 2026-04-20) — see [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
 - ✅ **v1.6 Editing UX** — Phases 28–31 (shipped 2026-04-21) — see [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
-- 🟡 **v1.7 3D Realism** — Phase 32 shipped (2026-04-21); remaining phases (User-Uploaded Textures, Camera Presets, Tech-Debt Sweep) deferred to a future milestone
+- 🟡 **v1.7 3D Realism** — Phase 32 shipped (2026-04-21); remainder absorbed into v1.8 (see below)
 - ✅ **v1.7.5 Design System & UI Polish** — Phase 33 (shipped 2026-04-22) — see [milestones/v1.7.5-ROADMAP.md](milestones/v1.7.5-ROADMAP.md)
+- 🚧 **v1.8 3D Realism Completion** — Phases 34–37 (in progress)
 
 ---
 
@@ -74,18 +75,16 @@
 
 ---
 
-## v1.7 3D Realism (PARTIAL — remainder deferred)
+## v1.7 3D Realism (PARTIAL — remainder absorbed into v1.8)
 
 **Goal:** Make Jessica's 3D view feel like the actual room — physically-based materials, user-uploaded textures, and camera presets.
 
-**Status:** Phase 32 shipped 2026-04-21. Remaining phases paused while v1.7.5 Design System & UI Polish ships. Milestone assignment for Phases 34–36 TBD (likely rolls into a follow-on 3D Realism milestone).
+**Status:** Phase 32 (PBR Foundation) shipped 2026-04-21. The remaining scope (user-uploaded textures, camera presets, wallpaper/wallArt regression, v1.6 tech-debt sweep) paused while v1.7.5 Design System & UI Polish shipped (2026-04-22), and has now been **rolled into the v1.8 3D Realism Completion milestone** below. See v1.8 section for phase details.
 
 ### Phases
 
 - [x] **Phase 32: PBR Foundation** — WOOD_PLANK / CONCRETE / PLASTER render with bundled albedo + normal + roughness maps; loader is non-blocking and color-space correct (completed 2026-04-21)
-- [ ] **Phase 34: User-Uploaded Textures** — Jessica uploads a photo of a real surface; it appears as a custom material on walls/floors/ceilings; persists locally with dedup + downscale (was Phase 33)
-- [ ] **Phase 35: Camera Presets** — eye-level / top-down / 3-quarter / corner switchable via toolbar buttons + 1/2/3/4 hotkeys with smooth ~600ms tween (was Phase 34)
-- [ ] **Phase 36: Tech-Debt Sweep** — close GH #44/#46/#50/#60, delete orphan SaveIndicator, finish resolveEffectiveDims migration, backfill Phase 29 frontmatter (was Phase 35)
+- 🔁 **Phases 34–36 moved to v1.8** (User-Uploaded Textures, Camera Presets, Wallpaper/wallArt Regression, Tech-Debt Sweep — now Phases 34/35/36/37 under v1.8)
 
 ### Phase Details
 
@@ -109,7 +108,31 @@
 - [x] 32-05-PLAN.md — GAP CLOSURE: debounced texture disposal (wallpaper/wallArt regression from D-05 cache migration) (wave 4)
 **UI hint**: yes
 
-#### Phase 34: User-Uploaded Textures (was Phase 33)
+---
+
+## v1.8 3D Realism Completion
+
+**Goal:** Close the v1.7 3D Realism story Phase 32 opened. Jessica uploads photos of real surfaces she is considering, switches camera angles via `1`/`2`/`3`/`4` hotkeys, and never sees textures vanish on 2D↔3D toggle. v1.6 tech-debt carry-overs also closed.
+
+**Requirements:** 11 | **Phases:** 4 (34, 35, 36, 37) | **Coverage:** 11/11 ✓
+
+### Sequencing rationale
+
+- **Phase 34 (User-Uploaded Textures)** runs first — it delivers the Core Value slice (Jessica applies HER photos to surfaces). Its cache / IDB / Suspense work overlaps heavily with Phase 36's debugging harness, so the two phases feed each other.
+- **Phase 36 (VIZ-10 regression)** runs EARLY — either parallel to Phase 34 or immediately after. The instrumentation harness may reveal cache semantics that reshape Phase 34's `userTextureStore` strategy. Do NOT defer Phase 36 to the end; a surprise here during Phase 37 would block a release.
+- **Phase 35 (Camera Presets)** is independent — can run parallel to Phase 34/36. No code coupling to texture pipeline.
+- **Phase 37 (Tech-Debt Sweep)** runs LAST. Positioned so it can be cut under scope pressure without leaving features half-shipped.
+
+### Phases
+
+- [x] **Phase 34: User-Uploaded Textures** — Jessica uploads JPEG/PNG/WebP with real-world tile size; applies to walls/floors/ceilings; 2048px downscale + SHA-256 dedup + orphan fallback (completed 2026-04-22)
+- [ ] **Phase 35: Camera Presets** — eye-level / top-down / 3-quarter / corner switchable via toolbar + 1/2/3/4 hotkeys with ~600ms ease-in-out tween, no undo/autosave pollution
+- [ ] **Phase 36: Wallpaper/wallArt 2D↔3D Regression (VIZ-10)** — instrumentation-first investigation of Phase 32 carry-over regression; Playwright harness captures root cause BEFORE any fix merges
+- [ ] **Phase 37: Tech-Debt Sweep** — close GH #44/#46/#50/#60, delete orphan SaveIndicator, finish `resolveEffectiveDims` migration, backfill Phase 29 frontmatter
+
+### Phase Details
+
+#### Phase 34: User-Uploaded Textures
 **Goal**: Jessica uploads a photo of a real surface she's considering and applies it to a wall/floor/ceiling within ~10 seconds; the upload persists across reload and never bloats project snapshots
 **Depends on**: Phase 32 (reuses PBR loader, color-space helper, per-mesh Suspense pattern, refcount dispose API)
 **Requirements**: LIB-06, LIB-07, LIB-08
@@ -120,12 +143,17 @@
   4. Images larger than 2048 px on the longest edge are auto-downscaled client-side to ≤2048 px before persistence; SHA-256 of the resulting bytes dedups same-image re-uploads to a single IDB entry
   5. `JSON.stringify(snapshot)` contains zero `data:` substrings >10 KB and zero `Blob` instances — `CADSnapshot` references textures by `userTextureId` only; Blobs live in a separate `userTextureStore` IDB keyspace
   6. Deleting a texture from the library while a project still references it leaves the project loadable; the orphan-referenced surface falls back to its base hex color without crash
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [x] 34-00-data-layer-PLAN.md — UserTexture type + userTextureStore IDB keyspace (SHA-256 dedup, most-recent-first list) + useUserTextures hook + countTextureRefs + cad.ts schema extensions (Wave 1) — SHIPPED 2026-04-22 (27 tests green; see 34-00-SUMMARY.md)
+- [x] 34-01-upload-modal-PLAN.md — processTextureFile pipeline (MIME gate + 2048px downscale + SHA-256) + UploadTextureModal (create + edit modes per UI-SPEC §1) (Wave 2) — SHIPPED 2026-04-22 (27 new tests green; see 34-01-upload-modal-SUMMARY.md)
+- [x] 34-02-picker-integration-PLAN.md — MyTexturesList shared component + DeleteTextureDialog (ref-count copy) + MY TEXTURES tab wired into Floor/Ceiling/Wall pickers (Wave 2) — SHIPPED 2026-04-22 (22 new tests green; user-texture-deleted CustomEvent contract published; see 34-02-picker-integration-SUMMARY.md)
+- [x] 34-03-render-integration-PLAN.md — userTextureCache (non-disposing per wallpaper pattern) + useUserTexture hook + WallMesh/FloorMesh/CeilingMesh branches + orphan fallback + LIB-08 snapshot assertion + VIZ-10 regression guard (Wave 3)
 **UI hint**: yes
 
-#### Phase 35: Camera Presets (was Phase 34)
+#### Phase 35: Camera Presets
 **Goal**: Jessica can switch between top-down, eye-level, 3/4, and corner views with a single keystroke or click, with a smooth glide between poses
-**Depends on**: Phase 34 (sequencing only — no code coupling; could run after Phase 32)
+**Depends on**: Nothing (sequencing only — no code coupling to other v1.8 phases; can run parallel to Phase 34/36)
 **Requirements**: CAM-01, CAM-02, CAM-03
 **Success Criteria** (what must be TRUE):
   1. Four toolbar buttons and bare `1`/`2`/`3`/`4` hotkeys switch between eye-level (5.5 ft), top-down (Y = 1.5× max(roomWidth, roomLength)), 3/4 (current default), and corner (room corner at ceiling - 0.5 ft, looking at opposite corner)
@@ -134,20 +162,33 @@
   4. The active preset is visually indicated on its toolbar button (`bg-accent/20 text-accent-light border-accent/30`)
   5. Preset switches do NOT push to undo history (`past.length` unchanged) and do NOT trigger `useAutoSave` (no Blob/MB churn into IDB on every glide)
   6. Switching view modes (2D/3D/split) mid-tween clears the in-flight tween cleanly without throwing or stranding the camera; walk-mode handoff is decided in plan-phase
-**Plans**: TBD
+**Plans**: TBD (est. 2–3 plans: pose computation + hotkey wiring, tween engine + damping toggle + mid-tween cancel, no-undo/no-autosave isolation)
 **UI hint**: yes
 
-#### Phase 36: Tech-Debt Sweep (was Phase 35)
+#### Phase 36: Wallpaper/wallArt 2D↔3D Regression (VIZ-10)
+**Goal**: Identify the root cause of the Phase 32 wallpaper/wallArt 2D↔3D view-toggle regression via runtime instrumentation BEFORE landing any fix; then fix it with root-cause evidence on record
+**Depends on**: Phase 32 (investigates the exact cache-migration code from Plans 32-03/05/06/07). Can run parallel to Phase 34 — its findings may reshape Phase 34's `userTextureStore` cache strategy
+**Requirements**: VIZ-10
+**Success Criteria** (what must be TRUE):
+  1. A Playwright instrumentation harness exists in the repo that exercises first-mount-upload → unmount → second-mount-attempt on uploaded-image wallpaper and wallArt, logging the full texture lifecycle (load → bind → unbind → dispose) across all mount cycles
+  2. A root-cause document (`.planning/phases/36-viz-10-regression/ROOT-CAUSE.md` or equivalent) is written BEFORE any fix PR merges — it names the actual cause identified by the harness (not speculation), and cross-references the still-plausible candidate causes listed in `.planning/phases/32-pbr-foundation/32-07-SUMMARY.md`
+  3. After the fix lands, uploading an image-based wallpaper on a wall → toggling 2D→3D→2D→3D five times → pixel-diff of every 3D frame vs the first 3D frame is ≤1%; same test passes for wallArt
+  4. The Playwright harness is retained as a regression guard, wired into the vitest or equivalent CI loop so a future cache-migration cannot silently break this path again
+  5. Existing defensive code from Phase 32 Plans 06/07 (non-disposing caches + `dispose={null}` primitive attach + static regression test) is either kept intact OR simplified with explicit justification in the root-cause document — no silent removals
+**Plans**: TBD (est. 2 plans: instrumentation harness + root-cause investigation, then fix informed by findings. DO NOT schedule the fix plan before the root-cause plan lands)
+**UI hint**: no
+
+#### Phase 37: Tech-Debt Sweep
 **Goal**: v1.6 leftover noise is gone — shipped issues are closed on GitHub, dead code is deleted, the resolver migration is complete, and Phase 29 traceability frontmatter is correct
-**Depends on**: Nothing (independent; recommended last so it can be cut under scope pressure without leaving features half-shipped)
+**Depends on**: Nothing (independent; positioned LAST so it can be cut under scope pressure without leaving features half-shipped)
 **Requirements**: DEBT-01, DEBT-02, DEBT-03, DEBT-04
 **Success Criteria** (what must be TRUE):
-  1. GitHub issues #44 (auto-save), #46 (editable dim labels), #50 (per-placement label override), and #60 (drag-to-resize) are closed with comments referencing PR #66 / PR #67
-  2. `src/components/SaveIndicator.tsx` no longer exists; `grep -r "SaveIndicator"` returns no production references; build still passes; full test suite (340+) still passes
+  1. GitHub issues #44 (auto-save), #46 (editable dim labels), #50 (per-placement label override), and #60 (drag-to-resize) are closed with comments referencing PR #66 / PR #67 (or their equivalents)
+  2. `src/components/SaveIndicator.tsx` no longer exists; `grep -r "SaveIndicator"` returns no production references; build still passes; full test suite (424+) still passes
   3. `grep "effectiveDimensions(" src/` returns only catalog-context usages — all `PlacedProduct` / `PlacedCustomElement` call sites use `resolveEffectiveDims` / `resolveEffectiveCustomDims`; per-placement overrides continue to render correctly across 3D meshes, snap scene, fabricSync, and selectTool
   4. Phase 29 SUMMARY.md frontmatter `requirements-completed` field is backfilled with `EDIT-20, EDIT-21` for the relevant plan summaries (verifiable via `gsd-tools summary-extract`)
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: TBD (est. 1–2 plans: close GH issues + delete SaveIndicator + complete migration + frontmatter backfill; can be parallelized across sub-tasks if desired)
+**UI hint**: no
 
 ---
 
@@ -157,9 +198,10 @@
 |-------|----------------|--------|-----------|
 | 32. PBR Foundation | 7/7 | Complete    | 2026-04-21 |
 | 33. Design System & UI Polish | 10/10 | Complete    | 2026-04-22 |
-| 34. User-Uploaded Textures | 0/0 | Deferred    | - |
-| 35. Camera Presets | 0/0 | Deferred    | - |
-| 36. Tech-Debt Sweep | 0/0 | Deferred    | - |
+| 34. User-Uploaded Textures | 4/4 | Complete   | 2026-04-22 |
+| 35. Camera Presets | 0/0 | Not started | - |
+| 36. Wallpaper/wallArt Regression (VIZ-10) | 0/0 | Not started | - |
+| 37. Tech-Debt Sweep | 0/0 | Not started | - |
 
 ## Backlog
 
@@ -168,21 +210,13 @@
 **Goal:** [Captured for future planning] Extend drag-to-resize handles from Phase 31 (products + custom-elements) to cover ceilings. Ceilings (customElements with `kind: "ceiling"`) currently have no resize handles — users can only move or delete and redraw. Mirror Phase 31's width/depth override pattern (`widthFtOverride` / `depthFtOverride`, single-undo drag transaction, Alt disables smart-snap).
 
 **Requirements:** TBD
-**Plans:** 0 plans
+**Plans:** 4/4 plans complete
 
 Plans:
 - [ ] TBD (promote with /gsd:review-backlog when ready)
 
 **Discovered:** 2026-04-21 during Phase 32 T4 human UAT (Jessica) — pre-existing, not Phase 32 scope.
 
-### Phase 999.2: Wallpaper + wallArt view-toggle regression (BACKLOG, deferred from Phase 32)
+### Phase 999.2: Wallpaper + wallArt view-toggle regression — PROMOTED to Phase 36 under v1.8
 
-**Goal:** [To be addressed early in Phase 34 — same code paths] Fix the regression where uploaded-image wallpaper and wallArt disappear after a 2D↔3D view toggle. PBR paths, color wallpaper, and paint paths all work — only the cached data-URL texture paths through `<meshStandardMaterial>` fail. Three stacked fix attempts in Phase 32 (Plans 05, 06, 07) landed correct code against known R3F footguns without resolving the underlying issue. Phase 34's first task: build a runtime instrumentation harness (Playwright + instrumented build) that captures the full sequence (first-mount texture upload → unmount → second-mount attempt → pixel diff) to identify the actual cause before a fourth fix.
-
-**Requirements:** TBD — see `.planning/phases/32-pbr-foundation/32-HUMAN-UAT.md` Gap 1 and `32-07-SUMMARY.md` "What's left that could cause it" for the still-plausible candidate causes.
-**Plans:** 0 plans
-
-Plans:
-- [ ] TBD (promote early in Phase 34)
-
-**Discovered:** 2026-04-21 Phase 32 T4 human UAT. Deferred rather than attempting a 4th speculative fix. Retained defensive code from 32-06 and 32-07 stays in place (non-disposing caches + `dispose={null}` primitive attach + static regression test).
+Originally captured 2026-04-21 Phase 32 T4 human UAT. Promoted into v1.8 as Phase 36 (VIZ-10). See Phase 36 Details above.

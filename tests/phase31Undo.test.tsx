@@ -27,6 +27,8 @@ vi.mock("idb-keyval", () => ({
   set: vi.fn().mockResolvedValue(undefined),
   del: vi.fn().mockResolvedValue(undefined),
   keys: vi.fn().mockResolvedValue([]),
+  values: vi.fn().mockResolvedValue([]),
+  createStore: vi.fn(() => ({})),
 }));
 vi.mock("@/lib/serialization", () => ({
   saveProject: vi.fn().mockResolvedValue(undefined),
