@@ -1,3 +1,11 @@
+// Retained per .planning/phases/36-viz-10-regression/ROOT-CAUSE.md §4.3.
+// Orthogonal coverage to the Playwright harness: this static source-level
+// test catches the *disappearance of the `dispose={null}` pattern* BEFORE a
+// pixel-diff regression would surface. ~50ms runtime.
+// Runtime verification: tests/e2e/specs/wallpaper-2d-3d-toggle.spec.ts,
+// wallart-2d-3d-toggle.spec.ts, floor-user-texture-toggle.spec.ts,
+// ceiling-user-texture-toggle.spec.ts (Plan 36-01).
+
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
