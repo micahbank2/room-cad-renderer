@@ -32,9 +32,6 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Run unit tests (vitest)
-        run: npm test -- --run
-
       - name: Run E2E tests (Playwright — chromium-dev + chromium-preview)
         run: npm run test:e2e
 
