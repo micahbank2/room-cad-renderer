@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: 3D Realism Completion
-status: verifying
-stopped_at: Completed 36-02-PLAN.md
-last_updated: "2026-04-24T21:27:08.092Z"
+status: executing
+stopped_at: Completed 35-01-structure-PLAN.md
+last_updated: "2026-04-24T23:02:42.427Z"
 last_activity: 2026-04-24
 progress:
   total_phases: 1
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-22 — v1.8 3D Realism Completion started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 36 — viz-10-regression
+**Current focus:** Phase 35 — camera-presets
 
 ## Current Position
 
 Milestone: v1.8 3D Realism Completion
-Phase: 36 (viz-10-regression) — EXECUTING
+Phase: 35 (camera-presets) — EXECUTING
 Plan: 2 of 2
-Status: Phase complete — ready for verification
+Status: Ready to execute
 Last activity: 2026-04-24
 
 Completed milestones: v1.0, v1.1, v1.2, v1.3, v1.4, v1.5, v1.6, v1.7.5 (all archived in `.planning/milestones/`)
@@ -67,6 +67,10 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 36-viz-10-regression]: No-repro outcome preserved — zero production code changes in Plan 36-02; all Phase 32 defensive code kept per ROOT-CAUSE.md §4
 - [Phase 36-viz-10-regression]: chromium-preview Playwright project + .github/workflows/e2e.yml CI workflow landed as permanent VIZ-10 regression guard
 - [Phase 36-viz-10-regression]: Added window.__cadStore test-mode handle (tree-shaken from prod) so specs work in both chromium-dev and chromium-preview bundles
+- [Phase 35-camera-presets]: [Phase 35 Plan 01]: uiStore.pendingPresetRequest mirrors wallSideCameraTarget shape ({id, seq}) — Plan 35-02 Scene useEffect watches the ref and translates into presetTween.current. requestPreset is the combined-write action (both activePreset + pendingPresetRequest in a single set()) called by Toolbar buttons, App.tsx hotkey handler, and future test drivers.
+- [Phase 35-camera-presets]: [Phase 35 Plan 01]: PresetId co-located in src/three/cameraPresets.ts (not src/types/cad.ts). Keeps preset metadata + pose math + type together. uiStore imports via 'import type' — zero runtime coupling to Three.js subtree.
+- [Phase 35-camera-presets]: [Phase 35 Plan 01]: Eye-level preset uses corner-stand at (0, 5.5, 0) + centered target — concrete resolution of CAM-01's ambiguous 'looking toward room center.' FLAGGED FOR HUMAN-UAT; JSDoc on getPresetPose carries the flag. Jessica may prefer facing longest wall or the door.
+- [Phase 35-camera-presets]: [Phase 35 Plan 01]: Rule 3 auto-fix — vitest.config.ts include globs extended to pick up colocated src/**/*.test.ts. Plan specified src/three/cameraPresets.test.ts path but prior config only scanned tests/** + src/__tests__/**. Fix is purely additive; no existing tests moved.
 
 ### Pending Todos
 
@@ -88,6 +92,6 @@ None. Roadmap approved, traceability complete (11/11), ready to plan Phase 34.
 
 ## Session Continuity
 
-Last session: 2026-04-24T21:27:08.090Z
-Stopped at: Completed 36-02-PLAN.md
+Last session: 2026-04-24T23:02:27.355Z
+Stopped at: Completed 35-01-structure-PLAN.md
 Resume file: None

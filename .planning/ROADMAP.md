@@ -162,9 +162,9 @@ Plans:
   4. The active preset is visually indicated on its toolbar button (`bg-accent/20 text-accent-light border-accent/30`)
   5. Preset switches do NOT push to undo history (`past.length` unchanged) and do NOT trigger `useAutoSave` (no Blob/MB churn into IDB on every glide)
   6. Switching view modes (2D/3D/split) mid-tween clears the in-flight tween cleanly without throwing or stranding the camera; walk-mode handoff is decided in plan-phase
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
-- [ ] 35-01-structure-PLAN.md — cameraPresets.ts pose module + unit tests + uiStore bridge (activePreset + pendingPresetRequest + requestPreset) + Toolbar 4-button lucide cluster + 1/2/3/4 hotkey wiring with full guard chain (Wave 1)
+- [x] 35-01-structure-PLAN.md — cameraPresets.ts pose module + unit tests + uiStore bridge (activePreset + pendingPresetRequest + requestPreset) + Toolbar 4-button lucide cluster + 1/2/3/4 hotkey wiring with full guard chain (Wave 1)
 - [ ] 35-02-motion-PLAN.md — ThreeViewport tween engine (easeInOutCubic + damping toggle + cancel-and-restart + reduced-motion snap + view-mode/walk-mode cleanup) + 3 test drivers (__applyCameraPreset / __getActivePreset / __getCameraPose) + 5 Playwright e2e specs covering CAM-01/02/03 (Wave 2)
 **UI hint**: yes
 
@@ -205,7 +205,7 @@ Plans:
 | 32. PBR Foundation | 7/7 | Complete    | 2026-04-21 |
 | 33. Design System & UI Polish | 10/10 | Complete    | 2026-04-22 |
 | 34. User-Uploaded Textures | 4/4 | Complete   | 2026-04-22 |
-| 35. Camera Presets | 0/2 | In progress | - |
+| 35. Camera Presets | 1/2 | In Progress|  |
 | 36. Wallpaper/wallArt Regression (VIZ-10) | 2/2 | Complete   | 2026-04-24 |
 | 37. Tech-Debt Sweep | 0/0 | Not started | - |
 
