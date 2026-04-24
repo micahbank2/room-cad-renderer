@@ -20,6 +20,9 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   retries: process.env.CI ? 1 : 0,
+  // 5-cycle toggle tests include 5x mount/unmount + screenshot + diff; CI
+  // runners are ~2x slower than local macOS so default 30s is insufficient.
+  timeout: process.env.CI ? 90_000 : 60_000,
   reporter: [["html", { open: "never" }], ["list"]],
   use: {
     viewport: { width: 1280, height: 720 },
