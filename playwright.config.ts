@@ -44,12 +44,20 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: "npm run dev -- --mode test --port 5173",
+      // Plan's canonical form: `npm run dev -- --mode test --port 5173`.
+      // We invoke `npx vite` directly because the npm `--` arg-forwarding
+      // layer intermittently loses `--mode test` on macOS npm 10 in nested
+      // Playwright webServer spawns. `npx vite --mode test` is semantically
+      // equivalent (same binary, same config) and is the Pitfall 1
+      // mitigation documented in 36-RESEARCH.md.
+      //
+      // Equivalent: npm run dev -- --mode test --port 5173
+      command: "npx vite --mode test --port 5173",
       port: 5173,
       reuseExistingServer: !process.env.CI,
       timeout: 60_000,
     },
     // Plan 36-02 adds preview server here:
-    // { command: "npm run build && npm run preview -- --mode test --port 4173", port: 4173, ... }
+    // { command: "npx vite preview --mode test --port 4173", port: 4173, ... }
   ],
 });
