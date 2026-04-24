@@ -16,6 +16,18 @@ import Lighting from "./Lighting";
 import WalkCameraController from "./WalkCameraController";
 import { getFloorTexture } from "./floorTexture";
 import { GestureChip } from "@/components/ui/GestureChip";
+import { getPresetPose, type PresetId } from "@/three/cameraPresets";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
+
+/**
+ * Phase 35 CAM-02: cubic-in-out easing for preset tween.
+ * Research §1 — chosen over exponential lerp so cancel-and-restart can
+ * capture `from` from the LIVE camera and resume smoothly; time-based
+ * progress normalizes the distance.
+ */
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
 
 // Phase 36 Plan 01 — VIZ-10 lifecycle tap (test-mode gated).
 // Mirrors the tap functions in userTextureCache.ts / wallpaperTextureCache.ts /
@@ -50,6 +62,9 @@ function Scene({ productLibrary }: Props) {
   const selectedIds = useUIStore((s) => s.selectedIds);
   const cameraMode = useUIStore((s) => s.cameraMode);
   const wallSideCameraTarget = useUIStore((s) => s.wallSideCameraTarget);
+  // Phase 35 CAM-02: preset tween subscriptions.
+  const pendingPresetRequest = useUIStore((s) => s.pendingPresetRequest);
+  const prefersReducedMotion = useReducedMotion();
 
   const halfW = room.width / 2;
   const halfL = room.length / 2;
@@ -109,18 +124,92 @@ function Scene({ productLibrary }: Props) {
     };
   }, []);
 
+  // Phase 35 Plan 02 — test drivers for preset motion e2e specs.
+  // Install/cleanup pattern mirrors __setTestCamera above (test-mode gated).
+  useEffect(() => {
+    if (import.meta.env.MODE !== "test" || typeof window === "undefined") return;
+    (window as unknown as {
+      __applyCameraPreset?: (presetId: PresetId) => void;
+    }).__applyCameraPreset = (presetId) => {
+      // Thin shim over the production code path (Research §6 Recommendation B)
+      // — same entry point as Toolbar click / hotkey.
+      useUIStore.getState().requestPreset(presetId);
+    };
+    return () => {
+      delete (window as unknown as { __applyCameraPreset?: unknown }).__applyCameraPreset;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (import.meta.env.MODE !== "test" || typeof window === "undefined") return;
+    (window as unknown as {
+      __getActivePreset?: () => PresetId | null;
+    }).__getActivePreset = () => useUIStore.getState().activePreset;
+    return () => {
+      delete (window as unknown as { __getActivePreset?: unknown }).__getActivePreset;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (import.meta.env.MODE !== "test" || typeof window === "undefined") return;
+    (window as unknown as {
+      __getCameraPose?: () => {
+        position: [number, number, number];
+        target: [number, number, number];
+      } | null;
+    }).__getCameraPose = () => {
+      const ctrl = orbitControlsRef.current;
+      if (!ctrl?.object) return null;
+      const cam = ctrl.object as THREE.Camera;
+      return {
+        position: [cam.position.x, cam.position.y, cam.position.z],
+        target: [ctrl.target.x, ctrl.target.y, ctrl.target.z],
+      };
+    };
+    return () => {
+      delete (window as unknown as { __getCameraPose?: unknown }).__getCameraPose;
+    };
+  }, []);
+
   // Camera animation target (smooth lerp)
   const cameraAnimTarget = useRef<{ pos: THREE.Vector3; look: THREE.Vector3 } | null>(null);
 
-  // 05.1 fix: restore saved camera position when returning to orbit mode
+  // Phase 35 CAM-02: time-based preset tween state. Coexists with
+  // cameraAnimTarget — mutually exclusive per frame (only one runs).
+  const presetTween = useRef<null | {
+    fromPos: THREE.Vector3;
+    fromTarget: THREE.Vector3;
+    toPos: THREE.Vector3;
+    toTarget: THREE.Vector3;
+    startMs: number;
+    durationMs: number;
+    presetId: PresetId;
+  }>(null);
+
+  // 05.1 fix: restore saved camera position when returning to orbit mode.
+  // Phase 35 Risk 5: also tear down any in-flight preset tween on walk-mode
+  // entry and restore damping (guard against walk-mode flip mid-tween).
   useEffect(() => {
-    if (cameraMode !== "orbit") return;
+    if (cameraMode !== "orbit") {
+      presetTween.current = null;
+      const ctrl = orbitControlsRef.current;
+      if (ctrl) ctrl.enableDamping = true;
+      return;
+    }
     const ctrl = orbitControlsRef.current;
     if (!ctrl?.object) return;
     const [x, y, z] = orbitPosRef.current;
     ctrl.object.position.set(x, y, z);
     ctrl.update();
   }, [cameraMode]);
+
+  // Phase 35 Risk 6: Scene unmount clears in-flight tween (belt-and-suspenders;
+  // ref is GC'd with Scene anyway, but this makes the intent explicit).
+  useEffect(() => {
+    return () => {
+      presetTween.current = null;
+    };
+  }, []);
 
   // MIC-35: animate camera to face selected wall side
   useEffect(() => {
@@ -147,25 +236,105 @@ function Scene({ productLibrary }: Props) {
     useUIStore.getState().clearWallSideCameraTarget();
   }, [wallSideCameraTarget, walls, cameraMode]);
 
-  // Smooth camera animation via useFrame
+  // Phase 35 CAM-02: consume pendingPresetRequest from uiStore.
+  // Research §1 cancel-and-restart — startPresetTween captures `from` from
+  // the LIVE camera pose, so a mid-tween request restarts smoothly without
+  // the prior tween's `toPos` being stranded.
+  useEffect(() => {
+    if (!pendingPresetRequest) return;
+    // D-01 + D-03 guards are applied upstream (App.tsx hotkey + Toolbar disabled).
+    // Belt-and-suspenders: if a request arrives while in walk mode, drop it.
+    if (cameraMode === "walk") {
+      useUIStore.getState().clearPendingPresetRequest();
+      return;
+    }
+    const ctrl = orbitControlsRef.current;
+    if (!ctrl?.object) {
+      // Scene not yet ready (OrbitControls mounts after Scene effect runs
+      // on first render). Clear the request so it doesn't re-fire; the
+      // user will have to click again — rare edge (only possible if
+      // hotkey fires within ~1 frame of 3D view mount).
+      useUIStore.getState().clearPendingPresetRequest();
+      return;
+    }
+    const cam = ctrl.object as THREE.Camera;
+    const pose = getPresetPose(pendingPresetRequest.id, room);
+    if (prefersReducedMotion) {
+      // D-04 + Phase 33 D-39: instant snap, no tween.
+      cam.position.set(pose.position[0], pose.position[1], pose.position[2]);
+      ctrl.target.set(pose.target[0], pose.target[1], pose.target[2]);
+      ctrl.update();
+      orbitPosRef.current = pose.position;
+      orbitTargetRef.current = pose.target;
+      presetTween.current = null;
+      ctrl.enableDamping = true;
+    } else {
+      // Time-based tween. Capture `from` LIVE for cancel-and-restart (§1).
+      const fromPos = cam.position.clone();
+      const fromTarget = ctrl.target.clone();
+      const toPos = new THREE.Vector3(...pose.position);
+      const toTarget = new THREE.Vector3(...pose.target);
+      ctrl.enableDamping = false; // imperative — avoids post-tween overshoot.
+      presetTween.current = {
+        fromPos,
+        fromTarget,
+        toPos,
+        toTarget,
+        startMs: performance.now(),
+        durationMs: 600,
+        presetId: pendingPresetRequest.id,
+      };
+    }
+    useUIStore.getState().clearPendingPresetRequest();
+  }, [pendingPresetRequest, cameraMode, prefersReducedMotion, room]);
+
+  // Smooth camera animation via useFrame.
+  // Two mutually-exclusive branches: wall-side lerp (MIC-35) runs first,
+  // preset tween (CAM-02) runs only when wall-side is idle.
   useFrame(() => {
-    if (!cameraAnimTarget.current) return;
+    // --- wall-side branch (existing, unchanged) ---
+    if (cameraAnimTarget.current) {
+      const ctrl = orbitControlsRef.current;
+      if (!ctrl?.object) return;
+      const { pos, look } = cameraAnimTarget.current;
+      const cam = ctrl.object as THREE.Camera;
+      const speed = 0.08;
+      cam.position.lerp(pos, speed);
+      ctrl.target.lerp(look, speed);
+      ctrl.update();
+      // Stop when close enough
+      if (cam.position.distanceTo(pos) < 0.05) {
+        cam.position.copy(pos);
+        ctrl.target.copy(look);
+        ctrl.update();
+        orbitPosRef.current = [pos.x, pos.y, pos.z];
+        orbitTargetRef.current = [look.x, look.y, look.z];
+        cameraAnimTarget.current = null;
+      }
+      return;
+    }
+
+    // --- preset-tween branch (Phase 35 CAM-02) ---
+    const t = presetTween.current;
+    if (!t) return;
     const ctrl = orbitControlsRef.current;
     if (!ctrl?.object) return;
-    const { pos, look } = cameraAnimTarget.current;
+    const elapsed = performance.now() - t.startMs;
+    const raw = Math.min(elapsed / t.durationMs, 1);
+    const eased = easeInOutCubic(raw);
     const cam = ctrl.object as THREE.Camera;
-    const speed = 0.08;
-    cam.position.lerp(pos, speed);
-    ctrl.target.lerp(look, speed);
+    cam.position.lerpVectors(t.fromPos, t.toPos, eased);
+    ctrl.target.lerpVectors(t.fromTarget, t.toTarget, eased);
     ctrl.update();
-    // Stop when close enough
-    if (cam.position.distanceTo(pos) < 0.05) {
-      cam.position.copy(pos);
-      ctrl.target.copy(look);
+    if (raw >= 1) {
+      // Settle: snap to exact target, restore damping, clear tween.
+      cam.position.copy(t.toPos);
+      ctrl.target.copy(t.toTarget);
       ctrl.update();
-      orbitPosRef.current = [pos.x, pos.y, pos.z];
-      orbitTargetRef.current = [look.x, look.y, look.z];
-      cameraAnimTarget.current = null;
+      orbitPosRef.current = [t.toPos.x, t.toPos.y, t.toPos.z];
+      orbitTargetRef.current = [t.toTarget.x, t.toTarget.y, t.toTarget.z];
+      ctrl.enableDamping = true;
+      presetTween.current = null;
     }
   });
 

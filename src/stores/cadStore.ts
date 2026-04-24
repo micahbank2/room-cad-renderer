@@ -1208,4 +1208,8 @@ if (import.meta.env.DEV) {
 // ─────────────────────────────────────────────────────────────────────
 if (typeof window !== "undefined" && import.meta.env.MODE === "test") {
   (window as unknown as Record<string, unknown>).__cadStore = useCADStore;
+  // Phase 35 CAM-03: history-length probe used by preset-no-history e2e spec
+  // to assert preset switches never push to the undo stack.
+  (window as unknown as { __getCADHistoryLength?: () => number }).__getCADHistoryLength =
+    () => useCADStore.getState().past.length;
 }
