@@ -62,7 +62,7 @@ source: resumes v1.7 3D Realism track + promotes Phase 999.2 backlog
 
 ### Wallpaper/wallArt 2D↔3D Regression (VIZ)
 
-- [ ] **VIZ-10** — Uploaded-image wallpaper and wallArt survive 2D↔3D view toggles indefinitely without reload or texture loss. Before proposing a fix, the root cause is identified via runtime instrumentation (Playwright harness capturing first-mount-upload → unmount → second-mount → pixel-diff).
+- [ ] **VIZ-10** — Uploaded-image wallpaper and wallArt survive 2D↔3D view toggles indefinitely without reload or texture loss. Before proposing a fix, the root cause is identified via runtime instrumentation (Playwright harness capturing first-mount-upload → unmount → second-mount → pixel-diff). _(Plan 36-01 shipped the harness + ROOT-CAUSE.md documenting no-repro under chromium-dev. Plan 36-02 activates chromium-preview + CI + expanded coverage.)_
   - **Source:** Phase 999.2 backlog; `.planning/phases/32-pbr-foundation/32-HUMAN-UAT.md` Gap 1; `32-07-SUMMARY.md` "What's left that could cause it".
   - **Verifiable:** Upload an image-based wallpaper on a wall → toggle 2D→3D→2D→3D five times → wallpaper visible on every 3D frame (verified by pixel-diff vs first 3D frame, ≤1% delta). Same test for wallArt. Instrumentation harness logs the full texture lifecycle across all 5 mount cycles; root-cause document written before any code fix merges.
   - **Acceptance:** No 4th speculative fix. Root cause identified BEFORE fix. Test harness retained as regression guard. Existing defensive code from Phase 32 Plans 06/07 (non-disposing caches + `dispose={null}` primitive attach + static regression test) may stay or be simplified based on root-cause findings.

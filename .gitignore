@@ -2,3 +2,10 @@ node_modules
 dist
 .DS_Store
 node-compile-cache/
+
+# Playwright — Phase 36 Plan 01
+# NOTE: *-snapshots/ directories are INTENTIONALLY NOT gitignored.
+# Golden images ARE the regression contract and must be committed.
+playwright-report/
+test-results/
+/playwright/.cache/

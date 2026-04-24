@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: 3D Realism Completion
-status: Phase 34 COMPLETE — verification PASS 8/8; LIB-06 / LIB-07 / LIB-08 delivered
-stopped_at: Phase 34 User-Uploaded Textures complete; ready for Phase 35 (Camera Presets)
-last_updated: "2026-04-22T20:10:00.000Z"
-last_activity: "2026-04-22 — Phase 34 verified (107/107 phase tests green, VIZ-10 guard installed, snapshot purity asserted); VERIFICATION.md written"
+status: executing
+stopped_at: Completed 36-01-PLAN.md
+last_updated: "2026-04-24T19:51:06.107Z"
+last_activity: 2026-04-24
 progress:
   total_phases: 1
   completed_phases: 1
-  total_plans: 8
-  completed_plans: 10
+  total_plans: 7
+  completed_plans: 7
 ---
 
 # Project State
@@ -20,15 +20,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-22 — v1.8 3D Realism Completion started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Milestone v1.8 — Phase 34 shipped and verified. Next up: Phase 35 (Camera Presets) or Phase 36 (VIZ-10 regression), either runnable next per roadmap sequencing notes.
+**Current focus:** Phase 36 — viz-10-regression
 
 ## Current Position
 
 Milestone: v1.8 3D Realism Completion
-Phase: 34 User-Uploaded Textures — COMPLETE (2026-04-22)
-Plan: all 4 plans shipped (34-00 data / 34-01 modal / 34-02 picker / 34-03 render)
-Status: Phase 34 verification PASS 8/8; LIB-06 / LIB-07 / LIB-08 delivered; ready for Phase 35 (Camera Presets)
-Last activity: 2026-04-22 — Phase 34 verifier passed (107/107 Phase 34 tests, VIZ-10 guard installed, LIB-08 snapshot purity asserted); VERIFICATION.md written
+Phase: 36 (viz-10-regression) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
+Last activity: 2026-04-24
 
 Completed milestones: v1.0, v1.1, v1.2, v1.3, v1.4, v1.5, v1.6, v1.7.5 (all archived in `.planning/milestones/`)
 Partial: v1.7 3D Realism — Phase 32 PBR Foundation shipped 2026-04-21; remainder absorbed into v1.8 as Phases 34–37
@@ -61,6 +61,9 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 34 Plan 03]: Mesh-contract tests use static-source regex (idiom established by tests/wallMeshDisposeContract.test.ts in Phase 32) instead of @react-three/test-renderer. R3F test renderer is not in package.json; adding it risks Phase 32 fragility. Static tests catch every known VIZ-10 mechanism (bare map={tex}, missing dispose={null}, missing import, missing branch guard).
 - [Phase 34 Plan 03]: Orphan fallback is silent per D-08/D-09 — both the IDB-miss path and the loader-error path resolve to null; meshes guard on `userTex !== null` before rendering the user-texture branch → render falls through to existing base-color / legacy / PBR paths. Zero throws, zero blank scenes.
 - [Phase 34 Plan 03]: Rule 3 auto-fix — ran `npm install --save-dev fake-indexeddb` because tests/setup.ts imports it (Plan 00 added the import and package.json entry but the worktree node_modules was out of sync; every test failed at setup resolve).
+- [Phase 36]: [Phase 36 Plan 01]: Playwright harness (chromium-dev, --mode test) did NOT reproduce VIZ-10. 4 specs pass, same tex.uuid across 5 mount cycles. Per R-04, no-repro is a valid terminal state; all 4 Phase 32 defensive-code pieces classified KEEP.
+- [Phase 36]: [Phase 36 Plan 01]: webServer invokes 'npx vite --mode test' directly instead of 'npm run dev -- --mode test' (npm arg-forwarding dropped --mode in nested Playwright spawns on macOS npm 10). Semantically equivalent; comment preserves plan's canonical form.
+- [Phase 36]: [Phase 36 Plan 01]: setupPage() helper pre-sets localStorage.room-cad-onboarding-completed=1 so the pointer-events-auto onboarding overlay doesn't block Toolbar clicks during E2E runs. Reusable by all future Playwright specs.
 
 ### Pending Todos
 
@@ -82,6 +85,6 @@ None. Roadmap approved, traceability complete (11/11), ready to plan Phase 34.
 
 ## Session Continuity
 
-Last session: 2026-04-22T20:10:00.000Z
-Stopped at: Phase 34 complete and verified (PASS 8/8); ready for Phase 35 or 36
-Resume file: .planning/ROADMAP.md (next phase selection)
+Last session: 2026-04-24T19:51:06.105Z
+Stopped at: Completed 36-01-PLAN.md
+Resume file: None
