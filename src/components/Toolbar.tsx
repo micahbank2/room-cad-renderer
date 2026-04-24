@@ -71,6 +71,7 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
           return (
             <button
               key={mode}
+              data-testid={`view-mode-${mode}`}
               onClick={() => onViewChange(mode)}
               className={`font-mono text-sm font-normal px-2 py-1 transition-colors duration-150 ${
                 viewMode === mode

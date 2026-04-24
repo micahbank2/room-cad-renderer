@@ -17,6 +17,23 @@ import WalkCameraController from "./WalkCameraController";
 import { getFloorTexture } from "./floorTexture";
 import { GestureChip } from "@/components/ui/GestureChip";
 
+// Phase 36 Plan 01 — VIZ-10 lifecycle tap (test-mode gated).
+// Mirrors the tap functions in userTextureCache.ts / wallpaperTextureCache.ts /
+// wallArtTextureCache.ts. The events buffer is a shared singleton on window.
+type LifecycleEvent = {
+  t: number;
+  event: string;
+  id?: string;
+  uuid?: string;
+  context?: Record<string, unknown>;
+};
+function tapEvent(e: Omit<LifecycleEvent, "t">): void {
+  if (typeof window === "undefined" || import.meta.env.MODE !== "test") return;
+  const w = window as unknown as { __textureLifecycleEvents?: LifecycleEvent[] };
+  if (!w.__textureLifecycleEvents) w.__textureLifecycleEvents = [];
+  w.__textureLifecycleEvents.push({ t: performance.now(), ...e });
+}
+
 interface Props {
   productLibrary: Product[];
 }
@@ -45,10 +62,52 @@ function Scene({ productLibrary }: Props) {
     registerRenderer(gl);
   }, [gl]);
 
+  // Phase 36 Plan 01 — VIZ-10 harness: viewport mount/unmount lifecycle.
+  // Test-mode only; zero production path impact.
+  useEffect(() => {
+    if (import.meta.env.MODE !== "test") return;
+    tapEvent({
+      event: "viewport-mount",
+      context: {
+        rendererUuid: (gl as unknown as { uuid?: string }).uuid ?? null,
+        domWidth: gl.domElement?.clientWidth ?? null,
+        domHeight: gl.domElement?.clientHeight ?? null,
+      },
+    });
+    return () => {
+      tapEvent({ event: "viewport-unmount" });
+    };
+  }, [gl]);
+
   // D-09: preserve orbit camera position+target across mode switches
   const orbitPosRef = useRef<[number, number, number]>([halfW + 15, 12, halfL + 15]);
   const orbitTargetRef = useRef<[number, number, number]>([halfW, room.wallHeight / 3, halfL]);
   const orbitControlsRef = useRef<any>(null);
+
+  // Phase 36 Plan 01 — VIZ-10 harness: deterministic camera pose helper.
+  // Mirrors Phase 31 `window.__drive*` convention (install/cleanup via
+  // useEffect; test-mode gated).
+  useEffect(() => {
+    if (import.meta.env.MODE !== "test" || typeof window === "undefined") return;
+    (window as unknown as {
+      __setTestCamera?: (p: {
+        position: [number, number, number];
+        target: [number, number, number];
+      }) => void;
+    }).__setTestCamera = ({ position, target }) => {
+      const ctrl = orbitControlsRef.current;
+      if (!ctrl?.object) return;
+      ctrl.object.position.set(position[0], position[1], position[2]);
+      ctrl.target.set(target[0], target[1], target[2]);
+      ctrl.update();
+      // Persist so D-09 restore path uses the test pose.
+      orbitPosRef.current = [position[0], position[1], position[2]];
+      orbitTargetRef.current = [target[0], target[1], target[2]];
+    };
+    return () => {
+      delete (window as unknown as { __setTestCamera?: unknown }).__setTestCamera;
+    };
+  }, []);
 
   // Camera animation target (smooth lerp)
   const cameraAnimTarget = useRef<{ pos: THREE.Vector3; look: THREE.Vector3 } | null>(null);

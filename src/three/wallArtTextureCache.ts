@@ -8,16 +8,52 @@ import { useEffect, useState } from "react";
 const cache = new Map<string, Promise<THREE.Texture | null>>();
 const loader = new THREE.TextureLoader();
 
+// Phase 36 Plan 01 — VIZ-10 lifecycle tap (test-mode gated).
+type LifecycleEvent = {
+  t: number;
+  event: string;
+  id?: string;
+  uuid?: string;
+  context?: Record<string, unknown>;
+};
+function tapEvent(e: Omit<LifecycleEvent, "t">): void {
+  if (typeof window === "undefined" || import.meta.env.MODE !== "test") return;
+  const w = window as unknown as { __textureLifecycleEvents?: LifecycleEvent[] };
+  if (!w.__textureLifecycleEvents) w.__textureLifecycleEvents = [];
+  w.__textureLifecycleEvents.push({ t: performance.now(), ...e });
+}
+
+function idFromUrl(url: string): string {
+  if (url.startsWith("data:")) return `data:${url.length}`;
+  if (url.startsWith("blob:")) return url;
+  return url.length > 80 ? url.slice(0, 80) + "…" : url;
+}
+
 export function getWallArtTexture(url: string): Promise<THREE.Texture | null> {
   const existing = cache.get(url);
   if (existing) return existing;
+  const id = idFromUrl(url);
+  tapEvent({ event: "wallArtTex:load-start", id });
   const p = loader
     .loadAsync(url)
     .then((tex) => {
       tex.colorSpace = THREE.SRGBColorSpace;
+      tapEvent({
+        event: "wallArtTex:load-resolve",
+        id,
+        uuid: tex.uuid,
+        context: { sourceUuid: tex.source?.uuid ?? null },
+      });
       return tex;
     })
-    .catch(() => null);
+    .catch((err) => {
+      tapEvent({
+        event: "wallArtTex:load-fail",
+        id,
+        context: { message: String(err) },
+      });
+      return null;
+    });
   cache.set(url, p);
   return p;
 }
