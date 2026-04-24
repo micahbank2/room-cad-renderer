@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: 3D Realism Completion
-status: Phase 34 COMPLETE — verification PASS 8/8; LIB-06 / LIB-07 / LIB-08 delivered
-stopped_at: Phase 34 User-Uploaded Textures complete; ready for Phase 35 (Camera Presets)
-last_updated: "2026-04-22T20:10:00.000Z"
-last_activity: "2026-04-22 — Phase 34 verified (107/107 phase tests green, VIZ-10 guard installed, snapshot purity asserted); VERIFICATION.md written"
+status: verifying
+stopped_at: Phase 36 context gathered
+last_updated: "2026-04-24T17:20:31.095Z"
+last_activity: 2026-04-22 — Phase 34 verifier passed (107/107 Phase 34 tests, VIZ-10 guard installed, LIB-08 snapshot purity asserted); VERIFICATION.md written
 progress:
   total_phases: 1
   completed_phases: 1
-  total_plans: 8
-  completed_plans: 10
+  total_plans: 7
+  completed_plans: 7
 ---
 
 # Project State
@@ -82,6 +82,6 @@ None. Roadmap approved, traceability complete (11/11), ready to plan Phase 34.
 
 ## Session Continuity
 
-Last session: 2026-04-22T20:10:00.000Z
-Stopped at: Phase 34 complete and verified (PASS 8/8); ready for Phase 35 or 36
-Resume file: .planning/ROADMAP.md (next phase selection)
+Last session: 2026-04-24T17:20:31.086Z
+Stopped at: Phase 36 context gathered
+Resume file: .planning/phases/36-viz-10-regression/36-CONTEXT.md
