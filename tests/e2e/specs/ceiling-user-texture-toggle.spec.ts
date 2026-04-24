@@ -9,6 +9,7 @@ import { toggleViewMode } from "../playwright-helpers/toggleViewMode";
 import { settle } from "../playwright-helpers/settle";
 import { getLifecycleEvents } from "../playwright-helpers/lifecycleEvents";
 import { setupPage } from "../playwright-helpers/setupPage";
+import { comparePng } from "../playwright-helpers/pixelDiff";
 
 const CAMERA: CameraPose = {
   position: [20, 4, 20],
@@ -81,6 +82,7 @@ test.describe("VIZ-10 — ceiling user-texture 2-cycle smoke", () => {
       { id: textureId },
     );
 
+    let baseline: Buffer | null = null;
     for (let cycle = 1; cycle <= 2; cycle++) {
       await toggleViewMode(page, "3d");
       await page.waitForFunction(
@@ -89,9 +91,17 @@ test.describe("VIZ-10 — ceiling user-texture 2-cycle smoke", () => {
       );
       await setTestCamera(page, CAMERA);
       await settle(page);
-      await expect(page).toHaveScreenshot(`ceiling-cycle-${cycle}.png`, {
-        maxDiffPixelRatio: 0.01,
-      });
+      const actual = await page.screenshot({ fullPage: false });
+      if (cycle === 1) {
+        baseline = actual;
+      } else {
+        const diff = comparePng(actual, baseline!);
+        expect(
+          diff.mismatchRatio,
+          `cycle ${cycle} drifted from cycle 1 by ${(diff.mismatchRatio * 100).toFixed(3)}% ` +
+            `(${diff.diffPixels}/${diff.totalPixels} px) — VIZ-10 regression signal`,
+        ).toBeLessThanOrEqual(0.01);
+      }
       await toggleViewMode(page, "2d");
       await page.waitForTimeout(100);
     }

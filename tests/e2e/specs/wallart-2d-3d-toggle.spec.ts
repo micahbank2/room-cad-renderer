@@ -9,6 +9,7 @@ import { toggleViewMode } from "../playwright-helpers/toggleViewMode";
 import { settle } from "../playwright-helpers/settle";
 import { getLifecycleEvents } from "../playwright-helpers/lifecycleEvents";
 import { setupPage } from "../playwright-helpers/setupPage";
+import { comparePng } from "../playwright-helpers/pixelDiff";
 import { readFileSync } from "node:fs";
 
 const CAMERA: CameraPose = {
@@ -73,6 +74,7 @@ test.describe("VIZ-10 — wallArt survives 5x 2D↔3D toggle", () => {
       dataUrl,
     );
 
+    let baseline: Buffer | null = null;
     for (let cycle = 1; cycle <= 5; cycle++) {
       await toggleViewMode(page, "3d");
       await page.waitForFunction(
@@ -81,9 +83,17 @@ test.describe("VIZ-10 — wallArt survives 5x 2D↔3D toggle", () => {
       );
       await setTestCamera(page, CAMERA);
       await settle(page);
-      await expect(page).toHaveScreenshot(`wallart-cycle-${cycle}.png`, {
-        maxDiffPixelRatio: 0.01,
-      });
+      const actual = await page.screenshot({ fullPage: false });
+      if (cycle === 1) {
+        baseline = actual;
+      } else {
+        const diff = comparePng(actual, baseline!);
+        expect(
+          diff.mismatchRatio,
+          `cycle ${cycle} drifted from cycle 1 by ${(diff.mismatchRatio * 100).toFixed(3)}% ` +
+            `(${diff.diffPixels}/${diff.totalPixels} px) — VIZ-10 regression signal`,
+        ).toBeLessThanOrEqual(0.01);
+      }
       await toggleViewMode(page, "2d");
       await page.waitForTimeout(100);
     }
