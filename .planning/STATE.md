@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: 3D Realism Completion
-status: executing
-stopped_at: Completed 36-01-PLAN.md
-last_updated: "2026-04-24T19:51:06.107Z"
+status: verifying
+stopped_at: Completed 36-02-PLAN.md
+last_updated: "2026-04-24T21:27:08.092Z"
 last_activity: 2026-04-24
 progress:
   total_phases: 1
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-22 — v1.8 3D Realism Completion sta
 Milestone: v1.8 3D Realism Completion
 Phase: 36 (viz-10-regression) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-24
 
 Completed milestones: v1.0, v1.1, v1.2, v1.3, v1.4, v1.5, v1.6, v1.7.5 (all archived in `.planning/milestones/`)
@@ -64,6 +64,9 @@ Full log in PROJECT.md Key Decisions table. Recent milestone decisions summarize
 - [Phase 36]: [Phase 36 Plan 01]: Playwright harness (chromium-dev, --mode test) did NOT reproduce VIZ-10. 4 specs pass, same tex.uuid across 5 mount cycles. Per R-04, no-repro is a valid terminal state; all 4 Phase 32 defensive-code pieces classified KEEP.
 - [Phase 36]: [Phase 36 Plan 01]: webServer invokes 'npx vite --mode test' directly instead of 'npm run dev -- --mode test' (npm arg-forwarding dropped --mode in nested Playwright spawns on macOS npm 10). Semantically equivalent; comment preserves plan's canonical form.
 - [Phase 36]: [Phase 36 Plan 01]: setupPage() helper pre-sets localStorage.room-cad-onboarding-completed=1 so the pointer-events-auto onboarding overlay doesn't block Toolbar clicks during E2E runs. Reusable by all future Playwright specs.
+- [Phase 36-viz-10-regression]: No-repro outcome preserved — zero production code changes in Plan 36-02; all Phase 32 defensive code kept per ROOT-CAUSE.md §4
+- [Phase 36-viz-10-regression]: chromium-preview Playwright project + .github/workflows/e2e.yml CI workflow landed as permanent VIZ-10 regression guard
+- [Phase 36-viz-10-regression]: Added window.__cadStore test-mode handle (tree-shaken from prod) so specs work in both chromium-dev and chromium-preview bundles
 
 ### Pending Todos
 
@@ -85,6 +88,6 @@ None. Roadmap approved, traceability complete (11/11), ready to plan Phase 34.
 
 ## Session Continuity
 
-Last session: 2026-04-24T19:51:06.105Z
-Stopped at: Completed 36-01-PLAN.md
+Last session: 2026-04-24T21:27:08.090Z
+Stopped at: Completed 36-02-PLAN.md
 Resume file: None
