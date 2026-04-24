@@ -110,9 +110,9 @@ Phase → requirement mapping. Plan column filled by `/gsd:plan-phase` when each
 | LIB-06 | Phase 34 | TBD |
 | LIB-07 | Phase 34 | TBD |
 | LIB-08 | Phase 34 | TBD |
-| CAM-01 | Phase 35 | TBD |
-| CAM-02 | Phase 35 | TBD |
-| CAM-03 | Phase 35 | TBD |
+| CAM-01 | Phase 35 | 35-01 |
+| CAM-02 | Phase 35 | 35-02 |
+| CAM-03 | Phase 35 | 35-02 |
 | VIZ-10 | Phase 36 | TBD |
 | DEBT-01 | Phase 37 | TBD |
 | DEBT-02 | Phase 37 | TBD |
