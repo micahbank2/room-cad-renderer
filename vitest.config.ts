@@ -14,5 +14,9 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./tests/setup.ts"],
     include: ["tests/**/*.{test,spec}.{ts,tsx}", "src/__tests__/**/*.{test,spec}.{ts,tsx}"],
+    // Phase 36 Plan 01: exclude Playwright E2E specs so vitest never tries
+    // to run them under happy-dom. Playwright uses real browser IDB, not
+    // fake-indexeddb (see 36-RESEARCH.md Pitfall 3).
+    exclude: ["node_modules/**", "dist/**", "tests/e2e/**"],
   },
 });
