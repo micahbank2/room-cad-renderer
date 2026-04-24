@@ -175,9 +175,9 @@ Plans:
   3. After the fix lands, uploading an image-based wallpaper on a wall → toggling 2D→3D→2D→3D five times → pixel-diff of every 3D frame vs the first 3D frame is ≤1%; same test passes for wallArt
   4. The Playwright harness is retained as a regression guard, wired into the vitest or equivalent CI loop so a future cache-migration cannot silently break this path again
   5. Existing defensive code from Phase 32 Plans 06/07 (non-disposing caches + `dispose={null}` primitive attach + static regression test) is either kept intact OR simplified with explicit justification in the root-cause document — no silent removals
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
-- [ ] 36-01-PLAN.md — Playwright harness + texture-lifecycle instrumentation + ROOT-CAUSE.md (NO fix)
+- [x] 36-01-PLAN.md — Playwright harness + texture-lifecycle instrumentation + ROOT-CAUSE.md (NO fix)
 - [ ] 36-02-PLAN.md — Fix per ROOT-CAUSE.md findings + defensive-code triage + CI regression guard
 **UI hint**: no
 
@@ -203,7 +203,7 @@ Plans:
 | 33. Design System & UI Polish | 10/10 | Complete    | 2026-04-22 |
 | 34. User-Uploaded Textures | 4/4 | Complete   | 2026-04-22 |
 | 35. Camera Presets | 0/0 | Not started | - |
-| 36. Wallpaper/wallArt Regression (VIZ-10) | 0/0 | Not started | - |
+| 36. Wallpaper/wallArt Regression (VIZ-10) | 1/2 | In Progress|  |
 | 37. Tech-Debt Sweep | 0/0 | Not started | - |
 
 ## Backlog
