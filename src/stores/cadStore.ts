@@ -1191,3 +1191,21 @@ if (import.meta.env.DEV) {
     return { mean, p95, samples };
   };
 }
+
+// ─────────────────────────────────────────────────────────────────────
+// Phase 36 Plan 02 — window.__cadStore test-mode handle.
+//
+// The Playwright harness (tests/e2e/specs/*.spec.ts) needs to seed the
+// CAD store before view-toggles. In chromium-dev (Vite dev server), specs
+// could `await import("/src/stores/cadStore.ts")` directly because Vite
+// serves raw source. That fails in chromium-preview (production bundle)
+// where module paths are hashed. This handle gives specs a stable API
+// that works in both projects.
+//
+// Gated on `import.meta.env.MODE === "test"` — production bundles tree-
+// shake the whole branch. Mirrors the `__drive*` / `__textureLifecycleEvents`
+// convention established in Phase 31 / 36-01.
+// ─────────────────────────────────────────────────────────────────────
+if (typeof window !== "undefined" && import.meta.env.MODE === "test") {
+  (window as unknown as Record<string, unknown>).__cadStore = useCADStore;
+}

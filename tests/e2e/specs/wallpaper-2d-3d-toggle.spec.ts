@@ -30,9 +30,11 @@ test.describe("VIZ-10 — wallpaper survives 5x 2D↔3D toggle", () => {
     //    the wallCount>0 effect in App.tsx → setHasStarted(true) → skips
     //    WelcomeScreen.
     await page.evaluate(async () => {
-      const mod = await import(/* @vite-ignore */ "/src/stores/cadStore.ts");
-      // @ts-expect-error — dev bundle has useCADStore export
-      mod.useCADStore.getState().loadSnapshot({
+      // Use window.__cadStore — test-mode handle installed by src/stores/cadStore.ts.
+      // Works in both chromium-dev (Vite dev server) and chromium-preview
+      // (production-minified bundle with hashed chunk names). Plan 36-02.
+      // @ts-expect-error — window.__cadStore installed in test mode
+      (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } }).__cadStore.getState().loadSnapshot({
         version: 2,
         rooms: {
           room_main: {
@@ -71,11 +73,8 @@ test.describe("VIZ-10 — wallpaper survives 5x 2D↔3D toggle", () => {
     // 3. Apply as wallpaper on side A of wall_1.
     await page.evaluate(
       async (args: { id: string }) => {
-        const mod = await import(
-          /* @vite-ignore */ "/src/stores/cadStore.ts"
-        );
-        // @ts-expect-error
-        mod.useCADStore.getState().setWallpaper("wall_1", "A", {
+        // @ts-expect-error — window.__cadStore installed in test mode
+        (window as unknown as { __cadStore: { getState: () => { setWallpaper: (id: string, side: string, wp: unknown) => void } } }).__cadStore.getState().setWallpaper("wall_1", "A", {
           kind: "pattern",
           userTextureId: args.id,
           scaleFt: 4,

@@ -1,0 +1,49 @@
+# Phase 36 Plan 02 — E2E Regression Harness
+# Runs the Playwright 4-surface harness (wallpaper + wallArt + floor + ceiling)
+# on every pull request targeting any branch. Chromium-only per 36-CONTEXT
+# C-03 / C-04. No `paths:` filter per C-02 — every PR runs the suite.
+#
+# Permanent regression guard for VIZ-10 (Issue #94). Harness was shipped in
+# Plan 36-01; no-repro outcome documented in
+# .planning/phases/36-viz-10-regression/ROOT-CAUSE.md. Retained per R-04 so
+# that any future defensive-code simplification or texture-pipeline refactor
+# surfaces a regression BEFORE it reaches main.
+
+name: E2E Regression Harness
+
+on:
+  pull_request:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run unit tests (vitest)
+        run: npm test -- --run
+
+      - name: Run E2E tests (Playwright — chromium-dev + chromium-preview)
+        run: npm run test:e2e
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14

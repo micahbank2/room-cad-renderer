@@ -24,9 +24,9 @@ test.describe("VIZ-10 — wallArt survives 5x 2D↔3D toggle", () => {
   test("uploaded wallArt survives 5 mount cycles", async ({ page }) => {
     // Seed room + wall.
     await page.evaluate(async () => {
-      const mod = await import(/* @vite-ignore */ "/src/stores/cadStore.ts");
-      // @ts-expect-error — dev bundle has useCADStore export
-      mod.useCADStore.getState().loadSnapshot({
+      // Use window.__cadStore — test-mode handle works in both dev + preview (Plan 36-02).
+      // @ts-expect-error — window.__cadStore installed in test mode
+      (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } }).__cadStore.getState().loadSnapshot({
         version: 2,
         rooms: {
           room_main: {
@@ -60,9 +60,8 @@ test.describe("VIZ-10 — wallArt survives 5x 2D↔3D toggle", () => {
 
     await page.evaluate(
       async (url: string) => {
-        const mod = await import(/* @vite-ignore */ "/src/stores/cadStore.ts");
-        // @ts-expect-error
-        mod.useCADStore.getState().addWallArt("wall_1", {
+        // @ts-expect-error — window.__cadStore installed in test mode
+        (window as unknown as { __cadStore: { getState: () => { addWallArt: (id: string, art: unknown) => void } } }).__cadStore.getState().addWallArt("wall_1", {
           offset: 8,
           centerY: 4,
           width: 3,

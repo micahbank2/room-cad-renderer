@@ -23,9 +23,9 @@ test.describe("VIZ-10 — floor user-texture 2-cycle smoke", () => {
 
   test("floor user-texture survives 2 mount cycles", async ({ page }) => {
     await page.evaluate(async () => {
-      const mod = await import(/* @vite-ignore */ "/src/stores/cadStore.ts");
-      // @ts-expect-error
-      mod.useCADStore.getState().loadSnapshot({
+      // Use window.__cadStore — test-mode handle works in both dev + preview (Plan 36-02).
+      // @ts-expect-error — window.__cadStore installed in test mode
+      (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } }).__cadStore.getState().loadSnapshot({
         version: 2,
         rooms: {
           room_main: {
@@ -61,9 +61,8 @@ test.describe("VIZ-10 — floor user-texture 2-cycle smoke", () => {
 
     await page.evaluate(
       async (args: { id: string }) => {
-        const mod = await import(/* @vite-ignore */ "/src/stores/cadStore.ts");
-        // @ts-expect-error
-        mod.useCADStore.getState().setFloorMaterial({
+        // @ts-expect-error — window.__cadStore installed in test mode
+        (window as unknown as { __cadStore: { getState: () => { setFloorMaterial: (m: unknown) => void } } }).__cadStore.getState().setFloorMaterial({
           kind: "user-texture",
           userTextureId: args.id,
           scaleFt: 4,
