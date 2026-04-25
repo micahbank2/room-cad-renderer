@@ -24,21 +24,21 @@ source: v1.8 carry-over tech debt + parked backlog (999.1 + 999.3) + real-use fe
 
 ### Verification Backfill (POLISH)
 
-- [ ] **POLISH-01** — Phases 35, 36, and 37 each have a formal `VERIFICATION.md` with goal-backward analysis, observable truths, must-haves verification, and pass/fail status. Backfill closes AUDIT-01 from v1.8.
+- [x] **POLISH-01** — Phases 35, 36, and 37 each have a formal `VERIFICATION.md` with goal-backward analysis, observable truths, must-haves verification, and pass/fail status. Backfill closes AUDIT-01 from v1.8. _(Shipped via Phase 38 / PR #110.)_
   - **Source:** v1.8 milestone audit (`.planning/milestones/v1.8-MILESTONE-AUDIT.md` AUDIT-01).
   - **Verifiable:** `ls .planning/phases/35-camera-presets/35-VERIFICATION.md .planning/phases/36-viz-10-regression/36-VERIFICATION.md .planning/phases/37-tech-debt-sweep/37-VERIFICATION.md` returns all three files. Each has the standard frontmatter (status, score, verified date) and reads coherently against the phase's actual implementation. Substitute evidence (SUMMARY frontmatter + e2e specs + ROOT-CAUSE.md) referenced where appropriate — don't fabricate verification not actually performed.
   - **Acceptance:** All three VERIFICATION.md files exist with status `passed` (Phase 35 + 37) or `passed_with_carry_over` (Phase 36, since VIZ-10 outcome is no-repro Branch B not a fix). Cross-references the existing SUMMARYs and ROOT-CAUSE.md rather than re-deriving evidence.
 
 ### Real-Use Feedback (FEEDBACK)
 
-- [ ] **FEEDBACK-01** — A scheduled ~1-hour session captures Jessica's real-use friction. Output is a ranked-priority document at `.planning/feedback/v1.9-jessica-session.md` that becomes the v2.0 scoping input.
+- [x] **FEEDBACK-01** — A scheduled ~1-hour session captures Jessica's real-use friction. Output is a ranked-priority document at `.planning/feedback/v1.9-jessica-session.md` that becomes the v2.0 scoping input. _(Shipped via Phase 39 / PR #111 + #112. Format pivoted from in-person hybrid to async 5-question questionnaire per CONTEXT D-08 due to calendar constraints. Result: zero friction reported, all 3 Phase 35 HUMAN-UAT items confirmed, Phase 40/41 cancellation decision recommended + accepted, 8 GH issues curated as v2.0 scope seeds. Acceptance thresholds for friction/wishes not met — honest absence reported, deliberate over fabrication.)_
   - **Source:** Strategic decision — v1.8 was big and fast; needs real-use signal before betting on the next major capability.
   - **Verifiable:** Document exists at the named path. Contains: (a) ≥3 specific friction points she hit during real use (with what task she was trying to do), (b) ≥3 "I wish it could…" feature requests with her own framing, (c) Phase 35 HUMAN-UAT review covering eye-level pose interpretation + easeInOutCubic feel + active-highlight contrast (each marked confirmed / adjust / reject), (d) a top-3 ranked-priority list synthesized from the session.
   - **Acceptance:** Doc reflects an actual session, not invented content. Top-3 list explicitly informs Phase 40/41 ordering for v1.9 AND seeds the v2.0 scope discussion. Items not actionable in v1.9 captured as backlog (999.x).
 
 ### Per-Surface Texture Tile-Size Bug Fix (BUG)
 
-- [ ] **BUG-01** — When the same user-uploaded texture is applied to multiple surfaces (floor + wall, two walls, etc.), each surface honors its own `tileSizeFt` independently. Currently changing the tile size on one surface affects all surfaces sharing that texture ([GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96)).
+- [x] **BUG-01** — When the same user-uploaded texture is applied to multiple surfaces (floor + wall, two walls, etc.), each surface honors its own `tileSizeFt` independently. Currently changing the tile size on one surface affects all surfaces sharing that texture ([GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96)). _(Shipped via Phase 42 / PR #114. Field named `Ceiling.scaleFt` (not `tileSizeFt`) per Phase 42 D-01 — matches existing `Wallpaper.scaleFt` + `FloorMaterial.scaleFt` schema convention; user-facing UI label stays "Tile size." 4 new tests guard the per-surface isolation invariant.)_
   - **Source:** [GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96). Re-scoped from full TILE-01 design-effect override (deferred to v2.0+) per Phase 39 feedback recommendation accepted 2026-04-25 — Jessica's Q4 confirmed catalog-default tile sizing feels right, but the per-surface bug exists regardless of whether she has noticed it.
   - **Verifiable:** Apply user-texture X to floor with `tileSizeFt=8`. Apply same user-texture X to a wall with `tileSizeFt=4`. Both surfaces render at their own tile size — floor planks 8 ft, wall planks 4 ft. Snapshot stores the per-surface tile size on the surface assignment, not on the catalog entry. Page reload preserves both. Catalog tile size stays a default-only fallback.
   - **Acceptance:** Per-surface `tileSizeFt` lives on the surface assignment (`floor.tileSizeFt`, `wall.wallpaper.tileSizeFt`, `ceiling.tileSizeFt`) — NOT on the user-texture catalog entry alone. Renderer reads from surface override; falls back to catalog default if surface override missing. Snapshot serializes the per-surface value. Migration handles existing snapshots that wrote tile size to the catalog (back-fill the surface override on read). Tests assert both-surfaces-different-tile-sizes invariant.
@@ -77,9 +77,9 @@ Phase → requirement mapping. Plan column filled by `/gsd:plan-phase` when each
 
 | Requirement | Phase | Plan(s) |
 | ----------- | ----- | ------- |
-| POLISH-01 | Phase 38 | 38-01 |
-| FEEDBACK-01 | Phase 39 | 39-01, 39-02 |
-| BUG-01 | Phase 42 (added 2026-04-25 mid-milestone — final v1.9 phase) | TBD |
+| POLISH-01 | Phase 38 | 38-01 ✅ |
+| FEEDBACK-01 | Phase 39 | 39-01, 39-02 ✅ |
+| BUG-01 | Phase 42 | 42-01 ✅ |
 | ~~CEIL-01~~ | ~~Phase 40~~ → CANCELLED 2026-04-25; deferred to v2.0+ (Phase 999.1 backlog) | n/a |
 | ~~TILE-01~~ | ~~Phase 41~~ → CANCELLED 2026-04-25; deferred to v2.0+ (Phase 999.3 backlog) | n/a |
 
