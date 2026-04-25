@@ -13,6 +13,8 @@
 - ✅ **v1.7.5 Design System & UI Polish** — Phase 33 (shipped 2026-04-22) — see [milestones/v1.7.5-ROADMAP.md](milestones/v1.7.5-ROADMAP.md)
 - ✅ **v1.8 3D Realism Completion** — Phases 34–37 (shipped 2026-04-25) — see [milestones/v1.8-ROADMAP.md](milestones/v1.8-ROADMAP.md)
 - ✅ **v1.9 Polish & Feedback** — Phases 38, 39, 42 (Phases 40 + 41 cancelled mid-milestone) — shipped 2026-04-25 — see [milestones/v1.9-ROADMAP.md](milestones/v1.9-ROADMAP.md)
+- 🚧 **v1.10 Evidence-Driven UX Polish** — Phases 43–44 (in progress)
+- 📋 **v1.11 Pascal Feature Set** — Phases 45–48 (planned; queued after v1.10)
 
 ---
 
@@ -88,6 +90,55 @@
 
 </details>
 
+---
+
+## v1.10 Evidence-Driven UX Polish
+
+**Goal:** Tighten the v1.9 surface by closing 5 GH-tracked UX issues with real evidence behind them. Skip speculative items (Pascal competitor copies, feature work without demand signal).
+
+**Why this shape:** v1.9 just validated "feedback-first sequencing." v1.10 validates the natural follow-up: "evidence-driven prioritization." Build only what has actual reports. Park what's hypothetical (8 curated v2.0 seeds → reduced to 5 evidence-driven; 3 Pascal-set items + 1 feature deferred). Result: smaller, faster milestone with no speculation.
+
+**Sequencing:** Phase 43 bundles the 4 UI-polish items (close to each other in code surface area). Phase 44 is the standalone reduced-motion sweep (different code paths — snap guides + camera tweens).
+
+### Phase Details
+
+#### Phase 43: UI Polish Bundle (UX + DEFAULT)
+**Goal:** Close 4 GH-tracked UI issues — SAVED badge size, muted text contrast, Properties panel onboarding, default templates need ceilings.
+**Depends on:** Phase 33 (design tokens — `--text-base`, `--color-text-dim`, `--color-text-ghost`); Phase 34 (template seed data location).
+**Requirements:** UX-01, UX-02, UX-03, DEFAULT-01
+**UI hint:** yes
+**Plans:** TBD (est. 1 plan with 4 atomic commits, one per issue; cleaner than 4 micro-phases)
+
+#### Phase 44: Reduced-Motion Sweep (A11Y)
+**Goal:** Honor `prefers-reduced-motion` for snap guides + wall-side camera tween. Phase 35 camera presets already do this; this phase brings the older animation paths to parity.
+**Depends on:** Phase 33 (`useReducedMotion` hook); Phase 30 (snap guide animation); existing `cameraAnimTarget` lerp in ThreeViewport.
+**Requirements:** A11Y-01
+**UI hint:** yes (subtle — observable only with `prefers-reduced-motion: reduce` set)
+**Plans:** TBD (est. 1 plan, ~1-2 commits)
+
+---
+
+## v1.11 Pascal Feature Set — PREVIEW (queued after v1.10)
+
+**Status:** PLANNED. Formal scoping via `/gsd:new-milestone` after v1.10 ships. Pre-committed in this milestone-list to make the direction explicit.
+
+**Goal:** Adopt the 4 strongest features from the Pascal Editor competitive audit. v1.9 Phase 39 deferred these as "speculative" because there was no demand signal at the time; the user has explicitly committed to them as the next direction.
+
+**Target features:**
+- **Phase 45 / [#79](https://github.com/micahbank2/room-cad-renderer/issues/79)** — Per-node saved camera with Focus action (each placed product / wall / ceiling can have its own bookmarked camera angle, double-click to "Focus" jumps the camera there)
+- **Phase 46 / [#80](https://github.com/micahbank2/room-cad-renderer/issues/80)** — Room display modes (solo / explode) for inspecting individual rooms in isolation or seeing exploded-axonometric layouts
+- **Phase 47 / [#78](https://github.com/micahbank2/room-cad-renderer/issues/78)** — Rooms hierarchy sidebar tree (collapsible, click-to-focus, visibility toggles per-node)
+- **Phase 48 / [#77](https://github.com/micahbank2/room-cad-renderer/issues/77)** — Auto-generated material swatch thumbnails from the renderer (replaces hand-curated swatches in pickers)
+
+**Phase numbering:** Continues from 44. Pre-allocated 45–48; final count + plan structure decided at v1.11 scoping time.
+
+**Source:** Pascal Editor competitive audit (`.planning/competitive/pascal-audit.md`). All 4 issues filed during v1.7.5 design-system work as `competitor-insight` labels.
+
+**Sequencing intent:** Order TBD at scoping time. Likely #77 first (cheap, isolated — no schema changes), then #78 (rooms tree depends only on existing room data), then #80 (display modes layer on top of room rendering), then #79 (per-node camera bookmarks need camera-state plumbing extension). Could parallelize.
+
+**Out of v1.11:** [#97](https://github.com/micahbank2/room-cad-renderer/issues/97) (Properties panel in 3D/split — separate concern), [#81](https://github.com/micahbank2/room-cad-renderer/issues/81) (PBR extensions — different domain), backend / mobile / R3F upgrade (still major-version-leap territory).
+
+---
 
 ## Progress
 
@@ -104,6 +155,8 @@
 | ~~40. Ceiling Resize Handles~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.1) |
 | ~~41. Per-Surface Tile-Size Override~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.3) |
 | 42. Per-Surface tileSizeFt Bug Fix | 1/1 | Complete   | 2026-04-25 |
+| 43. UI Polish Bundle | 0/0 | Not started | - |
+| 44. Reduced-Motion Sweep | 0/0 | Not started | - |
 
 ## Backlog
 
