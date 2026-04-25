@@ -14,7 +14,7 @@
 - ✅ **v1.8 3D Realism Completion** — Phases 34–37 (shipped 2026-04-25) — see [milestones/v1.8-ROADMAP.md](milestones/v1.8-ROADMAP.md)
 - ✅ **v1.9 Polish & Feedback** — Phases 38, 39, 42 (Phases 40 + 41 cancelled mid-milestone) — shipped 2026-04-25 — see [milestones/v1.9-ROADMAP.md](milestones/v1.9-ROADMAP.md)
 - ✅ **v1.10 Evidence-Driven UX Polish** — Phases 43–44 (shipped 2026-04-25) — see [milestones/v1.10-ROADMAP.md](milestones/v1.10-ROADMAP.md)
-- 📋 **v1.11 Pascal Feature Set** — Phases 45–48 (planned; next to scope via `/gsd:new-milestone`)
+- 🚧 **v1.11 Pascal Feature Set** — Phases 45–48 (in progress)
 
 ---
 
@@ -99,25 +99,45 @@
 
 ---
 
-## v1.11 Pascal Feature Set — PREVIEW (queued after v1.10)
+## v1.11 Pascal Feature Set
 
-**Status:** PLANNED. Formal scoping via `/gsd:new-milestone` after v1.10 ships. Pre-committed in this milestone-list to make the direction explicit.
+**Goal:** Adopt the 4 strongest features from the Pascal Editor competitive audit. v1.9 Phase 39 deferred these as "speculative" because there was no demand signal at the time; the user explicitly committed to them as the next direction during v1.10 scoping.
 
-**Goal:** Adopt the 4 strongest features from the Pascal Editor competitive audit. v1.9 Phase 39 deferred these as "speculative" because there was no demand signal at the time; the user has explicitly committed to them as the next direction.
+**Source:** Pascal Editor competitive audit (`.planning/competitive/pascal-audit.md`). All 4 issues filed during v1.7.5 design-system work with `competitor-insight` labels.
 
-**Target features:**
-- **Phase 45 / [#79](https://github.com/micahbank2/room-cad-renderer/issues/79)** — Per-node saved camera with Focus action (each placed product / wall / ceiling can have its own bookmarked camera angle, double-click to "Focus" jumps the camera there)
-- **Phase 46 / [#80](https://github.com/micahbank2/room-cad-renderer/issues/80)** — Room display modes (solo / explode) for inspecting individual rooms in isolation or seeing exploded-axonometric layouts
-- **Phase 47 / [#78](https://github.com/micahbank2/room-cad-renderer/issues/78)** — Rooms hierarchy sidebar tree (collapsible, click-to-focus, visibility toggles per-node)
-- **Phase 48 / [#77](https://github.com/micahbank2/room-cad-renderer/issues/77)** — Auto-generated material swatch thumbnails from the renderer (replaces hand-curated swatches in pickers)
+**Sequencing rationale:** Easy → hard. Each phase ships a tangible UX win; later phases depend on earlier infrastructure. Cancellation of any later phase still leaves earlier phases' value behind.
 
-**Phase numbering:** Continues from 44. Pre-allocated 45–48; final count + plan structure decided at v1.11 scoping time.
+### Phase Details
 
-**Source:** Pascal Editor competitive audit (`.planning/competitive/pascal-audit.md`). All 4 issues filed during v1.7.5 design-system work as `competitor-insight` labels.
+#### Phase 45: Auto-Generated Material Swatch Thumbnails (THUMB-01)
+**Goal:** Material picker swatches render from the live PBR/material pipeline rather than hand-curated static images.
+**Depends on:** Phase 32 PBR foundation (texture cache, color-space helper); existing `surfaceMaterials.ts` data + picker components.
+**Requirements:** THUMB-01
+**UI hint:** yes (visible in FloorMaterialPicker / SwatchPicker / ceiling material picker)
+**Plans:** TBD (est. 1-2 plans; offscreen R3F renderer + per-material cache + Suspense fallback)
 
-**Sequencing intent:** Order TBD at scoping time. Likely #77 first (cheap, isolated — no schema changes), then #78 (rooms tree depends only on existing room data), then #80 (display modes layer on top of room rendering), then #79 (per-node camera bookmarks need camera-state plumbing extension). Could parallelize.
+#### Phase 46: Rooms Hierarchy Sidebar Tree (TREE-01)
+**Goal:** Sidebar gains a Rooms tree — collapsible per-room, nested children (walls/ceilings/products/custom-elements), click-to-focus, per-node visibility toggle.
+**Depends on:** Phase 45 (sequencing, not code); Phase 33 `CollapsibleSection` primitive; existing `cadStore.rooms` structure; `uiStore.selectedIds`.
+**Requirements:** TREE-01
+**UI hint:** yes (new Sidebar panel)
+**Plans:** TBD (est. 2 plans; tree component + visibility-toggle wiring + click-to-select; Focus action ships in Phase 48)
 
-**Out of v1.11:** [#97](https://github.com/micahbank2/room-cad-renderer/issues/97) (Properties panel in 3D/split — separate concern), [#81](https://github.com/micahbank2/room-cad-renderer/issues/81) (PBR extensions — different domain), backend / mobile / R3F upgrade (still major-version-leap territory).
+#### Phase 47: Room Display Modes (DISPLAY-01)
+**Goal:** Toolbar (or sidebar) gains a NORMAL / SOLO / EXPLODE display-mode selector.
+**Depends on:** Phase 46 (rooms tree provides "active room" semantic); existing `uiStore.cameraMode` pattern (mirror for `displayMode`).
+**Requirements:** DISPLAY-01
+**UI hint:** yes (new toggle in Toolbar or sidebar)
+**Plans:** TBD (est. 1 plan; uiStore field + ThreeViewport rooms-render branch + toolbar UI)
+
+#### Phase 48: Per-Node Saved Camera + Focus Action (CAM-04)
+**Goal:** Each placed product / wall / ceiling can have a bookmarked camera angle. Double-click in tree (or right-click context menu) jumps camera there via Phase 35 easeInOutCubic tween.
+**Depends on:** Phase 35 preset-tween infrastructure (`pendingPresetRequest` shape); Phase 46 (tree node double-click trigger).
+**Requirements:** CAM-04
+**UI hint:** yes (right-click context menu + tree double-click)
+**Plans:** TBD (est. 1-2 plans; schema additions for savedCamera fields + context menu UI + tween integration)
+
+---
 
 ---
 
@@ -138,6 +158,10 @@
 | 42. Per-Surface tileSizeFt Bug Fix | 1/1 | Complete   | 2026-04-25 |
 | 43. UI Polish Bundle | 1/1 | Complete   | 2026-04-25 |
 | 44. Reduced-Motion Sweep | 1/1 | Complete   | 2026-04-25 |
+| 45. Auto-Gen Material Swatch Thumbnails | 0/0 | Not started | - |
+| 46. Rooms Hierarchy Sidebar Tree | 0/0 | Not started | - |
+| 47. Room Display Modes | 0/0 | Not started | - |
+| 48. Per-Node Saved Camera + Focus | 0/0 | Not started | - |
 
 ## Backlog
 
