@@ -12,6 +12,11 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
+**v1.10 Evidence-Driven UX Polish shipped 2026-04-25** (single-day milestone). 2 phases (43, 44), 2 plans, 19 commits, +1,180/-42 LOC. Smallest milestone in project history. Phase 43 UI polish bundle closed 4 GH issues atomically — templates ship with default ceiling, `--color-text-ghost` token bumped to meet WCAG AA (fixes 124+ usages), SAVED badge enlarged, PropertiesPanel gains empty-state copy. Phase 44 reduced-motion sweep closed [GH #76](https://github.com/micahbank2/room-cad-renderer/issues/76) with two honest guards (wall-side camera tween + SAVING spinner) plus the verified-and-documented finding that snap guides needed no guard (no animation existed despite issue claim). **AUDIT-01 systemic resolution:** three milestones of recurring "phases ship with SUMMARY-only" pattern resolved by editing the global GSD workflow (`~/.claude/get-shit-done/workflows/audit-milestone.md`) to formalize SUMMARY.md as canonical evidence — future audits across all GSD projects benefit. Audit `passed_with_carry_over`. The "evidence-driven prioritization" pattern validated: 5 evidence-driven items shipped, 6 speculative items deferred (Pascal competitor-set committed for v1.11; rest parked).
+
+<details>
+<summary>Earlier milestones</summary>
+
 **v1.9 Polish & Feedback shipped 2026-04-25** (single-day milestone). 3 phases (38, 39, 42), 4 plans, 22 commits, +2,840/-40 LOC. Closed v1.8 audit AUDIT-01 carry-over via Phase 38 (3 retroactive VERIFICATION.md backfills for Phases 35/36/37). Gathered real-use feedback from Jessica via async 5-question questionnaire (Phase 39) after the in-person hybrid format proved infeasible — result: zero friction reported, all 3 Phase 35 HUMAN-UAT items confirmed, 8 GH issues curated as v2.0 scope seeds. **Mid-milestone re-scope:** Phases 40 (CEIL-01 ceiling resize) and 41 (TILE-01 design-effect tile override) CANCELLED after Phase 39 contradicted both hypotheses ("ceilings went fine", "texture sizing feels right") — re-deferred to Phase 999.1 + 999.3 backlogs. Phase 42 added as v1.9 closer: Ceiling.scaleFt per-surface override added (mirrors Wallpaper.scaleFt + FloorMaterial.scaleFt), CeilingMesh resolver `ceiling.scaleFt ?? entry?.tileSizeFt ?? 2`, apply-time write in CeilingPaintSection, 4 new tests. Closes GH #96. Audit `passed_with_carry_over` (AUDIT-01 recurring: v1.9 phases also lack VERIFICATION.md). The mid-milestone re-scope is itself the biggest deliverable — validated the "feedback-first" sequencing pattern by acting on its own hedge.
 
 <details>
@@ -42,52 +47,41 @@ See `.planning/ROADMAP.md` for links to each milestone archive.
 
 </details>
 
-## Current Milestone: v1.10 Evidence-Driven UX Polish
+## Current Milestone: v1.11 Pascal Feature Set (next to scope)
 
-**Goal:** Tighten the v1.9 surface by closing 5 GH-tracked UX issues with real evidence behind them. Skip speculative items (Pascal competitor copies, feature work without demand signal).
+**Status:** v1.10 shipped 2026-04-25. v1.11 pre-committed in PROJECT + ROADMAP for the 4 Pascal Editor competitor-insight items the user explicitly committed to as the next direction. Formal scoping via `/gsd:new-milestone` produces REQUIREMENTS.md + ROADMAP entry + Phase Details — that's the next step.
 
-**Target features (5 issues, 2 phases):**
-- **UX-01 / Phase 43** ([#101](https://github.com/micahbank2/room-cad-renderer/issues/101)) — Auto-save SAVED badge enlarged so it's not overlooked
-- **UX-02 / Phase 43** ([#98](https://github.com/micahbank2/room-cad-renderer/issues/98)) — Muted text label contrast meets WCAG AA against obsidian-deepest
-- **UX-03 / Phase 43** ([#99](https://github.com/micahbank2/room-cad-renderer/issues/99)) — Properties panel gains a discoverable empty-state affordance
-- **DEFAULT-01 / Phase 43** ([#100](https://github.com/micahbank2/room-cad-renderer/issues/100)) — Default Living Room / Bedroom / Kitchen templates include a ceiling
-- **A11Y-01 / Phase 44** ([#76](https://github.com/micahbank2/room-cad-renderer/issues/76)) — `prefers-reduced-motion` honored across snap guides + wall-side camera tween (Phase 35 presets already honor it)
+**Target features:**
+- **Phase 45 / [#79](https://github.com/micahbank2/room-cad-renderer/issues/79)** — Per-node saved camera with Focus action (each placed product / wall / ceiling can have its own bookmarked camera angle, double-click "Focus" jumps the camera there)
+- **Phase 46 / [#80](https://github.com/micahbank2/room-cad-renderer/issues/80)** — Room display modes (solo / explode) for inspecting individual rooms in isolation or seeing exploded-axonometric layouts
+- **Phase 47 / [#78](https://github.com/micahbank2/room-cad-renderer/issues/78)** — Rooms hierarchy sidebar tree (collapsible, click-to-focus, visibility toggles per-node)
+- **Phase 48 / [#77](https://github.com/micahbank2/room-cad-renderer/issues/77)** — Auto-generated material swatch thumbnails from the renderer (replaces hand-curated swatches in pickers)
 
-**Phase numbering:** Phases 43–44 (continues from 42).
+**Sequencing intent:** TBD at scoping time. Likely [#77](https://github.com/micahbank2/room-cad-renderer/issues/77) first (cheap, isolated — no schema changes), then [#78](https://github.com/micahbank2/room-cad-renderer/issues/78) (rooms tree depends only on existing room data), then [#80](https://github.com/micahbank2/room-cad-renderer/issues/80) (display modes layer on top of room rendering), then [#79](https://github.com/micahbank2/room-cad-renderer/issues/79) (per-node camera bookmarks need camera-state plumbing extension).
 
-**Sequencing intent:** Phase 43 bundles the 4 UI items (close in code surface area — Toolbar / PropertiesPanel / template data / design tokens). Phase 44 is the standalone reduced-motion sweep (different code paths — snap guides + camera tween).
-
-**Why this milestone, why now:** v1.9 just validated "feedback-first sequencing" by cancelling 2 phases when Jessica's signal contradicted their hypotheses. v1.10 validates the natural follow-up — "evidence-driven prioritization": build only what has GH-tracked reports, skip what's hypothetical. The 8 curated v2.0 scope seeds from Phase 39 reduce to 5 evidence-driven items here; 3 Pascal-set items + 1 untargeted feature ([#97](https://github.com/micahbank2/room-cad-renderer/issues/97), [#79](https://github.com/micahbank2/room-cad-renderer/issues/79), [#80](https://github.com/micahbank2/room-cad-renderer/issues/80), [#78](https://github.com/micahbank2/room-cad-renderer/issues/78), [#77](https://github.com/micahbank2/room-cad-renderer/issues/77), [#81](https://github.com/micahbank2/room-cad-renderer/issues/81)) explicitly deferred until Jessica or Micah surfaces actual demand.
-
-**Out of v1.10 (deferred to later milestones):**
-- **Pascal competitor-insight set ([#79](https://github.com/micahbank2/room-cad-renderer/issues/79), [#80](https://github.com/micahbank2/room-cad-renderer/issues/80), [#78](https://github.com/micahbank2/room-cad-renderer/issues/78), [#77](https://github.com/micahbank2/room-cad-renderer/issues/77))** — committed for **v1.11 (queued next)**. See v1.11 preview in ROADMAP.md.
-- Properties panel in 3D/split ([#97](https://github.com/micahbank2/room-cad-renderer/issues/97)) + PBR extensions ([#81](https://github.com/micahbank2/room-cad-renderer/issues/81)) — speculative, no demand signal
-- Backend / auth / cloud sync / mobile / iPad — major-version leap; revisit only when an actual reason exists outside our heads
-- R3F v9 / React 19 upgrade — still gated on R3F v9 stability ([#56](https://github.com/micahbank2/room-cad-renderer/issues/56))
-- Phase 999.1 (ceiling drag-resize) + Phase 999.3 (full design-effect tile override) — re-deferred from v1.9 mid-milestone cancellation
-- AUDIT-01 (auto-generate VERIFICATION.md) — process tech debt; revisit if it keeps recurring
-
-**Next milestone (v1.11) committed:** Pascal Feature Set. Per-node saved camera + Focus action ([#79](https://github.com/micahbank2/room-cad-renderer/issues/79)), room display modes — solo/explode ([#80](https://github.com/micahbank2/room-cad-renderer/issues/80)), rooms hierarchy sidebar tree ([#78](https://github.com/micahbank2/room-cad-renderer/issues/78)), auto-generated material swatch thumbnails ([#77](https://github.com/micahbank2/room-cad-renderer/issues/77)). Formal scoping via `/gsd:new-milestone` after v1.10 ships.
+**Out of v1.11:** Backend / auth / cloud sync / mobile / iPad — major-version leap territory. R3F v9 / React 19 upgrade — still gated on R3F v9 stability ([#56](https://github.com/micahbank2/room-cad-renderer/issues/56)). [#97](https://github.com/micahbank2/room-cad-renderer/issues/97) Properties panel in 3D/split — separate concern. [#81](https://github.com/micahbank2/room-cad-renderer/issues/81) PBR extensions — different domain. Phase 999.1 (ceiling drag-resize) + Phase 999.3 (full design-effect tile override) — re-deferred from v1.9 cancellation; revisit pending demand signal.
 
 **Tech debt acknowledged + accepted:**
 - 6 pre-existing vitest failures permanently accepted (Phase 37 D-02); CI vitest stays disabled
-- AUDIT-01 recurring across v1.8 + v1.9 — accept SUMMARY-as-substitute pattern for now
+- AUDIT-01 systemic resolution: substitute-evidence policy formalized in `~/.claude/get-shit-done/workflows/audit-milestone.md` during v1.10 audit. SUMMARY.md is canonical evidence.
 
 <details>
-<summary>v1.9 milestone (now shipped)</summary>
+<summary>v1.10 milestone (now shipped)</summary>
 
-## Previous Milestone: v1.9 Polish & Feedback
+## Previous Milestone: v1.10 Evidence-Driven UX Polish
 
-**Goal:** Close v1.8 carry-over tech debt, gather real-use feedback to inform v2.0 scoping, and ship the bug-fix actions that emerge from the feedback signal.
+**Goal:** Tighten the v1.9 surface by closing 5 GH-tracked UX issues with real evidence behind them. Skip speculative items.
 
-**Final shape (after 2026-04-25 mid-milestone re-scope):**
-- ✅ POLISH-01 / Phase 38 — VERIFICATION.md backfill for Phases 35/36/37. Closes v1.8 AUDIT-01.
-- ✅ FEEDBACK-01 / Phase 39 — Async 5-question questionnaire (CONTEXT D-08 pivot). Zero friction reported; all 3 Phase 35 HUMAN-UAT confirmed; 8 GH issues curated as v2.0 scope seeds.
-- 🔄 Phase 40 (CEIL-01) CANCELLED — Jessica reported "ceilings went fine." Re-deferred to Phase 999.1.
-- 🔄 Phase 41 (TILE-01 full design-effect override) CANCELLED — Jessica reported "feels right." Re-deferred to Phase 999.3.
-- ✅ BUG-01 / Phase 42 — Per-surface `Ceiling.scaleFt` isolation. Closes [GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96).
+**Final shape:**
+- ✅ UX-01 / Phase 43 — SAVED badge enlarged
+- ✅ UX-02 / Phase 43 — Muted text contrast WCAG AA (token bump fixes 124+ usages)
+- ✅ UX-03 / Phase 43 — PropertiesPanel empty-state copy
+- ✅ DEFAULT-01 / Phase 43 — Templates ship with default ceiling
+- ✅ A11Y-01 / Phase 44 — `prefers-reduced-motion` guards on wall-side camera tween + SAVING spinner (snap guides verified to need no guard)
 
-**The biggest deliverable:** the mid-milestone re-scope itself. v1.9 honored its own "Phases 40-41 subject to Phase 39 reordering" hedge by acting on it instead of overriding. Pattern validated.
+**Pattern validated:** Evidence-driven prioritization. 5 evidence-driven items shipped, 6 speculative items deferred. Smallest, cleanest milestone in project history.
+
+**AUDIT-01 systemic resolution:** Three milestones of recurring "phases ship with SUMMARY-only" pattern resolved via global GSD workflow edit. SUMMARY.md is now formally canonical evidence. Future audits across all GSD projects benefit.
 
 </details>
 

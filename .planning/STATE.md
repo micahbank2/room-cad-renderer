@@ -1,62 +1,61 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.10
-milestone_name: Evidence-Driven UX Polish
-status: executing
-stopped_at: v1.9 milestone archived
-last_updated: "2026-04-25T21:32:03.356Z"
+milestone: TBD
+milestone_name: (next milestone — run /gsd:new-milestone for v1.11 Pascal Feature Set)
+status: idle
+stopped_at: v1.10 milestone shipped 2026-04-25
+last_updated: "2026-04-25T23:30:00.000Z"
+last_activity: 2026-04-25 -- v1.10 archived
 progress:
-  total_phases: 2
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 1
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-25 — v1.10 Evidence-Driven UX Polish scoped)
+See: .planning/PROJECT.md (updated 2026-04-25 — v1.10 archived; v1.11 Pascal Feature Set queued next)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 44 — reduced-motion-sweep
+**Current focus:** none — v1.10 shipped; v1.11 scoping pending via `/gsd:new-milestone`
 
 ## Current Position
 
-Phase: 44 (reduced-motion-sweep) — EXECUTING
-Milestone: v1.10 Evidence-Driven UX Polish
-Phases: 2 (43, 44) — none planned yet
-Plan: 1 of 1
-Status: Executing Phase 44
+Milestone: TBD (run `/gsd:new-milestone` to formally scope v1.11 Pascal Feature Set)
+Phase: none
+Plan: none
+Status: Idle — milestone v1.10 shipped 2026-04-25 (2 phases, 2 plans, 5/5 reqs, audit passed_with_carry_over with AUDIT-01 systemic resolution)
 
-**Next milestone committed:** v1.11 Pascal Feature Set (Phases 45–48) — formal scoping via `/gsd:new-milestone` after v1.10 ships. Per-node saved camera + Focus, room display modes, rooms hierarchy tree, auto-generated material swatch thumbnails.
+## Last 3 milestones (summary)
 
-## Last 2 milestones (summary)
-
-- **v1.9 (shipped 2026-04-25)** — single-day milestone. Phases 38, 39, 42 shipped; Phases 40 + 41 cancelled mid-milestone after Phase 39 feedback contradicted both hypotheses. Closed v1.8 audit AUDIT-01 carry-over (Phase 38), gathered Jessica's async signal (Phase 39), shipped per-surface `Ceiling.scaleFt` isolation closing GH #96 (Phase 42). 22 commits, +2,840/-40 LOC.
+- **v1.10 (shipped 2026-04-25)** — single-day milestone. Phases 43, 44. UI polish bundle (4 GH issues atomically) + reduced-motion sweep. AUDIT-01 systemic resolution: substitute-evidence policy formalized globally in `~/.claude/get-shit-done/workflows/audit-milestone.md`. 19 commits, +1,180/-42 LOC. Smallest milestone in project history.
+- **v1.9 (shipped 2026-04-25)** — single-day milestone. Phases 38, 39, 42 shipped; Phases 40 + 41 cancelled mid-milestone after Phase 39 feedback contradicted both hypotheses. 22 commits, +2,840/-40 LOC.
 - **v1.8 (shipped 2026-04-25)** — 4 phases (32 inherited from v1.7, 34/35/36/37). 80 commits, +16,588/-242 LOC. User-uploaded textures, camera presets, VIZ-10 permanent regression guard, tech-debt sweep.
 
 Earlier milestones archived in `.planning/milestones/`.
 
-## Carry-Over Tech Debt for v2.0 Scoping
+## Carry-Over Tech Debt for v1.11 Scoping
 
-- AUDIT-01 (recurring): formal VERIFICATION.md auto-generation pattern
 - 6 pre-existing vitest failures (formally permanent, Phase 37 D-02)
 - CI vitest disabled (Phase 36-02)
 - R3F v9 / React 19 upgrade gated on stability ([#56](https://github.com/micahbank2/room-cad-renderer/issues/56))
-- Phase 999.1 (ceiling drag-resize) + Phase 999.3 (full design-effect tile-size override) — re-deferred from v1.9 mid-milestone cancellation
+- Phase 999.1 (ceiling drag-resize) + Phase 999.3 (full design-effect tile-size override) — re-deferred from v1.9 cancellation
+- AUDIT-01 systemic policy resolution shipped during v1.10 audit; pattern resolved globally
 
-## v2.0 Scope Seeds (curated from Phase 39)
+## v1.11 Pre-Committed (Pascal Feature Set)
 
-When `/gsd:new-milestone` runs for v2.0, start input is:
+When `/gsd:new-milestone` runs for v1.11, the starting input is already specified in PROJECT.md + ROADMAP.md preview:
 
-- UX polish trio: [#97](https://github.com/micahbank2/room-cad-renderer/issues/97), [#98](https://github.com/micahbank2/room-cad-renderer/issues/98), [#99](https://github.com/micahbank2/room-cad-renderer/issues/99)
-- Quick wins: [#100](https://github.com/micahbank2/room-cad-renderer/issues/100), [#101](https://github.com/micahbank2/room-cad-renderer/issues/101), [#76](https://github.com/micahbank2/room-cad-renderer/issues/76)
-- Pascal competitor-insight: [#79](https://github.com/micahbank2/room-cad-renderer/issues/79), [#80](https://github.com/micahbank2/room-cad-renderer/issues/80), [#78](https://github.com/micahbank2/room-cad-renderer/issues/78), [#77](https://github.com/micahbank2/room-cad-renderer/issues/77)
-- PBR extensions: [#81](https://github.com/micahbank2/room-cad-renderer/issues/81)
+- [#79](https://github.com/micahbank2/room-cad-renderer/issues/79) — Per-node saved camera + Focus action
+- [#80](https://github.com/micahbank2/room-cad-renderer/issues/80) — Room display modes (solo / explode)
+- [#78](https://github.com/micahbank2/room-cad-renderer/issues/78) — Rooms hierarchy sidebar tree
+- [#77](https://github.com/micahbank2/room-cad-renderer/issues/77) — Auto-generated material swatch thumbnails
 
 ## Session Continuity
 
-Last session: 2026-04-25T20:30:00.000Z
-Stopped at: v1.9 milestone archived
+Last session: 2026-04-25T23:30:00.000Z
+Stopped at: v1.10 milestone archived
 Resume file: None
