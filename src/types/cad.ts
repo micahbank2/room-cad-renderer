@@ -144,6 +144,16 @@ export interface Ceiling {
   /** Phase 34 (LIB-06/08): id of a UserTexture in the `room-cad-user-textures`
    *  IDB keyspace. When present, takes priority over `surfaceMaterialId` at render. */
   userTextureId?: string;
+  /** Phase 42 (BUG-01): per-ceiling tile-size override (in feet) for the
+   *  user-uploaded texture. Written at apply-time when the user picks a
+   *  `userTextureId`. Mirrors `Wallpaper.scaleFt` + `FloorMaterial.scaleFt`.
+   *
+   *  Resolver precedence in `CeilingMesh`: `ceiling.scaleFt ?? catalog.tileSizeFt ?? 2`.
+   *
+   *  Optional: existing snapshots that pre-date the BUG-01 fix have no value
+   *  here and fall through to the catalog default — functionally equivalent
+   *  to pre-fix behavior. Closes [GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96). */
+  scaleFt?: number;
 }
 
 export interface FloorMaterial {

@@ -18,8 +18,15 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
   };
 
   // Phase 34 — apply a user-uploaded texture to this ceiling.
-  const handleCeilingUserTexture = (id: string) => {
-    updateCeiling(ceilingId, { userTextureId: id, surfaceMaterialId: undefined });
+  // Phase 42 BUG-01 — write `scaleFt` at apply-time so per-ceiling tile
+  // size is isolated from the catalog (mirrors FloorMaterialPicker +
+  // WallSurfacePanel apply-time pattern). Closes GH #96.
+  const handleCeilingUserTexture = (id: string, tileSizeFt: number) => {
+    updateCeiling(ceilingId, {
+      userTextureId: id,
+      scaleFt: tileSizeFt,
+      surfaceMaterialId: undefined,
+    });
   };
 
   const handleToggleLimeWash = (checked: boolean) => {
