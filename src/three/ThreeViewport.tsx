@@ -211,7 +211,10 @@ function Scene({ productLibrary }: Props) {
     };
   }, []);
 
-  // MIC-35: animate camera to face selected wall side
+  // MIC-35: animate camera to face selected wall side.
+  // Phase 44 A11Y-01: when prefers-reduced-motion is on, snap directly to the
+  // wall-side pose instead of populating cameraAnimTarget (which drives a
+  // useFrame lerp). Mirrors Phase 35 preset-tween reduced-motion path.
   useEffect(() => {
     if (!wallSideCameraTarget || cameraMode !== "orbit") return;
     const wall = walls[wallSideCameraTarget.wallId];
@@ -232,9 +235,19 @@ function Scene({ productLibrary }: Props) {
     // Camera position: wall center + normal * distance (in 3D coords: x→x, y→up, z→z)
     const camPos = new THREE.Vector3(cx + nx * dist, cy + 2, cz + nz * dist);
     const lookAt = new THREE.Vector3(cx, cy, cz);
-    cameraAnimTarget.current = { pos: camPos, look: lookAt };
+    if (prefersReducedMotion) {
+      // Snap directly — never enter useFrame lerp.
+      const ctrl = orbitControlsRef.current;
+      if (ctrl?.object) {
+        ctrl.object.position.copy(camPos);
+        ctrl.target.copy(lookAt);
+        ctrl.update();
+      }
+    } else {
+      cameraAnimTarget.current = { pos: camPos, look: lookAt };
+    }
     useUIStore.getState().clearWallSideCameraTarget();
-  }, [wallSideCameraTarget, walls, cameraMode]);
+  }, [wallSideCameraTarget, walls, cameraMode, prefersReducedMotion]);
 
   // Phase 35 CAM-02: consume pendingPresetRequest from uiStore.
   // Research §1 cancel-and-restart — startPresetTween captures `from` from
