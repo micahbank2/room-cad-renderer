@@ -12,6 +12,11 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
+**v1.8 3D Realism Completion shipped 2026-04-25.** 4 phases, 9 plans, 11/11 requirements complete (LIB-06/07/08, CAM-01/02/03, VIZ-10, DEBT-01..04). User-uploaded textures (drop JPEG/PNG/WebP → name + real-world tile size in feet+inches → apply to walls/floors/ceilings; 2048px longest-edge downscale + SHA-256 dedup to single IDB entry; snapshots reference by `userTextureId` only — zero `data:` strings >10KB and zero Blobs in JSON; orphan-deletion fallback to base hex color). Camera presets (eye-level / top-down / 3-quarter / corner via 4 lucide Toolbar buttons + bare `1`/`2`/`3`/`4` hotkeys; ~600ms easeInOutCubic tween with imperative damping toggle, live-capture cancel-and-restart, view-mode + walk-mode cleanup, reduced-motion instant-snap; full activeElement / viewMode / cameraMode / modifier guard chain; zero `cadStore.past` pollution + zero `useAutoSave` triggers). VIZ-10 permanent regression guard (Playwright harness across 4 surfaces × 2 projects + within-run pixel-diff via pixelmatch + GitHub Actions CI workflow; ROOT-CAUSE.md documents no-repro Branch B per R-04 — same texture UUID across 5 mount cycles, 14 goldens byte-identical, all 4 Phase 32 defensive-code pieces classified KEEP). Tech-debt sweep verifies 4 carry-over GH issues closed cleanly, deletes orphan `SaveIndicator.tsx`, finishes `effectiveDimensions` → `resolveEffectiveDims` migration with `@deprecated` JSDoc + 3 unused-import cleanups, backfills Phase 29 frontmatter, formally accepts 6 pre-existing vitest failures as permanent in deferred-items.md. 80 commits, +16,588/-242 LOC. Audit `passed_with_carry_over` (AUDIT-01: 3 phases lack VERIFICATION.md → tech debt for v1.9+). Issue #94 (VIZ-10) stays OPEN by design — no-repro ≠ fix.
+
+<details>
+<summary>Earlier milestones</summary>
+
 **v1.7.5 Design System & UI Polish — Phase 33 shipped 2026-04-22.** 10 plans across 3 waves. Foundation tokens (`--text-*` / `--spacing-*` / `--radius-*` on Tailwind v4 @theme, `--radius-lg` 6→8px) + `lucide-react` installed. Typography ramp (mixed-case section/panel/button labels; UPPERCASE preserved for dynamic IDs, status strings, unit value labels per D-03/D-04/D-05). Zero arbitrary `p-[Npx]` / `m-[Npx]` / `rounded-[Npx]` / `gap-[Npx]` across Toolbar/Sidebar/PropertiesPanel/RoomSettings. Shared `useReducedMotion` hook, `CollapsibleSection` primitive with localStorage persistence (10 PropertiesPanel sections wrapped), `LibraryCard` + `CategoryTabs` primitives (ProductLibrary + CustomElementsPanel migrated; WainscotLibrary / Paint/Material / FramedArt deferred per D-31), `FloatingSelectionToolbar` (Duplicate + Delete above bbox), `GestureChip` (dismissible, 2D + 3D variants), rotation preset chips `[-90,-45,0,45,90]` with single-undo contract, `InlineEditableText` primitive (doc title + room tabs click-to-edit via Phase 31 LabelOverrideInput pattern). Closes GH #83-#90. Test baseline grew 340 → 424 passing (+45 Phase 33 tests + 39 other net); same pre-existing LIB-03/04/05 + App.restore failures unrelated (now 6, was 8 on main — improved by 2).
 
 **v1.6 Editing UX shipped 2026-04-21.** 4 phases, 17 plans, 11/11 requirements complete (audit `passed`). Auto-save with debounce + SAVING/SAVED/SAVE_FAILED toolbar status + pointer-based silent restore on reload (Phase 28: SAVE-05, SAVE-06). Editable dimension labels via double-click overlay with feet+inches parser, single-undo guard preserved (Phase 29: EDIT-20, EDIT-21). Smart snapping with pure 427-LOC `snapEngine.ts` + Fabric `snapGuides.ts` renderer, edge/midpoint snap, accent-purple axis guides, Alt/Option disables (Phase 30: SNAP-01, SNAP-02, SNAP-03). Drag-to-resize with corner uniform + edge per-axis handles on products and custom elements; wall-endpoint drag with smart-snap closing Phase 30 D-08b deferral; per-placement label override on custom elements via `PropertiesPanel` input + live 2D render via `resolveEffectiveDims` resolver (Phase 31: EDIT-22, EDIT-23, EDIT-24, CUSTOM-06). Phase 25 drag fast-path preserved across all new editing branches (single undo entry per drag op). Test baseline grew 191 → 340 passing; same 6 pre-existing LIB-03/04/05 failures unrelated. 21 perceptual items auto-approved across 4 HUMAN-UAT.md files. Tech debt: orphan `SaveIndicator.tsx`, legacy `effectiveDimensions` coexists with `resolveEffectiveDims` (incremental migration).
@@ -30,7 +35,22 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 See `.planning/ROADMAP.md` for links to each milestone archive.
 
-## Current Milestone: v1.8 3D Realism Completion
+</details>
+
+## Current Milestone: TBD (v1.9+)
+
+**Status:** v1.8 shipped 2026-04-25. Next milestone not yet scoped — run `/gsd:new-milestone` to start v1.9 questioning + research + requirements + roadmap.
+
+**Carry-over tech debt for whoever scopes v1.9:**
+- AUDIT-01: backfill formal `VERIFICATION.md` for Phases 35/36/37 (3 phases shipped without one; substitute evidence is sufficient but the formal artifact is missing)
+- 6 pre-existing vitest failures permanently accepted; CI vitest stays disabled until/unless a future phase has independent reason to fix the affected production code
+- Phase 999.1: ceiling resize handles (BACKLOG)
+- Phase 999.3 / GH #105: per-surface texture tile-size override (BACKLOG)
+
+<details>
+<summary>v1.8 milestone (now shipped)</summary>
+
+## Previous Milestone: v1.8 3D Realism Completion
 
 **Goal:** Close the v1.7 3D Realism story that Phase 32 opened — Jessica can upload photos of real surfaces she's considering, switch camera angles instantly, and never see textures vanish on view toggle. The "SEEING" side of Core Value reaches parity with the 2D editing side.
 
@@ -47,6 +67,8 @@ See `.planning/ROADMAP.md` for links to each milestone archive.
 **Reused foundations from Phase 32:** color-space helper (`sRGBColorSpace` / `NoColorSpace` discipline), refcount-based dispose API, per-mesh `<Suspense>` + `<ErrorBoundary>` pattern, R3F v8 / drei v9 / React 18 lock.
 
 **Why this milestone, why now:** Core Value is "Jessica can SEE her future room with her actual furniture before spending money." v1.0–v1.6 delivered 2D editing + persistence; v1.7.5 closed the visual quality gap; v1.8 finishes the 3D realism story that compounds directly on every prior milestone's work. User-uploaded textures in particular close the last remaining Core-Value gap — letting Jessica see HER actual materials, not just bundled presets.
+
+</details>
 
 ## Target User
 

@@ -1,5 +1,38 @@
 # Milestones — Room CAD Renderer
 
+## v1.8 — 3D Realism Completion ✅
+
+**Shipped:** 2026-04-25
+**Timeline:** 2026-04-22 → 2026-04-25 (~3 days)
+**Phases:** 4 (34, 35, 36, 37) — 9 plans
+**Files changed:** 121 files (+16,588 / −242 LOC)
+**Git range:** Phase 34 first commit → `a2116f3` (PR #107 audit close)
+**Tag:** `v1.8`
+**PRs:** #93 (Phase 34), #102/#103 (Phase 36), #104 (Phase 35), #106 (Phase 37), #107 (audit + close gaps)
+
+**Delivered:** Jessica drops a photo of any real surface (JPEG/PNG/WebP) and sees it on a wall/floor/ceiling at the right scale within seconds; switches between top-down / eye-level / 3-quarter / corner camera angles with a single keystroke and a smooth ~600ms glide; uploaded-image wallpaper and wallArt survive 2D↔3D toggles indefinitely (permanent regression guard via Playwright CI on every PR). v1.6 carry-over tech debt cleared. The "SEEING" side of Core Value reaches parity with the 2D editing side.
+
+**Key accomplishments:**
+
+- **User-uploaded textures (LIB-06/07/08)** — Upload UI accepts JPEG/PNG/WebP, names + real-world tile size in feet+inches, applies to walls/floors/ceilings. 2048px longest-edge client-side downscale + SHA-256 dedup to single IDB entry. Snapshots reference textures by `userTextureId` only. Orphan-deletion fallback to base hex color (no crash).
+- **Camera presets (CAM-01/02/03)** — 4 lucide Toolbar buttons + bare `1`/`2`/`3`/`4` hotkeys. ~600ms easeInOutCubic tween with imperative damping toggle, live-capture cancel-and-restart, view-mode + walk-mode cleanup, reduced-motion instant-snap. Full activeElement/viewMode/cameraMode/modifier guard chain. Zero `cadStore.past` pollution + zero `useAutoSave` triggers.
+- **VIZ-10 permanent regression guard** — Playwright harness across 4 surfaces × 2 projects (chromium-dev + chromium-preview production-minified) with within-run pixel-diff via pixelmatch + GitHub Actions CI. ROOT-CAUSE.md documents Branch B no-repro per R-04. All 4 Phase 32 defensive-code pieces classified KEEP. Issue #94 stays OPEN by design.
+- **Tech-debt sweep (DEBT-01/02/03/04)** — Verified GH #44/#46/#50/#60 closed cleanly; deleted orphan `SaveIndicator.tsx`; finished `effectiveDimensions` migration with `@deprecated` JSDoc + 3 unused-import cleanups; backfilled Phase 29 `29-03-SUMMARY.md` frontmatter; permanently accepted 6 pre-existing vitest failures.
+- **Within-run pixel-diff testing pattern** — Phase 36's redesigned spec format (cycle-N vs cycle-1 buffer baseline via `pixelmatch` + `pngjs`) sidesteps Playwright's platform-coupled stored-golden problem. Reusable for any "stability across actions" test.
+- **Root-cause-before-fix discipline** — Phase 36's `depends_on: [36-01]` gate on Plan 36-02 saved a 4th speculative VIZ-10 fix attempt after three earlier Phase 32 fixes (Plans 05/06/07) failed to identify the root cause.
+
+**Audit:** [v1.8-MILESTONE-AUDIT.md](milestones/v1.8-MILESTONE-AUDIT.md) — `passed_with_carry_over`. AUDIT-01 (3 phases lack `VERIFICATION.md`) → tech debt for v1.9+ polish cycle.
+
+**Tech debt carried forward:**
+- AUDIT-01 — backfill formal VERIFICATION.md for Phases 35/36/37
+- 6 pre-existing vitest failures — formally permanent until/unless a future phase has independent reason to fix the affected production code
+- CI vitest disabled (Playwright-only on PR)
+
+**Backlog surfaced:**
+- Phase 999.3 / GH #105 — per-surface texture tile-size override (design-effect scaling)
+
+---
+
 ## v1.6 Editing UX (Shipped: 2026-04-21)
 
 **Phases completed:** 4 phases, 17 plans, 34 tasks
