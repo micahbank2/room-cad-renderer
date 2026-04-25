@@ -60,11 +60,14 @@ See `.planning/ROADMAP.md` for links to each milestone archive.
 **Why this milestone, why now:** v1.9 just validated "feedback-first sequencing" by cancelling 2 phases when Jessica's signal contradicted their hypotheses. v1.10 validates the natural follow-up — "evidence-driven prioritization": build only what has GH-tracked reports, skip what's hypothetical. The 8 curated v2.0 scope seeds from Phase 39 reduce to 5 evidence-driven items here; 3 Pascal-set items + 1 untargeted feature ([#97](https://github.com/micahbank2/room-cad-renderer/issues/97), [#79](https://github.com/micahbank2/room-cad-renderer/issues/79), [#80](https://github.com/micahbank2/room-cad-renderer/issues/80), [#78](https://github.com/micahbank2/room-cad-renderer/issues/78), [#77](https://github.com/micahbank2/room-cad-renderer/issues/77), [#81](https://github.com/micahbank2/room-cad-renderer/issues/81)) explicitly deferred until Jessica or Micah surfaces actual demand.
 
 **Out of v1.10 (deferred to later milestones):**
-- Pascal competitor-insight set + Properties panel in 3D/split + PBR extensions — speculative, no demand signal
+- **Pascal competitor-insight set ([#79](https://github.com/micahbank2/room-cad-renderer/issues/79), [#80](https://github.com/micahbank2/room-cad-renderer/issues/80), [#78](https://github.com/micahbank2/room-cad-renderer/issues/78), [#77](https://github.com/micahbank2/room-cad-renderer/issues/77))** — committed for **v1.11 (queued next)**. See v1.11 preview in ROADMAP.md.
+- Properties panel in 3D/split ([#97](https://github.com/micahbank2/room-cad-renderer/issues/97)) + PBR extensions ([#81](https://github.com/micahbank2/room-cad-renderer/issues/81)) — speculative, no demand signal
 - Backend / auth / cloud sync / mobile / iPad — major-version leap; revisit only when an actual reason exists outside our heads
 - R3F v9 / React 19 upgrade — still gated on R3F v9 stability ([#56](https://github.com/micahbank2/room-cad-renderer/issues/56))
 - Phase 999.1 (ceiling drag-resize) + Phase 999.3 (full design-effect tile override) — re-deferred from v1.9 mid-milestone cancellation
 - AUDIT-01 (auto-generate VERIFICATION.md) — process tech debt; revisit if it keeps recurring
+
+**Next milestone (v1.11) committed:** Pascal Feature Set. Per-node saved camera + Focus action ([#79](https://github.com/micahbank2/room-cad-renderer/issues/79)), room display modes — solo/explode ([#80](https://github.com/micahbank2/room-cad-renderer/issues/80)), rooms hierarchy sidebar tree ([#78](https://github.com/micahbank2/room-cad-renderer/issues/78)), auto-generated material swatch thumbnails ([#77](https://github.com/micahbank2/room-cad-renderer/issues/77)). Formal scoping via `/gsd:new-milestone` after v1.10 ships.
 
 **Tech debt acknowledged + accepted:**
 - 6 pre-existing vitest failures permanently accepted (Phase 37 D-02); CI vitest stays disabled

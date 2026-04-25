@@ -14,6 +14,7 @@
 - ✅ **v1.8 3D Realism Completion** — Phases 34–37 (shipped 2026-04-25) — see [milestones/v1.8-ROADMAP.md](milestones/v1.8-ROADMAP.md)
 - ✅ **v1.9 Polish & Feedback** — Phases 38, 39, 42 (Phases 40 + 41 cancelled mid-milestone) — shipped 2026-04-25 — see [milestones/v1.9-ROADMAP.md](milestones/v1.9-ROADMAP.md)
 - 🚧 **v1.10 Evidence-Driven UX Polish** — Phases 43–44 (in progress)
+- 📋 **v1.11 Pascal Feature Set** — Phases 45–48 (planned; queued after v1.10)
 
 ---
 
@@ -114,6 +115,28 @@
 **Requirements:** A11Y-01
 **UI hint:** yes (subtle — observable only with `prefers-reduced-motion: reduce` set)
 **Plans:** TBD (est. 1 plan, ~1-2 commits)
+
+---
+
+## v1.11 Pascal Feature Set — PREVIEW (queued after v1.10)
+
+**Status:** PLANNED. Formal scoping via `/gsd:new-milestone` after v1.10 ships. Pre-committed in this milestone-list to make the direction explicit.
+
+**Goal:** Adopt the 4 strongest features from the Pascal Editor competitive audit. v1.9 Phase 39 deferred these as "speculative" because there was no demand signal at the time; the user has explicitly committed to them as the next direction.
+
+**Target features:**
+- **Phase 45 / [#79](https://github.com/micahbank2/room-cad-renderer/issues/79)** — Per-node saved camera with Focus action (each placed product / wall / ceiling can have its own bookmarked camera angle, double-click to "Focus" jumps the camera there)
+- **Phase 46 / [#80](https://github.com/micahbank2/room-cad-renderer/issues/80)** — Room display modes (solo / explode) for inspecting individual rooms in isolation or seeing exploded-axonometric layouts
+- **Phase 47 / [#78](https://github.com/micahbank2/room-cad-renderer/issues/78)** — Rooms hierarchy sidebar tree (collapsible, click-to-focus, visibility toggles per-node)
+- **Phase 48 / [#77](https://github.com/micahbank2/room-cad-renderer/issues/77)** — Auto-generated material swatch thumbnails from the renderer (replaces hand-curated swatches in pickers)
+
+**Phase numbering:** Continues from 44. Pre-allocated 45–48; final count + plan structure decided at v1.11 scoping time.
+
+**Source:** Pascal Editor competitive audit (`.planning/competitive/pascal-audit.md`). All 4 issues filed during v1.7.5 design-system work as `competitor-insight` labels.
+
+**Sequencing intent:** Order TBD at scoping time. Likely #77 first (cheap, isolated — no schema changes), then #78 (rooms tree depends only on existing room data), then #80 (display modes layer on top of room rendering), then #79 (per-node camera bookmarks need camera-state plumbing extension). Could parallelize.
+
+**Out of v1.11:** [#97](https://github.com/micahbank2/room-cad-renderer/issues/97) (Properties panel in 3D/split — separate concern), [#81](https://github.com/micahbank2/room-cad-renderer/issues/81) (PBR extensions — different domain), backend / mobile / R3F upgrade (still major-version-leap territory).
 
 ---
 

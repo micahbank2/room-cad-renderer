@@ -29,6 +29,8 @@ Phases: 2 (43, 44) — none planned yet
 Plan: none
 Status: Ready for `/gsd:plan-phase 43` (UX-01/02/03 + DEFAULT-01 bundle)
 
+**Next milestone committed:** v1.11 Pascal Feature Set (Phases 45–48) — formal scoping via `/gsd:new-milestone` after v1.10 ships. Per-node saved camera + Focus, room display modes, rooms hierarchy tree, auto-generated material swatch thumbnails.
+
 ## Last 2 milestones (summary)
 
 - **v1.9 (shipped 2026-04-25)** — single-day milestone. Phases 38, 39, 42 shipped; Phases 40 + 41 cancelled mid-milestone after Phase 39 feedback contradicted both hypotheses. Closed v1.8 audit AUDIT-01 carry-over (Phase 38), gathered Jessica's async signal (Phase 39), shipped per-surface `Ceiling.scaleFt` isolation closing GH #96 (Phase 42). 22 commits, +2,840/-40 LOC.
