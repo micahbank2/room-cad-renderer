@@ -1,6 +1,7 @@
 import { useUIStore } from "@/stores/uiStore";
 import { useCADStore } from "@/stores/cadStore";
 import { useProjectStore } from "@/stores/projectStore";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { exportRenderedImage } from "@/lib/export";
 import type { ToolType } from "@/types/cad";
 import Tooltip from "@/components/Tooltip";
@@ -258,6 +259,10 @@ const TOOL_SHORTCUTS: Record<ToolType, string> = {
 /** Prominent save indicator in the top toolbar (SAVE-04) */
 function ToolbarSaveStatus() {
   const status = useProjectStore((s) => s.saveStatus);
+  // Phase 44 A11Y-01: drop the SAVING spinner's continuous rotation when
+  // prefers-reduced-motion is on. Icon stays visible (semantic meaning
+  // preserved); rotation removed.
+  const reducedMotion = useReducedMotion();
 
   // D-04 / D-04a: SAVE_FAILED surface — persists (no auto-fade) until store leaves "failed"
   if (status === "failed") {
@@ -277,7 +282,11 @@ function ToolbarSaveStatus() {
     <div className="flex items-center gap-1.5 min-w-[72px]" aria-label="Save status">
       {isSaving ? (
         <>
-          <span className="material-symbols-outlined text-[14px] text-accent-light animate-spin">
+          <span
+            className={`material-symbols-outlined text-[14px] text-accent-light ${
+              reducedMotion ? "" : "animate-spin"
+            }`}
+          >
             progress_activity
           </span>
           <span className="font-mono text-base tracking-widest text-accent-light">
