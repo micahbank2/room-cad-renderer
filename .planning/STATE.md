@@ -1,13 +1,13 @@
 ---
 gsd_state_version: 1.0
-milestone: TBD
-milestone_name: (next milestone — run /gsd:new-milestone)
-status: idle
-stopped_at: v1.8 milestone shipped 2026-04-25
-last_updated: "2026-04-25T02:50:00.000Z"
-last_activity: 2026-04-25 -- v1.8 archived
+milestone: v1.9
+milestone_name: Polish & Feedback
+status: scoped
+stopped_at: v1.9 scoped 2026-04-25 — ready for /gsd:plan-phase 38
+last_updated: "2026-04-25T03:30:00.000Z"
+last_activity: 2026-04-25 -- v1.9 milestone scoped
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,17 +17,24 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-25 — v1.8 archived; awaiting v1.9 scope)
+See: .planning/PROJECT.md (updated 2026-04-25 — v1.9 Polish & Feedback scoped)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** none — v1.8 shipped; next milestone scoping pending
+**Current focus:** v1.9 Polish & Feedback — close v1.8 carry-overs, ship 2 parked backlog features, gather real-use feedback for v2.0 scoping.
 
 ## Current Position
 
-Milestone: TBD (run `/gsd:new-milestone` to start v1.9 questioning + research + requirements + roadmap)
-Phase: none
+Milestone: v1.9 Polish & Feedback
+Phases: 4 (38, 39, 40, 41) — none planned yet
 Plan: none
-Status: Idle — milestone v1.8 shipped 2026-04-25 (4 phases, 9 plans, 11/11 reqs, audit passed_with_carry_over)
+Status: Ready for `/gsd:plan-phase 38` (POLISH-01 — VERIFICATION.md backfill)
+
+## v1.9 Phase Sequence
+
+1. **Phase 38** — POLISH-01: VERIFICATION.md backfill for Phases 35/36/37 (closes AUDIT-01)
+2. **Phase 39** — FEEDBACK-01: real-use session with Jessica → ranked-priority doc that informs v2.0
+3. **Phase 40** — CEIL-01: ceiling resize handles (Phase 999.1 promotion) — subject to Phase 39 reordering
+4. **Phase 41** — TILE-01: per-surface texture tile-size override (Phase 999.3 / GH #105 promotion) — subject to Phase 39 reordering
 Last activity: 2026-04-25 -- Phase 37 execution started
 
 Completed milestones: v1.0, v1.1, v1.2, v1.3, v1.4, v1.5, v1.6, v1.7.5 (all archived in `.planning/milestones/`)
