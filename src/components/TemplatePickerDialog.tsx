@@ -65,6 +65,9 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
             room: tpl.room,
             walls: tpl.makeWalls(),
             placedProducts: {},
+            // Phase 43 (DEFAULT-01 / GH #100): named templates ship with a
+            // ceiling. BLANK omits `makeCeiling` so the field stays absent.
+            ...(tpl.makeCeiling ? { ceilings: tpl.makeCeiling() } : {}),
           },
         },
         activeRoomId: roomId,

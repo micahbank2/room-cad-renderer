@@ -153,7 +153,24 @@ export default function PropertiesPanel({ productLibrary }: Props) {
     );
   }
 
-  if (!wall && !pp && !ceiling && !pce) return null;
+  // Phase 43 (UX-03 / GH #99): empty-state when nothing is selected.
+  // First-time users had no cue that selecting reveals editing controls.
+  // Static copy — no animation, no dismissible state.
+  if (!wall && !pp && !ceiling && !pce) {
+    return (
+      <div
+        className="absolute right-3 top-3 z-10 w-64 glass-panel rounded-sm p-4"
+        aria-label="Properties (none selected)"
+      >
+        <h3 className="font-mono text-base font-medium text-text-muted mb-2">
+          Properties
+        </h3>
+        <p className="font-mono text-sm text-text-dim leading-snug">
+          Select a wall, product, or ceiling to see its properties here.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto glass-panel rounded-sm p-4 space-y-3">

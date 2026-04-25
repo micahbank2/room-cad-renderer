@@ -107,7 +107,8 @@
 **Depends on:** Phase 33 (design tokens — `--text-base`, `--color-text-dim`, `--color-text-ghost`); Phase 34 (template seed data location).
 **Requirements:** UX-01, UX-02, UX-03, DEFAULT-01
 **UI hint:** yes
-**Plans:** TBD (est. 1 plan with 4 atomic commits, one per issue; cleaner than 4 micro-phases)
+**Plans:**
+1/1 plans complete
 
 #### Phase 44: Reduced-Motion Sweep (A11Y)
 **Goal:** Honor `prefers-reduced-motion` for snap guides + wall-side camera tween. Phase 35 camera presets already do this; this phase brings the older animation paths to parity.
@@ -155,7 +156,7 @@
 | ~~40. Ceiling Resize Handles~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.1) |
 | ~~41. Per-Surface Tile-Size Override~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.3) |
 | 42. Per-Surface tileSizeFt Bug Fix | 1/1 | Complete   | 2026-04-25 |
-| 43. UI Polish Bundle | 0/0 | Not started | - |
+| 43. UI Polish Bundle | 1/1 | Complete   | 2026-04-25 |
 | 44. Reduced-Motion Sweep | 0/0 | Not started | - |
 
 ## Backlog
