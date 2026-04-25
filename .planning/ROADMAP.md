@@ -101,7 +101,8 @@
 **Depends on:** Nothing (pure docs work)
 **Requirements:** POLISH-01
 **UI hint:** no
-**Plans:** TBD (est. 1 plan; reference existing SUMMARY + e2e + ROOT-CAUSE.md as substitute evidence — don't fabricate verification not actually performed)
+**Plans:**
+- [x] 38-01-backfill — 3 retroactive VERIFICATION.md files (Phase 35/36/37) with substitute evidence from SUMMARY + e2e + ROOT-CAUSE.md (4 atomic commits) — completed 2026-04-25
 
 #### Phase 39: Real-Use Feedback Session (FEEDBACK-01)
 **Goal:** Capture Jessica's friction during a scheduled ~1-hour real-use session. Output is a ranked-priority document at `.planning/feedback/v1.9-jessica-session.md` that becomes the v2.0 scoping input.
@@ -138,7 +139,7 @@
 | 35. Camera Presets | 2/2 | Complete   | 2026-04-25 |
 | 36. Wallpaper/wallArt Regression (VIZ-10) | 2/2 | Complete   | 2026-04-24 |
 | 37. Tech-Debt Sweep | 1/1 | Complete   | 2026-04-25 |
-| 38. VERIFICATION.md Backfill | 0/0 | Not started | - |
+| 38. VERIFICATION.md Backfill | 1/1 | Complete   | 2026-04-25 |
 | 39. Real-Use Feedback Session | 2/2 | Complete   | 2026-04-25 |
 | ~~40. Ceiling Resize Handles~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.1) |
 | ~~41. Per-Surface Tile-Size Override~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.3) |
