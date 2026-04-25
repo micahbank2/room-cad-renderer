@@ -124,7 +124,8 @@
 **Depends on:** Phase 34 (user-texture pipeline). Independent of cancelled Phases 40/41.
 **Requirements:** BUG-01
 **UI hint:** no (data-model fix; existing UI surfaces already pass `tileSizeFt`)
-**Plans:** TBD (est. 1 plan; data-model migration + renderer-resolution change + tests; v1.9 milestone closer)
+**Plans:**
+- [ ] 42-01-fix — schema (Ceiling.scaleFt) + resolver update (CeilingMesh) + apply-time write (picker) + tests + close GH #96 (4 atomic commits)
 **Added:** 2026-04-25 mid-milestone after Phase 39 acceptance.
 
 ---
@@ -143,7 +144,7 @@
 | 39. Real-Use Feedback Session | 2/2 | Complete   | 2026-04-25 |
 | ~~40. Ceiling Resize Handles~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.1) |
 | ~~41. Per-Surface Tile-Size Override~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.3) |
-| 42. Per-Surface tileSizeFt Bug Fix | 0/1 | Not started | - |
+| 42. Per-Surface tileSizeFt Bug Fix | 0/1 | In progress | - |
 
 ## Backlog
 
