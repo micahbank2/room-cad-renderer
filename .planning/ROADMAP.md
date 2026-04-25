@@ -226,3 +226,16 @@ Plans:
 ### Phase 999.2: Wallpaper + wallArt view-toggle regression — PROMOTED to Phase 36 under v1.8
 
 Originally captured 2026-04-21 Phase 32 T4 human UAT. Promoted into v1.8 as Phase 36 (VIZ-10). See Phase 36 Details above.
+
+### Phase 999.3: Per-surface texture tile-size override (BACKLOG)
+
+**Goal:** Let users scale a texture for design effect on a single surface without re-uploading. e.g., preview the same wood floor at 6"/12"/18" plank widths in the same room. Default behavior (real-world tiling via `RepeatWrapping`) stays correct; override is optional per surface.
+
+**Requirements:** TBD
+**GH Issue:** [#105](https://github.com/micahbank2/room-cad-renderer/issues/105)
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd:review-backlog when ready, likely v1.9+ texture polish)
+
+**Discovered:** 2026-04-25 during Phase 35 HUMAN-UAT — user asked why wood oak doesn't grow with the floor. Confirmed by-design behavior; captured as a natural follow-up enhancement. CLAUDE.md already flags "Texture tiling controls beyond real-world size" as out of scope for v1.8.
