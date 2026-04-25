@@ -41,7 +41,7 @@ source: resumes v1.7 3D Realism track + promotes Phase 999.2 backlog
 
 ### Camera Presets (CAM)
 
-- [ ] **CAM-01** — Four camera presets (eye-level, top-down, 3/4, corner) are accessible via toolbar buttons and bare `1` / `2` / `3` / `4` hotkeys.
+- [x] **CAM-01** — Four camera presets (eye-level, top-down, 3/4, corner) are accessible via toolbar buttons and bare `1` / `2` / `3` / `4` hotkeys.
   - **Source:** [#45](https://github.com/micahbank2/room-cad-renderer/issues/45)
   - **Verifiable:** Click each toolbar button or press each hotkey in a clean 3D viewport → camera transitions to the correct pose:
     - Eye-level: 5.5 ft height, looking toward room center
@@ -50,38 +50,38 @@ source: resumes v1.7 3D Realism track + promotes Phase 999.2 backlog
     - Corner: opposite room corner at ceiling height – 0.5 ft, looking at opposite corner
   - **Acceptance:** Active preset visually indicated on its toolbar button (`bg-accent/20 text-accent-light border-accent/30`). Hotkeys inert when `document.activeElement` is an `<input>` or `<textarea>` (no preset switch while typing in PropertiesPanel / RoomSettings).
 
-- [ ] **CAM-02** — Preset switches glide smoothly and handle mid-tween interruption cleanly.
+- [x] **CAM-02** — Preset switches glide smoothly and handle mid-tween interruption cleanly.
   - **Source:** [#45](https://github.com/micahbank2/room-cad-renderer/issues/45)
   - **Verifiable:** Clicking a preset → camera tweens ~600ms ease-in-out (not a snap). `OrbitControls` damping is disabled during the tween and re-enabled on settle (snap on epsilon). Pressing a different preset mid-tween → previous tween cancels and a new tween starts from the current camera position (no jumps, no stranded cameras). Switching view mode (2D / split) mid-tween → tween clears without throwing.
   - **Acceptance:** ~600ms ease-in-out tween. Damping toggle on tween boundaries. Cancel-and-restart behavior on interrupting input. Walk-mode ↔ preset handoff decided in plan-phase.
 
-- [ ] **CAM-03** — Preset switches do not pollute persistence.
+- [x] **CAM-03** — Preset switches do not pollute persistence.
   - **Source:** [#45](https://github.com/micahbank2/room-cad-renderer/issues/45)
   - **Verifiable:** Before any preset switch, note `useCADStore.getState().past.length`. Trigger 10 preset switches (mix of buttons + hotkeys). `past.length` is unchanged. `useAutoSave` status never flips from `idle`/`saved` to `saving` on preset switches (verified via stubbed spy or devtools observation — no IDB writes during preset tweens).
   - **Acceptance:** Camera state is view-state, not CAD-state. Undo history and autosave both ignore it.
 
 ### Wallpaper/wallArt 2D↔3D Regression (VIZ)
 
-- [ ] **VIZ-10** — Uploaded-image wallpaper and wallArt survive 2D↔3D view toggles indefinitely without reload or texture loss. Before proposing a fix, the root cause is identified via runtime instrumentation (Playwright harness capturing first-mount-upload → unmount → second-mount → pixel-diff). _(Plan 36-01 shipped the harness + ROOT-CAUSE.md documenting no-repro under chromium-dev. Plan 36-02 activates chromium-preview + CI + expanded coverage.)_
+- [x] **VIZ-10** — Uploaded-image wallpaper and wallArt survive 2D↔3D view toggles indefinitely without reload or texture loss. Before proposing a fix, the root cause is identified via runtime instrumentation (Playwright harness capturing first-mount-upload → unmount → second-mount → pixel-diff). _(Shipped via Plans 36-01 + 36-02. Outcome: NO-REPRO under instrumented harness — same texture UUID across 5 mount cycles, 14 goldens byte-identical. ROOT-CAUSE.md §1 documents Branch B no-repro per R-04. All 4 Phase 32 defensive-code pieces classified KEEP. Permanent regression guard in chromium-dev + chromium-preview Playwright projects, wired to GH Actions e2e.yml. Issue #94 stays OPEN by design — no-repro ≠ fix.)_
   - **Source:** Phase 999.2 backlog; `.planning/phases/32-pbr-foundation/32-HUMAN-UAT.md` Gap 1; `32-07-SUMMARY.md` "What's left that could cause it".
   - **Verifiable:** Upload an image-based wallpaper on a wall → toggle 2D→3D→2D→3D five times → wallpaper visible on every 3D frame (verified by pixel-diff vs first 3D frame, ≤1% delta). Same test for wallArt. Instrumentation harness logs the full texture lifecycle across all 5 mount cycles; root-cause document written before any code fix merges.
   - **Acceptance:** No 4th speculative fix. Root cause identified BEFORE fix. Test harness retained as regression guard. Existing defensive code from Phase 32 Plans 06/07 (non-disposing caches + `dispose={null}` primitive attach + static regression test) may stay or be simplified based on root-cause findings.
 
 ### Tech-Debt Sweep (DEBT)
 
-- [ ] **DEBT-01** — v1.6 carry-over GitHub issues are closed with PR references.
+- [x] **DEBT-01** — v1.6 carry-over GitHub issues are closed with PR references.
   - **Source:** v1.6 milestone close (retained open as carry-over tracking).
   - **Verifiable:** `gh issue view 44` / `46` / `50` / `60` all show `state: CLOSED` with closing comments referencing the actual PRs that shipped the corresponding features (PR #66 / PR #67 or their equivalents). No orphan "in-progress" labels remain on these issues.
 
-- [ ] **DEBT-02** — Orphan `SaveIndicator.tsx` component is removed.
+- [x] **DEBT-02** — Orphan `SaveIndicator.tsx` component is removed.
   - **Source:** v1.6 carry-over (Phase 28 scope boundary).
   - **Verifiable:** `src/components/SaveIndicator.tsx` no longer exists on disk. `grep -r "SaveIndicator" src/` returns zero hits in production code (test drivers referencing the string by comment are acceptable — zero import/JSX hits). `npm run build` passes. Full vitest suite (424+) passes; failure count does not increase.
 
-- [ ] **DEBT-03** — `effectiveDimensions` → `resolveEffectiveDims` migration is complete for all placement call sites.
+- [x] **DEBT-03** — `effectiveDimensions` → `resolveEffectiveDims` migration is complete for all placement call sites.
   - **Source:** v1.6 Phase 31 incremental-migration tech-debt.
   - **Verifiable:** `grep -rn "effectiveDimensions(" src/` returns only catalog-context usages (places that compute library dims with no `PlacedProduct` / `PlacedCustomElement` to resolve against — e.g. placement preview before the placed record exists). All consumer sites (3D product mesh, 2D fabricSync, snap scene, selectTool hit-test, productTool) use `resolveEffectiveDims` / `resolveEffectiveCustomDims`. Per-placement `widthFtOverride` / `depthFtOverride` continue to render correctly after the migration (Phase 31 regression tests remain GREEN).
 
-- [ ] **DEBT-04** — Phase 29 SUMMARY.md frontmatter traceability is backfilled.
+- [x] **DEBT-04** — Phase 29 SUMMARY.md frontmatter traceability is backfilled.
   - **Source:** v1.6 Phase 29 SUMMARY.md frontmatter gap.
   - **Verifiable:** Each Phase 29 plan SUMMARY.md relevant to EDIT-20 / EDIT-21 has `requirements-completed: [EDIT-20, EDIT-21]` (or appropriate subset) in its YAML frontmatter. `node $HOME/.claude/get-shit-done/bin/gsd-tools.cjs summary-extract` can enumerate the backfilled requirements from Phase 29 without errors.
 
@@ -107,14 +107,14 @@ Phase → requirement mapping. Plan column filled by `/gsd:plan-phase` when each
 
 | Requirement | Phase | Plan(s) |
 | ----------- | ----- | ------- |
-| LIB-06 | Phase 34 | TBD |
-| LIB-07 | Phase 34 | TBD |
-| LIB-08 | Phase 34 | TBD |
+| LIB-06 | Phase 34 | 34-01 |
+| LIB-07 | Phase 34 | 34-02 |
+| LIB-08 | Phase 34 | 34-03, 34-04 |
 | CAM-01 | Phase 35 | 35-01 |
 | CAM-02 | Phase 35 | 35-02 |
 | CAM-03 | Phase 35 | 35-02 |
-| VIZ-10 | Phase 36 | TBD |
-| DEBT-01 | Phase 37 | TBD |
-| DEBT-02 | Phase 37 | TBD |
-| DEBT-03 | Phase 37 | TBD |
-| DEBT-04 | Phase 37 | TBD |
+| VIZ-10 | Phase 36 | 36-01, 36-02 |
+| DEBT-01 | Phase 37 | 37-01 |
+| DEBT-02 | Phase 37 | 37-01 |
+| DEBT-03 | Phase 37 | 37-01 |
+| DEBT-04 | Phase 37 | 37-01 |
