@@ -55,6 +55,10 @@ This is a **process phase**. The "implementation" is a human-led session that Cl
 - **D-07:** Deliverable doc must contain ≥3 friction points (with task context), ≥3 feature wishes (in Jessica's framing), 3/3 HUMAN-UAT verdicts, and a top-3 ranked-priority list. Items not in the top 3 captured as backlog candidates (don't lose them).
 - **Reason:** Concrete acceptance prevents "we did the session" without producing actionable output. Top-3 forces ranking — without it, every wish becomes "high priority" and the doc is useless for Phase 40-41 ordering.
 
+### Format adaptation: async questionnaire
+- **D-08 (added 2026-04-25 during Plan 39-02 execution):** Hybrid in-person session (D-01) was infeasible in v1.9's window due to Micah's calendar. Adapted to a 5-question async questionnaire format. Trade-off accepted: less rich signal (no observation, no probes, no body language) in exchange for real signal that can ship inside the milestone. **Rejected alternative:** Claude roleplaying Jessica — would generate confabulated signal with false confidence. Honest "no friction reported" beats invented friction.
+- **Reason:** Time pressure made the choice between (a) skipping FEEDBACK-01, (b) deferring Phase 39 to next milestone, (c) Claude roleplaying, or (d) async questionnaire. Option (d) was the only path that produced real-but-thin signal inside v1.9. Caveat: deliverable doc explicitly flags single-data-point bias and recommends follow-up hybrid session when time permits.
+
 ### Claude's Discretion
 - Exact wording of the session script's scripted tasks (Plan 1 task)
 - Which order to present scripted tasks (Plan 1 task)
