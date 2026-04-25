@@ -1,5 +1,40 @@
 # Milestones — Room CAD Renderer
 
+## v1.10 — Evidence-Driven UX Polish ✅
+
+**Shipped:** 2026-04-25 (single-day milestone)
+**Phases:** 2 (43, 44) — 2 plans
+**Files changed:** 17 files (+1,180 / −42 LOC)
+**Git range:** v1.9 tag → `3fdb13e` (audit-close merge)
+**Tag:** `v1.10`
+**PRs:** #117 (scope), #118 (Phase 43), #119 (Phase 44), #120 (audit + AUDIT-01 policy resolution)
+
+**Delivered:** Smallest milestone in project history. 5 evidence-driven UX issues closed; 6 speculative items deferred (Pascal set committed for v1.11; rest parked until evidence). The "evidence-driven prioritization" pattern shipped clean — no scope changes, no cancellations, no surprises.
+
+**Key accomplishments:**
+
+- **UI polish bundle (Phase 43)** — 4 atomic commits closed [#100](https://github.com/micahbank2/room-cad-renderer/issues/100) (templates default ceiling), [#98](https://github.com/micahbank2/room-cad-renderer/issues/98) (`--color-text-ghost` WCAG AA bump fixing 124+ usages), [#101](https://github.com/micahbank2/room-cad-renderer/issues/101) (SAVED badge enlarged), [#99](https://github.com/micahbank2/room-cad-renderer/issues/99) (PropertiesPanel empty-state). Ordered lowest-risk-first.
+- **Reduced-motion sweep (Phase 44)** — Closed [#76](https://github.com/micahbank2/room-cad-renderer/issues/76). Two honest guards (wall-side camera tween + SAVING spinner). Snap guides verified to need no guard — no animation existed despite issue body claim. Documented honestly.
+- **Evidence-driven pattern validated** — Phase 39's 8-item v2.0-scope-seeds list filtered to 5 evidence-driven; 6 speculative items deferred. Pascal competitor-set committed for v1.11.
+- **AUDIT-01 systemic resolution** — Three milestones of recurring "phases ship with SUMMARY-only" pattern resolved by editing the global GSD workflow (`~/.claude/get-shit-done/workflows/audit-milestone.md`) to formalize SUMMARY.md as canonical evidence. Future audits across all GSD projects benefit.
+- **Cleanest milestone shape to date** — 2 phases, 5 reqs, single day, no surprises. Validated that the evidence-driven filter prevents the kind of bloat that had required v1.9's mid-milestone cancellation.
+
+**Audit:** [v1.10-MILESTONE-AUDIT.md](milestones/v1.10-MILESTONE-AUDIT.md) — `passed_with_carry_over`. AUDIT-01 resolved during audit (policy formalized); AUDIT-02 fixed inline (5 stale checkboxes); AUDIT-03 (A11Y-01 honest deviation re: snap guides) accepted.
+
+**Tech debt carried forward:**
+
+- 6 pre-existing vitest failures (formally permanent per Phase 37 D-02)
+- CI vitest disabled
+
+**Backlog re-stated (no changes):**
+
+- Phase 999.1 — Ceiling drag-resize handles (re-deferred from v1.9)
+- Phase 999.3 — Full design-effect tile-size override (re-deferred from v1.9)
+
+**Next milestone (v1.11) pre-committed:** Pascal Feature Set — per-node saved camera + Focus ([#79](https://github.com/micahbank2/room-cad-renderer/issues/79)), room display modes ([#80](https://github.com/micahbank2/room-cad-renderer/issues/80)), rooms hierarchy tree ([#78](https://github.com/micahbank2/room-cad-renderer/issues/78)), auto-generated material swatch thumbnails ([#77](https://github.com/micahbank2/room-cad-renderer/issues/77)). Formal scoping via `/gsd:new-milestone`.
+
+---
+
 ## v1.9 — Polish & Feedback ✅
 
 **Shipped:** 2026-04-25 (single-day milestone)

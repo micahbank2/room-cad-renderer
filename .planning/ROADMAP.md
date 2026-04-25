@@ -13,8 +13,8 @@
 - ✅ **v1.7.5 Design System & UI Polish** — Phase 33 (shipped 2026-04-22) — see [milestones/v1.7.5-ROADMAP.md](milestones/v1.7.5-ROADMAP.md)
 - ✅ **v1.8 3D Realism Completion** — Phases 34–37 (shipped 2026-04-25) — see [milestones/v1.8-ROADMAP.md](milestones/v1.8-ROADMAP.md)
 - ✅ **v1.9 Polish & Feedback** — Phases 38, 39, 42 (Phases 40 + 41 cancelled mid-milestone) — shipped 2026-04-25 — see [milestones/v1.9-ROADMAP.md](milestones/v1.9-ROADMAP.md)
-- 🚧 **v1.10 Evidence-Driven UX Polish** — Phases 43–44 (in progress)
-- 📋 **v1.11 Pascal Feature Set** — Phases 45–48 (planned; queued after v1.10)
+- ✅ **v1.10 Evidence-Driven UX Polish** — Phases 43–44 (shipped 2026-04-25) — see [milestones/v1.10-ROADMAP.md](milestones/v1.10-ROADMAP.md)
+- 📋 **v1.11 Pascal Feature Set** — Phases 45–48 (planned; next to scope via `/gsd:new-milestone`)
 
 ---
 
@@ -90,33 +90,12 @@
 
 </details>
 
----
+<details>
+<summary>✅ v1.10 Evidence-Driven UX Polish (Phases 43–44) — SHIPPED 2026-04-25</summary>
 
-## v1.10 Evidence-Driven UX Polish
+2 phases, 2 plans, 5/5 shipped requirements (UX-01/02/03, DEFAULT-01, A11Y-01). Phase 43 UI polish bundle: 4 atomic commits closing #100 (templates ship with default ceiling at room.wallHeight), #98 (`--color-text-ghost` #484554 → #888494, ~5.15:1 WCAG AA, fixes 124+ usages globally), #101 (SAVED/SAVING/SAVE_FAILED badges enlarged text-[10px] → text-base 13px), #99 (PropertiesPanel empty-state copy when nothing selected). Phase 44 reduced-motion sweep: 2 honest guards on wall-side camera tween + SAVING spinner; snap guides verified to need no guard (render at static GUIDE_OPACITY=0.6, no animation existed despite GH #76 issue body claim). Pattern validated: "evidence-driven prioritization" — 5 evidence-driven items shipped, 6 speculative items deferred (Pascal competitor-set committed for v1.11; #97/#81 deferred until evidence). 19 commits, +1,180/-42 LOC, single-day milestone. **AUDIT-01 systemic resolution:** three milestones of recurring "phases ship with SUMMARY-only" pattern (v1.8/v1.9/v1.10) resolved during v1.10 audit by editing `~/.claude/get-shit-done/workflows/audit-milestone.md` to formalize substitute-evidence policy. SUMMARY.md is now canonical evidence; VERIFICATION.md optional. Audit `passed_with_carry_over`. See [milestones/v1.10-ROADMAP.md](milestones/v1.10-ROADMAP.md).
 
-**Goal:** Tighten the v1.9 surface by closing 5 GH-tracked UX issues with real evidence behind them. Skip speculative items (Pascal competitor copies, feature work without demand signal).
-
-**Why this shape:** v1.9 just validated "feedback-first sequencing." v1.10 validates the natural follow-up: "evidence-driven prioritization." Build only what has actual reports. Park what's hypothetical (8 curated v2.0 seeds → reduced to 5 evidence-driven; 3 Pascal-set items + 1 feature deferred). Result: smaller, faster milestone with no speculation.
-
-**Sequencing:** Phase 43 bundles the 4 UI-polish items (close to each other in code surface area). Phase 44 is the standalone reduced-motion sweep (different code paths — snap guides + camera tweens).
-
-### Phase Details
-
-#### Phase 43: UI Polish Bundle (UX + DEFAULT)
-**Goal:** Close 4 GH-tracked UI issues — SAVED badge size, muted text contrast, Properties panel onboarding, default templates need ceilings.
-**Depends on:** Phase 33 (design tokens — `--text-base`, `--color-text-dim`, `--color-text-ghost`); Phase 34 (template seed data location).
-**Requirements:** UX-01, UX-02, UX-03, DEFAULT-01
-**UI hint:** yes
-**Plans:**
-1/1 plans complete
-
-#### Phase 44: Reduced-Motion Sweep (A11Y)
-**Goal:** Honor `prefers-reduced-motion` for snap guides + wall-side camera tween. Phase 35 camera presets already do this; this phase brings the older animation paths to parity.
-**Depends on:** Phase 33 (`useReducedMotion` hook); Phase 30 (snap guide animation); existing `cameraAnimTarget` lerp in ThreeViewport.
-**Requirements:** A11Y-01
-**UI hint:** yes (subtle — observable only with `prefers-reduced-motion: reduce` set)
-**Plans:**
-1/1 plans complete
+</details>
 
 ---
 
