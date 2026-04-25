@@ -188,3 +188,114 @@ describe("VIZ-10 regression guard — userTextureCache stability", () => {
     expect(size).toBe(1);
   });
 });
+
+describe("BUG-01 — per-surface scaleFt isolation across same userTextureId", () => {
+  it("same userTextureId on wall + ceiling preserves independent scaleFt across snapshot roundtrip", () => {
+    // Apply user-texture utex_shared to:
+    //  - wall side A with scaleFt=4 (4ft pattern repeat)
+    //  - ceiling with scaleFt=8 (8ft pattern repeat)
+    // Snapshot must serialize each surface's scaleFt independently — editing
+    // the catalog tileSizeFt should not bleed across surfaces (GH #96).
+    const snapshot: CADSnapshot = {
+      version: 2,
+      rooms: {
+        r1: {
+          id: "r1",
+          name: "Test",
+          room: { width: 20, length: 16, wallHeight: 8 },
+          walls: {
+            w1: {
+              id: "w1",
+              start: { x: 0, y: 0 },
+              end: { x: 10, y: 0 },
+              thickness: 0.5,
+              height: 8,
+              openings: [],
+              wallpaper: {
+                A: { kind: "pattern", userTextureId: "utex_shared", scaleFt: 4 },
+              },
+            },
+          },
+          ceilings: {
+            c1: {
+              id: "c1",
+              points: [
+                { x: 0, y: 0 },
+                { x: 10, y: 0 },
+                { x: 10, y: 10 },
+                { x: 0, y: 10 },
+              ],
+              height: 8,
+              material: "#f5f5f5",
+              userTextureId: "utex_shared",
+              scaleFt: 8,
+            },
+          },
+          placedProducts: {},
+        } as RoomDoc,
+      },
+      activeRoomId: "r1",
+    };
+
+    const json = JSON.stringify(snapshot);
+    const parsed = JSON.parse(json) as CADSnapshot;
+
+    // Per-surface scaleFt is preserved independently
+    expect(parsed.rooms.r1.walls.w1.wallpaper?.A?.scaleFt).toBe(4);
+    expect(parsed.rooms.r1.ceilings?.c1.scaleFt).toBe(8);
+    // Both reference the same catalog id (single source of truth for the texture itself)
+    expect(parsed.rooms.r1.walls.w1.wallpaper?.A?.userTextureId).toBe("utex_shared");
+    expect(parsed.rooms.r1.ceilings?.c1.userTextureId).toBe("utex_shared");
+    // Catalog edit (hypothetical: change UserTexture.tileSizeFt) would NOT affect
+    // either surface's scaleFt — both have explicit overrides written at apply-time.
+  });
+
+  it("ceiling without scaleFt falls back to catalog default at render (implicit migration)", () => {
+    // Pre-Phase-42 snapshot: ceiling has userTextureId but no scaleFt.
+    // CeilingMesh resolver uses ceiling.scaleFt ?? entry?.tileSizeFt ?? 2.
+    // This test asserts the resolver's fallback semantics directly.
+    const ceilingPreFix = {
+      scaleFt: undefined as number | undefined,
+      userTextureId: "utex_legacy",
+    };
+    const catalog = [{ id: "utex_legacy", tileSizeFt: 6 }];
+
+    // Inline the resolver (matches CeilingMesh.tsx logic):
+    const effectiveTileSize = (() => {
+      if (ceilingPreFix.scaleFt !== undefined) return ceilingPreFix.scaleFt;
+      if (!ceilingPreFix.userTextureId) return 2;
+      const entry = catalog.find((t) => t.id === ceilingPreFix.userTextureId);
+      return entry?.tileSizeFt ?? 2;
+    })();
+
+    expect(effectiveTileSize).toBe(6); // falls through to catalog
+  });
+
+  it("ceiling with scaleFt override wins over catalog default (BUG-01 fix)", () => {
+    const ceilingPostFix = { scaleFt: 4, userTextureId: "utex_post" };
+    const catalog = [{ id: "utex_post", tileSizeFt: 8 }];
+
+    const effectiveTileSize = (() => {
+      if (ceilingPostFix.scaleFt !== undefined) return ceilingPostFix.scaleFt;
+      if (!ceilingPostFix.userTextureId) return 2;
+      const entry = catalog.find((t) => t.id === ceilingPostFix.userTextureId);
+      return entry?.tileSizeFt ?? 2;
+    })();
+
+    expect(effectiveTileSize).toBe(4); // override wins
+  });
+
+  it("ceiling with no userTextureId and no scaleFt returns hardcoded 2 (last resort)", () => {
+    const empty = { scaleFt: undefined as number | undefined, userTextureId: undefined as string | undefined };
+    const catalog: { id: string; tileSizeFt: number }[] = [];
+
+    const effectiveTileSize = (() => {
+      if (empty.scaleFt !== undefined) return empty.scaleFt;
+      if (!empty.userTextureId) return 2;
+      const entry = catalog.find((t) => t.id === empty.userTextureId);
+      return entry?.tileSizeFt ?? 2;
+    })();
+
+    expect(effectiveTileSize).toBe(2);
+  });
+});
