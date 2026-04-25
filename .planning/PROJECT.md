@@ -37,15 +37,27 @@ See `.planning/ROADMAP.md` for links to each milestone archive.
 
 </details>
 
-## Current Milestone: TBD (v1.9+)
+## Current Milestone: v1.9 Polish & Feedback
 
-**Status:** v1.8 shipped 2026-04-25. Next milestone not yet scoped — run `/gsd:new-milestone` to start v1.9 questioning + research + requirements + roadmap.
+**Goal:** Close v1.8 carry-over tech debt, ship two parked backlog features Jessica has already asked for (ceiling resize handles, per-surface texture tile-size override), and gather real-use feedback to inform v2.0 scoping.
 
-**Carry-over tech debt for whoever scopes v1.9:**
-- AUDIT-01: backfill formal `VERIFICATION.md` for Phases 35/36/37 (3 phases shipped without one; substitute evidence is sufficient but the formal artifact is missing)
-- 6 pre-existing vitest failures permanently accepted; CI vitest stays disabled until/unless a future phase has independent reason to fix the affected production code
-- Phase 999.1: ceiling resize handles (BACKLOG)
-- Phase 999.3 / GH #105: per-surface texture tile-size override (BACKLOG)
+**Target features:**
+- **VERIFICATION.md backfill (POLISH-01)** — Retroactive verification reports for Phases 35/36/37. Closes AUDIT-01 carry-over from v1.8.
+- **Real-use feedback session (FEEDBACK-01)** — Scheduled ~1-hour session with Jessica using the app for real tasks. Output is a ranked-priority document at `.planning/feedback/v1.9-jessica-session.md` that becomes the v2.0 scope input. Includes Phase 35 HUMAN-UAT review.
+- **Ceiling resize handles (CEIL-01 — Phase 999.1 promotion)** — Drag-resize edge handles on ceilings, mirroring the Phase 31 pattern (`widthFtOverride` / `depthFtOverride` / single-undo drag transactions / Alt disables smart-snap).
+- **Per-surface texture tile-size override (TILE-01 — Phase 999.3 / GH #105 promotion)** — Optional `tileSizeOverrideFt` per floor / wall.wallpaper / ceiling that scales texture for design effect (preview wide-plank vs narrow-plank in same room without re-uploading).
+
+**Phase numbering:** continues from 37. Phases 38–41.
+
+**Sequencing intent:** Phase 38 (docs) → Phase 39 (Jessica feedback) → Phases 40-41 (committed but reorderable based on Phase 39 output). If Phase 39 surfaces something more painful than 999.1/999.3, Phases 40-41 get bumped to v2.0+.
+
+**Out of v1.9:** Lighting controls, walk-mode improvements, layout templates, multi-room navigation, export workflow, AI-assisted layout, mobile/iPad, backend + auth + cloud sync, R3F v9 / React 19 upgrade, per-surface rotation/offset/seam-smoothing — all deferred to v2.0+ pending FEEDBACK-01 results.
+
+**Why this milestone, why now:** v1.8 was big and fast (4 phases in 3 days). Real-use signal beats guesswork for the next major capability bet. Closing the carry-over tech debt and shipping the two specific features Jessica's already named keeps the surface tight while feedback informs v2.0.
+
+**Tech debt acknowledged + accepted:**
+- 6 pre-existing vitest failures permanently accepted (Phase 37 D-02); CI vitest stays disabled
+- Phase 26 R3F v9 / React 19 upgrade still gated on R3F v9 stability (#56)
 
 <details>
 <summary>v1.8 milestone (now shipped)</summary>

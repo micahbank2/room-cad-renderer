@@ -12,6 +12,7 @@
 - ✅ **v1.7 3D Realism** — Phase 32 shipped 2026-04-21; remainder absorbed into v1.8
 - ✅ **v1.7.5 Design System & UI Polish** — Phase 33 (shipped 2026-04-22) — see [milestones/v1.7.5-ROADMAP.md](milestones/v1.7.5-ROADMAP.md)
 - ✅ **v1.8 3D Realism Completion** — Phases 34–37 (shipped 2026-04-25) — see [milestones/v1.8-ROADMAP.md](milestones/v1.8-ROADMAP.md)
+- 🚧 **v1.9 Polish & Feedback** — Phases 38–41 (in progress)
 
 ---
 
@@ -80,6 +81,48 @@
 
 </details>
 
+---
+
+## v1.9 Polish & Feedback
+
+**Goal:** Close v1.8 carry-over tech debt, ship two parked backlog features Jessica has already asked for, and gather real-use feedback to inform v2.0 scoping.
+
+**Sequencing rationale:**
+- **Phase 38** (POLISH-01) runs first — pure docs work, no dependency on Jessica's input. Closes AUDIT-01 carry-over.
+- **Phase 39** (FEEDBACK-01) runs second — captures real-use friction BEFORE we commit deeper to ceiling resize / tile-size override. Output may reorder or replace Phases 40-41.
+- **Phase 40** (CEIL-01) and **Phase 41** (TILE-01) run last — committed work but explicitly subject to Phase 39's feedback. If Jessica's pain points are elsewhere, these get bumped to v2.0+.
+
+### Phase Details
+
+#### Phase 38: VERIFICATION.md Backfill (AUDIT-01)
+**Goal:** Phases 35, 36, 37 each gain a formal VERIFICATION.md that closes the v1.8 audit's AUDIT-01 carry-over.
+**Depends on:** Nothing (pure docs work)
+**Requirements:** POLISH-01
+**UI hint:** no
+**Plans:** TBD (est. 1 plan; reference existing SUMMARY + e2e + ROOT-CAUSE.md as substitute evidence — don't fabricate verification not actually performed)
+
+#### Phase 39: Real-Use Feedback Session (FEEDBACK-01)
+**Goal:** Capture Jessica's friction during a scheduled ~1-hour real-use session. Output is a ranked-priority document at `.planning/feedback/v1.9-jessica-session.md` that becomes the v2.0 scoping input.
+**Depends on:** Nothing (independent of code phases)
+**Requirements:** FEEDBACK-01
+**UI hint:** no (process phase)
+**Plans:** TBD (est. 1 plan; covers session prep, recording technique, debrief format, and Phase 35 HUMAN-UAT review folded in)
+
+#### Phase 40: Ceiling Resize Handles (CEIL-01)
+**Goal:** Ceilings can be drag-resized via edge handles like products and walls. Mirrors Phase 31 pattern.
+**Depends on:** Phase 31 (drag-resize pattern + `widthFtOverride` / `depthFtOverride` schema + single-undo drag-transaction).
+**Requirements:** CEIL-01
+**UI hint:** yes
+**Plans:** TBD (est. 1-2 plans; promote Phase 999.1 backlog. Subject to Phase 39 reordering)
+
+#### Phase 41: Per-Surface Texture Tile-Size Override (TILE-01)
+**Goal:** Each surface (floor / wall.wallpaper / ceiling) can have an optional per-placement texture tile-size override that scales the texture for design effect.
+**Depends on:** Phase 34 (user-texture pipeline + RepeatWrapping math).
+**Requirements:** TILE-01
+**UI hint:** yes
+**Plans:** TBD (est. 1-2 plans; promote Phase 999.3 / GH #105 backlog. Subject to Phase 39 reordering)
+
+---
 
 ## Progress
 
@@ -91,6 +134,10 @@
 | 35. Camera Presets | 2/2 | Complete   | 2026-04-25 |
 | 36. Wallpaper/wallArt Regression (VIZ-10) | 2/2 | Complete   | 2026-04-24 |
 | 37. Tech-Debt Sweep | 1/1 | Complete   | 2026-04-25 |
+| 38. VERIFICATION.md Backfill | 0/0 | Not started | - |
+| 39. Real-Use Feedback Session | 0/0 | Not started | - |
+| 40. Ceiling Resize Handles | 0/0 | Not started | - |
+| 41. Per-Surface Tile-Size Override | 0/0 | Not started | - |
 
 ## Backlog
 
