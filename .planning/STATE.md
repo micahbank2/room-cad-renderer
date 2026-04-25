@@ -30,12 +30,15 @@ Phases: 4 (38, 39, 40, 41) — none planned yet
 Plan: 1 of 2
 Status: Executing Phase 39
 
-## v1.9 Phase Sequence
+## v1.9 Phase Sequence (after 2026-04-25 mid-milestone re-scope)
 
-1. **Phase 38** — POLISH-01: VERIFICATION.md backfill for Phases 35/36/37 (closes AUDIT-01)
-2. **Phase 39** — FEEDBACK-01: real-use session with Jessica → ranked-priority doc that informs v2.0
-3. **Phase 40** — CEIL-01: ceiling resize handles (Phase 999.1 promotion) — subject to Phase 39 reordering
-4. **Phase 41** — TILE-01: per-surface texture tile-size override (Phase 999.3 / GH #105 promotion) — subject to Phase 39 reordering
+1. ✅ **Phase 38** — POLISH-01: VERIFICATION.md backfill for Phases 35/36/37 (closes AUDIT-01)
+2. ✅ **Phase 39** — FEEDBACK-01: async 5-question questionnaire with Jessica → zero friction, zero new wishes, all HUMAN-UAT confirmed
+3. 🔄 ~~**Phase 40** — CEIL-01~~ → **CANCELLED 2026-04-25**, re-deferred to Phase 999.1 backlog (Jessica said ceilings "went fine")
+4. 🔄 ~~**Phase 41** — TILE-01~~ → **CANCELLED 2026-04-25**, re-deferred to Phase 999.3 backlog (Jessica said texture sizing "feels right")
+5. ⏳ **Phase 42** — BUG-01: per-surface `tileSizeFt` isolation, closes GH #96. Final v1.9 phase. Plan + execution pending.
+
+After Phase 42 ships: `/gsd:audit-milestone v1.9` → `/gsd:complete-milestone v1.9` → `/gsd:new-milestone` for v2.0.
 
 Last activity: 2026-04-25
 

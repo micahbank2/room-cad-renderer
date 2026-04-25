@@ -87,10 +87,12 @@
 
 **Goal:** Close v1.8 carry-over tech debt, ship two parked backlog features Jessica has already asked for, and gather real-use feedback to inform v2.0 scoping.
 
-**Sequencing rationale:**
+**Sequencing rationale (as planned):**
 - **Phase 38** (POLISH-01) runs first — pure docs work, no dependency on Jessica's input. Closes AUDIT-01 carry-over.
 - **Phase 39** (FEEDBACK-01) runs second — captures real-use friction BEFORE we commit deeper to ceiling resize / tile-size override. Output may reorder or replace Phases 40-41.
 - **Phase 40** (CEIL-01) and **Phase 41** (TILE-01) run last — committed work but explicitly subject to Phase 39's feedback. If Jessica's pain points are elsewhere, these get bumped to v2.0+.
+
+**Mid-milestone re-scope (2026-04-25):** Phase 39 feedback signal showed Jessica reported zero pain on ceilings ("went fine") and zero pain on texture sizing ("feels right"). Per the milestone's explicit hedge, **Phase 40 (CEIL-01) and Phase 41 (TILE-01) were CANCELLED** and deferred to v2.0+ as Phase 999.1 and Phase 999.3 respectively. **Phase 42 (BUG-01)** was added as the final v1.9 phase — closes [GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96) per-surface `tileSizeFt` sharing bug, which exists regardless of Jessica's signal.
 
 ### Phase Details
 
@@ -110,19 +112,19 @@
 2/2 plans complete
 - [x] 39-02-synthesis — post-session synthesis of `.planning/feedback/v1.9-jessica-session.md` from Micah's notes (gated on session happening + notes supplied)
 
-#### Phase 40: Ceiling Resize Handles (CEIL-01)
-**Goal:** Ceilings can be drag-resized via edge handles like products and walls. Mirrors Phase 31 pattern.
-**Depends on:** Phase 31 (drag-resize pattern + `widthFtOverride` / `depthFtOverride` schema + single-undo drag-transaction).
-**Requirements:** CEIL-01
-**UI hint:** yes
-**Plans:** TBD (est. 1-2 plans; promote Phase 999.1 backlog. Subject to Phase 39 reordering)
+#### ~~Phase 40: Ceiling Resize Handles (CEIL-01)~~ — CANCELLED 2026-04-25
+**Status:** CANCELLED mid-milestone after Phase 39 Q5 feedback ("went fine"). Deferred to v2.0+ as Phase 999.1. CEIL-01 requirement moved to Future Requirements / Deferred section in REQUIREMENTS.md. No plans authored.
 
-#### Phase 41: Per-Surface Texture Tile-Size Override (TILE-01)
-**Goal:** Each surface (floor / wall.wallpaper / ceiling) can have an optional per-placement texture tile-size override that scales the texture for design effect.
-**Depends on:** Phase 34 (user-texture pipeline + RepeatWrapping math).
-**Requirements:** TILE-01
-**UI hint:** yes
-**Plans:** TBD (est. 1-2 plans; promote Phase 999.3 / GH #105 backlog. Subject to Phase 39 reordering)
+#### ~~Phase 41: Per-Surface Texture Tile-Size Override (TILE-01)~~ — CANCELLED 2026-04-25
+**Status:** CANCELLED mid-milestone after Phase 39 Q4 feedback ("feels right"). Deferred to v2.0+ as Phase 999.3. TILE-01 requirement moved to Future Requirements / Deferred section in REQUIREMENTS.md. The narrower per-surface bug fix lives in Phase 42 below. No plans authored.
+
+#### Phase 42: Per-Surface tileSizeFt Bug Fix (BUG-01)
+**Goal:** When the same user-uploaded texture is applied to multiple surfaces, each surface honors its own `tileSizeFt` independently. Closes [GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96).
+**Depends on:** Phase 34 (user-texture pipeline). Independent of cancelled Phases 40/41.
+**Requirements:** BUG-01
+**UI hint:** no (data-model fix; existing UI surfaces already pass `tileSizeFt`)
+**Plans:** TBD (est. 1 plan; data-model migration + renderer-resolution change + tests; v1.9 milestone closer)
+**Added:** 2026-04-25 mid-milestone after Phase 39 acceptance.
 
 ---
 
@@ -138,36 +140,41 @@
 | 37. Tech-Debt Sweep | 1/1 | Complete   | 2026-04-25 |
 | 38. VERIFICATION.md Backfill | 0/0 | Not started | - |
 | 39. Real-Use Feedback Session | 2/2 | Complete   | 2026-04-25 |
-| 40. Ceiling Resize Handles | 0/0 | Not started | - |
-| 41. Per-Surface Tile-Size Override | 0/0 | Not started | - |
+| ~~40. Ceiling Resize Handles~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.1) |
+| ~~41. Per-Surface Tile-Size Override~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.3) |
+| 42. Per-Surface tileSizeFt Bug Fix | 0/1 | Not started | - |
 
 ## Backlog
 
-### Phase 999.1: Ceiling resize handles (BACKLOG)
+### Phase 999.1: Ceiling resize handles (BACKLOG — re-deferred from v1.9)
 
-**Goal:** [Captured for future planning] Extend drag-to-resize handles from Phase 31 (products + custom-elements) to cover ceilings. Ceilings (customElements with `kind: "ceiling"`) currently have no resize handles — users can only move or delete and redraw. Mirror Phase 31's width/depth override pattern (`widthFtOverride` / `depthFtOverride`, single-undo drag transaction, Alt disables smart-snap).
+**Goal:** Extend drag-to-resize handles from Phase 31 (products + custom-elements) to cover ceilings. Ceilings (customElements with `kind: "ceiling"`) currently have no resize handles — users can only move or delete and redraw. Mirror Phase 31's width/depth override pattern (`widthFtOverride` / `depthFtOverride`, single-undo drag transaction, Alt disables smart-snap).
 
-**Requirements:** TBD
-**Plans:** 1/1 plans complete
+**Requirements:** CEIL-01 (re-parked here from v1.9 Phase 40 cancellation 2026-04-25)
+**Plans:** 0 plans
 
 Plans:
-- [ ] TBD (promote with /gsd:review-backlog when ready)
+- [ ] TBD (promote with /gsd:review-backlog or v2.0 milestone scoping)
 
-**Discovered:** 2026-04-21 during Phase 32 T4 human UAT (Jessica) — pre-existing, not Phase 32 scope.
+**Discovered:** 2026-04-21 during Phase 32 T4 human UAT (Jessica) — pre-existing.
+**Promoted to v1.9 as Phase 40 (CEIL-01)** during 2026-04-25 v1.9 scoping.
+**Re-deferred 2026-04-25** after Phase 39 feedback signal showed Jessica reported zero pain on ceilings ("went fine"). Building drag-resize on hypothesis-only would be guessing; revisit when a future feedback session surfaces actual ceiling-resize friction.
 
 ### Phase 999.2: Wallpaper + wallArt view-toggle regression — PROMOTED to Phase 36 under v1.8
 
 Originally captured 2026-04-21 Phase 32 T4 human UAT. Promoted into v1.8 as Phase 36 (VIZ-10). See Phase 36 Details above.
 
-### Phase 999.3: Per-surface texture tile-size override (BACKLOG)
+### Phase 999.3: Per-surface texture tile-size override — design-effect (BACKLOG — re-deferred from v1.9)
 
 **Goal:** Let users scale a texture for design effect on a single surface without re-uploading. e.g., preview the same wood floor at 6"/12"/18" plank widths in the same room. Default behavior (real-world tiling via `RepeatWrapping`) stays correct; override is optional per surface.
 
-**Requirements:** TBD
+**Requirements:** TILE-01 (re-parked here from v1.9 Phase 41 cancellation 2026-04-25). Distinct from BUG-01 (#96 fix in v1.9 Phase 42) which only handles per-surface `tileSizeFt` isolation, not the full design-effect override UI.
 **GH Issue:** [#105](https://github.com/micahbank2/room-cad-renderer/issues/105)
 **Plans:** 0 plans
 
 Plans:
-- [ ] TBD (promote with /gsd:review-backlog when ready, likely v1.9+ texture polish)
+- [ ] TBD (promote with /gsd:review-backlog or v2.0 milestone scoping)
 
-**Discovered:** 2026-04-25 during Phase 35 HUMAN-UAT — user asked why wood oak doesn't grow with the floor. Confirmed by-design behavior; captured as a natural follow-up enhancement. CLAUDE.md already flags "Texture tiling controls beyond real-world size" as out of scope for v1.8.
+**Discovered:** 2026-04-25 during Phase 35 HUMAN-UAT — user asked why wood oak doesn't grow with the floor. Confirmed by-design behavior; captured as a natural follow-up enhancement.
+**Promoted to v1.9 as Phase 41 (TILE-01)** during 2026-04-25 v1.9 scoping.
+**Re-deferred 2026-04-25** after Phase 39 feedback signal showed Jessica reported zero pain on texture sizing ("feels right"). Full design-effect override is hypothesis-only; the narrower BUG-01 fix (Phase 42) handles the per-surface isolation that's needed regardless. Revisit design-effect scaling when a future feedback session surfaces demand.

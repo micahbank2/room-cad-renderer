@@ -36,26 +36,21 @@ source: v1.8 carry-over tech debt + parked backlog (999.1 + 999.3) + real-use fe
   - **Verifiable:** Document exists at the named path. Contains: (a) ≥3 specific friction points she hit during real use (with what task she was trying to do), (b) ≥3 "I wish it could…" feature requests with her own framing, (c) Phase 35 HUMAN-UAT review covering eye-level pose interpretation + easeInOutCubic feel + active-highlight contrast (each marked confirmed / adjust / reject), (d) a top-3 ranked-priority list synthesized from the session.
   - **Acceptance:** Doc reflects an actual session, not invented content. Top-3 list explicitly informs Phase 40/41 ordering for v1.9 AND seeds the v2.0 scope discussion. Items not actionable in v1.9 captured as backlog (999.x).
 
-### Ceiling Resize Handles (CEIL)
+### Per-Surface Texture Tile-Size Bug Fix (BUG)
 
-- [ ] **CEIL-01** — Ceilings (custom-elements with `kind: "ceiling"`) can be drag-resized via edge handles like products and walls. Mirrors the Phase 31 pattern.
-  - **Source:** Phase 999.1 backlog. Originally captured 2026-04-21 during Phase 32 T4 human UAT (Jessica) — pre-existing gap, not Phase 32 scope.
-  - **Verifiable:** Select a ceiling in 2D → 4 edge handles render (N/S/E/W). Drag a handle → ceiling resizes along that axis only, with `widthFtOverride` / `depthFtOverride` written to `PlacedCustomElement` (mirrors Phase 31 product/custom-element resize). Single-undo: `past.length` increments by exactly 1 per drag cycle. Alt/Option disables smart-snap during the drag (grid-snap still applies). 3D ceiling mesh re-renders at the new dimensions. Reset action clears the override.
-  - **Acceptance:** Reuses `resolveEffectiveCustomDims` resolver. Reuses Phase 31 single-undo drag-transaction pattern (mousedown push history, NoHistory mid-drag, no extra entries). Reuses Phase 25 fast-path (`renderOnAddRemove: false` + `_dragActive` flag). Smart-snap scene includes wall edges + other ceiling edges (per Phase 30 D-08b extension).
-
-### Per-Surface Texture Tile-Size Override (TILE)
-
-- [ ] **TILE-01** — Each surface (floor, wall.wallpaper side, ceiling) can have an optional per-placement texture tile-size override that scales the texture for design effect without changing the catalog tile size.
-  - **Source:** [GH #105](https://github.com/micahbank2/room-cad-renderer/issues/105) / Phase 999.3 backlog. Discovered 2026-04-25 during Phase 35 HUMAN-UAT — Jessica asked why wood oak doesn't scale up with the floor; confirmed real-world tiling is correct, this is the natural follow-up enhancement.
-  - **Verifiable:** Apply `wood-oak` texture to a floor → texture tiles at catalog size (e.g., 0.5 ft plank width × N planks across the floor). In the floor material picker (or a new "Tile size" affordance), enter a custom tile size in feet+inches (reusing Phase 29 parser) → texture re-tiles at the new size; one IDB entry, one catalog reference, one per-placement override. Reset clears the override → texture returns to catalog size. Override survives page reload. Override is per-surface — same texture on a different floor renders independently.
-  - **Acceptance:** New optional fields: `floor.tileSizeOverrideFt?: number`, `wall.wallpaper.tileSizeOverrideFt?: number`, `ceiling.tileSizeOverrideFt?: number`. Default `undefined` (uses catalog tile size). Renderer math: `texture.repeat = surface_dim / (override ?? catalog.tileSizeFt)`. UI: small `+`/`-` stepper or feet+inches input in the material picker showing effective tile size + reset button. Snapshot persists override per-surface. Orphan-safe (deleting the texture clears the override along with the assignment).
+- [ ] **BUG-01** — When the same user-uploaded texture is applied to multiple surfaces (floor + wall, two walls, etc.), each surface honors its own `tileSizeFt` independently. Currently changing the tile size on one surface affects all surfaces sharing that texture ([GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96)).
+  - **Source:** [GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96). Re-scoped from full TILE-01 design-effect override (deferred to v2.0+) per Phase 39 feedback recommendation accepted 2026-04-25 — Jessica's Q4 confirmed catalog-default tile sizing feels right, but the per-surface bug exists regardless of whether she has noticed it.
+  - **Verifiable:** Apply user-texture X to floor with `tileSizeFt=8`. Apply same user-texture X to a wall with `tileSizeFt=4`. Both surfaces render at their own tile size — floor planks 8 ft, wall planks 4 ft. Snapshot stores the per-surface tile size on the surface assignment, not on the catalog entry. Page reload preserves both. Catalog tile size stays a default-only fallback.
+  - **Acceptance:** Per-surface `tileSizeFt` lives on the surface assignment (`floor.tileSizeFt`, `wall.wallpaper.tileSizeFt`, `ceiling.tileSizeFt`) — NOT on the user-texture catalog entry alone. Renderer reads from surface override; falls back to catalog default if surface override missing. Snapshot serializes the per-surface value. Migration handles existing snapshots that wrote tile size to the catalog (back-fill the surface override on read). Tests assert both-surfaces-different-tile-sizes invariant.
 
 ---
 
 ## Future Requirements (Deferred to v2.0+)
 
-These items are intentionally **out of v1.9** and will be revisited based on FEEDBACK-01 results:
+These items are intentionally **out of v1.9**. The CEIL-01 / TILE-01 deferrals were promoted from v1.9 scope to v2.0+ on 2026-04-25 after Phase 39 feedback signal showed Jessica reported zero pain on either area. They remain valid candidate work — just not warranted on hypothesis-only.
 
+- **CEIL-01** (was v1.9 Phase 40) — Ceilings drag-resizable via edge handles like products and walls. Mirrors Phase 31 pattern. **Deferred:** Jessica's Phase 39 Q5 said ceilings "went fine" — no signaled pain. Phase 999.1 backlog. Revisit if a future feedback session surfaces actual ceiling-resize friction.
+- **TILE-01** (was v1.9 Phase 41 — full design-effect override) — Optional per-placement `tileSizeOverrideFt` that scales textures for design effect (preview wide-plank vs narrow-plank in same room without re-uploading). **Deferred:** Jessica's Phase 39 Q4 said catalog-default tile sizing "feels right" — design-effect override is hypothesis-only. The narrower BUG-01 (#96 fix above) lands the per-surface isolation that's actually required regardless. Phase 999.3 backlog. Revisit when a future feedback session surfaces design-effect demand.
 - **Lighting controls** — directional light angle, ambient intensity, time-of-day presets
 - **Walk-mode improvements** — head bob, transition smoothness, collision
 - **Layout templates** — pre-built room layouts for common scenarios
@@ -67,16 +62,26 @@ These items are intentionally **out of v1.9** and will be revisited based on FEE
 - **R3F v9 / React 19 upgrade** — still gated on R3F v9 stability (#56)
 - **Per-surface rotation / offset / seam-smoothing** — beyond TILE-01 scope; revisit in v2.0+ texture polish
 
+### Phase 39 v2.0 scope seeds (curated GH issues)
+
+Items surfaced from Phase 39's "GH backlog IS the wishlist" insight. v2.0 scoping starts here:
+
+- **UX polish trio:** [#97](https://github.com/micahbank2/room-cad-renderer/issues/97) (Properties panel in 3D/split), [#98](https://github.com/micahbank2/room-cad-renderer/issues/98) (muted text contrast), [#99](https://github.com/micahbank2/room-cad-renderer/issues/99) (Properties panel onboarding)
+- **Quick wins:** [#100](https://github.com/micahbank2/room-cad-renderer/issues/100) (default templates need ceilings), [#101](https://github.com/micahbank2/room-cad-renderer/issues/101) (SAVED badge too small), [#76](https://github.com/micahbank2/room-cad-renderer/issues/76) (`prefers-reduced-motion` for snap guides + camera tweens)
+- **Pascal competitor-insight set:** [#79](https://github.com/micahbank2/room-cad-renderer/issues/79) (per-node saved camera + Focus), [#80](https://github.com/micahbank2/room-cad-renderer/issues/80) (room display modes — solo/explode), [#78](https://github.com/micahbank2/room-cad-renderer/issues/78) (rooms hierarchy sidebar tree), [#77](https://github.com/micahbank2/room-cad-renderer/issues/77) (auto-generate material swatch thumbnails)
+- **PBR extensions:** [#81](https://github.com/micahbank2/room-cad-renderer/issues/81) (AO + displacement + emissive)
+
 ## Traceability
 
 Phase → requirement mapping. Plan column filled by `/gsd:plan-phase` when each phase is planned.
 
 | Requirement | Phase | Plan(s) |
 | ----------- | ----- | ------- |
-| POLISH-01 | Phase 38 | TBD |
-| FEEDBACK-01 | Phase 39 | TBD |
-| CEIL-01 | Phase 40 | TBD |
-| TILE-01 | Phase 41 | TBD |
+| POLISH-01 | Phase 38 | 38-01 |
+| FEEDBACK-01 | Phase 39 | 39-01, 39-02 |
+| BUG-01 | Phase 42 (added 2026-04-25 mid-milestone — final v1.9 phase) | TBD |
+| ~~CEIL-01~~ | ~~Phase 40~~ → CANCELLED 2026-04-25; deferred to v2.0+ (Phase 999.1 backlog) | n/a |
+| ~~TILE-01~~ | ~~Phase 41~~ → CANCELLED 2026-04-25; deferred to v2.0+ (Phase 999.3 backlog) | n/a |
 
 ---
 
