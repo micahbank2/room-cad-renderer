@@ -1,13 +1,13 @@
 ---
 gsd_state_version: 1.0
-milestone: TBD
-milestone_name: (next milestone — run /gsd:new-milestone for v1.11 Pascal Feature Set)
-status: idle
-stopped_at: v1.10 milestone shipped 2026-04-25
-last_updated: "2026-04-25T23:30:00.000Z"
-last_activity: 2026-04-25 -- v1.10 archived
+milestone: v1.11
+milestone_name: Pascal Feature Set
+status: scoped
+stopped_at: v1.11 scoped 2026-04-25 — ready for /gsd:plan-phase 45
+last_updated: "2026-04-25T23:45:00.000Z"
+last_activity: 2026-04-25 -- v1.11 milestone scoped
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -24,10 +24,19 @@ See: .planning/PROJECT.md (updated 2026-04-25 — v1.10 archived; v1.11 Pascal F
 
 ## Current Position
 
-Milestone: TBD (run `/gsd:new-milestone` to formally scope v1.11 Pascal Feature Set)
-Phase: none
+Milestone: v1.11 Pascal Feature Set
+Phases: 4 (45, 46, 47, 48) — none planned yet
 Plan: none
-Status: Idle — milestone v1.10 shipped 2026-04-25 (2 phases, 2 plans, 5/5 reqs, audit passed_with_carry_over with AUDIT-01 systemic resolution)
+Status: Ready for `/gsd:plan-phase 45` (THUMB-01 — auto-generated material swatch thumbnails)
+
+## v1.11 Phase Sequence
+
+1. **Phase 45** — THUMB-01: Auto-generated material swatch thumbnails (#77)
+2. **Phase 46** — TREE-01: Rooms hierarchy sidebar tree (#78)
+3. **Phase 47** — DISPLAY-01: Room display modes (NORMAL/SOLO/EXPLODE) (#80)
+4. **Phase 48** — CAM-04: Per-node saved camera + Focus action (#79)
+
+Easy → hard ordering. Each phase ships a tangible UX win.
 
 ## Last 3 milestones (summary)
 

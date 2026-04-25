@@ -47,17 +47,19 @@ See `.planning/ROADMAP.md` for links to each milestone archive.
 
 </details>
 
-## Current Milestone: v1.11 Pascal Feature Set (next to scope)
+## Current Milestone: v1.11 Pascal Feature Set
 
-**Status:** v1.10 shipped 2026-04-25. v1.11 pre-committed in PROJECT + ROADMAP for the 4 Pascal Editor competitor-insight items the user explicitly committed to as the next direction. Formal scoping via `/gsd:new-milestone` produces REQUIREMENTS.md + ROADMAP entry + Phase Details — that's the next step.
+**Goal:** Adopt the 4 strongest features from the Pascal Editor competitive audit. v1.9 Phase 39 deferred these as "speculative"; user explicitly committed to them during v1.10 scoping as the next direction.
 
-**Target features:**
-- **Phase 45 / [#79](https://github.com/micahbank2/room-cad-renderer/issues/79)** — Per-node saved camera with Focus action (each placed product / wall / ceiling can have its own bookmarked camera angle, double-click "Focus" jumps the camera there)
-- **Phase 46 / [#80](https://github.com/micahbank2/room-cad-renderer/issues/80)** — Room display modes (solo / explode) for inspecting individual rooms in isolation or seeing exploded-axonometric layouts
-- **Phase 47 / [#78](https://github.com/micahbank2/room-cad-renderer/issues/78)** — Rooms hierarchy sidebar tree (collapsible, click-to-focus, visibility toggles per-node)
-- **Phase 48 / [#77](https://github.com/micahbank2/room-cad-renderer/issues/77)** — Auto-generated material swatch thumbnails from the renderer (replaces hand-curated swatches in pickers)
+**Target features (4 issues, 4 phases — easy → hard):**
+- **Phase 45 / THUMB-01 / [#77](https://github.com/micahbank2/room-cad-renderer/issues/77)** — Auto-generated material swatch thumbnails from the renderer (replaces hand-curated swatches in pickers)
+- **Phase 46 / TREE-01 / [#78](https://github.com/micahbank2/room-cad-renderer/issues/78)** — Rooms hierarchy sidebar tree (collapsible per-room, click-to-focus, per-node visibility toggle)
+- **Phase 47 / DISPLAY-01 / [#80](https://github.com/micahbank2/room-cad-renderer/issues/80)** — Room display modes (NORMAL / SOLO / EXPLODE) for inspecting individual rooms or seeing exploded layouts
+- **Phase 48 / CAM-04 / [#79](https://github.com/micahbank2/room-cad-renderer/issues/79)** — Per-node saved camera with Focus action (each product/wall/ceiling can bookmark a camera angle; double-click in tree jumps camera there via Phase 35 tween)
 
-**Sequencing intent:** TBD at scoping time. Likely [#77](https://github.com/micahbank2/room-cad-renderer/issues/77) first (cheap, isolated — no schema changes), then [#78](https://github.com/micahbank2/room-cad-renderer/issues/78) (rooms tree depends only on existing room data), then [#80](https://github.com/micahbank2/room-cad-renderer/issues/80) (display modes layer on top of room rendering), then [#79](https://github.com/micahbank2/room-cad-renderer/issues/79) (per-node camera bookmarks need camera-state plumbing extension).
+**Phase numbering:** Phases 45–48 (continues from 44).
+
+**Sequencing intent:** Easy → hard. Phase 45 (cheapest, isolated, no schema changes). Phase 46 (rooms tree depends on existing room data — provides infrastructure for Focus). Phase 47 (display modes layer on top of room rendering + tree's "active room" semantic). Phase 48 (per-node camera reuses Phase 35 tween + Phase 46 tree double-click trigger). Each phase ships a tangible UX win — cancellation of any later phase still leaves earlier phases' value behind.
 
 **Out of v1.11:** Backend / auth / cloud sync / mobile / iPad — major-version leap territory. R3F v9 / React 19 upgrade — still gated on R3F v9 stability ([#56](https://github.com/micahbank2/room-cad-renderer/issues/56)). [#97](https://github.com/micahbank2/room-cad-renderer/issues/97) Properties panel in 3D/split — separate concern. [#81](https://github.com/micahbank2/room-cad-renderer/issues/81) PBR extensions — different domain. Phase 999.1 (ceiling drag-resize) + Phase 999.3 (full design-effect tile override) — re-deferred from v1.9 cancellation; revisit pending demand signal.
 
