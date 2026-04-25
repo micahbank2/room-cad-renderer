@@ -2,14 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.10
 milestone_name: Evidence-Driven UX Polish
-status: scoped
-stopped_at: v1.10 scoped 2026-04-25 — ready for /gsd:plan-phase 43
-last_updated: "2026-04-25T20:45:00.000Z"
-last_activity: 2026-04-25 -- v1.10 milestone scoped
+status: executing
+stopped_at: v1.9 milestone archived
+last_updated: "2026-04-25T20:59:14.669Z"
 progress:
   total_phases: 2
   completed_phases: 0
-  total_plans: 0
+  total_plans: 1
   completed_plans: 0
 ---
 
@@ -20,14 +19,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-25 — v1.10 Evidence-Driven UX Polish scoped)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** v1.10 Evidence-Driven UX Polish — close 5 GH-tracked UX issues with real evidence; skip speculation.
+**Current focus:** Phase 43 — ui-polish-bundle
 
 ## Current Position
 
+Phase: 43 (ui-polish-bundle) — EXECUTING
 Milestone: v1.10 Evidence-Driven UX Polish
 Phases: 2 (43, 44) — none planned yet
-Plan: none
-Status: Ready for `/gsd:plan-phase 43` (UX-01/02/03 + DEFAULT-01 bundle)
+Plan: 1 of 1
+Status: Executing Phase 43
 
 **Next milestone committed:** v1.11 Pascal Feature Set (Phases 45–48) — formal scoping via `/gsd:new-milestone` after v1.10 ships. Per-node saved camera + Focus, room display modes, rooms hierarchy tree, auto-generated material swatch thumbnails.
 

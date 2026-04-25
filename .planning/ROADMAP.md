@@ -108,7 +108,7 @@
 **Requirements:** UX-01, UX-02, UX-03, DEFAULT-01
 **UI hint:** yes
 **Plans:**
-- [ ] 43-01-bundle — 4 atomic commits (DEFAULT-01 templates ceiling → UX-02 contrast → UX-01 SAVED badge → UX-03 empty-state)
+1/1 plans complete
 
 #### Phase 44: Reduced-Motion Sweep (A11Y)
 **Goal:** Honor `prefers-reduced-motion` for snap guides + wall-side camera tween. Phase 35 camera presets already do this; this phase brings the older animation paths to parity.
@@ -156,7 +156,7 @@
 | ~~40. Ceiling Resize Handles~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.1) |
 | ~~41. Per-Surface Tile-Size Override~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.3) |
 | 42. Per-Surface tileSizeFt Bug Fix | 1/1 | Complete   | 2026-04-25 |
-| 43. UI Polish Bundle | 0/1 | In progress | - |
+| 43. UI Polish Bundle | 1/1 | Complete   | 2026-04-25 |
 | 44. Reduced-Motion Sweep | 0/0 | Not started | - |
 
 ## Backlog
