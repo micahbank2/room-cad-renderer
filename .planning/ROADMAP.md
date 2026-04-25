@@ -128,7 +128,7 @@
 - [x] **Phase 34: User-Uploaded Textures** — Jessica uploads JPEG/PNG/WebP with real-world tile size; applies to walls/floors/ceilings; 2048px downscale + SHA-256 dedup + orphan fallback (completed 2026-04-22)
 - [x] **Phase 35: Camera Presets** — eye-level / top-down / 3-quarter / corner switchable via toolbar + 1/2/3/4 hotkeys with ~600ms ease-in-out tween, no undo/autosave pollution (completed 2026-04-25)
 - [x] **Phase 36: Wallpaper/wallArt 2D↔3D Regression (VIZ-10)** — instrumentation-first investigation of Phase 32 carry-over regression; Playwright harness captures root cause BEFORE any fix merges (completed 2026-04-24)
-- [ ] **Phase 37: Tech-Debt Sweep** — close GH #44/#46/#50/#60, delete orphan SaveIndicator, finish `resolveEffectiveDims` migration, backfill Phase 29 frontmatter
+- [x] **Phase 37: Tech-Debt Sweep** — close GH #44/#46/#50/#60, delete orphan SaveIndicator, finish `resolveEffectiveDims` migration, backfill Phase 29 frontmatter (completed 2026-04-25)
 
 ### Phase Details
 
@@ -189,7 +189,7 @@ Plans:
 **Depends on**: Nothing
 **Requirements**: DEBT-01, DEBT-02, DEBT-03, DEBT-04
 **Plans**:
-- [ ] 37-01-sweep — All 4 DEBT items in one plan (4 atomic commits)
+- [x] 37-01-sweep — All 4 DEBT items in one plan (4 atomic commits)
 **Goal**: v1.6 leftover noise is gone — shipped issues are closed on GitHub, dead code is deleted, the resolver migration is complete, and Phase 29 traceability frontmatter is correct
 **Depends on**: Nothing (independent; positioned LAST so it can be cut under scope pressure without leaving features half-shipped)
 **Requirements**: DEBT-01, DEBT-02, DEBT-03, DEBT-04
@@ -212,7 +212,7 @@ Plans:
 | 34. User-Uploaded Textures | 4/4 | Complete   | 2026-04-22 |
 | 35. Camera Presets | 2/2 | Complete   | 2026-04-25 |
 | 36. Wallpaper/wallArt Regression (VIZ-10) | 2/2 | Complete   | 2026-04-24 |
-| 37. Tech-Debt Sweep | 0/1 | In progress | - |
+| 37. Tech-Debt Sweep | 1/1 | Complete   | 2026-04-25 |
 
 ## Backlog
 
@@ -221,7 +221,7 @@ Plans:
 **Goal:** [Captured for future planning] Extend drag-to-resize handles from Phase 31 (products + custom-elements) to cover ceilings. Ceilings (customElements with `kind: "ceiling"`) currently have no resize handles — users can only move or delete and redraw. Mirror Phase 31's width/depth override pattern (`widthFtOverride` / `depthFtOverride`, single-undo drag transaction, Alt disables smart-snap).
 
 **Requirements:** TBD
-**Plans:** 4/4 plans complete
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] TBD (promote with /gsd:review-backlog when ready)
