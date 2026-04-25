@@ -26,15 +26,18 @@ export default function CeilingMesh({ ceiling, isSelected }: Props) {
   // Phase 34 — user-texture branch is HIGHEST priority. Hook returns null on
   // orphan (D-08/D-09) → fall through to surfaceMaterialId / paint chain.
   const userTex = useUserTexture(ceiling.userTextureId);
-  // `Ceiling` carries no `scaleFt` field today, so look up the catalog
-  // entry's `tileSizeFt` via useUserTextures (RESEARCH.md §H recommended
-  // approach; avoids a schema change to Ceiling).
+  // Phase 42 BUG-01 — resolver precedence: ceiling.scaleFt (per-surface
+  // override) ?? entry.tileSizeFt (catalog default) ?? 2 (last resort).
+  // The override is written at apply-time by the picker; existing snapshots
+  // without it fall through to the catalog default — functionally equivalent
+  // to pre-fix behavior. Closes GH #96.
   const { textures: userTextureCatalog } = useUserTextures();
   const userTextureTileSizeFt = useMemo(() => {
+    if (ceiling.scaleFt !== undefined) return ceiling.scaleFt;
     if (!ceiling.userTextureId) return 2;
     const entry = userTextureCatalog.find((t) => t.id === ceiling.userTextureId);
     return entry?.tileSizeFt ?? 2;
-  }, [ceiling.userTextureId, userTextureCatalog]);
+  }, [ceiling.scaleFt, ceiling.userTextureId, userTextureCatalog]);
 
   const pbrMaterial = useMemo(() => {
     if (!ceiling.surfaceMaterialId) return null;
