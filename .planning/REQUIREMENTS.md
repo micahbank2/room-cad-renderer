@@ -24,31 +24,31 @@ source: Phase 39 v2.0 scope seeds (filtered to evidence-driven items only — sp
 
 ### UI Polish (UX)
 
-- [ ] **UX-01** — The auto-save SAVED badge in the Toolbar is large enough to notice without searching for it.
+- [x] **UX-01** — The auto-save SAVED badge in the Toolbar is large enough to notice without searching for it. _(Shipped in Phase 43 / PR #118 commit `569f879`. text-[10px] → text-base = 13px; covers SAVED, SAVING, SAVE_FAILED states.)_
   - **Source:** [GH #101](https://github.com/micahbank2/room-cad-renderer/issues/101) — observed during real use.
   - **Verifiable:** Save fires (any CAD edit + ~2 s wait). Toolbar shows "SAVED" indicator that's at least as large as adjacent toolbar text and visually distinct from background. Confirm legibility at default viewport zoom (100%).
   - **Acceptance:** Existing 'SAVED' badge gains larger font-size or higher-contrast background. Phase 33 `--text-base` token (13px) is the new minimum. No new chrome added; existing element resized.
 
-- [ ] **UX-02** — Muted text labels (UPLOAD, NO RECENT COLORS, etc.) are readable against the obsidian-deepest background.
+- [x] **UX-02** — Muted text labels (UPLOAD, NO RECENT COLORS, etc.) are readable against the obsidian-deepest background. _(Shipped in Phase 43 / PR #118 commit `f8cb87f`. `--color-text-ghost` bumped #484554 → #888494, ~5.15:1 contrast against obsidian-deepest, comfortably above WCAG AA 4.5:1. Affects 124+ existing usages globally.)_
   - **Source:** [GH #98](https://github.com/micahbank2/room-cad-renderer/issues/98) — accessibility issue observed during real use.
   - **Verifiable:** Open ProductLibrary, FloorMaterialPicker, SwatchPicker. All `text-text-dim` / `text-text-ghost` labels meet WCAG AA contrast (≥4.5:1 for body text or ≥3:1 for ≥18px text) against their actual background.
   - **Acceptance:** Audit `--color-text-dim` / `--color-text-ghost` against the surfaces they appear on. Adjust the dimmest tokens upward (lighter) until WCAG AA is met. NO new tokens added — adjusting existing tokens is preferred for design-system consistency.
 
-- [ ] **UX-03** — The right-side Properties panel has a discoverable affordance when no element is selected.
+- [x] **UX-03** — The right-side Properties panel has a discoverable affordance when no element is selected. _(Shipped in Phase 43 / PR #118 commit `e5f98ef`. Replaced `return null` with empty-state copy: 'Select a wall, product, or ceiling to see its properties here.' Static — no animation. Verified visually via preview snapshot.)_
   - **Source:** [GH #99](https://github.com/micahbank2/room-cad-renderer/issues/99) — discovery problem observed during real use.
   - **Verifiable:** Open the app with nothing selected. The Properties panel either (a) shows an explicit empty-state message ("Select a wall, product, or ceiling to edit its properties") or (b) is collapsed with a clear "open Properties" affordance. Currently the panel is just blank — users don't know what to do.
   - **Acceptance:** Add empty-state copy + a hint icon or `<EmptyState>` primitive. Preserve existing CollapsibleSection persistence behavior. No new state stores.
 
 ### Default Content (DEFAULT)
 
-- [ ] **DEFAULT-01** — Default Living Room / Bedroom / Kitchen templates include a ceiling.
+- [x] **DEFAULT-01** — Default Living Room / Bedroom / Kitchen templates include a ceiling. _(Shipped in Phase 43 / PR #118 commit `131a053`. RoomTemplate gained optional `makeCeiling()`; named templates produce a single ceiling polygon at room perimeter, height = room.wallHeight, material #f5f5f5 — same default as cadStore.addCeiling. BLANK template stays bare.)_
   - **Source:** [GH #100](https://github.com/micahbank2/room-cad-renderer/issues/100) — observed during real use; every new project from a template lacks a ceiling.
   - **Verifiable:** New project from any of the 3 default templates → 3D view shows a ceiling at room.wallHeight. Fresh blank project still has no ceiling (intentional — only templates).
   - **Acceptance:** Edit the template seed data (likely `src/data/templates.ts` or similar) so each template's `CADSnapshot.rooms.r1.ceilings` includes a single ceiling polygon matching the room dimensions, with the template's named material. No schema changes; reuses the existing Ceiling type.
 
 ### Accessibility (A11Y)
 
-- [ ] **A11Y-01** — `prefers-reduced-motion` is honored across snap-guide animations and camera-related tweens.
+- [x] **A11Y-01** — `prefers-reduced-motion` is honored across snap-guide animations and camera-related tweens. _(Shipped in Phase 44 / PR #119 commits `9b7260f` (wall-side camera snaps) + `0f41ebd` (SAVING spinner conditional animate-spin). **Honest deviation:** snap guides verified during planning to render at static GUIDE_OPACITY = 0.6 with no animation — no guard needed. Two real targets guarded; third was a non-existent animation. Documented in Phase 44 CONTEXT D-03 + 44-01-sweep-SUMMARY.md.)_
   - **Source:** [GH #76](https://github.com/micahbank2/room-cad-renderer/issues/76) — Phase 33 introduced `useReducedMotion` for new animations (D-39). Existing snap guides + wall-side camera lerp pre-date that hook.
   - **Verifiable:** Enable `prefers-reduced-motion: reduce` (DevTools → Rendering → Emulate). Drag a product near a wall — snap guides appear instantly without fade-in/out. Click "face wall side" — camera snaps to wall instead of lerping. Phase 35 preset tween already honors this; add the same guard to snap guides + wall-side lerp.
   - **Acceptance:** Wrap relevant animation paths in `useReducedMotion` checks. When reduced motion is on: snap guides render at full opacity instantly (no fade); wall-side camera target snaps directly (no lerp). Camera presets (Phase 35) and any other animation already guarded stays as-is.
@@ -74,11 +74,11 @@ Phase → requirement mapping. Plan column filled by `/gsd:plan-phase` when each
 
 | Requirement | Phase | Plan(s) |
 | ----------- | ----- | ------- |
-| UX-01 | Phase 43 | TBD |
-| UX-02 | Phase 43 | TBD |
-| UX-03 | Phase 43 | TBD |
-| DEFAULT-01 | Phase 43 | TBD |
-| A11Y-01 | Phase 44 | TBD |
+| UX-01 | Phase 43 | 43-01 ✅ |
+| UX-02 | Phase 43 | 43-01 ✅ |
+| UX-03 | Phase 43 | 43-01 ✅ |
+| DEFAULT-01 | Phase 43 | 43-01 ✅ |
+| A11Y-01 | Phase 44 | 44-01 ✅ (with documented A11Y-01 deviation — snap guides target was non-existent animation) |
 
 ---
 
