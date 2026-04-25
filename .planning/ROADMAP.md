@@ -106,7 +106,9 @@
 **Depends on:** Nothing (independent of code phases)
 **Requirements:** FEEDBACK-01
 **UI hint:** no (process phase)
-**Plans:** TBD (est. 1 plan; covers session prep, recording technique, debrief format, and Phase 35 HUMAN-UAT review folded in)
+**Plans:**
+1/2 plans executed
+- [ ] 39-02-synthesis — post-session synthesis of `.planning/feedback/v1.9-jessica-session.md` from Micah's notes (gated on session happening + notes supplied)
 
 #### Phase 40: Ceiling Resize Handles (CEIL-01)
 **Goal:** Ceilings can be drag-resized via edge handles like products and walls. Mirrors Phase 31 pattern.
@@ -135,7 +137,7 @@
 | 36. Wallpaper/wallArt Regression (VIZ-10) | 2/2 | Complete   | 2026-04-24 |
 | 37. Tech-Debt Sweep | 1/1 | Complete   | 2026-04-25 |
 | 38. VERIFICATION.md Backfill | 0/0 | Not started | - |
-| 39. Real-Use Feedback Session | 0/0 | Not started | - |
+| 39. Real-Use Feedback Session | 1/2 | In Progress|  |
 | 40. Ceiling Resize Handles | 0/0 | Not started | - |
 | 41. Per-Surface Tile-Size Override | 0/0 | Not started | - |
 

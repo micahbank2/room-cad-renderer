@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: Polish & Feedback
-status: scoped
-stopped_at: v1.9 scoped 2026-04-25 — ready for /gsd:plan-phase 38
-last_updated: "2026-04-25T03:30:00.000Z"
-last_activity: 2026-04-25 -- v1.9 milestone scoped
+status: executing
+stopped_at: Completed 35-01-structure-PLAN.md
+last_updated: "2026-04-25T17:31:07.171Z"
+last_activity: 2026-04-25
 progress:
-  total_phases: 4
+  total_phases: 7
   completed_phases: 0
-  total_plans: 0
+  total_plans: 2
   completed_plans: 0
 ---
 
@@ -20,14 +20,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-25 — v1.9 Polish & Feedback scoped)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** v1.9 Polish & Feedback — close v1.8 carry-overs, ship 2 parked backlog features, gather real-use feedback for v2.0 scoping.
+**Current focus:** Phase 39 — feedback-session
 
 ## Current Position
 
+Phase: 39 (feedback-session) — EXECUTING
 Milestone: v1.9 Polish & Feedback
 Phases: 4 (38, 39, 40, 41) — none planned yet
-Plan: none
-Status: Ready for `/gsd:plan-phase 38` (POLISH-01 — VERIFICATION.md backfill)
+Plan: 1 of 2
+Status: Executing Phase 39
 
 ## v1.9 Phase Sequence
 
@@ -35,7 +36,8 @@ Status: Ready for `/gsd:plan-phase 38` (POLISH-01 — VERIFICATION.md backfill)
 2. **Phase 39** — FEEDBACK-01: real-use session with Jessica → ranked-priority doc that informs v2.0
 3. **Phase 40** — CEIL-01: ceiling resize handles (Phase 999.1 promotion) — subject to Phase 39 reordering
 4. **Phase 41** — TILE-01: per-surface texture tile-size override (Phase 999.3 / GH #105 promotion) — subject to Phase 39 reordering
-Last activity: 2026-04-25 -- Phase 37 execution started
+
+Last activity: 2026-04-25
 
 Completed milestones: v1.0, v1.1, v1.2, v1.3, v1.4, v1.5, v1.6, v1.7.5 (all archived in `.planning/milestones/`)
 Partial: v1.7 3D Realism — Phase 32 PBR Foundation shipped 2026-04-21; remainder absorbed into v1.8 as Phases 34–37
