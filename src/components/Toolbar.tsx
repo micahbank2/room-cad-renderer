@@ -264,7 +264,7 @@ function ToolbarSaveStatus() {
     return (
       <div className="flex items-center gap-1.5 min-w-[72px]" aria-label="Save status">
         <span className="material-symbols-outlined text-[14px] text-error">error</span>
-        <span className="font-mono text-[10px] tracking-widest text-error">
+        <span className="font-mono text-base tracking-widest text-error">
           SAVE_FAILED
         </span>
       </div>
@@ -280,7 +280,7 @@ function ToolbarSaveStatus() {
           <span className="material-symbols-outlined text-[14px] text-accent-light animate-spin">
             progress_activity
           </span>
-          <span className="font-mono text-[10px] tracking-widest text-accent-light">
+          <span className="font-mono text-base tracking-widest text-accent-light">
             SAVING
           </span>
         </>
@@ -290,7 +290,7 @@ function ToolbarSaveStatus() {
             cloud_done
           </span>
           <span
-            className={`font-mono text-[10px] tracking-widest ${
+            className={`font-mono text-base tracking-widest ${
               isSaved ? "text-success" : "text-text-ghost"
             }`}
           >
