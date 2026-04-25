@@ -4,7 +4,7 @@ import { useUIStore } from "@/stores/uiStore";
 import { snapPoint, distance, closestPointOnWall, formatFeet } from "@/lib/geometry";
 import type { Point, PlacedProduct, PlacedCustomElement, CustomElement } from "@/types/cad";
 import type { Product } from "@/types/product";
-import { effectiveDimensions, resolveEffectiveDims, resolveEffectiveCustomDims } from "@/types/product";
+import { resolveEffectiveDims, resolveEffectiveCustomDims } from "@/types/product";
 import { hitTestHandle, snapAngle, angleFromCenterToPointer } from "../rotationHandle";
 import {
   hitTestWallHandle,
