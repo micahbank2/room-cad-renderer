@@ -1,5 +1,48 @@
 # Milestones — Room CAD Renderer
 
+## v1.9 — Polish & Feedback ✅
+
+**Shipped:** 2026-04-25 (single-day milestone)
+**Phases:** 3 (38, 39, 42) — 4 plans · 2 phases (40, 41) cancelled mid-milestone
+**Files changed:** 26 files (+2,840 / −40 LOC)
+**Git range:** v1.8 tag → `26340fc` (audit-close merge)
+**Tag:** `v1.9`
+**PRs:** #110 (Phase 38), #111 (Phase 39 prep), #112 (Phase 39 synthesis), #113 (rescope), #114 (Phase 42), #115 (audit)
+
+**Delivered:** Smaller, more honest milestone than originally scoped. Shipped what feedback signal warranted, cancelled what it contradicted. Closed v1.8 audit AUDIT-01 (3 retroactive VERIFICATION.md backfills), gathered real-use signal from Jessica via async questionnaire (zero friction reported, zero new wishes beyond GH backlog), fixed [GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96) per-surface `scaleFt` isolation bug (Ceiling.scaleFt added; CeilingMesh resolver + apply-time write + 4 new tests).
+
+**The biggest delivery:** validating the "feedback-first" milestone sequencing pattern by acting on its own hedge. Phases 40 (CEIL-01) and 41 (TILE-01) were CANCELLED mid-milestone after Jessica's signal contradicted both hypotheses — re-deferred to Phase 999.1 + 999.3 backlogs.
+
+**Key accomplishments:**
+
+- **VERIFICATION.md backfill (POLISH-01)** — Phase 38 closed v1.8 AUDIT-01 carry-over with 3 retroactive verification reports (Phase 35 = passed, 36 = passed_with_carry_over, 37 = passed). Substitute evidence pattern: cross-reference SUMMARY + e2e + ROOT-CAUSE.md rather than re-running tests.
+- **Real-use feedback signal (FEEDBACK-01)** — Phase 39 pivoted from in-person 50-min hybrid to async 5-question questionnaire (CONTEXT D-08) due to calendar constraints. Result: zero friction reported, all 3 Phase 35 HUMAN-UAT items confirmed, 8 GH issues curated as v2.0 scope seeds.
+- **Mid-milestone re-scope** — Phase 40 + Phase 41 CANCELLED after Phase 39 contradicted hypotheses ("ceilings went fine", "texture sizing feels right"). Re-deferred to Phase 999.1 + 999.3 backlogs.
+- **Per-surface `scaleFt` isolation (BUG-01 / Phase 42)** — Closed [GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96). Added `Ceiling.scaleFt?: number` (mirrors Wallpaper + FloorMaterial schema convention). CeilingMesh resolver: `ceiling.scaleFt ?? entry?.tileSizeFt ?? 2`. Apply-time write in CeilingPaintSection. 4 new tests guard the invariant. No CADSnapshot version bump (implicit migration via resolver fallback).
+- **Honest restraint** — Rejected Claude-roleplay-Jessica option (would generate confabulated signal). Rejected padding Phase 39 deliverable to meet ≥3 friction / ≥3 wishes thresholds. Honest absence > fabricated complaint.
+
+**Audit:** [v1.9-MILESTONE-AUDIT.md](milestones/v1.9-MILESTONE-AUDIT.md) — `passed_with_carry_over`. AUDIT-01 recurring (v1.9 phases 38/39/42 lack VERIFICATION.md, same pattern as v1.8); AUDIT-03 (BUG-01 field name `scaleFt` vs REQUIREMENTS literal `tileSizeFt` — documented deviation); AUDIT-04 (Phase 39 thresholds not met — honest absence). All accepted with rationale.
+
+**Tech debt carried forward:**
+
+- AUDIT-01 (recurring) — systemic fix for VERIFICATION.md auto-generation deferred to v2.0+
+- 6 pre-existing vitest failures (formally permanent per Phase 37 D-02)
+- CI vitest disabled
+
+**Backlog re-parked:**
+
+- Phase 999.1 — Ceiling drag-resize handles (CEIL-01 from cancelled Phase 40)
+- Phase 999.3 — Per-surface design-effect tile-size override (TILE-01 from cancelled Phase 41)
+
+**v2.0 scope seeds curated (8 GH issues):**
+
+- UX polish trio: [#97](https://github.com/micahbank2/room-cad-renderer/issues/97), [#98](https://github.com/micahbank2/room-cad-renderer/issues/98), [#99](https://github.com/micahbank2/room-cad-renderer/issues/99)
+- Quick wins: [#100](https://github.com/micahbank2/room-cad-renderer/issues/100), [#101](https://github.com/micahbank2/room-cad-renderer/issues/101), [#76](https://github.com/micahbank2/room-cad-renderer/issues/76)
+- Pascal competitor-insight set: [#79](https://github.com/micahbank2/room-cad-renderer/issues/79), [#80](https://github.com/micahbank2/room-cad-renderer/issues/80), [#78](https://github.com/micahbank2/room-cad-renderer/issues/78), [#77](https://github.com/micahbank2/room-cad-renderer/issues/77)
+- PBR extensions: [#81](https://github.com/micahbank2/room-cad-renderer/issues/81)
+
+---
+
 ## v1.8 — 3D Realism Completion ✅
 
 **Shipped:** 2026-04-25

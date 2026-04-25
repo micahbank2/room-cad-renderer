@@ -12,7 +12,7 @@
 - ✅ **v1.7 3D Realism** — Phase 32 shipped 2026-04-21; remainder absorbed into v1.8
 - ✅ **v1.7.5 Design System & UI Polish** — Phase 33 (shipped 2026-04-22) — see [milestones/v1.7.5-ROADMAP.md](milestones/v1.7.5-ROADMAP.md)
 - ✅ **v1.8 3D Realism Completion** — Phases 34–37 (shipped 2026-04-25) — see [milestones/v1.8-ROADMAP.md](milestones/v1.8-ROADMAP.md)
-- 🚧 **v1.9 Polish & Feedback** — Phases 38–41 (in progress)
+- ✅ **v1.9 Polish & Feedback** — Phases 38, 39, 42 (Phases 40 + 41 cancelled mid-milestone) — shipped 2026-04-25 — see [milestones/v1.9-ROADMAP.md](milestones/v1.9-ROADMAP.md)
 
 ---
 
@@ -81,54 +81,13 @@
 
 </details>
 
----
+<details>
+<summary>✅ v1.9 Polish & Feedback (Phases 38, 39, 42 — 40 + 41 cancelled mid-milestone) — SHIPPED 2026-04-25</summary>
 
-## v1.9 Polish & Feedback
+3 phases, 4 plans, 3/3 shipped requirements (POLISH-01, FEEDBACK-01, BUG-01). VERIFICATION.md backfill closed v1.8 audit AUDIT-01 carry-over (3 retroactive verification reports for Phases 35/36/37). Real-use feedback signal pivoted from in-person hybrid to async 5-question questionnaire per CONTEXT D-08 due to calendar constraints — Jessica reported zero friction and zero new wishes beyond the GH backlog; all 3 Phase 35 HUMAN-UAT items confirmed; 8 GH issues curated as v2.0 scope seeds. **Mid-milestone re-scope:** Phases 40 (CEIL-01) and 41 (TILE-01) CANCELLED after Phase 39 contradicted their hypotheses ("ceilings went fine", "texture sizing feels right") — re-deferred to Phase 999.1 and Phase 999.3 backlogs. Narrower BUG-01 (Phase 42) shipped per-surface scaleFt isolation closing GH #96 — Ceiling.scaleFt added (mirrors Wallpaper.scaleFt + FloorMaterial.scaleFt convention), CeilingMesh resolver ceiling.scaleFt ?? entry?.tileSizeFt ?? 2, apply-time write in CeilingPaintSection, 4 new tests guard the invariant. 22 commits, +2,840/-40 LOC, single-day milestone. Audit passed_with_carry_over (AUDIT-01 recurring: v1.9 phases also lack VERIFICATION.md). The mid-milestone re-scope is itself the milestone's most valuable artifact — validated the "feedback-first" sequencing pattern by acting on its own hedge. See [milestones/v1.9-ROADMAP.md](milestones/v1.9-ROADMAP.md).
 
-**Goal:** Close v1.8 carry-over tech debt, ship two parked backlog features Jessica has already asked for, and gather real-use feedback to inform v2.0 scoping.
+</details>
 
-**Sequencing rationale (as planned):**
-- **Phase 38** (POLISH-01) runs first — pure docs work, no dependency on Jessica's input. Closes AUDIT-01 carry-over.
-- **Phase 39** (FEEDBACK-01) runs second — captures real-use friction BEFORE we commit deeper to ceiling resize / tile-size override. Output may reorder or replace Phases 40-41.
-- **Phase 40** (CEIL-01) and **Phase 41** (TILE-01) run last — committed work but explicitly subject to Phase 39's feedback. If Jessica's pain points are elsewhere, these get bumped to v2.0+.
-
-**Mid-milestone re-scope (2026-04-25):** Phase 39 feedback signal showed Jessica reported zero pain on ceilings ("went fine") and zero pain on texture sizing ("feels right"). Per the milestone's explicit hedge, **Phase 40 (CEIL-01) and Phase 41 (TILE-01) were CANCELLED** and deferred to v2.0+ as Phase 999.1 and Phase 999.3 respectively. **Phase 42 (BUG-01)** was added as the final v1.9 phase — closes [GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96) per-surface `tileSizeFt` sharing bug, which exists regardless of Jessica's signal.
-
-### Phase Details
-
-#### Phase 38: VERIFICATION.md Backfill (AUDIT-01)
-**Goal:** Phases 35, 36, 37 each gain a formal VERIFICATION.md that closes the v1.8 audit's AUDIT-01 carry-over.
-**Depends on:** Nothing (pure docs work)
-**Requirements:** POLISH-01
-**UI hint:** no
-**Plans:**
-- [x] 38-01-backfill — 3 retroactive VERIFICATION.md files (Phase 35/36/37) with substitute evidence from SUMMARY + e2e + ROOT-CAUSE.md (4 atomic commits) — completed 2026-04-25
-
-#### Phase 39: Real-Use Feedback Session (FEEDBACK-01)
-**Goal:** Capture Jessica's friction during a scheduled ~1-hour real-use session. Output is a ranked-priority document at `.planning/feedback/v1.9-jessica-session.md` that becomes the v2.0 scoping input.
-**Depends on:** Nothing (independent of code phases)
-**Requirements:** FEEDBACK-01
-**UI hint:** no (process phase)
-**Plans:**
-2/2 plans complete
-- [x] 39-02-synthesis — post-session synthesis of `.planning/feedback/v1.9-jessica-session.md` from Micah's notes (gated on session happening + notes supplied)
-
-#### ~~Phase 40: Ceiling Resize Handles (CEIL-01)~~ — CANCELLED 2026-04-25
-**Status:** CANCELLED mid-milestone after Phase 39 Q5 feedback ("went fine"). Deferred to v2.0+ as Phase 999.1. CEIL-01 requirement moved to Future Requirements / Deferred section in REQUIREMENTS.md. No plans authored.
-
-#### ~~Phase 41: Per-Surface Texture Tile-Size Override (TILE-01)~~ — CANCELLED 2026-04-25
-**Status:** CANCELLED mid-milestone after Phase 39 Q4 feedback ("feels right"). Deferred to v2.0+ as Phase 999.3. TILE-01 requirement moved to Future Requirements / Deferred section in REQUIREMENTS.md. The narrower per-surface bug fix lives in Phase 42 below. No plans authored.
-
-#### Phase 42: Per-Surface tileSizeFt Bug Fix (BUG-01)
-**Goal:** When the same user-uploaded texture is applied to multiple surfaces, each surface honors its own `tileSizeFt` independently. Closes [GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96).
-**Depends on:** Phase 34 (user-texture pipeline). Independent of cancelled Phases 40/41.
-**Requirements:** BUG-01
-**UI hint:** no (data-model fix; existing UI surfaces already pass `tileSizeFt`)
-**Plans:**
-1/1 plans complete
-**Added:** 2026-04-25 mid-milestone after Phase 39 acceptance.
-
----
 
 ## Progress
 

@@ -12,6 +12,11 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
+**v1.9 Polish & Feedback shipped 2026-04-25** (single-day milestone). 3 phases (38, 39, 42), 4 plans, 22 commits, +2,840/-40 LOC. Closed v1.8 audit AUDIT-01 carry-over via Phase 38 (3 retroactive VERIFICATION.md backfills for Phases 35/36/37). Gathered real-use feedback from Jessica via async 5-question questionnaire (Phase 39) after the in-person hybrid format proved infeasible — result: zero friction reported, all 3 Phase 35 HUMAN-UAT items confirmed, 8 GH issues curated as v2.0 scope seeds. **Mid-milestone re-scope:** Phases 40 (CEIL-01 ceiling resize) and 41 (TILE-01 design-effect tile override) CANCELLED after Phase 39 contradicted both hypotheses ("ceilings went fine", "texture sizing feels right") — re-deferred to Phase 999.1 + 999.3 backlogs. Phase 42 added as v1.9 closer: Ceiling.scaleFt per-surface override added (mirrors Wallpaper.scaleFt + FloorMaterial.scaleFt), CeilingMesh resolver `ceiling.scaleFt ?? entry?.tileSizeFt ?? 2`, apply-time write in CeilingPaintSection, 4 new tests. Closes GH #96. Audit `passed_with_carry_over` (AUDIT-01 recurring: v1.9 phases also lack VERIFICATION.md). The mid-milestone re-scope is itself the biggest deliverable — validated the "feedback-first" sequencing pattern by acting on its own hedge.
+
+<details>
+<summary>Earlier milestones</summary>
+
 **v1.8 3D Realism Completion shipped 2026-04-25.** 4 phases, 9 plans, 11/11 requirements complete (LIB-06/07/08, CAM-01/02/03, VIZ-10, DEBT-01..04). User-uploaded textures (drop JPEG/PNG/WebP → name + real-world tile size in feet+inches → apply to walls/floors/ceilings; 2048px longest-edge downscale + SHA-256 dedup to single IDB entry; snapshots reference by `userTextureId` only — zero `data:` strings >10KB and zero Blobs in JSON; orphan-deletion fallback to base hex color). Camera presets (eye-level / top-down / 3-quarter / corner via 4 lucide Toolbar buttons + bare `1`/`2`/`3`/`4` hotkeys; ~600ms easeInOutCubic tween with imperative damping toggle, live-capture cancel-and-restart, view-mode + walk-mode cleanup, reduced-motion instant-snap; full activeElement / viewMode / cameraMode / modifier guard chain; zero `cadStore.past` pollution + zero `useAutoSave` triggers). VIZ-10 permanent regression guard (Playwright harness across 4 surfaces × 2 projects + within-run pixel-diff via pixelmatch + GitHub Actions CI workflow; ROOT-CAUSE.md documents no-repro Branch B per R-04 — same texture UUID across 5 mount cycles, 14 goldens byte-identical, all 4 Phase 32 defensive-code pieces classified KEEP). Tech-debt sweep verifies 4 carry-over GH issues closed cleanly, deletes orphan `SaveIndicator.tsx`, finishes `effectiveDimensions` → `resolveEffectiveDims` migration with `@deprecated` JSDoc + 3 unused-import cleanups, backfills Phase 29 frontmatter, formally accepts 6 pre-existing vitest failures as permanent in deferred-items.md. 80 commits, +16,588/-242 LOC. Audit `passed_with_carry_over` (AUDIT-01: 3 phases lack VERIFICATION.md → tech debt for v1.9+). Issue #94 (VIZ-10) stays OPEN by design — no-repro ≠ fix.
 
 <details>
@@ -37,50 +42,38 @@ See `.planning/ROADMAP.md` for links to each milestone archive.
 
 </details>
 
-## Current Milestone: v1.9 Polish & Feedback
+## Current Milestone: TBD (v2.0+)
+
+**Status:** v1.9 shipped 2026-04-25 (single-day milestone). Next milestone not yet scoped — run `/gsd:new-milestone` to start v2.0 questioning + research + requirements + roadmap.
+
+**Carry-over tech debt for v2.0 scoping:**
+- AUDIT-01 (recurring across v1.8 + v1.9): phases ship with SUMMARY.md but not formal `VERIFICATION.md`. Substitute evidence is sufficient. Systemic fix worth considering — either accept the SUMMARY-as-substitute pattern formally and update audit-milestone, OR patch `/gsd:execute-phase` to auto-generate a minimal VERIFICATION.md scaffold from the SUMMARY at phase-complete time.
+- 6 pre-existing vitest failures formally permanent (Phase 37 D-02)
+- CI vitest disabled (Phase 36-02 decision)
+- R3F v9 / React 19 upgrade still gated on R3F v9 stability ([#56](https://github.com/micahbank2/room-cad-renderer/issues/56))
+- Phase 999.1 (ceiling drag-resize handles) + Phase 999.3 (full design-effect tile-size override) — re-deferred from v1.9 mid-milestone cancellation; revisit pending demand signal from a future feedback session
+
+**v2.0 starting input curated** (from Phase 39's "GH backlog IS the wishlist" insight):
+- UX polish trio: [#97](https://github.com/micahbank2/room-cad-renderer/issues/97) (Properties panel in 3D/split), [#98](https://github.com/micahbank2/room-cad-renderer/issues/98) (muted text contrast), [#99](https://github.com/micahbank2/room-cad-renderer/issues/99) (Properties panel onboarding)
+- Quick wins: [#100](https://github.com/micahbank2/room-cad-renderer/issues/100) (default templates need ceilings), [#101](https://github.com/micahbank2/room-cad-renderer/issues/101) (SAVED badge size), [#76](https://github.com/micahbank2/room-cad-renderer/issues/76) (`prefers-reduced-motion`)
+- Pascal competitor-insight set: [#79](https://github.com/micahbank2/room-cad-renderer/issues/79), [#80](https://github.com/micahbank2/room-cad-renderer/issues/80), [#78](https://github.com/micahbank2/room-cad-renderer/issues/78), [#77](https://github.com/micahbank2/room-cad-renderer/issues/77)
+- PBR extensions: [#81](https://github.com/micahbank2/room-cad-renderer/issues/81)
+
+<details>
+<summary>v1.9 milestone (now shipped)</summary>
+
+## Previous Milestone: v1.9 Polish & Feedback
 
 **Goal:** Close v1.8 carry-over tech debt, gather real-use feedback to inform v2.0 scoping, and ship the bug-fix actions that emerge from the feedback signal.
 
 **Final shape (after 2026-04-25 mid-milestone re-scope):**
-- ✅ **VERIFICATION.md backfill (POLISH-01 / Phase 38)** — Retroactive verification reports for Phases 35/36/37. Closes AUDIT-01 carry-over from v1.8.
-- ✅ **Real-use feedback signal (FEEDBACK-01 / Phase 39)** — Async 5-question questionnaire (CONTEXT D-08 pivot from in-person hybrid). Result: zero friction reported, zero new wishes beyond GH backlog, all 3 Phase 35 HUMAN-UAT items confirmed.
-- 🔄 **Phase 40 (CEIL-01 — ceiling resize) — CANCELLED** mid-milestone. Jessica reported zero pain on ceilings ("went fine"). Re-deferred to Phase 999.1 backlog for v2.0+ revisit pending demand signal.
-- 🔄 **Phase 41 (TILE-01 — full design-effect tile override) — CANCELLED** mid-milestone. Jessica reported zero pain on texture sizing ("feels right"). Full design-effect feature re-deferred to Phase 999.3 backlog for v2.0+ revisit.
-- ⏳ **Phase 42 (BUG-01) — added** mid-milestone as the v1.9 closer. Closes [GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96) per-surface `tileSizeFt` isolation bug. Real defect, ships regardless of Jessica's signal.
+- ✅ POLISH-01 / Phase 38 — VERIFICATION.md backfill for Phases 35/36/37. Closes v1.8 AUDIT-01.
+- ✅ FEEDBACK-01 / Phase 39 — Async 5-question questionnaire (CONTEXT D-08 pivot). Zero friction reported; all 3 Phase 35 HUMAN-UAT confirmed; 8 GH issues curated as v2.0 scope seeds.
+- 🔄 Phase 40 (CEIL-01) CANCELLED — Jessica reported "ceilings went fine." Re-deferred to Phase 999.1.
+- 🔄 Phase 41 (TILE-01 full design-effect override) CANCELLED — Jessica reported "feels right." Re-deferred to Phase 999.3.
+- ✅ BUG-01 / Phase 42 — Per-surface `Ceiling.scaleFt` isolation. Closes [GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96).
 
-**Phase numbering:** Phases 38, 39, 42 active in v1.9. Phases 40 and 41 are cancelled-in-flight (preserved in audit trail with CANCELLED markers).
-
-**Sequencing intent:** Phase 38 → Phase 39 → mid-milestone re-scope → Phase 42 closes v1.9. Re-scope honors the original milestone hedge ("Phases 40-41 explicitly subject to Phase 39 reordering") rather than building on hypothesis-only after feedback contradicted the hypotheses.
-
-**Out of v1.9:** Lighting controls, walk-mode improvements, layout templates, multi-room navigation, export workflow, AI-assisted layout, mobile/iPad, backend + auth + cloud sync, R3F v9 / React 19 upgrade, per-surface rotation/offset/seam-smoothing — all deferred to v2.0+ pending FEEDBACK-01 results. Plus, post-rescope: full design-effect tile-size override (Phase 999.3) and ceiling drag-resize (Phase 999.1) deferred too.
-
-**Why this milestone, why now:** v1.8 was big and fast (4 phases in 3 days). Real-use signal beats guesswork. The honest outcome — Jessica's signal contradicted two of the three planned features — is itself the milestone's most valuable artifact: it prevented building on hypothesis. v1.9 is small but real.
-
-**Tech debt acknowledged + accepted:**
-- 6 pre-existing vitest failures permanently accepted (Phase 37 D-02); CI vitest stays disabled
-- Phase 26 R3F v9 / React 19 upgrade still gated on R3F v9 stability (#56)
-- v1.9 mid-milestone re-scope is itself a validation of the "Phase 39 first" sequencing — feedback BEFORE feature commit caught the wrong bet before money got spent on it
-
-<details>
-<summary>v1.8 milestone (now shipped)</summary>
-
-## Previous Milestone: v1.8 3D Realism Completion
-
-**Goal:** Close the v1.7 3D Realism story that Phase 32 opened — Jessica can upload photos of real surfaces she's considering, switch camera angles instantly, and never see textures vanish on view toggle. The "SEEING" side of Core Value reaches parity with the 2D editing side.
-
-**Target features:**
-- **User-uploaded textures (#47 → LIB-06/07/08)** — Drop/pick JPEG/PNG/WebP → name + real-world tile size → applies to walls/floors/ceilings. MIME whitelist rejects SVG/GIF. 2048px downscale before persistence. SHA-256 dedup to single IDB entry. Snapshots reference by `userTextureId` only (zero Blobs / data-URLs in snapshot JSON). Orphan-fallback on delete (surface falls back to base hex color, no crash).
-- **Camera presets (#45 → CAM-01/02/03)** — Eye-level (5.5 ft) / top-down (Y = 1.5× max(roomW, roomL)) / 3-quarter / corner via toolbar buttons + `1/2/3/4` hotkeys. ~600ms ease-in-out tween. `activeElement` guard (hotkeys inert while typing). No undo history / autosave pollution on preset switches. Mid-tween switch cancels cleanly.
-- **Tech-debt sweep (DEBT-01..04)** — Close GH #44/#46/#50/#60 with PR references. Delete orphan `src/components/SaveIndicator.tsx`. Finish `effectiveDimensions` → `resolveEffectiveDims` migration (no `PlacedProduct` / `PlacedCustomElement` call sites using legacy resolver). Backfill Phase 29 SUMMARY frontmatter with `EDIT-20, EDIT-21`.
-- **Wallpaper/wallArt 2D↔3D regression investigation (Phase 999.2 promotion)** — Build Playwright instrumentation harness capturing first-mount-upload → unmount → second-mount-attempt → pixel-diff sequence. Identify root cause before any 4th speculative fix (3 prior attempts in Phase 32 Plans 05/06/07 did not resolve). May land as Phase 34's first task or as a separate Phase 37 — decided in plan-phase based on what instrumentation reveals.
-
-**Phase numbering:** continues from 33. Next `/gsd:plan-phase` = 34. Estimated 3–4 phases (34/35/36, optional 37).
-
-**Out of v1.8:** GLTF/OBJ upload (#29 — Out of Scope per PROJECT), cloud sync (#30 — Out of Scope), R3F v9 / React 19 (#56 — deferred per D-02, GH #56). Library follow-ups under GH #89 deferred to polish cycle. Phase 999.1 (ceiling resize handles) deferred.
-
-**Reused foundations from Phase 32:** color-space helper (`sRGBColorSpace` / `NoColorSpace` discipline), refcount-based dispose API, per-mesh `<Suspense>` + `<ErrorBoundary>` pattern, R3F v8 / drei v9 / React 18 lock.
-
-**Why this milestone, why now:** Core Value is "Jessica can SEE her future room with her actual furniture before spending money." v1.0–v1.6 delivered 2D editing + persistence; v1.7.5 closed the visual quality gap; v1.8 finishes the 3D realism story that compounds directly on every prior milestone's work. User-uploaded textures in particular close the last remaining Core-Value gap — letting Jessica see HER actual materials, not just bundled presets.
+**The biggest deliverable:** the mid-milestone re-scope itself. v1.9 honored its own "Phases 40-41 subject to Phase 39 reordering" hedge by acting on it instead of overriding. Pattern validated.
 
 </details>
 
