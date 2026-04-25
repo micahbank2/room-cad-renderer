@@ -116,7 +116,7 @@
 **Requirements:** A11Y-01
 **UI hint:** yes (subtle — observable only with `prefers-reduced-motion: reduce` set)
 **Plans:**
-- [ ] 44-01-sweep — wall-side camera snap + SAVING spinner conditional animate-spin (2 code commits + SUMMARY commit)
+1/1 plans complete
 
 ---
 
@@ -158,7 +158,7 @@
 | ~~41. Per-Surface Tile-Size Override~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.3) |
 | 42. Per-Surface tileSizeFt Bug Fix | 1/1 | Complete   | 2026-04-25 |
 | 43. UI Polish Bundle | 1/1 | Complete   | 2026-04-25 |
-| 44. Reduced-Motion Sweep | 0/1 | In progress | - |
+| 44. Reduced-Motion Sweep | 1/1 | Complete   | 2026-04-25 |
 
 ## Backlog
 
