@@ -126,7 +126,7 @@
 ### Phases
 
 - [x] **Phase 34: User-Uploaded Textures** — Jessica uploads JPEG/PNG/WebP with real-world tile size; applies to walls/floors/ceilings; 2048px downscale + SHA-256 dedup + orphan fallback (completed 2026-04-22)
-- [ ] **Phase 35: Camera Presets** — eye-level / top-down / 3-quarter / corner switchable via toolbar + 1/2/3/4 hotkeys with ~600ms ease-in-out tween, no undo/autosave pollution
+- [x] **Phase 35: Camera Presets** — eye-level / top-down / 3-quarter / corner switchable via toolbar + 1/2/3/4 hotkeys with ~600ms ease-in-out tween, no undo/autosave pollution (completed 2026-04-25)
 - [x] **Phase 36: Wallpaper/wallArt 2D↔3D Regression (VIZ-10)** — instrumentation-first investigation of Phase 32 carry-over regression; Playwright harness captures root cause BEFORE any fix merges (completed 2026-04-24)
 - [ ] **Phase 37: Tech-Debt Sweep** — close GH #44/#46/#50/#60, delete orphan SaveIndicator, finish `resolveEffectiveDims` migration, backfill Phase 29 frontmatter
 
@@ -162,10 +162,10 @@ Plans:
   4. The active preset is visually indicated on its toolbar button (`bg-accent/20 text-accent-light border-accent/30`)
   5. Preset switches do NOT push to undo history (`past.length` unchanged) and do NOT trigger `useAutoSave` (no Blob/MB churn into IDB on every glide)
   6. Switching view modes (2D/3D/split) mid-tween clears the in-flight tween cleanly without throwing or stranding the camera; walk-mode handoff is decided in plan-phase
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 35-01-structure-PLAN.md — cameraPresets.ts pose module + unit tests + uiStore bridge (activePreset + pendingPresetRequest + requestPreset) + Toolbar 4-button lucide cluster + 1/2/3/4 hotkey wiring with full guard chain (Wave 1)
-- [ ] 35-02-motion-PLAN.md — ThreeViewport tween engine (easeInOutCubic + damping toggle + cancel-and-restart + reduced-motion snap + view-mode/walk-mode cleanup) + 3 test drivers (__applyCameraPreset / __getActivePreset / __getCameraPose) + 5 Playwright e2e specs covering CAM-01/02/03 (Wave 2)
+- [x] 35-02-motion-PLAN.md — ThreeViewport tween engine (easeInOutCubic + damping toggle + cancel-and-restart + reduced-motion snap + view-mode/walk-mode cleanup) + 3 test drivers (__applyCameraPreset / __getActivePreset / __getCameraPose) + 5 Playwright e2e specs covering CAM-01/02/03 (Wave 2)
 **UI hint**: yes
 
 #### Phase 36: Wallpaper/wallArt 2D↔3D Regression (VIZ-10)
@@ -205,7 +205,7 @@ Plans:
 | 32. PBR Foundation | 7/7 | Complete    | 2026-04-21 |
 | 33. Design System & UI Polish | 10/10 | Complete    | 2026-04-22 |
 | 34. User-Uploaded Textures | 4/4 | Complete   | 2026-04-22 |
-| 35. Camera Presets | 1/2 | In Progress|  |
+| 35. Camera Presets | 2/2 | Complete   | 2026-04-25 |
 | 36. Wallpaper/wallArt Regression (VIZ-10) | 2/2 | Complete   | 2026-04-24 |
 | 37. Tech-Debt Sweep | 0/0 | Not started | - |
 
