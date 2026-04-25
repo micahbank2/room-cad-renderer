@@ -38,8 +38,8 @@ Final cleanup phase before v1.8 milestone close. Closes the four DEBT requiremen
 - **Reason:** Re-enabling would require fixing the 6 deferred failures first (D-02 says no). Local `npm test` discipline + Playwright on PR is the current contract; no observed problem with that contract.
 
 ### Phase 29 frontmatter backfill
-- **D-04:** Add `requirements: [EDIT-20]` to `.planning/phases/29-editable-dim-labels/29-03-SUMMARY.md` frontmatter. Other Phase 29 SUMMARY files (29-01, 29-02, 29-04) already have the `requirements` field — no further backfill needed.
-- **Reason:** 29-03 was the PropertiesPanel parser prop change supporting the editable-dim-label feature (EDIT-20). 29-01 already has `[EDIT-20, EDIT-21]`; 29-02 has `[EDIT-20]`; 29-04 has `[EDIT-20, EDIT-21]`. Adding EDIT-20 to 29-03 closes the traceability gap that DEBT-04 names.
+- **D-04:** Add `requirements: [EDIT-20, EDIT-21]` to `.planning/phases/29-editable-dim-labels/29-03-SUMMARY.md` frontmatter. Other Phase 29 SUMMARY files (29-01, 29-02, 29-04) already have the `requirements` field — no further backfill needed.
+- **Reason:** 29-03 was the PropertiesPanel parser prop change supporting the editable-dim-label feature. REQUIREMENTS DEBT-04 literally names "EDIT-20 / EDIT-21". Closest siblings 29-01 and 29-04 both use `[EDIT-20, EDIT-21]`; 29-02 uses `[EDIT-20]` only but is the outlier. Matching the REQUIREMENTS literal + canonical siblings keeps the milestone-close audit clean. (Initial draft of D-04 used `[EDIT-20]` only; revised after plan-checker review surfaced the literal-vs-sibling-2 mismatch.)
 
 ### GH issue label hygiene
 - **D-05:** Verify no `in-progress` labels remain on #44/#46/#50/#60. Spot-check at discuss time confirmed no `in-progress` labels visible — verification step in plan should re-confirm and remove any if found.

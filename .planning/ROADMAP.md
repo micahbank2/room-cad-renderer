@@ -185,6 +185,11 @@ Plans:
 **UI hint**: no
 
 #### Phase 37: Tech-Debt Sweep
+**Goal**: Final v1.8 cleanup — close GH #44/#46/#50/#60 verification, delete orphan SaveIndicator, finish effectiveDimensions migration with @deprecated marker, backfill 29-03 frontmatter, document permanent acceptance of 6 pre-existing vitest failures
+**Depends on**: Nothing
+**Requirements**: DEBT-01, DEBT-02, DEBT-03, DEBT-04
+**Plans**:
+- [ ] 37-01-sweep — All 4 DEBT items in one plan (4 atomic commits)
 **Goal**: v1.6 leftover noise is gone — shipped issues are closed on GitHub, dead code is deleted, the resolver migration is complete, and Phase 29 traceability frontmatter is correct
 **Depends on**: Nothing (independent; positioned LAST so it can be cut under scope pressure without leaving features half-shipped)
 **Requirements**: DEBT-01, DEBT-02, DEBT-03, DEBT-04
@@ -207,7 +212,7 @@ Plans:
 | 34. User-Uploaded Textures | 4/4 | Complete   | 2026-04-22 |
 | 35. Camera Presets | 2/2 | Complete   | 2026-04-25 |
 | 36. Wallpaper/wallArt Regression (VIZ-10) | 2/2 | Complete   | 2026-04-24 |
-| 37. Tech-Debt Sweep | 0/0 | Not started | - |
+| 37. Tech-Debt Sweep | 0/1 | In progress | - |
 
 ## Backlog
 
