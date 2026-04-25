@@ -24,7 +24,11 @@
   --color-text-primary: #e3e0f1;
   --color-text-muted: #cac3d7;
   --color-text-dim: #938ea0;
-  --color-text-ghost: #484554;
+  /* Phase 43 (UX-02 / GH #98): bumped from #484554 (~2.0:1 against
+     obsidian-deepest, fails WCAG AA) to #888494 (~5.15:1, passes AA).
+     Affects 124+ existing usages globally. --color-text-dim and
+     --color-text-muted unchanged (already pass AA). */
+  --color-text-ghost: #888494;
 
   /* Semantic */
   --color-success: #22c55e;
