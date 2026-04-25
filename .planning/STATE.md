@@ -1,13 +1,13 @@
 ---
 gsd_state_version: 1.0
-milestone: TBD
-milestone_name: (next milestone — run /gsd:new-milestone for v2.0)
-status: idle
-stopped_at: v1.9 milestone shipped 2026-04-25
-last_updated: "2026-04-25T20:30:00.000Z"
-last_activity: 2026-04-25 -- v1.9 archived
+milestone: v1.10
+milestone_name: Evidence-Driven UX Polish
+status: scoped
+stopped_at: v1.10 scoped 2026-04-25 — ready for /gsd:plan-phase 43
+last_updated: "2026-04-25T20:45:00.000Z"
+last_activity: 2026-04-25 -- v1.10 milestone scoped
 progress:
-  total_phases: 0
+  total_phases: 2
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,17 +17,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-25 — v1.9 archived; awaiting v2.0 scope)
+See: .planning/PROJECT.md (updated 2026-04-25 — v1.10 Evidence-Driven UX Polish scoped)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** none — v1.9 shipped; v2.0 scoping pending
+**Current focus:** v1.10 Evidence-Driven UX Polish — close 5 GH-tracked UX issues with real evidence; skip speculation.
 
 ## Current Position
 
-Milestone: TBD (run `/gsd:new-milestone` to start v2.0 questioning + research + requirements + roadmap)
-Phase: none
+Milestone: v1.10 Evidence-Driven UX Polish
+Phases: 2 (43, 44) — none planned yet
 Plan: none
-Status: Idle — milestone v1.9 shipped 2026-04-25 (3 phases shipped + 2 cancelled mid-milestone, 4 plans, 3/3 reqs, audit passed_with_carry_over)
+Status: Ready for `/gsd:plan-phase 43` (UX-01/02/03 + DEFAULT-01 bundle)
 
 ## Last 2 milestones (summary)
 
