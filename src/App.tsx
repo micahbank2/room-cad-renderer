@@ -31,6 +31,7 @@ import RoomTabs from "@/components/RoomTabs";
 import AddRoomDialog from "@/components/AddRoomDialog";
 import TemplatePickerDialog from "@/components/TemplatePickerDialog";
 import FabricCanvas from "@/canvas/FabricCanvas";
+import { PRESETS } from "@/three/cameraPresets";
 
 const ThreeViewport = lazy(() => import("@/three/ThreeViewport"));
 
@@ -158,6 +159,23 @@ export default function App() {
       // D-03: 'e' toggles camera mode in 3D/split views
       if (e.key.toLowerCase() === "e" && (viewMode === "3d" || viewMode === "split")) {
         useUIStore.getState().toggleCameraMode();
+      }
+      // Phase 35 CAM-01: bare 1/2/3/4 → camera preset dispatch.
+      // Full guard chain (Research §4):
+      //   - activeElement: handled by lines 133-137 above (skipped for INPUT/TEXTAREA/SELECT).
+      //   - Modifier keys: Ctrl+1 / Cmd+1 are browser tab switches — do NOT swallow.
+      //   - D-03: inert outside 3d/split viewMode.
+      //   - D-01: inert in walk mode.
+      {
+        const presetMeta = PRESETS.find((p) => p.key === e.key);
+        if (presetMeta) {
+          if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+          if (viewMode !== "3d" && viewMode !== "split") return;
+          if (useUIStore.getState().cameraMode === "walk") return;
+          useUIStore.getState().requestPreset(presetMeta.id);
+          e.preventDefault();
+          return;
+        }
       }
       // Copy (Ctrl/Cmd+C) — copy selected walls and products to clipboard
       if (e.key.toLowerCase() === "c" && (e.ctrlKey || e.metaKey) && !e.shiftKey) {

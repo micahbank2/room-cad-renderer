@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { ToolType, WallSide } from "@/types/cad";
+import type { PresetId } from "@/three/cameraPresets";
 
 export type HelpSectionId =
   | "getting-started"
@@ -22,6 +23,19 @@ interface UIState {
   activeWallSide: WallSide; // which face of the selected wall is being edited (Phase 17)
   /** When set, 3D viewport should animate camera to face this wall side. */
   wallSideCameraTarget: { wallId: string; side: WallSide; seq: number } | null;
+  /**
+   * Phase 35 CAM-01 (D-02): the last preset Jessica applied. Stays set
+   * across manual OrbitControls drags — only cleared by applying a different
+   * preset. Toolbar reads this for the active-button highlight.
+   */
+  activePreset: PresetId | null;
+  /**
+   * Phase 35 CAM-02 bridge (Research §4 Option B): selectTool-style request
+   * bridge from App.tsx/Toolbar → Scene. Scene useEffect watches this ref
+   * and translates into a preset tween (Plan 35-02). seq increments each
+   * request so back-to-back requests for the same preset still fire.
+   */
+  pendingPresetRequest: { id: PresetId; seq: number } | null;
   showSidebar: boolean;
   /**
    * Phase 33 D-13: bridge flag set by selectTool during an active drag.
@@ -54,6 +68,14 @@ interface UIState {
   setActiveWallSide: (side: WallSide) => void;
   focusWallSide: (wallId: string, side: WallSide) => void;
   clearWallSideCameraTarget: () => void;
+  setActivePreset: (preset: PresetId | null) => void;
+  /**
+   * Phase 35: combined write — sets activePreset AND pendingPresetRequest
+   * in a single set() call. Hotkey handler + Toolbar buttons + test driver
+   * all call this; no code path sets one without the other.
+   */
+  requestPreset: (id: PresetId) => void;
+  clearPendingPresetRequest: () => void;
   toggleSidebar: () => void;
   /** Phase 33 D-13: selectTool calls this at drag start/end. */
   setDragging: (v: boolean) => void;
@@ -76,6 +98,8 @@ export const useUIStore = create<UIState>()((set) => ({
   panOffset: { x: 0, y: 0 },
   activeWallSide: "A",
   wallSideCameraTarget: null,
+  activePreset: null,
+  pendingPresetRequest: null,
   showSidebar: true,
   isDragging: false,
 
@@ -147,6 +171,13 @@ export const useUIStore = create<UIState>()((set) => ({
       wallSideCameraTarget: { wallId, side, seq: (s.wallSideCameraTarget?.seq ?? 0) + 1 },
     })),
   clearWallSideCameraTarget: () => set({ wallSideCameraTarget: null }),
+  setActivePreset: (preset) => set({ activePreset: preset }),
+  requestPreset: (id) =>
+    set((s) => ({
+      activePreset: id,
+      pendingPresetRequest: { id, seq: (s.pendingPresetRequest?.seq ?? 0) + 1 },
+    })),
+  clearPendingPresetRequest: () => set({ pendingPresetRequest: null }),
   toggleSidebar: () => set((s) => ({ showSidebar: !s.showSidebar })),
   setDragging: (v) => set({ isDragging: v }),
 }));

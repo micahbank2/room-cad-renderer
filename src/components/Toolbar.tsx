@@ -5,6 +5,22 @@ import { exportRenderedImage } from "@/lib/export";
 import type { ToolType } from "@/types/cad";
 import Tooltip from "@/components/Tooltip";
 import { InlineEditableText } from "@/components/ui/InlineEditableText";
+import { PRESETS, type PresetId } from "@/three/cameraPresets";
+import {
+  PersonStanding,
+  Map as MapIcon,
+  Box,
+  CornerDownRight,
+  type LucideIcon,
+} from "lucide-react";
+
+// Phase 35 CAM-01 — lucide icon map per PresetId (Phase 33 D-33).
+const PRESET_ICONS: Record<PresetId, LucideIcon> = {
+  "eye-level": PersonStanding,
+  "top-down": MapIcon,
+  "three-quarter": Box,
+  corner: CornerDownRight,
+};
 
 const tools: { id: ToolType; label: string; icon: string }[] = [
   { id: "select", label: "SELECT", icon: "arrow_selector_tool" },
@@ -30,6 +46,8 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
   const futureLen = useCADStore((s) => s.future.length);
   const cameraMode = useUIStore((s) => s.cameraMode);
   const toggleCameraMode = useUIStore((s) => s.toggleCameraMode);
+  const activePreset = useUIStore((s) => s.activePreset);
+  const requestPreset = useUIStore((s) => s.requestPreset);
   const openHelp = useUIStore((s) => s.openHelp);
 
   // Phase 33 GH #88 — inline-edit document title in Toolbar center slot.
@@ -103,6 +121,48 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
             {cameraMode === "orbit" ? "Walk" : "Orbit"}
           </button>
         </Tooltip>
+      )}
+
+      {/* Phase 35 CAM-01 — camera preset cluster (D-06: right of camera-mode toggle,
+          D-03: only mounted in 3d/split, D-01: disabled in walk mode,
+          D-02: active preset persists until another applied). */}
+      {(viewMode === "3d" || viewMode === "split") && (
+        <div
+          className="flex items-center gap-1 mr-6"
+          role="group"
+          aria-label="Camera presets"
+        >
+          {PRESETS.map(({ id, key, label }) => {
+            const Icon = PRESET_ICONS[id];
+            const isActive = activePreset === id;
+            const isWalkMode = cameraMode === "walk";
+            return (
+              <Tooltip
+                key={id}
+                content={isWalkMode ? "Exit walk mode to use presets" : label}
+                shortcut={key}
+                placement="bottom"
+              >
+                <button
+                  data-testid={`preset-${id}`}
+                  onClick={() => {
+                    if (!isWalkMode) requestPreset(id);
+                  }}
+                  disabled={isWalkMode}
+                  aria-label={label}
+                  aria-pressed={isActive}
+                  className={`flex items-center justify-center p-1 rounded-sm transition-colors duration-150 ${
+                    isActive
+                      ? "bg-accent/20 text-accent-light border border-accent/30"
+                      : "text-text-dim hover:text-accent-light border border-transparent"
+                  } ${isWalkMode ? "opacity-40 cursor-not-allowed" : ""}`}
+                >
+                  <Icon size={16} strokeWidth={1.5} />
+                </button>
+              </Tooltip>
+            );
+          })}
+        </div>
       )}
 
       {/* Document title — inline-editable (Phase 33 GH #88) */}

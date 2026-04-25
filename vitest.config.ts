@@ -13,7 +13,12 @@ export default defineConfig({
     environment: "happy-dom",
     globals: true,
     setupFiles: ["./tests/setup.ts"],
-    include: ["tests/**/*.{test,spec}.{ts,tsx}", "src/__tests__/**/*.{test,spec}.{ts,tsx}"],
+    include: [
+      "tests/**/*.{test,spec}.{ts,tsx}",
+      "src/__tests__/**/*.{test,spec}.{ts,tsx}",
+      // Phase 35: allow colocated *.test.ts in src/ (e.g. src/three/cameraPresets.test.ts)
+      "src/**/*.{test,spec}.{ts,tsx}",
+    ],
     // Phase 36 Plan 01: exclude Playwright E2E specs so vitest never tries
     // to run them under happy-dom. Playwright uses real browser IDB, not
     // fake-indexeddb (see 36-RESEARCH.md Pitfall 3).
