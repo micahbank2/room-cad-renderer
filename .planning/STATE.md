@@ -4,8 +4,8 @@ milestone: v1.8
 milestone_name: 3D Realism Completion
 status: executing
 stopped_at: Completed 35-01-structure-PLAN.md
-last_updated: "2026-04-24T23:02:42.427Z"
-last_activity: 2026-04-24
+last_updated: "2026-04-25T02:09:35.722Z"
+last_activity: 2026-04-25 -- Phase 37 execution started
 progress:
   total_phases: 1
   completed_phases: 1
@@ -20,15 +20,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-22 — v1.8 3D Realism Completion started)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 35 — camera-presets
+**Current focus:** Phase 37 — tech-debt-sweep
 
 ## Current Position
 
 Milestone: v1.8 3D Realism Completion
-Phase: 35 (camera-presets) — EXECUTING
-Plan: 2 of 2
-Status: Ready to execute
-Last activity: 2026-04-24
+Phase: 37 (tech-debt-sweep) — EXECUTING
+Plan: 1 of 1
+Status: Executing Phase 37
+Last activity: 2026-04-25 -- Phase 37 execution started
 
 Completed milestones: v1.0, v1.1, v1.2, v1.3, v1.4, v1.5, v1.6, v1.7.5 (all archived in `.planning/milestones/`)
 Partial: v1.7 3D Realism — Phase 32 PBR Foundation shipped 2026-04-21; remainder absorbed into v1.8 as Phases 34–37

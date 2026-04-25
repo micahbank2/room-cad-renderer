@@ -1,3 +1,35 @@
+---
+phase: 29
+plan: 03
+subsystem: properties-panel
+tags: [parser, properties-panel, feet-inches, edit-20, edit-21, wave-2]
+requirements: [EDIT-20, EDIT-21]
+requires:
+  - 29-02 (validateInput + overlay polish)
+provides:
+  - EditableRow accepts parser prop; LENGTH row commits via feet+inches grammar
+  - Commit guard tightened (silent-cancel on null/NaN, abs-epsilon no-op guard)
+  - flushSync wrap on startEdit for deterministic DOM mount
+  - Stable recentPaints selector (Rule-3 auto-fix; resolves React 18 getSnapshot warning)
+affects:
+  - src/components/PropertiesPanel.tsx
+  - src/components/SwatchPicker.tsx
+tech_stack:
+  added: []
+  patterns: [optional-parser-prop, silent-cancel-on-invalid, abs-epsilon-no-op-guard, flushSync-DOM-determinism]
+key_files:
+  created: []
+  modified:
+    - src/components/PropertiesPanel.tsx
+    - src/components/SwatchPicker.tsx
+decisions:
+  - LENGTH row gets the parser prop; THICKNESS / HEIGHT keep their decimal-only path (D-05, D-05a, D-05b).
+  - Input type toggles to "text" when parser is supplied — prevents browser's number-input rejection of feet+inches notation.
+  - abs-epsilon (1e-6) no-op guard prevents formatFeet round-trip floats from creating spurious undo entries on no-op opens.
+  - SwatchPicker selector fix landed inline as Rule-3 sanctioned auto-fix; one-line stability fix, blast radius zero.
+backfilled: 2026-04-25 (Phase 37 DEBT-04 — frontmatter was missing on the original commit)
+---
+
 # Phase 29 Plan 03 — SUMMARY
 
 **Plan:** 29-03 EditableRow parser prop + LENGTH feet+inches opt-in

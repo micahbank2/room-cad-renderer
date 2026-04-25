@@ -30,7 +30,7 @@ import type {
   CustomElement,
 } from "@/types/cad";
 import type { Product } from "@/types/product";
-import { effectiveDimensions, resolveEffectiveDims, resolveEffectiveCustomDims } from "@/types/product";
+import { resolveEffectiveDims, resolveEffectiveCustomDims } from "@/types/product";
 
 // ---------------------------------------------------------------------------
 // Public constants

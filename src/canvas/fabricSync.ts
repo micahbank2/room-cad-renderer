@@ -7,7 +7,7 @@ import type {
   PlacedCustomElement,
 } from "@/types/cad";
 import type { Product } from "@/types/product";
-import { effectiveDimensions, hasDimensions, resolveEffectiveDims, resolveEffectiveCustomDims } from "@/types/product";
+import { hasDimensions, resolveEffectiveDims, resolveEffectiveCustomDims } from "@/types/product";
 import { wallCorners, angle as wallAngle } from "@/lib/geometry";
 import { getWallHandleWorldPos } from "./wallRotationHandle";
 import { drawWallDimension } from "./dimensions";

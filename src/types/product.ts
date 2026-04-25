@@ -34,6 +34,12 @@ export function hasDimensions(p: Product): boolean {
 /**
  * Returns effective render dimensions for a product.
  * If product is undefined (orphan) OR any dim is null, returns 2x2x2 + isPlaceholder:true.
+ *
+ * @deprecated Use {@link resolveEffectiveDims} instead. The legacy
+ * `effectiveDimensions(product, scale)` form does not honor per-placement
+ * `widthFtOverride` / `depthFtOverride` from Phase 31. New call sites must
+ * use `resolveEffectiveDims(product, placedProduct)`. Retained only for
+ * catalog-context placement-preview paths that have no `PlacedProduct` yet.
  */
 export function effectiveDimensions(
   p: Product | undefined | null,
