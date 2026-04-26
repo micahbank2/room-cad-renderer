@@ -30,7 +30,7 @@ source: Pascal Editor competitive audit (.planning/competitive/pascal-audit.md);
 
 ### Auto-Generated Material Swatch Thumbnails (THUMB)
 
-- [ ] **THUMB-01** — Material picker swatches are auto-rendered from the live PBR/material pipeline rather than hand-curated static images. Source: [#77](https://github.com/micahbank2/room-cad-renderer/issues/77).
+- [x] **THUMB-01** — Material picker swatches are auto-rendered from the live PBR/material pipeline rather than hand-curated static images. Source: [#77](https://github.com/micahbank2/room-cad-renderer/issues/77).
   - **Verifiable:** Open any material picker (FloorMaterialPicker, SwatchPicker, ceiling material picker via SurfaceMaterialPicker) → each swatch tile renders the actual material that will apply when selected (correct color/tone/PBR feel for the size of the tile). Adding a new material to `src/data/surfaceMaterials.ts` (or equivalent) does NOT require committing a new PNG asset — the swatch generates from the material definition.
   - **Acceptance:** Renderer-driven thumbnail generation (small offscreen R3F or WebGL canvas, or static-shader fallback for non-PBR materials). Cached per-material so each picker render does not re-paint. Cache invalidates on material edit. Loading state graceful — placeholder hex swatch while async render completes (re-uses Phase 32 `<Suspense>` + `<ErrorBoundary>` pattern).
 

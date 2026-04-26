@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { materialsForSurface } from "@/data/surfaceMaterials";
 import { CategoryTabs, type CategoryTab } from "@/components/library/CategoryTabs";
 import { MyTexturesList } from "@/components/MyTexturesList";
 import { useUserTextures } from "@/hooks/useUserTextures";
+import { generateBatch } from "@/three/swatchThumbnailGenerator";
+import { MaterialThumbnail } from "@/components/MaterialThumbnail";
 
 interface Props {
   surface: "floor" | "ceiling";
@@ -27,6 +29,18 @@ export default function SurfaceMaterialPicker({
   const { textures } = useUserTextures();
   const [activeTab, setActiveTab] = useState<string>("presets");
 
+  // Phase 45 THUMB-01: warm the thumbnail cache for every visible swatch on
+  // mount / surface change. Fire-and-forget — each MaterialThumbnail re-renders
+  // independently as its own generateThumbnail() resolves. The .catch() is a
+  // belt-and-suspenders guard for environments without WebGL (jsdom/happy-dom
+  // test runs, or hostile browser contexts). MaterialThumbnail will still show
+  // its solid hex placeholder if the cache stays empty (D-06 / D-07).
+  useEffect(() => {
+    generateBatch(materials).catch(() => {
+      /* swallow — placeholder tiles remain visible as designed */
+    });
+  }, [materials]);
+
   const showTextureTab = Boolean(onSelectUserTexture);
 
   const grid = (
@@ -44,10 +58,7 @@ export default function SurfaceMaterialPicker({
                 : "border-outline-variant/20 hover:border-outline-variant/40",
             ].join(" ")}
           >
-            <div
-              className="w-full aspect-square rounded-sm"
-              style={{ backgroundColor: m.color }}
-            />
+            <MaterialThumbnail materialId={m.id} fallbackColor={m.color} />
             <span className="font-mono text-[8px] text-text-dim block mt-1 truncate">
               {m.label}
             </span>

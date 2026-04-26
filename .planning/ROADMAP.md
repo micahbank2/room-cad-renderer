@@ -114,7 +114,9 @@
 **Depends on:** Phase 32 PBR foundation (texture cache, color-space helper); existing `surfaceMaterials.ts` data + picker components.
 **Requirements:** THUMB-01
 **UI hint:** yes (visible in FloorMaterialPicker / SwatchPicker / ceiling material picker)
-**Plans:** TBD (est. 1-2 plans; offscreen R3F renderer + per-material cache + Suspense fallback)
+**Plans:** 2/2 plans complete
+- [x] 45-01-PLAN.md — Renderer + cache module (`swatchThumbnailGenerator.ts`) + Wave 0 vitest
+- [x] 45-02-PLAN.md — `MaterialThumbnail` component + `SurfaceMaterialPicker` wiring + Wave 0 vitest
 
 #### Phase 46: Rooms Hierarchy Sidebar Tree (TREE-01)
 **Goal:** Sidebar gains a Rooms tree — collapsible per-room, nested children (walls/ceilings/products/custom-elements), click-to-focus, per-node visibility toggle.
@@ -158,7 +160,7 @@
 | 42. Per-Surface tileSizeFt Bug Fix | 1/1 | Complete   | 2026-04-25 |
 | 43. UI Polish Bundle | 1/1 | Complete   | 2026-04-25 |
 | 44. Reduced-Motion Sweep | 1/1 | Complete   | 2026-04-25 |
-| 45. Auto-Gen Material Swatch Thumbnails | 0/0 | Not started | - |
+| 45. Auto-Gen Material Swatch Thumbnails | 2/2 | Complete    | 2026-04-26 |
 | 46. Rooms Hierarchy Sidebar Tree | 0/0 | Not started | - |
 | 47. Room Display Modes | 0/0 | Not started | - |
 | 48. Per-Node Saved Camera + Focus | 0/0 | Not started | - |
