@@ -170,7 +170,7 @@
 | 44. Reduced-Motion Sweep | 1/1 | Complete   | 2026-04-25 |
 | 45. Auto-Gen Material Swatch Thumbnails | 2/2 | Complete    | 2026-04-26 |
 | 46. Rooms Hierarchy Sidebar Tree | 4/4 | Complete    | 2026-04-26 |
-| 47. Room Display Modes | 3/3 | Complete   | 2026-04-26 |
+| 47. Room Display Modes | 3/3 | Complete    | 2026-04-26 |
 | 48. Per-Node Saved Camera + Focus | 0/0 | Not started | - |
 
 ## Backlog
