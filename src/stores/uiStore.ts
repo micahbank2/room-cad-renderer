@@ -2,6 +2,27 @@ import { create } from "zustand";
 import type { ToolType, WallSide } from "@/types/cad";
 import type { PresetId } from "@/three/cameraPresets";
 
+/** Phase 47 D-05: localStorage key for displayMode persistence. */
+const GSD_DISPLAY_MODE_KEY = "gsd:displayMode";
+const VALID_DISPLAY_MODES = ["normal", "solo", "explode"] as const;
+type DisplayMode = (typeof VALID_DISPLAY_MODES)[number];
+
+/**
+ * Phase 47 D-05: synchronous lazy read at store-creation time.
+ * SSR-safe via typeof window guard; quota/privacy mode falls back to "normal".
+ */
+function readDisplayMode(): DisplayMode {
+  if (typeof window === "undefined") return "normal";
+  try {
+    const v = window.localStorage.getItem(GSD_DISPLAY_MODE_KEY);
+    return (VALID_DISPLAY_MODES as readonly string[]).includes(v ?? "")
+      ? (v as DisplayMode)
+      : "normal";
+  } catch {
+    return "normal";
+  }
+}
+
 export type HelpSectionId =
   | "getting-started"
   | "shortcuts"
@@ -101,6 +122,15 @@ interface UIState {
     target: [number, number, number],
   ) => void;
   clearPendingCameraTarget: () => void;
+
+  /**
+   * Phase 47 D-02: NORMAL/SOLO/EXPLODE display mode for 3D viewport.
+   * View-state only — NO cadStore mutations, NO undo entries, NO autosave triggers.
+   * Persisted to localStorage["gsd:displayMode"] (D-05).
+   */
+  displayMode: "normal" | "solo" | "explode";
+  /** Phase 47 D-02 + D-05: setter writes to localStorage as a side effect. */
+  setDisplayMode: (mode: "normal" | "solo" | "explode") => void;
 }
 
 const MIN_ZOOM = 0.25;
@@ -126,6 +156,7 @@ export const useUIStore = create<UIState>()((set) => ({
   isDragging: false,
   hiddenIds: new Set<string>(),
   pendingCameraTarget: null,
+  displayMode: readDisplayMode(),
 
   setTool: (tool) => set({ activeTool: tool, selectedIds: [] }),
   select: (ids) => set({ selectedIds: ids }),
@@ -227,4 +258,13 @@ export const useUIStore = create<UIState>()((set) => ({
       },
     })),
   clearPendingCameraTarget: () => set({ pendingCameraTarget: null }),
+  setDisplayMode: (mode) => {
+    set({ displayMode: mode });
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(GSD_DISPLAY_MODE_KEY, mode);
+    } catch {
+      // quota / privacy mode — silently swallow per Phase 35 / uiPersistence convention
+    }
+  },
 }));

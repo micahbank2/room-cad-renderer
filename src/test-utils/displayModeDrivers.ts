@@ -1,6 +1,6 @@
 // src/test-utils/displayModeDrivers.ts
 // Phase 47: window-level drivers for e2e + RTL access. Gated by MODE === "test".
-// Plan 02 fills the bodies; Plan 01 declares the API.
+import { useUIStore } from "@/stores/uiStore";
 
 declare global {
   interface Window {
@@ -9,16 +9,21 @@ declare global {
   }
 }
 
+/**
+ * Phase 47: window-level drivers for e2e + test access.
+ * Gated by import.meta.env.MODE === "test"; production no-op.
+ */
 export function installDisplayModeDrivers(): void {
   if (typeof window === "undefined") return;
   if (import.meta.env.MODE !== "test") return;
-  const unimpl = (name: string) => () => {
-    throw new Error(`displayModeDrivers.${name} unimplemented — Plan 47-02 wires this`);
+
+  window.__driveDisplayMode = (mode) => {
+    useUIStore.getState().setDisplayMode(mode);
   };
-  window.__driveDisplayMode = unimpl("driveDisplayMode") as Window["__driveDisplayMode"];
-  window.__getDisplayMode = (() => {
-    throw new Error("displayModeDrivers.getDisplayMode unimplemented — Plan 47-02 wires this");
-  }) as Window["__getDisplayMode"];
+
+  window.__getDisplayMode = () => {
+    return useUIStore.getState().displayMode;
+  };
 }
 
 export {};
