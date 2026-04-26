@@ -1,4 +1,39 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
+
+const SNAPSHOT = {
+  version: 2,
+  rooms: {
+    room_main: {
+      id: "room_main",
+      name: "Main Room",
+      room: { width: 20, length: 16, wallHeight: 8 },
+      walls: {
+        wall_1: {
+          id: "wall_1",
+          start: { x: 2, y: 2 },
+          end: { x: 18, y: 2 },
+          thickness: 0.5,
+          height: 8,
+          openings: [],
+        },
+      },
+      placedProducts: {},
+      placedCustomElements: {},
+    },
+  },
+  activeRoomId: "room_main",
+};
+
+async function seedAndEnter3D(page: Page): Promise<void> {
+  // The `loadSnapshot` call only mutates in-memory state — it does NOT survive
+  // page.reload(). Tests that reload must call this helper again afterwards
+  // so the WelcomeScreen gets bypassed and the Toolbar is visible.
+  await page.evaluate(async (snap) => {
+    // @ts-expect-error — window.__cadStore installed in test mode
+    (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } }).__cadStore.getState().loadSnapshot(snap);
+  }, SNAPSHOT);
+  await page.getByTestId("view-mode-3d").click();
+}
 
 test.describe("Phase 47 — display-mode cycle (DISPLAY-01)", () => {
   test.beforeEach(async ({ page }) => {
@@ -16,39 +51,7 @@ test.describe("Phase 47 — display-mode cycle (DISPLAY-01)", () => {
     });
 
     await page.goto("/");
-
-    // Seed a project with one wall — bypasses WelcomeScreen (App.tsx
-    // setHasStarted gate is wallCount>0 OR placedCount>0).
-    await page.evaluate(async () => {
-      // @ts-expect-error — window.__cadStore installed in test mode
-      (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } }).__cadStore.getState().loadSnapshot({
-        version: 2,
-        rooms: {
-          room_main: {
-            id: "room_main",
-            name: "Main Room",
-            room: { width: 20, length: 16, wallHeight: 8 },
-            walls: {
-              wall_1: {
-                id: "wall_1",
-                start: { x: 2, y: 2 },
-                end: { x: 18, y: 2 },
-                thickness: 0.5,
-                height: 8,
-                openings: [],
-              },
-            },
-            placedProducts: {},
-            placedCustomElements: {},
-          },
-        },
-        activeRoomId: "room_main",
-      });
-    });
-
-    // Wait for the Toolbar to mount, then switch to 3D view so the
-    // display-mode segmented control is visible (D-01 gate).
-    await page.getByTestId("view-mode-3d").click();
+    await seedAndEnter3D(page);
 
     // Reset displayMode to default-normal entry for each test.
     await page.evaluate(() => localStorage.removeItem("gsd:displayMode"));
@@ -79,9 +82,9 @@ test.describe("Phase 47 — display-mode cycle (DISPLAY-01)", () => {
 
     await page.reload();
     await page.emulateMedia({ reducedMotion: "reduce" });
-
-    // After reload, App boots in 2D — switch to 3D so the buttons are visible again.
-    await page.getByTestId("view-mode-3d").click();
+    // Snapshot is in-memory only; re-seed so WelcomeScreen is bypassed
+    // and the Toolbar (with view-mode + display-mode buttons) renders.
+    await seedAndEnter3D(page);
 
     const restoredMode = await page.evaluate(() => (window as { __getDisplayMode?: () => string }).__getDisplayMode?.());
     expect(restoredMode).toBe("solo");
@@ -92,7 +95,7 @@ test.describe("Phase 47 — display-mode cycle (DISPLAY-01)", () => {
     await page.evaluate(() => localStorage.setItem("gsd:displayMode", "BLAHBLAH"));
     await page.reload();
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.getByTestId("view-mode-3d").click();
+    await seedAndEnter3D(page);
 
     const mode = await page.evaluate(() => (window as { __getDisplayMode?: () => string }).__getDisplayMode?.());
     expect(mode).toBe("normal");
