@@ -42,7 +42,7 @@ source: Pascal Editor competitive audit (.planning/competitive/pascal-audit.md);
 
 ### Room Display Modes (DISPLAY)
 
-- [ ] **DISPLAY-01** — Toolbar (or sidebar) gains a display-mode selector: NORMAL (default — all rooms render), SOLO (only the active room renders, others hidden), EXPLODE (all rooms render with positional offsets so they don't overlap visually — axonometric "exploded" feel). Source: [#80](https://github.com/micahbank2/room-cad-renderer/issues/80).
+- [x] **DISPLAY-01** — Toolbar (or sidebar) gains a display-mode selector: NORMAL (default — all rooms render), SOLO (only the active room renders, others hidden), EXPLODE (all rooms render with positional offsets so they don't overlap visually — axonometric "exploded" feel). Source: [#80](https://github.com/micahbank2/room-cad-renderer/issues/80).
   - **Verifiable:** With 3+ rooms in a project, switch the display mode → 3D viewport changes correspondingly. SOLO hides all but `activeRoomId`. EXPLODE preserves all rooms but offsets them along an axis so they read as separate volumes (matches Pascal's "exploded layout" concept). NORMAL is the existing render. Switching modes is instant — no tween (D-39 reduced-motion: snap; design choice: this is a structural mode change, not a transition).
   - **Acceptance:** New `uiStore.displayMode: "normal" | "solo" | "explode"` field (default `"normal"`). Three toggles in Toolbar (or appropriate UI surface — picker decided in CONTEXT). EXPLODE math: each room offset by `(roomBboxWidth × index)` along X-axis, stacked spacing decided in CONTEXT. Hidden rooms (SOLO mode) skipped at the `Object.values(rooms).map` level in ThreeViewport. View-state only — no cadStore mutations, no undo entries, no autosave triggers.
 

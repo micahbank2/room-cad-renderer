@@ -134,9 +134,9 @@
 **Depends on:** Phase 46 (rooms tree provides "active room" semantic); existing `uiStore.cameraMode` pattern (mirror for `displayMode`).
 **Requirements:** DISPLAY-01
 **UI hint:** yes (new toggle in Toolbar or sidebar)
-**Plans:** 3 plans (Wave 0 RED scaffolding + Wave 1 logic/3D + Wave 1 toolbar UI)
+**Plans:** 1/3 plans executed
 **Plans:**
-- [ ] 47-01-PLAN.md — Wave 0 RED scaffolding (4 test files + 2 source stubs at canonical paths)
+- [x] 47-01-PLAN.md — Wave 0 RED scaffolding (4 test files + 2 source stubs at canonical paths)
 - [ ] 47-02-PLAN.md — Wave 1 uiStore.displayMode + multi-room ThreeViewport refactor (RoomGroup, computeRoomOffsets)
 - [ ] 47-03-PLAN.md — Wave 1 Toolbar 3-button segmented control (NORMAL/SOLO/EXPLODE)
 
@@ -170,7 +170,7 @@
 | 44. Reduced-Motion Sweep | 1/1 | Complete   | 2026-04-25 |
 | 45. Auto-Gen Material Swatch Thumbnails | 2/2 | Complete    | 2026-04-26 |
 | 46. Rooms Hierarchy Sidebar Tree | 4/4 | Complete    | 2026-04-26 |
-| 47. Room Display Modes | 0/0 | Not started | - |
+| 47. Room Display Modes | 1/3 | In Progress|  |
 | 48. Per-Node Saved Camera + Focus | 0/0 | Not started | - |
 
 ## Backlog
