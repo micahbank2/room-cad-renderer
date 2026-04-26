@@ -124,6 +124,20 @@ interface UIState {
   clearPendingCameraTarget: () => void;
 
   /**
+   * Phase 48 CAM-04: cross-component camera-capture bridge. ThreeViewport
+   * installs this getter on Scene mount via installCameraCapture; PropertiesPanel
+   * reads it from outside the R3F Canvas tree to capture the live OrbitControls
+   * pose at Save-button click time. Null when no Scene is mounted (e.g. viewMode === "2d").
+   */
+  getCameraCapture: (() => { pos: [number, number, number]; target: [number, number, number] } | null) | null;
+  /** Phase 48 CAM-04: ThreeViewport calls this on Scene mount with a capture closure. */
+  installCameraCapture: (
+    fn: () => { pos: [number, number, number]; target: [number, number, number] } | null,
+  ) => void;
+  /** Phase 48 CAM-04: ThreeViewport calls this on Scene unmount. */
+  clearCameraCapture: () => void;
+
+  /**
    * Phase 47 D-02: NORMAL/SOLO/EXPLODE display mode for 3D viewport.
    * View-state only — NO cadStore mutations, NO undo entries, NO autosave triggers.
    * Persisted to localStorage["gsd:displayMode"] (D-05).
@@ -156,6 +170,7 @@ export const useUIStore = create<UIState>()((set) => ({
   isDragging: false,
   hiddenIds: new Set<string>(),
   pendingCameraTarget: null,
+  getCameraCapture: null,
   displayMode: readDisplayMode(),
 
   setTool: (tool) => set({ activeTool: tool, selectedIds: [] }),
@@ -258,6 +273,8 @@ export const useUIStore = create<UIState>()((set) => ({
       },
     })),
   clearPendingCameraTarget: () => set({ pendingCameraTarget: null }),
+  installCameraCapture: (fn) => set({ getCameraCapture: fn }),
+  clearCameraCapture: () => set({ getCameraCapture: null }),
   setDisplayMode: (mode) => {
     set({ displayMode: mode });
     if (typeof window === "undefined") return;
