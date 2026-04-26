@@ -68,6 +68,14 @@ test.describe("Phase 48 — saved-camera Save → Focus cycle (CAM-04)", () => {
     });
     expect(productId).not.toBeNull();
 
+    // Wait for ThreeViewport's Scene useEffect to install camera capture +
+    // __getCameraPose drivers. Until this lands, __setTestCamera is a no-op
+    // and __getCameraPose returns null.
+    await page.waitForFunction(
+      () => typeof (window as unknown as { __getCameraPose?: unknown }).__getCameraPose === "function",
+      { timeout: 10_000 },
+    );
+
     // Set a known camera pose.
     await page.evaluate(([pos, target]) => {
       (window as unknown as { __setTestCamera?: (p: { position: [number,number,number]; target: [number,number,number] }) => void }).__setTestCamera?.({ position: pos, target });
@@ -95,6 +103,10 @@ test.describe("Phase 48 — saved-camera Save → Focus cycle (CAM-04)", () => {
     await page.evaluate((id) => {
       (window as unknown as { __driveFocusNode?: (id: string) => void }).__driveFocusNode?.(id);
     }, productId!);
+
+    // Phase 46's pendingCameraTarget useEffect runs on the next React tick;
+    // give the snap a frame to propagate before reading camera pose.
+    await page.waitForTimeout(100);
 
     // Under reduced-motion, the camera snaps. Assert pose matches saved tuple.
     const post = await page.evaluate(() => {
