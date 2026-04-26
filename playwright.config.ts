@@ -15,7 +15,10 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: "./tests/e2e/specs",
+  // Phase 46: Phase 36 specs live in tests/e2e/specs/; Phase 46 tree specs live
+  // in e2e/ at repo root (VALIDATION.md canonical paths). testMatch covers both.
+  testDir: ".",
+  testMatch: ["tests/e2e/specs/**/*.spec.ts", "e2e/**/*.spec.ts"],
   // Texture caches are module-level singletons — isolate serial.
   fullyParallel: false,
   workers: 1,
