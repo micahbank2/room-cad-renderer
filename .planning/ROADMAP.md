@@ -134,7 +134,11 @@
 **Depends on:** Phase 46 (rooms tree provides "active room" semantic); existing `uiStore.cameraMode` pattern (mirror for `displayMode`).
 **Requirements:** DISPLAY-01
 **UI hint:** yes (new toggle in Toolbar or sidebar)
-**Plans:** TBD (est. 1 plan; uiStore field + ThreeViewport rooms-render branch + toolbar UI)
+**Plans:** 3 plans (Wave 0 RED scaffolding + Wave 1 logic/3D + Wave 1 toolbar UI)
+**Plans:**
+- [ ] 47-01-PLAN.md — Wave 0 RED scaffolding (4 test files + 2 source stubs at canonical paths)
+- [ ] 47-02-PLAN.md — Wave 1 uiStore.displayMode + multi-room ThreeViewport refactor (RoomGroup, computeRoomOffsets)
+- [ ] 47-03-PLAN.md — Wave 1 Toolbar 3-button segmented control (NORMAL/SOLO/EXPLODE)
 
 #### Phase 48: Per-Node Saved Camera + Focus Action (CAM-04)
 **Goal:** Each placed product / wall / ceiling can have a bookmarked camera angle. Double-click in tree (or right-click context menu) jumps camera there via Phase 35 easeInOutCubic tween.
