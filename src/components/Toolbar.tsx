@@ -12,6 +12,9 @@ import {
   Map as MapIcon,
   Box,
   CornerDownRight,
+  LayoutGrid,
+  Square,
+  Move3d,
   type LucideIcon,
 } from "lucide-react";
 
@@ -22,6 +25,13 @@ const PRESET_ICONS: Record<PresetId, LucideIcon> = {
   "three-quarter": Box,
   corner: CornerDownRight,
 };
+
+/** Phase 47 D-09: display-mode segmented-control config. */
+const DISPLAY_MODES = [
+  { id: "normal" as const,  label: "NORMAL",  Icon: LayoutGrid, tooltip: "All rooms render together" },
+  { id: "solo" as const,    label: "SOLO",    Icon: Square,     tooltip: "Only the active room renders" },
+  { id: "explode" as const, label: "EXPLODE", Icon: Move3d,     tooltip: "Rooms separated along X-axis" },
+];
 
 const tools: { id: ToolType; label: string; icon: string }[] = [
   { id: "select", label: "SELECT", icon: "arrow_selector_tool" },
@@ -38,7 +48,7 @@ interface Props {
   onFloorPlanClick?: () => void;
 }
 
-export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Props) {
+export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Props) {
   const activeTool = useUIStore((s) => s.activeTool);
   const setTool = useUIStore((s) => s.setTool);
   const undo = useCADStore((s) => s.undo);
@@ -50,6 +60,9 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
   const activePreset = useUIStore((s) => s.activePreset);
   const requestPreset = useUIStore((s) => s.requestPreset);
   const openHelp = useUIStore((s) => s.openHelp);
+  // Phase 47 D-02: displayMode subscriptions
+  const displayMode = useUIStore((s) => s.displayMode);
+  const setDisplayMode = useUIStore((s) => s.setDisplayMode);
 
   // Phase 33 GH #88 — inline-edit document title in Toolbar center slot.
   // Live-preview writes go to `draftName` (auto-save does NOT subscribe);
@@ -166,6 +179,38 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
         </div>
       )}
 
+      {/* Phase 47 D-01/D-09: display-mode segmented control — only in 3d/split */}
+      {(viewMode === "3d" || viewMode === "split") && (
+        <div
+          className="flex items-center gap-1 mr-6"
+          role="group"
+          aria-label="Display mode"
+        >
+          {DISPLAY_MODES.map(({ id, label, Icon, tooltip }) => {
+            const isActive = displayMode === id;
+            return (
+              <Tooltip key={id} content={tooltip} placement="bottom">
+                <button
+                  data-testid={`display-mode-${id}`}
+                  onClick={() => setDisplayMode(id)}
+                  aria-label={label}
+                  aria-pressed={isActive}
+                  title={tooltip}
+                  className={`flex items-center justify-center gap-1 px-2 py-1 rounded-sm font-mono text-sm transition-colors duration-150 border ${
+                    isActive
+                      ? "bg-accent/10 text-accent border-accent/30"
+                      : "text-text-dim hover:text-accent-light border-transparent"
+                  }`}
+                >
+                  <Icon size={14} strokeWidth={1.5} />
+                  <span>{label}</span>
+                </button>
+              </Tooltip>
+            );
+          })}
+        </div>
+      )}
+
       {/* Document title — inline-editable (Phase 33 GH #88) */}
       <div className="flex-1 flex items-center justify-center min-w-0 px-4">
         <InlineEditableText
@@ -246,6 +291,8 @@ export default function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanCli
     </header>
   );
 }
+
+export default Toolbar;
 
 const TOOL_SHORTCUTS: Record<ToolType, string> = {
   select: "V",
