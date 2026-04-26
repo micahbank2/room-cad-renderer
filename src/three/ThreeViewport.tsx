@@ -3,18 +3,13 @@ import { Suspense, useRef, useEffect, useState, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, PointerLockControls } from "@react-three/drei";
 import { registerRenderer } from "./pbrTextureCache";
-import { useCADStore, useActiveRoom, useActiveRoomDoc, useActiveWalls, useActivePlacedProducts, useActiveCeilings, useActivePlacedCustomElements, useCustomElements } from "@/stores/cadStore";
+import { useCADStore, useActiveRoom, useCustomElements } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import type { Product } from "@/types/product";
 import { angle as wallAngleRad } from "@/lib/geometry";
-import WallMesh from "./WallMesh";
-import ProductMesh from "./ProductMesh";
-import CeilingMesh from "./CeilingMesh";
-import FloorMesh from "./FloorMesh";
-import CustomElementMesh from "./CustomElementMesh";
 import Lighting from "./Lighting";
+import { RoomGroup, computeRoomOffsets } from "./RoomGroup";
 import WalkCameraController from "./WalkCameraController";
-import { getFloorTexture } from "./floorTexture";
 import { GestureChip } from "@/components/ui/GestureChip";
 import { getPresetPose, type PresetId } from "@/three/cameraPresets";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -51,14 +46,9 @@ interface Props {
 }
 
 function Scene({ productLibrary }: Props) {
+  // Keep active room for camera presets, walk-mode bounds, grid centering.
   const room = useActiveRoom() ?? { width: 20, length: 16, wallHeight: 8 };
-  const walls = useActiveWalls();
-  const placedProducts = useActivePlacedProducts();
-  const ceilings = useActiveCeilings();
-  const placedCustoms = useActivePlacedCustomElements();
   const customCatalog = useCustomElements();
-  const activeDoc = useActiveRoomDoc();
-  const floorMaterial = activeDoc?.floorMaterial;
   const selectedIds = useUIStore((s) => s.selectedIds);
   const cameraMode = useUIStore((s) => s.cameraMode);
   const wallSideCameraTarget = useUIStore((s) => s.wallSideCameraTarget);
@@ -71,40 +61,18 @@ function Scene({ productLibrary }: Props) {
   const activeRoomId = useCADStore((s) => s.activeRoomId);
   const pendingCameraTarget = useUIStore((s) => s.pendingCameraTarget);
 
-  // Phase 46 D-11/D-12: build effective-hidden set once per render.
-  // Cascade: room hidden -> all leaves; group hidden -> all leaves of that group;
-  // per-leaf ids from hiddenIds stay as-is. Phase 47 SOLO/EXPLODE will compose
-  // AT ROOM LEVEL above this leaf-level filter (Pitfall 7).
-  const effectivelyHidden = useMemo(() => {
-    const out = new Set<string>();
-    if (!activeRoomId) return out;
-    if (hiddenIds.has(activeRoomId)) {
-      Object.values(walls).forEach((w) => out.add(w.id));
-      Object.values(placedProducts).forEach((p) => out.add(p.id));
-      Object.values(ceilings).forEach((c) => out.add(c.id));
-      Object.values(placedCustoms).forEach((p) => out.add(p.id));
-      return out;
-    }
-    if (hiddenIds.has(`${activeRoomId}:walls`)) {
-      Object.values(walls).forEach((w) => out.add(w.id));
-    }
-    if (hiddenIds.has(`${activeRoomId}:ceiling`)) {
-      Object.values(ceilings).forEach((c) => out.add(c.id));
-    }
-    if (hiddenIds.has(`${activeRoomId}:products`)) {
-      Object.values(placedProducts).forEach((p) => out.add(p.id));
-    }
-    if (hiddenIds.has(`${activeRoomId}:custom`)) {
-      Object.values(placedCustoms).forEach((p) => out.add(p.id));
-    }
-    for (const id of hiddenIds) out.add(id);
-    return out;
-  }, [hiddenIds, activeRoomId, walls, placedProducts, ceilings, placedCustoms]);
+  // Phase 47 D-02: multi-room render gate.
+  const rooms = useCADStore((s) => s.rooms);
+  const displayMode = useUIStore((s) => s.displayMode);
+
+  // Phase 47 D-03: per-room X offsets (cumulative sum for EXPLODE; 0 for NORMAL/SOLO).
+  const roomOffsets = useMemo(
+    () => computeRoomOffsets(rooms, displayMode),
+    [rooms, displayMode],
+  );
 
   const halfW = room.width / 2;
   const halfL = room.length / 2;
-
-  const floorTexture = getFloorTexture(room.width, room.length);
 
   // Register the renderer once so pbrTextureCache applies device anisotropy (clamped ≤8).
   const gl = useThree((s) => s.gl);
@@ -254,7 +222,9 @@ function Scene({ productLibrary }: Props) {
   // useFrame lerp). Mirrors Phase 35 preset-tween reduced-motion path.
   useEffect(() => {
     if (!wallSideCameraTarget || cameraMode !== "orbit") return;
-    const wall = walls[wallSideCameraTarget.wallId];
+    // Derive active room's walls from rooms record for wall-side camera animation.
+    const activeWalls = activeRoomId ? (rooms[activeRoomId]?.walls ?? {}) : {};
+    const wall = activeWalls[wallSideCameraTarget.wallId];
     if (!wall) return;
     // Wall center in 3D (x = 2D x, z = 2D y, y = height/2)
     const cx = (wall.start.x + wall.end.x) / 2;
@@ -284,7 +254,7 @@ function Scene({ productLibrary }: Props) {
       cameraAnimTarget.current = { pos: camPos, look: lookAt };
     }
     useUIStore.getState().clearWallSideCameraTarget();
-  }, [wallSideCameraTarget, walls, cameraMode, prefersReducedMotion]);
+  }, [wallSideCameraTarget, rooms, activeRoomId, cameraMode, prefersReducedMotion]);
 
   // Phase 35 CAM-02: consume pendingPresetRequest from uiStore.
   // Research §1 cancel-and-restart — startPresetTween captures `from` from
@@ -436,63 +406,45 @@ function Scene({ productLibrary }: Props) {
     <>
       <Lighting />
 
-      {/* Floor — procedural wood by default, or user-chosen material (FLOOR-01/02/03) */}
-      <FloorMesh
-        width={room.width}
-        length={room.length}
-        halfW={halfW}
-        halfL={halfL}
-        material={floorMaterial}
-        fallbackTexture={floorTexture}
-      />
-
       {/* Ambient PBR bounce — D-08 (bundled local HDR) */}
       <Suspense fallback={null}>
         <Environment files="/hdr/studio_small_09_1k.hdr" />
       </Suspense>
 
-      {/* Floor grid helper */}
+      {/* Floor grid helper — kept at Scene level (Pitfall 3, Phase 47 D-03) */}
       <gridHelper
         args={[Math.max(room.width, room.length), Math.max(room.width, room.length), "#9ca3af", "#d1d5db"]}
         position={[halfW, 0.01, halfL]}
       />
 
-      {/* Walls */}
-      {Object.values(walls).filter((wall) => !effectivelyHidden.has(wall.id)).map((wall) => (
-        <WallMesh
-          key={wall.id}
-          wall={wall}
-          isSelected={selectedIds.includes(wall.id)}
-        />
-      ))}
-
-      {/* Products — orphan-safe: product may be undefined, ProductMesh renders placeholder */}
-      {Object.values(placedProducts).filter((pp) => !effectivelyHidden.has(pp.id)).map((pp) => {
-        const product = productLibrary.find((p) => p.id === pp.productId);
-        return (
-          <ProductMesh
-            key={pp.id}
-            placed={pp}
-            product={product}
-            isSelected={selectedIds.includes(pp.id)}
-          />
-        );
-      })}
-
-      {/* Ceilings — overhead polygon surfaces */}
-      {Object.values(ceilings).filter((c) => !effectivelyHidden.has(c.id)).map((c) => (
-        <CeilingMesh key={c.id} ceiling={c} isSelected={selectedIds.includes(c.id)} />
-      ))}
-
-      {/* Custom elements (Phase 14) */}
-      {Object.values(placedCustoms).filter((p) => !effectivelyHidden.has(p.id)).map((p) => (
-        <CustomElementMesh
-          key={p.id}
-          placed={p}
-          element={customCatalog[p.customElementId]}
-          isSelected={selectedIds.includes(p.id)}
-        />
-      ))}
+      {/* Phase 47 D-03/D-04/D-06: multi-room render branches.
+          SOLO: render only active room at offsetX=0 (null activeRoomId → empty scene per D-06).
+          NORMAL/EXPLODE: iterate all rooms with computed X-axis offsets. */}
+      {displayMode === "solo"
+        ? activeRoomId && rooms[activeRoomId]
+          ? (
+            <RoomGroup
+              key={activeRoomId}
+              roomDoc={rooms[activeRoomId]}
+              offsetX={0}
+              productLibrary={productLibrary}
+              selectedIds={selectedIds}
+              hiddenIds={hiddenIds}
+              customCatalog={customCatalog}
+            />
+          )
+          : null  /* D-06: SOLO + null/missing activeRoomId → empty scene */
+        : Object.entries(rooms).map(([id, doc]) => (
+            <RoomGroup
+              key={id}
+              roomDoc={doc}
+              offsetX={roomOffsets[id] ?? 0}
+              productLibrary={productLibrary}
+              selectedIds={selectedIds}
+              hiddenIds={hiddenIds}
+              customCatalog={customCatalog}
+            />
+          ))}
 
       {cameraMode === "orbit" ? (
         <OrbitControls
