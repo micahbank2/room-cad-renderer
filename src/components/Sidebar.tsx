@@ -8,6 +8,7 @@ import FloorMaterialPicker from "./FloorMaterialPicker";
 import CustomElementsPanel from "./CustomElementsPanel";
 import FramedArtLibrary from "./FramedArtLibrary";
 import WainscotLibrary from "./WainscotLibrary";
+import { RoomsTreePanel } from "./RoomsTreePanel";
 
 interface Props {
   productLibrary: Product[];
@@ -41,7 +42,7 @@ function CollapsibleSection({
   );
 }
 
-export default function Sidebar({ productLibrary: _productLibrary }: Props) {
+export default function Sidebar({ productLibrary }: Props) {
   const room = useActiveRoom() ?? { width: 20, length: 16, wallHeight: 8 };
   const walls = useActiveWalls();
   const placedProducts = useActivePlacedProducts();
@@ -69,6 +70,7 @@ export default function Sidebar({ productLibrary: _productLibrary }: Props) {
 
       {/* Scrollable content */}
       <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
+        <RoomsTreePanel productLibrary={productLibrary} />
         <CollapsibleSection label="Room config">
           <RoomSettings />
         </CollapsibleSection>

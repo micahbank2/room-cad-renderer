@@ -36,7 +36,7 @@ source: Pascal Editor competitive audit (.planning/competitive/pascal-audit.md);
 
 ### Rooms Hierarchy Sidebar Tree (TREE)
 
-- [ ] **TREE-01** — Sidebar gains a Rooms hierarchy tree: collapsible per room, showing the room's contents (walls, ceilings, placed products, custom-element placements) as nested children. Click-to-focus the camera on a node. Per-node visibility toggle. Source: [#78](https://github.com/micahbank2/room-cad-renderer/issues/78).
+- [x] **TREE-01** — Sidebar gains a Rooms hierarchy tree: collapsible per room, showing the room's contents (walls, ceilings, placed products, custom-element placements) as nested children. Click-to-focus the camera on a node. Per-node visibility toggle. Source: [#78](https://github.com/micahbank2/room-cad-renderer/issues/78).
   - **Verifiable:** Sidebar shows a "Rooms" panel with one entry per room in `cadStore.rooms`. Expanding a room reveals its child nodes grouped (Walls / Ceilings / Products / Custom Elements). Clicking a child node selects it (drives `uiStore.selectedIds`) AND focuses the camera (re-uses MIC-35 wall-side / Phase 35 preset camera infrastructure). Eye icon next to each node toggles visibility (renderer skips hidden nodes).
   - **Acceptance:** Reuses `CollapsibleSection` primitive (Phase 33). Selection state is single source of truth via `uiStore.selectedIds` — clicking in tree drives same path as clicking in canvas. Visibility state lives on `uiStore.hiddenIds: Set<string>` (new field) — view-state, not CAD-state, so undo/autosave skip it. Lucide icons for tree (ChevronRight/Down, Eye/EyeOff). Activates per-node Focus action (TREE-CAM-01 below) — but Focus itself ships in CAM-04, not here.
 
@@ -73,7 +73,7 @@ Phase → requirement mapping. Plan column filled by `/gsd:plan-phase` when each
 | Requirement | Phase | Plan(s) |
 | ----------- | ----- | ------- |
 | THUMB-01 | Phase 45 | TBD |
-| TREE-01 | Phase 46 | TBD |
+| TREE-01 | Phase 46 | 46-01, 46-02, 46-03, 46-04 |
 | DISPLAY-01 | Phase 47 | TBD |
 | CAM-04 | Phase 48 | TBD |
 

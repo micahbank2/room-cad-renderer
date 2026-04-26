@@ -47,6 +47,19 @@ interface UIState {
    */
   isDragging: boolean;
 
+  /** Phase 46 D-13: transient view-state. NOT persisted; resets on page load. NOT pushed to undo history. */
+  hiddenIds: Set<string>;
+
+  /**
+   * Phase 46: extends Phase 35 dispatch — non-preset bbox/look-at target.
+   * ThreeViewport mirrors lines 252–302 useEffect for this field.
+   */
+  pendingCameraTarget: {
+    position: [number, number, number];
+    target: [number, number, number];
+    seq: number;
+  } | null;
+
   setTool: (tool: ToolType) => void;
   select: (ids: string[]) => void;
   addToSelection: (id: string) => void;
@@ -79,6 +92,15 @@ interface UIState {
   toggleSidebar: () => void;
   /** Phase 33 D-13: selectTool calls this at drag start/end. */
   setDragging: (v: boolean) => void;
+
+  toggleHidden: (id: string) => void;
+  setHidden: (id: string, hidden: boolean) => void;
+  clearHidden: () => void;
+  requestCameraTarget: (
+    position: [number, number, number],
+    target: [number, number, number],
+  ) => void;
+  clearPendingCameraTarget: () => void;
 }
 
 const MIN_ZOOM = 0.25;
@@ -102,6 +124,8 @@ export const useUIStore = create<UIState>()((set) => ({
   pendingPresetRequest: null,
   showSidebar: true,
   isDragging: false,
+  hiddenIds: new Set<string>(),
+  pendingCameraTarget: null,
 
   setTool: (tool) => set({ activeTool: tool, selectedIds: [] }),
   select: (ids) => set({ selectedIds: ids }),
@@ -180,4 +204,27 @@ export const useUIStore = create<UIState>()((set) => ({
   clearPendingPresetRequest: () => set({ pendingPresetRequest: null }),
   toggleSidebar: () => set((s) => ({ showSidebar: !s.showSidebar })),
   setDragging: (v) => set({ isDragging: v }),
+  toggleHidden: (id) =>
+    set((s) => {
+      const next = new Set(s.hiddenIds);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return { hiddenIds: next };
+    }),
+  setHidden: (id, hidden) =>
+    set((s) => {
+      const next = new Set(s.hiddenIds);
+      if (hidden) next.add(id);
+      else next.delete(id);
+      return { hiddenIds: next };
+    }),
+  clearHidden: () => set({ hiddenIds: new Set<string>() }),
+  requestCameraTarget: (position, target) =>
+    set((s) => ({
+      pendingCameraTarget: {
+        position, target,
+        seq: (s.pendingCameraTarget?.seq ?? 0) + 1,
+      },
+    })),
+  clearPendingCameraTarget: () => set({ pendingCameraTarget: null }),
 }));

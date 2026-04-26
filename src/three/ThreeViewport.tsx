@@ -1,9 +1,9 @@
 import * as THREE from "three";
-import { Suspense, useRef, useEffect, useState } from "react";
+import { Suspense, useRef, useEffect, useState, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Environment, PointerLockControls } from "@react-three/drei";
 import { registerRenderer } from "./pbrTextureCache";
-import { useActiveRoom, useActiveRoomDoc, useActiveWalls, useActivePlacedProducts, useActiveCeilings, useActivePlacedCustomElements, useCustomElements } from "@/stores/cadStore";
+import { useCADStore, useActiveRoom, useActiveRoomDoc, useActiveWalls, useActivePlacedProducts, useActiveCeilings, useActivePlacedCustomElements, useCustomElements } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import type { Product } from "@/types/product";
 import { angle as wallAngleRad } from "@/lib/geometry";
@@ -65,6 +65,41 @@ function Scene({ productLibrary }: Props) {
   // Phase 35 CAM-02: preset tween subscriptions.
   const pendingPresetRequest = useUIStore((s) => s.pendingPresetRequest);
   const prefersReducedMotion = useReducedMotion();
+
+  // Phase 46 D-11/D-12: visibility + camera-target subscriptions.
+  const hiddenIds = useUIStore((s) => s.hiddenIds);
+  const activeRoomId = useCADStore((s) => s.activeRoomId);
+  const pendingCameraTarget = useUIStore((s) => s.pendingCameraTarget);
+
+  // Phase 46 D-11/D-12: build effective-hidden set once per render.
+  // Cascade: room hidden -> all leaves; group hidden -> all leaves of that group;
+  // per-leaf ids from hiddenIds stay as-is. Phase 47 SOLO/EXPLODE will compose
+  // AT ROOM LEVEL above this leaf-level filter (Pitfall 7).
+  const effectivelyHidden = useMemo(() => {
+    const out = new Set<string>();
+    if (!activeRoomId) return out;
+    if (hiddenIds.has(activeRoomId)) {
+      Object.values(walls).forEach((w) => out.add(w.id));
+      Object.values(placedProducts).forEach((p) => out.add(p.id));
+      Object.values(ceilings).forEach((c) => out.add(c.id));
+      Object.values(placedCustoms).forEach((p) => out.add(p.id));
+      return out;
+    }
+    if (hiddenIds.has(`${activeRoomId}:walls`)) {
+      Object.values(walls).forEach((w) => out.add(w.id));
+    }
+    if (hiddenIds.has(`${activeRoomId}:ceiling`)) {
+      Object.values(ceilings).forEach((c) => out.add(c.id));
+    }
+    if (hiddenIds.has(`${activeRoomId}:products`)) {
+      Object.values(placedProducts).forEach((p) => out.add(p.id));
+    }
+    if (hiddenIds.has(`${activeRoomId}:custom`)) {
+      Object.values(placedCustoms).forEach((p) => out.add(p.id));
+    }
+    for (const id of hiddenIds) out.add(id);
+    return out;
+  }, [hiddenIds, activeRoomId, walls, placedProducts, ceilings, placedCustoms]);
 
   const halfW = room.width / 2;
   const halfL = room.length / 2;
@@ -176,6 +211,8 @@ function Scene({ productLibrary }: Props) {
 
   // Phase 35 CAM-02: time-based preset tween state. Coexists with
   // cameraAnimTarget — mutually exclusive per frame (only one runs).
+  // Phase 46: presetId widened to PresetId | null so pendingCameraTarget
+  // consumer can reuse the same tween infrastructure without a preset id.
   const presetTween = useRef<null | {
     fromPos: THREE.Vector3;
     fromTarget: THREE.Vector3;
@@ -183,7 +220,7 @@ function Scene({ productLibrary }: Props) {
     toTarget: THREE.Vector3;
     startMs: number;
     durationMs: number;
-    presetId: PresetId;
+    presetId: PresetId | null;
   }>(null);
 
   // 05.1 fix: restore saved camera position when returning to orbit mode.
@@ -301,6 +338,50 @@ function Scene({ productLibrary }: Props) {
     useUIStore.getState().clearPendingPresetRequest();
   }, [pendingPresetRequest, cameraMode, prefersReducedMotion, room]);
 
+  // Phase 46: consume pendingCameraTarget — mirrors Phase 35 pattern above.
+  // Set by tree-row click via useUIStore.requestCameraTarget(position, target).
+  // Reuses the same presetTween infrastructure for animation; D-39 reduced-motion
+  // snap; D-04 cancel-and-restart-safe.
+  useEffect(() => {
+    if (!pendingCameraTarget) return;
+    if (cameraMode === "walk") {
+      useUIStore.getState().clearPendingCameraTarget();
+      return;
+    }
+    const ctrl = orbitControlsRef.current;
+    if (!ctrl?.object) {
+      useUIStore.getState().clearPendingCameraTarget();
+      return;
+    }
+    const cam = ctrl.object as THREE.Camera;
+    const { position, target } = pendingCameraTarget;
+    if (prefersReducedMotion) {
+      cam.position.set(position[0], position[1], position[2]);
+      ctrl.target.set(target[0], target[1], target[2]);
+      ctrl.update();
+      orbitPosRef.current = position;
+      orbitTargetRef.current = target;
+      presetTween.current = null;
+      ctrl.enableDamping = true;
+    } else {
+      const fromPos = cam.position.clone();
+      const fromTarget = ctrl.target.clone();
+      const toPos = new THREE.Vector3(...position);
+      const toTarget = new THREE.Vector3(...target);
+      ctrl.enableDamping = false;
+      presetTween.current = {
+        fromPos,
+        fromTarget,
+        toPos,
+        toTarget,
+        startMs: performance.now(),
+        durationMs: 600,
+        presetId: null,
+      };
+    }
+    useUIStore.getState().clearPendingCameraTarget();
+  }, [pendingCameraTarget, cameraMode, prefersReducedMotion, room]);
+
   // Smooth camera animation via useFrame.
   // Two mutually-exclusive branches: wall-side lerp (MIC-35) runs first,
   // preset tween (CAM-02) runs only when wall-side is idle.
@@ -377,7 +458,7 @@ function Scene({ productLibrary }: Props) {
       />
 
       {/* Walls */}
-      {Object.values(walls).map((wall) => (
+      {Object.values(walls).filter((wall) => !effectivelyHidden.has(wall.id)).map((wall) => (
         <WallMesh
           key={wall.id}
           wall={wall}
@@ -386,7 +467,7 @@ function Scene({ productLibrary }: Props) {
       ))}
 
       {/* Products — orphan-safe: product may be undefined, ProductMesh renders placeholder */}
-      {Object.values(placedProducts).map((pp) => {
+      {Object.values(placedProducts).filter((pp) => !effectivelyHidden.has(pp.id)).map((pp) => {
         const product = productLibrary.find((p) => p.id === pp.productId);
         return (
           <ProductMesh
@@ -399,12 +480,12 @@ function Scene({ productLibrary }: Props) {
       })}
 
       {/* Ceilings — overhead polygon surfaces */}
-      {Object.values(ceilings).map((c) => (
+      {Object.values(ceilings).filter((c) => !effectivelyHidden.has(c.id)).map((c) => (
         <CeilingMesh key={c.id} ceiling={c} isSelected={selectedIds.includes(c.id)} />
       ))}
 
       {/* Custom elements (Phase 14) */}
-      {Object.values(placedCustoms).map((p) => (
+      {Object.values(placedCustoms).filter((p) => !effectivelyHidden.has(p.id)).map((p) => (
         <CustomElementMesh
           key={p.id}
           placed={p}
