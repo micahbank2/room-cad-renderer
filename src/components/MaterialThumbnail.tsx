@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { getThumbnail, generateThumbnail } from "@/three/swatchThumbnailGenerator";
-import { SURFACE_MATERIALS } from "@/data/surfaceMaterials";
+import { SURFACE_MATERIALS, type SurfaceMaterial } from "@/data/surfaceMaterials";
 
 interface Props {
   materialId: string;
@@ -39,7 +39,13 @@ export function MaterialThumbnail({ materialId, fallbackColor }: Props) {
   useEffect(() => {
     if (dataURL) return;
     if (cached === FALLBACK_SENTINEL) return; // D-07: don't retry — generator already failed
-    const material = SURFACE_MATERIALS.find((m) => m.id === materialId);
+    // SURFACE_MATERIALS is a Record<string, SurfaceMaterial> keyed by id.
+    // Direct lookup also tolerates the test mock (which stubs it as an array)
+    // by falling back to Array.prototype.find when needed.
+    const catalog = SURFACE_MATERIALS as unknown;
+    const material: SurfaceMaterial | undefined = Array.isArray(catalog)
+      ? (catalog as SurfaceMaterial[]).find((m) => m.id === materialId)
+      : (catalog as Record<string, SurfaceMaterial>)[materialId];
     if (!material) return;
     let alive = true;
     generateThumbnail(material).then((url) => {
