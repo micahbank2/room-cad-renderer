@@ -1,10 +1,11 @@
 ---
 phase: 46
 slug: rooms-hierarchy-sidebar-tree-tree-01
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-04-26
+reviewed_at: 2026-04-26
 ---
 
 # Phase 46 — UI Design Contract
