@@ -142,7 +142,13 @@ describe("swatchThumbnailGenerator", () => {
   });
 
   it("Single-renderer invariant: 5 sequential generateThumbnail calls construct WebGLRenderer exactly ONCE", async () => {
+    // Reset module state so the renderer-singleton is freshly created inside this test
+    // (per planner hint in 45-01-PLAN.md action block — renderer-init invariants need a clean module).
+    vi.resetModules();
+    rendererCtorCalls.count = 0;
+    renderCalls.count = 0;
     const mod = await import("@/three/swatchThumbnailGenerator");
+    mod.__resetSwatchThumbnailCache();
     const mats = [
       { ...flatMat, id: "M1" },
       { ...flatMat, id: "M2" },
