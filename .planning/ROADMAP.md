@@ -145,9 +145,9 @@
 **Depends on:** Phase 35 preset-tween infrastructure (easeInOutCubic); Phase 46 (`pendingCameraTarget` bridge + tree click-to-focus); Phase 28 (autosave debounce — saves persist via existing snapshot path).
 **Requirements:** CAM-04
 **UI hint:** yes (PropertiesPanel Save/Clear buttons; tree-row Camera icon indicator; tree double-click triggers Focus)
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 - [x] 48-01-PLAN.md — Wave 0 RED scaffolding (3 vitest + 1 playwright + 2 source stubs at canonical paths)
-- [ ] 48-02-PLAN.md — Wave 1 cadStore type additions (D-03) + 5 NoHistory setters (D-04) + uiStore getCameraCapture bridge + ThreeViewport install
+- [x] 48-02-PLAN.md — Wave 1 cadStore type additions (D-03) + 5 NoHistory setters (D-04) + uiStore getCameraCapture bridge + ThreeViewport install
 - [ ] 48-03-PLAN.md — Wave 1 PropertiesPanel Save/Clear buttons (D-01/D-09/D-11) + TreeRow Camera icon indicator (D-07) + double-click dispatch (D-02) + focusOnSavedCamera helper + savedCameraDrivers fill
 
 ---
@@ -174,7 +174,7 @@
 | 45. Auto-Gen Material Swatch Thumbnails | 2/2 | Complete    | 2026-04-26 |
 | 46. Rooms Hierarchy Sidebar Tree | 4/4 | Complete    | 2026-04-26 |
 | 47. Room Display Modes | 3/3 | Complete    | 2026-04-26 |
-| 48. Per-Node Saved Camera + Focus | 1/3 | In Progress|  |
+| 48. Per-Node Saved Camera + Focus | 2/3 | In Progress|  |
 
 ## Backlog
 
