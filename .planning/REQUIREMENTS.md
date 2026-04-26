@@ -73,7 +73,7 @@ Phase → requirement mapping. Plan column filled by `/gsd:plan-phase` when each
 | Requirement | Phase | Plan(s) |
 | ----------- | ----- | ------- |
 | THUMB-01 | Phase 45 | TBD |
-| TREE-01 | Phase 46 | TBD |
+| TREE-01 | Phase 46 | 46-01, 46-02, 46-03, 46-04 |
 | DISPLAY-01 | Phase 47 | TBD |
 | CAM-04 | Phase 48 | TBD |
 
