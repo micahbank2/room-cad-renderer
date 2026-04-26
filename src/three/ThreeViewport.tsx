@@ -174,6 +174,25 @@ function Scene({ productLibrary }: Props) {
     };
   }, []);
 
+  // Phase 48 CAM-04: install cross-component camera-capture bridge.
+  // PropertiesPanel reads useUIStore.getState().getCameraCapture?.() to read
+  // the live OrbitControls pose at Save-button click. Bridge mirrors Phase 46's
+  // requestCameraTarget pattern in reverse (ThreeViewport writes; PropertiesPanel reads).
+  useEffect(() => {
+    useUIStore.getState().installCameraCapture(() => {
+      const ctrl = orbitControlsRef.current;
+      if (!ctrl?.object) return null;
+      const cam = ctrl.object as THREE.Camera;
+      return {
+        pos: [cam.position.x, cam.position.y, cam.position.z] as [number, number, number],
+        target: [ctrl.target.x, ctrl.target.y, ctrl.target.z] as [number, number, number],
+      };
+    });
+    return () => {
+      useUIStore.getState().clearCameraCapture();
+    };
+  }, []);
+
   // Camera animation target (smooth lerp)
   const cameraAnimTarget = useRef<{ pos: THREE.Vector3; look: THREE.Vector3 } | null>(null);
 

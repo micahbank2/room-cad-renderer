@@ -2,7 +2,7 @@
 // Phase 46: Single tree row matching UI-SPEC § Per-Row Anatomy verbatim.
 
 import React from "react";
-import { ChevronRight, ChevronDown, Eye, EyeOff } from "lucide-react";
+import { ChevronRight, ChevronDown, Eye, EyeOff, Camera } from "lucide-react";
 import type { TreeNode } from "@/lib/buildRoomTree";
 import { isHiddenInTree } from "@/lib/isHiddenInTree";
 
@@ -17,9 +17,13 @@ interface TreeRowProps {
   hiddenIds: Set<string>;
   /** Label of the immediate parent row (for cascade aria-label). */
   parentLabel?: string;
+  /** Phase 48 D-07: leaf-node IDs that have a saved camera angle. */
+  savedCameraNodeIds: Set<string>;
   onToggleExpand: (id: string) => void;
   onClickRow: (node: TreeNode) => void;
   onToggleVisibility: (id: string) => void;
+  /** Phase 48 D-02: double-click handler — falls through to single-click default focus when no savedCamera. */
+  onDoubleClickRow?: (node: TreeNode) => void;
 }
 
 const INDENT: Record<0 | 1 | 2, string> = {
@@ -42,6 +46,9 @@ export function TreeRow(props: TreeRowProps) {
 
   const isRoom = node.kind === "room";
   const isGroup = node.kind === "group";
+  // Phase 48 D-07: leaf = not room, not group.
+  const isLeaf = !isRoom && !isGroup;
+  const hasSavedCamera = isLeaf && props.savedCameraNodeIds.has(node.id);
 
   // Groups always open (UI-SPEC § Expand/collapse: "always expanded by default, no persistence").
   const isOpen = isRoom ? (expanded[node.id] ?? false) : true;
@@ -122,6 +129,11 @@ export function TreeRow(props: TreeRowProps) {
           if (isGroup) return;
           props.onClickRow(node);
         }}
+        onDoubleClick={() => {
+          // Phase 48 D-02: groups ignored (matches single-click NO-OP semantics).
+          if (isGroup) return;
+          props.onDoubleClickRow?.(node);
+        }}
       >
         {/* Chevron — ROOM ROWS ONLY per UI-SPEC § Per-Row Anatomy */}
         {isRoom ? (
@@ -164,6 +176,18 @@ export function TreeRow(props: TreeRowProps) {
           {node.label}
         </button>
 
+        {/* Phase 48 D-07: leaf-only saved-camera indicator. */}
+        {hasSavedCamera && (
+          <span
+            title="Has saved camera angle"
+            aria-hidden="true"
+            className="text-accent-light flex items-center justify-center"
+            data-saved-camera-indicator
+          >
+            <Camera className="w-3.5 h-3.5" />
+          </span>
+        )}
+
         {/* Eye-icon button — UI-SPEC § Per-Row Anatomy: w-6 h-6, inner glyph w-3.5 h-3.5 */}
         <button
           data-tree-eye
@@ -195,9 +219,11 @@ export function TreeRow(props: TreeRowProps) {
             selectedIds={selectedIds}
             hiddenIds={hiddenIds}
             parentLabel={node.label}
+            savedCameraNodeIds={props.savedCameraNodeIds}
             onToggleExpand={props.onToggleExpand}
             onClickRow={props.onClickRow}
             onToggleVisibility={props.onToggleVisibility}
+            onDoubleClickRow={props.onDoubleClickRow}
           />
         ))
       }

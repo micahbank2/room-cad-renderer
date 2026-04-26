@@ -18,9 +18,12 @@ import type { PlacedCustomElement } from "@/types/cad";
 import WallSurfacePanel from "./WallSurfacePanel";
 import CeilingPaintSection from "./CeilingPaintSection";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
+import { Camera, CameraOff } from "lucide-react";
 
 interface Props {
   productLibrary: Product[];
+  /** Phase 48 D-09: Save button is disabled in 2D / library view. */
+  viewMode: "2d" | "3d" | "split" | "library";
 }
 
 // Phase 33 Plan 08 (GH #87) — rotation preset chips (D-19/D-20/D-21/D-22).
@@ -73,7 +76,102 @@ function RotationPresetChips({
   );
 }
 
-export default function PropertiesPanel({ productLibrary }: Props) {
+/**
+ * Phase 48 CAM-04 (D-01, D-09, D-11): Save / Clear camera buttons for a leaf entity.
+ * Save reads the live OrbitControls pose via uiStore.getCameraCapture (Plan 02 bridge).
+ * Save is disabled in 2D / library views (D-09) — no 3D camera available.
+ * Clear renders only when the entity already has a savedCameraPos.
+ */
+function SavedCameraButtons({
+  kind,
+  id,
+  hasSavedCamera,
+  viewMode,
+  onSave,
+  onClear,
+}: {
+  kind: "wall" | "product" | "ceiling" | "custom";
+  id: string;
+  hasSavedCamera: boolean;
+  viewMode: "2d" | "3d" | "split" | "library";
+  onSave: (id: string, pos: [number, number, number], target: [number, number, number]) => void;
+  onClear: (kind: "wall" | "product" | "ceiling" | "custom", id: string) => void;
+}) {
+  const disabled = viewMode === "2d" || viewMode === "library";
+  const saveTitle = disabled
+    ? "Switch to 3D view to save a camera angle"
+    : "Save current camera angle to this node";
+
+  const handleSave = () => {
+    if (disabled) return;
+    const uiState = useUIStore.getState() as ReturnType<typeof useUIStore.getState> & {
+      getCameraCapture?: (() => { pos: [number, number, number]; target: [number, number, number] } | null) | null;
+    };
+    const capture = uiState.getCameraCapture?.();
+    if (!capture) return;
+    // Read action live from store so test spies (vi.spyOn on getState() result) are intercepted.
+    const cadState = useCADStore.getState() as ReturnType<typeof useCADStore.getState> & {
+      setSavedCameraOnWallNoHistory?: typeof onSave;
+      setSavedCameraOnProductNoHistory?: typeof onSave;
+      setSavedCameraOnCeilingNoHistory?: typeof onSave;
+      setSavedCameraOnCustomElementNoHistory?: typeof onSave;
+    };
+    if (kind === "wall") cadState.setSavedCameraOnWallNoHistory?.(id, capture.pos, capture.target);
+    else if (kind === "product") cadState.setSavedCameraOnProductNoHistory?.(id, capture.pos, capture.target);
+    else if (kind === "ceiling") cadState.setSavedCameraOnCeilingNoHistory?.(id, capture.pos, capture.target);
+    else if (kind === "custom") cadState.setSavedCameraOnCustomElementNoHistory?.(id, capture.pos, capture.target);
+    else onSave(id, capture.pos, capture.target);
+  };
+
+  const handleClear = () => {
+    // Read action live from store so test spies (vi.spyOn on getState() result) are intercepted.
+    const cadState = useCADStore.getState() as ReturnType<typeof useCADStore.getState> & {
+      clearSavedCameraNoHistory?: typeof onClear;
+    };
+    if (cadState.clearSavedCameraNoHistory) {
+      cadState.clearSavedCameraNoHistory(kind, id);
+    } else {
+      onClear(kind, id);
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-1" data-saved-camera-buttons>
+      <button
+        type="button"
+        onClick={handleSave}
+        disabled={disabled}
+        data-testid="save-camera-btn"
+        aria-label="Save camera"
+        title={saveTitle}
+        className={
+          "px-2 py-1 rounded-sm font-mono text-sm border flex items-center gap-1 transition-colors " +
+          (disabled
+            ? "bg-obsidian-high text-text-ghost border-outline-variant/20 cursor-not-allowed"
+            : "bg-obsidian-high text-text-dim border-outline-variant/20 hover:bg-obsidian-highest hover:text-accent-light")
+        }
+      >
+        <Camera className="w-3.5 h-3.5" />
+        <span>Save camera</span>
+      </button>
+      {hasSavedCamera && (
+        <button
+          type="button"
+          onClick={handleClear}
+          data-testid="clear-camera-btn"
+          aria-label="Clear saved camera"
+          title="Remove saved camera angle"
+          className="px-2 py-1 rounded-sm font-mono text-sm border flex items-center gap-1 transition-colors bg-obsidian-high text-text-dim border-outline-variant/20 hover:bg-obsidian-highest hover:text-accent-light"
+        >
+          <CameraOff className="w-3.5 h-3.5" />
+          <span>Clear</span>
+        </button>
+      )}
+    </div>
+  );
+}
+
+export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
   const selectedIds = useUIStore((s) => s.selectedIds);
   const walls = useActiveWalls();
   const placedProducts = useActivePlacedProducts();
@@ -92,6 +190,13 @@ export default function PropertiesPanel({ productLibrary }: Props) {
     (s) => s.clearCustomElementOverrides,
   );
   const clearProductOverrides = useCADStore((s) => s.clearProductOverrides);
+
+  // Phase 48 CAM-04 (D-01): camera bookmark actions (Plan 02 NoHistory setters).
+  const setSavedCameraOnWallNoHistory = useCADStore((s) => s.setSavedCameraOnWallNoHistory);
+  const setSavedCameraOnProductNoHistory = useCADStore((s) => s.setSavedCameraOnProductNoHistory);
+  const setSavedCameraOnCeilingNoHistory = useCADStore((s) => s.setSavedCameraOnCeilingNoHistory);
+  const setSavedCameraOnCustomElementNoHistory = useCADStore((s) => s.setSavedCameraOnCustomElementNoHistory);
+  const clearSavedCameraNoHistory = useCADStore((s) => s.clearSavedCameraNoHistory);
 
   const id = selectedIds[0];
   const wall = id ? walls[id] : undefined;
@@ -190,6 +295,14 @@ export default function PropertiesPanel({ productLibrary }: Props) {
             </div>
           </CollapsibleSection>
           <CeilingPaintSection ceilingId={ceiling.id} ceiling={ceiling} />
+          <SavedCameraButtons
+            kind="ceiling"
+            id={ceiling.id}
+            hasSavedCamera={!!ceiling.savedCameraPos}
+            viewMode={viewMode}
+            onSave={(cId, pos, target) => setSavedCameraOnCeilingNoHistory(cId, pos, target)}
+            onClear={clearSavedCameraNoHistory}
+          />
         </div>
       )}
 
@@ -241,6 +354,14 @@ export default function PropertiesPanel({ productLibrary }: Props) {
             {wall.openings.length} OPENING(S)
           </div>
           <WallSurfacePanel />
+          <SavedCameraButtons
+            kind="wall"
+            id={wall.id}
+            hasSavedCamera={!!wall.savedCameraPos}
+            viewMode={viewMode}
+            onSave={(wId, pos, target) => setSavedCameraOnWallNoHistory(wId, pos, target)}
+            onClear={clearSavedCameraNoHistory}
+          />
         </div>
       )}
 
@@ -322,6 +443,14 @@ export default function PropertiesPanel({ productLibrary }: Props) {
                 </div>
               </div>
             )}
+            <SavedCameraButtons
+              kind="product"
+              id={pp.id}
+              hasSavedCamera={!!pp.savedCameraPos}
+              viewMode={viewMode}
+              onSave={(pId, pos, target) => setSavedCameraOnProductNoHistory(pId, pos, target)}
+              onClear={clearSavedCameraNoHistory}
+            />
           </div>
         );
       })()}
@@ -372,6 +501,14 @@ export default function PropertiesPanel({ productLibrary }: Props) {
               Reset size
             </button>
           )}
+          <SavedCameraButtons
+            kind="custom"
+            id={pce.id}
+            hasSavedCamera={!!pce.savedCameraPos}
+            viewMode={viewMode}
+            onSave={(ceId, pos, target) => setSavedCameraOnCustomElementNoHistory(ceId, pos, target)}
+            onClear={clearSavedCameraNoHistory}
+          />
         </div>
       )}
 

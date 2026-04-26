@@ -141,11 +141,14 @@
 - [x] 47-03-PLAN.md — Wave 1 Toolbar 3-button segmented control (NORMAL/SOLO/EXPLODE)
 
 #### Phase 48: Per-Node Saved Camera + Focus Action (CAM-04)
-**Goal:** Each placed product / wall / ceiling can have a bookmarked camera angle. Double-click in tree (or right-click context menu) jumps camera there via Phase 35 easeInOutCubic tween.
-**Depends on:** Phase 35 preset-tween infrastructure (`pendingPresetRequest` shape); Phase 46 (tree node double-click trigger).
+**Goal:** Each placed product / wall / ceiling / custom-element can have a bookmarked camera angle saved via PropertiesPanel button. Double-click in the rooms tree dispatches the saved pose through Phase 46's pendingCameraTarget bridge (easeInOutCubic + reduced-motion snap inherited).
+**Depends on:** Phase 35 preset-tween infrastructure (easeInOutCubic); Phase 46 (`pendingCameraTarget` bridge + tree click-to-focus); Phase 28 (autosave debounce — saves persist via existing snapshot path).
 **Requirements:** CAM-04
-**UI hint:** yes (right-click context menu + tree double-click)
-**Plans:** TBD (est. 1-2 plans; schema additions for savedCamera fields + context menu UI + tween integration)
+**UI hint:** yes (PropertiesPanel Save/Clear buttons; tree-row Camera icon indicator; tree double-click triggers Focus)
+**Plans:** 2/3 plans complete
+- [x] 48-01-PLAN.md — Wave 0 RED scaffolding (3 vitest + 1 playwright + 2 source stubs at canonical paths)
+- [x] 48-02-PLAN.md — Wave 1 cadStore type additions (D-03) + 5 NoHistory setters (D-04) + uiStore getCameraCapture bridge + ThreeViewport install
+- [ ] 48-03-PLAN.md — Wave 1 PropertiesPanel Save/Clear buttons (D-01/D-09/D-11) + TreeRow Camera icon indicator (D-07) + double-click dispatch (D-02) + focusOnSavedCamera helper + savedCameraDrivers fill
 
 ---
 
@@ -171,7 +174,7 @@
 | 45. Auto-Gen Material Swatch Thumbnails | 2/2 | Complete    | 2026-04-26 |
 | 46. Rooms Hierarchy Sidebar Tree | 4/4 | Complete    | 2026-04-26 |
 | 47. Room Display Modes | 3/3 | Complete    | 2026-04-26 |
-| 48. Per-Node Saved Camera + Focus | 0/0 | Not started | - |
+| 48. Per-Node Saved Camera + Focus | 2/3 | Complete    | 2026-04-26 |
 
 ## Backlog
 

@@ -352,7 +352,7 @@ export default function App() {
               <div className={`${viewMode === "split" ? "w-1/2" : "flex-1"} h-full relative`}>
                 <FabricCanvas productLibrary={productLibrary} />
                 <ToolPalette />
-                <PropertiesPanel productLibrary={productLibrary} />
+                <PropertiesPanel productLibrary={productLibrary} viewMode={viewMode} />
               </div>
             )}
             {viewMode === "split" && (
@@ -372,7 +372,7 @@ export default function App() {
                   <ThreeViewport productLibrary={productLibrary} />
                 </Suspense>
                 {viewMode === "3d" && (
-                  <PropertiesPanel productLibrary={productLibrary} />
+                  <PropertiesPanel productLibrary={productLibrary} viewMode={viewMode} />
                 )}
               </div>
             )}

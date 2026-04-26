@@ -13,7 +13,9 @@ import {
   focusOnPlacedProduct,
   focusOnCeiling,
   focusOnPlacedCustomElement,
+  focusOnSavedCamera,
 } from "./focusDispatch";
+import { buildSavedCameraSet } from "./savedCameraSet";
 
 // ---------------------------------------------------------------------------
 // Module-level stable references (avoids infinite render loops in Zustand selectors)
@@ -159,6 +161,12 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
     [rooms, customElements, productLibrary],
   );
 
+  // Phase 48 D-07: derive set of leaf IDs with saved cameras from rooms state.
+  const savedCameraNodeIds = useMemo(
+    () => buildSavedCameraSet(rooms),
+    [rooms],
+  );
+
   // ---------------------------------------------------------------------------
   // Handlers
   // ---------------------------------------------------------------------------
@@ -223,6 +231,45 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
     [productLibrary],
   );
 
+  const onDoubleClickRow = useCallback(
+    (node: TreeNode) => {
+      // Defense in depth: TreeRow already guards groups + rooms in its handler,
+      // but enforce here too so any future caller can't accidentally trigger
+      // camera moves on group / room nodes (D-02 leaf-only contract).
+      if (node.kind === "group" || node.kind === "room") return;
+
+      const cadState = useCADStore.getState();
+      const doc = cadState.rooms[node.roomId];
+      if (!doc) return;
+
+      // Look up the entity to read savedCameraPos/Target (D-02 fall-through key).
+      let savedPos: [number, number, number] | undefined;
+      let savedTarget: [number, number, number] | undefined;
+      if (node.kind === "wall") {
+        const w = doc.walls[node.id];
+        savedPos = w?.savedCameraPos;
+        savedTarget = w?.savedCameraTarget;
+      } else if (node.kind === "product") {
+        const pp = doc.placedProducts[node.id];
+        savedPos = pp?.savedCameraPos;
+        savedTarget = pp?.savedCameraTarget;
+      } else if (node.kind === "ceiling") {
+        const c = (doc.ceilings ?? {})[node.id];
+        savedPos = c?.savedCameraPos;
+        savedTarget = c?.savedCameraTarget;
+      } else if (node.kind === "custom") {
+        const pce = (doc.placedCustomElements ?? {})[node.id];
+        savedPos = pce?.savedCameraPos;
+        savedTarget = pce?.savedCameraTarget;
+      }
+
+      // D-02 fall-through: if no saved camera, dispatch the default focus
+      // (same path as single-click).
+      focusOnSavedCamera(savedPos, savedTarget, () => onClickRow(node));
+    },
+    [onClickRow],
+  );
+
   // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
@@ -239,9 +286,11 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
             activeRoomId={activeRoomId}
             selectedIds={selectedIds}
             hiddenIds={hiddenIds}
+            savedCameraNodeIds={savedCameraNodeIds}
             onToggleExpand={onToggleExpand}
             onClickRow={onClickRow}
             onToggleVisibility={onToggleVisibility}
+            onDoubleClickRow={onDoubleClickRow}
           />
         ))}
       </div>

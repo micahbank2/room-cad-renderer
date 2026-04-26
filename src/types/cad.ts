@@ -35,6 +35,11 @@ export interface WallSegment {
   crownMolding?: { A?: CrownConfig; B?: CrownConfig };
   /** Wall art items. Each item has a side (defaults to "A"). */
   wallArt?: WallArt[];
+  /** Phase 48 CAM-04 (D-03): bookmarked camera angle for double-click Focus.
+   *  Optional — older snapshots load with undefined; falls through to default focus. */
+  savedCameraPos?: [number, number, number];
+  /** Phase 48 CAM-04 (D-03): bookmarked camera target. Pairs with savedCameraPos. */
+  savedCameraTarget?: [number, number, number];
 }
 
 export interface Wallpaper {
@@ -93,6 +98,10 @@ export interface PlacedProduct {
   widthFtOverride?: number;
   /** D-01/D-02: per-axis depth override. Set only by edge-handle drag. */
   depthFtOverride?: number;
+  /** Phase 48 CAM-04 (D-03). */
+  savedCameraPos?: [number, number, number];
+  /** Phase 48 CAM-04 (D-03). */
+  savedCameraTarget?: [number, number, number];
 }
 
 export interface Room {
@@ -125,6 +134,10 @@ export interface PlacedCustomElement {
   depthFtOverride?: number;
   /** D-13: per-placement display name override. Empty/undefined → render catalog name. Max 40 chars (client-enforced). */
   labelOverride?: string;
+  /** Phase 48 CAM-04 (D-03). */
+  savedCameraPos?: [number, number, number];
+  /** Phase 48 CAM-04 (D-03). */
+  savedCameraTarget?: [number, number, number];
 }
 
 export interface Ceiling {
@@ -154,6 +167,10 @@ export interface Ceiling {
    *  here and fall through to the catalog default — functionally equivalent
    *  to pre-fix behavior. Closes [GH #96](https://github.com/micahbank2/room-cad-renderer/issues/96). */
   scaleFt?: number;
+  /** Phase 48 CAM-04 (D-03). */
+  savedCameraPos?: [number, number, number];
+  /** Phase 48 CAM-04 (D-03). */
+  savedCameraTarget?: [number, number, number];
 }
 
 export interface FloorMaterial {

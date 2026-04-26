@@ -82,6 +82,35 @@ interface CADState {
   resizeCustomElementAxis: (id: string, axis: "width" | "depth", valueFt: number) => void;
   resizeCustomElementAxisNoHistory: (id: string, axis: "width" | "depth", valueFt: number) => void;
   clearCustomElementOverrides: (id: string) => void;
+  /** Phase 48 CAM-04 (D-04): NoHistory setter — write savedCameraPos/Target on a wall. */
+  setSavedCameraOnWallNoHistory: (
+    wallId: string,
+    pos: [number, number, number],
+    target: [number, number, number],
+  ) => void;
+  /** Phase 48 CAM-04 (D-04): NoHistory setter — write savedCameraPos/Target on a placed product. */
+  setSavedCameraOnProductNoHistory: (
+    productId: string,
+    pos: [number, number, number],
+    target: [number, number, number],
+  ) => void;
+  /** Phase 48 CAM-04 (D-04): NoHistory setter — write savedCameraPos/Target on a ceiling. */
+  setSavedCameraOnCeilingNoHistory: (
+    ceilingId: string,
+    pos: [number, number, number],
+    target: [number, number, number],
+  ) => void;
+  /** Phase 48 CAM-04 (D-04): NoHistory setter — write savedCameraPos/Target on a placed custom element. */
+  setSavedCameraOnCustomElementNoHistory: (
+    placedId: string,
+    pos: [number, number, number],
+    target: [number, number, number],
+  ) => void;
+  /** Phase 48 CAM-04 (D-04): NoHistory clearer — remove savedCamera fields from any leaf entity. */
+  clearSavedCameraNoHistory: (
+    kind: "wall" | "product" | "ceiling" | "custom",
+    id: string,
+  ) => void;
   removeProduct: (id: string) => void;
   removeSelected: (ids: string[]) => void;
   undo: () => void;
@@ -816,6 +845,88 @@ export const useCADStore = create<CADState>()((set) => ({
         pushHistory(s);
         doc.placedCustomElements[id].widthFtOverride = undefined;
         doc.placedCustomElements[id].depthFtOverride = undefined;
+      })
+    ),
+
+  // Phase 48 CAM-04 (D-04): NoHistory camera-bookmark setters.
+  // These bypass pushHistory intentionally — see D-04: savedCamera is a transient
+  // annotation, not a design mutation; undo should not remove camera bookmarks.
+
+  setSavedCameraOnWallNoHistory: (wallId, pos, target) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        if (!doc.walls[wallId]) return;
+        // NOTE: No pushHistory(s) — intentional bypass per D-04.
+        doc.walls[wallId].savedCameraPos = pos;
+        doc.walls[wallId].savedCameraTarget = target;
+      })
+    ),
+
+  setSavedCameraOnProductNoHistory: (productId, pos, target) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        if (!doc.placedProducts[productId]) return;
+        // NOTE: No pushHistory(s) — intentional bypass per D-04.
+        doc.placedProducts[productId].savedCameraPos = pos;
+        doc.placedProducts[productId].savedCameraTarget = target;
+      })
+    ),
+
+  setSavedCameraOnCeilingNoHistory: (ceilingId, pos, target) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const ceilings = doc.ceilings;
+        if (!ceilings || !ceilings[ceilingId]) return;
+        // NOTE: No pushHistory(s) — intentional bypass per D-04.
+        ceilings[ceilingId].savedCameraPos = pos;
+        ceilings[ceilingId].savedCameraTarget = target;
+      })
+    ),
+
+  setSavedCameraOnCustomElementNoHistory: (placedId, pos, target) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const placed = doc.placedCustomElements;
+        if (!placed || !placed[placedId]) return;
+        // NOTE: No pushHistory(s) — intentional bypass per D-04.
+        placed[placedId].savedCameraPos = pos;
+        placed[placedId].savedCameraTarget = target;
+      })
+    ),
+
+  clearSavedCameraNoHistory: (kind, id) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        // NOTE: No pushHistory(s) — intentional bypass per D-04.
+        if (kind === "wall") {
+          if (!doc.walls[id]) return;
+          doc.walls[id].savedCameraPos = undefined;
+          doc.walls[id].savedCameraTarget = undefined;
+        } else if (kind === "product") {
+          if (!doc.placedProducts[id]) return;
+          doc.placedProducts[id].savedCameraPos = undefined;
+          doc.placedProducts[id].savedCameraTarget = undefined;
+        } else if (kind === "ceiling") {
+          const ceilings = doc.ceilings;
+          if (!ceilings || !ceilings[id]) return;
+          ceilings[id].savedCameraPos = undefined;
+          ceilings[id].savedCameraTarget = undefined;
+        } else if (kind === "custom") {
+          const placed = doc.placedCustomElements;
+          if (!placed || !placed[id]) return;
+          placed[id].savedCameraPos = undefined;
+          placed[id].savedCameraTarget = undefined;
+        }
       })
     ),
 
