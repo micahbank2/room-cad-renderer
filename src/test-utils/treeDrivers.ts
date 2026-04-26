@@ -1,6 +1,8 @@
 // src/test-utils/treeDrivers.ts
-// Phase 46: window-level drivers for e2e + RTL access. Gated by MODE === "test".
-// Plan 03 fills the bodies; Plan 01 declares the API.
+// Phase 46 Plan 03: live test drivers (replaces Wave 0 throw stubs).
+// Gated by import.meta.env.MODE === "test" — production unaffected.
+
+import { useUIStore } from "@/stores/uiStore";
 
 declare global {
   interface Window {
@@ -18,15 +20,47 @@ declare global {
 export function installTreeDrivers(): void {
   if (typeof window === "undefined") return;
   if (import.meta.env.MODE !== "test") return;
-  const unimpl = (name: string) => () => {
-    throw new Error(`treeDrivers.${name} unimplemented — Plan 03 wires this`);
+
+  window.__driveTreeExpand = (roomId: string) => {
+    const el = document.querySelector(
+      `[data-tree-node="${roomId}"] [data-tree-chevron]`,
+    ) as HTMLElement | null;
+    el?.click();
   };
-  window.__driveTreeExpand = unimpl("driveTreeExpand");
-  window.__driveTreeVisibility = unimpl("driveTreeVisibility");
-  window.__driveTreeSelect = unimpl("driveTreeSelect");
-  window.__getTreeState = (() => {
-    throw new Error("treeDrivers.getTreeState unimplemented — Plan 03 wires this");
-  }) as Window["__getTreeState"];
+
+  window.__driveTreeVisibility = (id: string) => {
+    const el = document.querySelector(
+      `[data-tree-node="${id}"] [data-tree-eye]`,
+    ) as HTMLElement | null;
+    el?.click();
+  };
+
+  window.__driveTreeSelect = (id: string) => {
+    const el = document.querySelector(
+      `[data-tree-node="${id}"] [data-tree-row]`,
+    ) as HTMLElement | null;
+    el?.click();
+  };
+
+  window.__getTreeState = () => {
+    const expanded: Record<string, boolean> = {};
+    document.querySelectorAll('[data-tree-kind="room"]').forEach((el) => {
+      const id = (el as HTMLElement).dataset.treeNode;
+      const chevron = el.querySelector("[data-tree-chevron]");
+      const expandedAttr = chevron?.getAttribute("aria-expanded");
+      if (id) expanded[id] = expandedAttr === "true";
+    });
+
+    const state = useUIStore.getState() as ReturnType<typeof useUIStore.getState> & {
+      hiddenIds?: Set<string>;
+    };
+
+    return {
+      expanded,
+      hiddenIds: Array.from(state.hiddenIds ?? new Set<string>()),
+      selectedIds: state.selectedIds,
+    };
+  };
 }
 
 export {};
