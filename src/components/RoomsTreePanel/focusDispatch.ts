@@ -121,6 +121,29 @@ export function focusOnCeiling(doc: RoomDoc, ceiling: Ceiling): void {
 }
 
 // ---------------------------------------------------------------------------
+// Phase 48 D-02 / D-06: focusOnSavedCamera — fall-through to default focus
+// ---------------------------------------------------------------------------
+
+/**
+ * Phase 48 CAM-04 (D-02, D-06): focus camera on a saved bookmark.
+ * If savedPos AND savedTarget are both defined, dispatches via Phase 46's
+ * pendingCameraTarget bridge (easeInOutCubic + reduced-motion snap inherited).
+ * Otherwise calls the fallback (which RoomsTreePanel sets to the same dispatch
+ * as single-click — D-02 fall-through).
+ */
+export function focusOnSavedCamera(
+  savedPos: [number, number, number] | undefined,
+  savedTarget: [number, number, number] | undefined,
+  fallback: () => void,
+): void {
+  if (savedPos && savedTarget) {
+    requestCameraTarget(savedPos, savedTarget);
+  } else {
+    fallback();
+  }
+}
+
+// ---------------------------------------------------------------------------
 // D-08 variant: Custom element focus — bbox-fit (Phase 31 overrides honored)
 // ---------------------------------------------------------------------------
 

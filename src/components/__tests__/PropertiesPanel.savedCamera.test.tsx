@@ -110,11 +110,17 @@ describe("PropertiesPanel — Phase 48 savedCamera Save/Clear (D-01, D-09, D-11)
   });
 
   it("clicking Clear calls clearSavedCameraNoHistory(kind, id)", () => {
-    const cadStore = useCADStore.getState() as ReturnType<typeof useCADStore.getState> & {
+    // Apply the saved-camera mutation FIRST (set() replaces the state object
+    // reference under immer middleware, so capturing cadStore before this
+    // would leave the spy on a stale reference the component never reads).
+    const seedStore = useCADStore.getState() as ReturnType<typeof useCADStore.getState> & {
       setSavedCameraOnWallNoHistory?: (id: string, p: [number,number,number], t: [number,number,number]) => void;
+    };
+    if (seedStore.setSavedCameraOnWallNoHistory) seedStore.setSavedCameraOnWallNoHistory("wall_test_1", [1,2,3], [4,5,6]);
+
+    const cadStore = useCADStore.getState() as ReturnType<typeof useCADStore.getState> & {
       clearSavedCameraNoHistory?: (kind: "wall"|"product"|"ceiling"|"custom", id: string) => void;
     };
-    if (cadStore.setSavedCameraOnWallNoHistory) cadStore.setSavedCameraOnWallNoHistory("wall_test_1", [1,2,3], [4,5,6]);
     const spy = vi.spyOn(cadStore as unknown as { clearSavedCameraNoHistory: (...args: unknown[]) => void }, "clearSavedCameraNoHistory");
 
     renderPanelWithViewMode("3d");

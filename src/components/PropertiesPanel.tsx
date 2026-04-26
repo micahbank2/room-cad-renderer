@@ -124,7 +124,15 @@ function SavedCameraButtons({
   };
 
   const handleClear = () => {
-    onClear(kind, id);
+    // Read action live from store so test spies (vi.spyOn on getState() result) are intercepted.
+    const cadState = useCADStore.getState() as ReturnType<typeof useCADStore.getState> & {
+      clearSavedCameraNoHistory?: typeof onClear;
+    };
+    if (cadState.clearSavedCameraNoHistory) {
+      cadState.clearSavedCameraNoHistory(kind, id);
+    } else {
+      onClear(kind, id);
+    }
   };
 
   return (

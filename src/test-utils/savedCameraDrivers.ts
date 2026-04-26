@@ -1,6 +1,8 @@
 // src/test-utils/savedCameraDrivers.ts
 // Phase 48: window-level drivers for e2e + RTL access. Gated by MODE === "test".
-// Plan 03 fills the bodies; Plan 01 declares the API.
+
+import { useCADStore } from "@/stores/cadStore";
+import { useUIStore } from "@/stores/uiStore";
 
 declare global {
   interface Window {
@@ -16,49 +18,91 @@ declare global {
       id: string,
     ) => { pos: [number, number, number]; target: [number, number, number] } | null;
     /**
-     * Phase 48 BLOCKER-2 fix: e2e needs to pick a valid product id without
-     * hard-coding seed shape. Returns ids in the active room (empty if none).
-     * Stub throws — Plan 03 fills the body.
+     * E2E helper — returns placedProduct ids in the active room. Lets the spec
+     * pick a valid id without hard-coding seed shape.
      */
     __getActiveProductIds?: () => string[];
     /**
-     * Phase 48 BLOCKER-2 fix: declared here so the e2e spec compiles.
-     * Implementation is installed by ThreeViewport in Plan 02 Task 3 alongside
-     * installCameraCapture — NOT by installSavedCameraDrivers — because
-     * orbitControlsRef is module-local to ThreeViewport's Scene component.
+     * Installed by ThreeViewport's Scene useEffect (orbitControlsRef is local
+     * there). Declared here so the test types compile.
      */
     __getCameraPose?: () => { position: [number, number, number]; target: [number, number, number] } | null;
   }
 }
 
+type Kind = "wall" | "product" | "ceiling" | "custom";
+
+function activeRoom() {
+  const cad = useCADStore.getState();
+  return cad.rooms[cad.activeRoomId] ?? null;
+}
+
 /**
  * Phase 48: install savedCamera test drivers. Production no-op.
- * Plan 01 declares the API with stub bodies that throw.
- * Plan 03 fills the bodies and wires main.tsx to call this.
- *
- * NOTE: __getCameraPose is NOT installed here — Plan 02 Task 3 installs it
- * inside ThreeViewport's Scene useEffect because orbitControlsRef is local
- * to that component.
  */
 export function installSavedCameraDrivers(): void {
   if (typeof window === "undefined") return;
   if (import.meta.env.MODE !== "test") return;
 
-  window.__driveSaveCamera = ((..._args: unknown[]) => {
-    throw new Error("savedCameraDrivers.driveSaveCamera unimplemented — Plan 48-03 wires this");
-  }) as Window["__driveSaveCamera"];
+  window.__driveSaveCamera = (kind: Kind, id: string, pos, target) => {
+    const cad = useCADStore.getState() as ReturnType<typeof useCADStore.getState> & {
+      setSavedCameraOnWallNoHistory?: (id: string, p: [number,number,number], t: [number,number,number]) => void;
+      setSavedCameraOnProductNoHistory?: (id: string, p: [number,number,number], t: [number,number,number]) => void;
+      setSavedCameraOnCeilingNoHistory?: (id: string, p: [number,number,number], t: [number,number,number]) => void;
+      setSavedCameraOnCustomElementNoHistory?: (id: string, p: [number,number,number], t: [number,number,number]) => void;
+    };
+    if (kind === "wall") cad.setSavedCameraOnWallNoHistory?.(id, pos, target);
+    else if (kind === "product") cad.setSavedCameraOnProductNoHistory?.(id, pos, target);
+    else if (kind === "ceiling") cad.setSavedCameraOnCeilingNoHistory?.(id, pos, target);
+    else if (kind === "custom") cad.setSavedCameraOnCustomElementNoHistory?.(id, pos, target);
+  };
 
-  window.__driveFocusNode = ((_id: string) => {
-    throw new Error("savedCameraDrivers.driveFocusNode unimplemented — Plan 48-03 wires this");
-  }) as Window["__driveFocusNode"];
+  window.__driveFocusNode = (id: string) => {
+    const room = activeRoom();
+    if (!room) return;
+    const ui = useUIStore.getState() as ReturnType<typeof useUIStore.getState> & {
+      requestCameraTarget?: (pos: [number,number,number], tgt: [number,number,number]) => void;
+    };
+    const wall = room.walls?.[id];
+    if (wall?.savedCameraPos && wall?.savedCameraTarget) {
+      ui.requestCameraTarget?.(wall.savedCameraPos, wall.savedCameraTarget);
+      return;
+    }
+    const pp = room.placedProducts?.[id];
+    if (pp?.savedCameraPos && pp?.savedCameraTarget) {
+      ui.requestCameraTarget?.(pp.savedCameraPos, pp.savedCameraTarget);
+      return;
+    }
+    const ceiling = room.ceilings?.[id];
+    if (ceiling?.savedCameraPos && ceiling?.savedCameraTarget) {
+      ui.requestCameraTarget?.(ceiling.savedCameraPos, ceiling.savedCameraTarget);
+      return;
+    }
+    const pce = room.placedCustomElements?.[id];
+    if (pce?.savedCameraPos && pce?.savedCameraTarget) {
+      ui.requestCameraTarget?.(pce.savedCameraPos, pce.savedCameraTarget);
+    }
+  };
 
-  window.__getSavedCamera = ((..._args: unknown[]) => {
-    throw new Error("savedCameraDrivers.getSavedCamera unimplemented — Plan 48-03 wires this");
-  }) as Window["__getSavedCamera"];
+  window.__getSavedCamera = (kind: Kind, id: string) => {
+    const room = activeRoom();
+    if (!room) return null;
+    const entity =
+      kind === "wall" ? room.walls?.[id] :
+      kind === "product" ? room.placedProducts?.[id] :
+      kind === "ceiling" ? room.ceilings?.[id] :
+      kind === "custom" ? room.placedCustomElements?.[id] : null;
+    if (!entity) return null;
+    const e = entity as { savedCameraPos?: [number,number,number]; savedCameraTarget?: [number,number,number] };
+    if (!e.savedCameraPos || !e.savedCameraTarget) return null;
+    return { pos: e.savedCameraPos, target: e.savedCameraTarget };
+  };
 
-  window.__getActiveProductIds = (() => {
-    throw new Error("savedCameraDrivers.getActiveProductIds unimplemented — Plan 48-03 wires this");
-  }) as Window["__getActiveProductIds"];
+  window.__getActiveProductIds = () => {
+    const room = activeRoom();
+    if (!room) return [];
+    return Object.keys(room.placedProducts ?? {});
+  };
 }
 
 export {};

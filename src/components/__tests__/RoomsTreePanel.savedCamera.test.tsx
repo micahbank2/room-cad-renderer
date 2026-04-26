@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, fireEvent } from "@testing-library/react";
 import { RoomsTreePanel } from "@/components/RoomsTreePanel/RoomsTreePanel";
 import { useCADStore } from "@/stores/cadStore";
@@ -64,7 +64,17 @@ function seedSavedCameraScene(): void {
 
 describe("RoomsTreePanel — Phase 48 savedCamera indicator + double-click (D-02, D-07)", () => {
   beforeEach(() => {
+    // Restore spies from prior tests so per-test vi.spyOn calls start fresh.
+    // Without this, accumulated requestCameraTarget calls from earlier
+    // double-click tests leak into the "group row is NO-OP" assertion.
+    vi.restoreAllMocks();
+    vi.clearAllMocks();
     seedSavedCameraScene();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it("leaf row WITH savedCameraPos renders Camera icon (title='Has saved camera angle', text-accent-light, w-3.5 h-3.5)", () => {
