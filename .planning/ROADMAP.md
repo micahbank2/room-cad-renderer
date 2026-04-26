@@ -123,10 +123,10 @@
 **Depends on:** Phase 45 (sequencing, not code); Phase 33 `CollapsibleSection` primitive; existing `cadStore.rooms` structure; `uiStore.selectedIds`.
 **Requirements:** TREE-01
 **UI hint:** yes (new Sidebar panel)
-**Plans:** 2/4 plans executed
+**Plans:** 3/4 plans executed
 - [x] 46-01-PLAN.md — Wave 0 RED test scaffolding (8 test files + pure-function stubs)
 - [x] 46-02-PLAN.md — Wave 1 pure logic + uiStore additions (treeBuilder, wallLabels, hiddenIds, pendingCameraTarget)
-- [ ] 46-03-PLAN.md — Wave 1 component family + Sidebar integration (RoomsTreePanel, TreeRow, focusDispatch)
+- [x] 46-03-PLAN.md — Wave 1 component family + Sidebar integration (RoomsTreePanel, TreeRow, focusDispatch)
 - [ ] 46-04-PLAN.md — Wave 2 ThreeViewport wiring (visibility filter + pendingCameraTarget consumer)
 
 #### Phase 47: Room Display Modes (DISPLAY-01)
@@ -165,7 +165,7 @@
 | 43. UI Polish Bundle | 1/1 | Complete   | 2026-04-25 |
 | 44. Reduced-Motion Sweep | 1/1 | Complete   | 2026-04-25 |
 | 45. Auto-Gen Material Swatch Thumbnails | 2/2 | Complete    | 2026-04-26 |
-| 46. Rooms Hierarchy Sidebar Tree | 2/4 | In Progress|  |
+| 46. Rooms Hierarchy Sidebar Tree | 3/4 | In Progress|  |
 | 47. Room Display Modes | 0/0 | Not started | - |
 | 48. Per-Node Saved Camera + Focus | 0/0 | Not started | - |
 
