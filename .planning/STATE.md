@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.12
 milestone_name: Maintenance Pass
 status: verifying
-stopped_at: Completed 49-01-PLAN.md (BUG-02 wall user-texture first-apply fix)
-last_updated: "2026-04-27T16:06:17.211Z"
+stopped_at: Completed 50-01-PLAN.md (BUG-03 wallArt view-toggle persistence fix)
+last_updated: "2026-04-27T18:49:16.123Z"
 progress:
   total_phases: 8
-  completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
+  completed_phases: 2
+  total_plans: 2
+  completed_plans: 2
 ---
 
 # Project State
@@ -19,7 +19,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-25 — v1.10 archived; v1.11 Pascal Feature Set queued next)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 49 — bug-02-wall-user-texture-first-apply
+**Current focus:** Phase 50 — wallpaper-wallart-view-toggle-persistence-bug-03
 
 ## Current Position
 
@@ -65,6 +65,6 @@ When `/gsd:new-milestone` runs for v1.11, the starting input is already specifie
 
 ## Session Continuity
 
-Last session: 2026-04-27T16:04:00.078Z
-Stopped at: Completed 49-01-PLAN.md (BUG-02 wall user-texture first-apply fix)
+Last session: 2026-04-27T18:46:55.409Z
+Stopped at: Completed 50-01-PLAN.md (BUG-03 wallArt view-toggle persistence fix)
 Resume file: None

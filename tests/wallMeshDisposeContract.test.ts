@@ -11,8 +11,16 @@
 // R3F does NOT auto-dispose externally-passed texture props — only objects it
 // created internally. The userTextureCache module retains ownership, which is
 // equivalent to the dispose={null} contract on the removed <primitive>.
-// This test now asserts: (a) the wallpaper + wallArt <primitive> sites are
-// unchanged, AND (b) the user-texture branch uses the direct map={} prop.
+// This test now asserts: (a) the wallpaper <primitive> site is unchanged,
+// (b) the user-texture branch uses direct map={userTex} prop, AND
+// (c) the wallArt branches use direct map={tex} prop (Phase 50 BUG-03 fix).
+//
+// Phase 50 update: the two wallArt render sites (unframed + framed inner) were
+// converted to direct `map={tex}` props with mesh-level tex-conditional split,
+// matching the Phase 49 BUG-02 mechanism. wallArtTextureCache retains ownership.
+// Only the preset wallpaper site remains using <primitive attach="map" dispose={null}>.
+// Counts updated: attachCount/disposeNullCount >= 1 (was >= 3).
+// bad-shorthand regex updated: `tex` removed (it is now CORRECT for wallArt direct prop).
 
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
@@ -38,6 +46,12 @@ import { resolve } from "node:path";
  * The module-level userTextureCache owns the texture lifetime. The test below
  * explicitly asserts this direct-prop pattern exists.
  *
+ * Exception (Phase 50 / BUG-03): the two wallArt render sites (unframed + framed
+ * inner) were also converted to direct `map={tex}` props with mesh-level
+ * tex-conditional split. The wallArtTextureCache retains ownership — equivalent
+ * contract to Phase 49. Only the preset wallpaper <primitive> site remains.
+ * Counts updated to >= 1 (was >= 3). bad-shorthand regex updated to exclude `tex`.
+ *
  * This test is static-source-level on purpose. Testing R3F's actual dispose
  * traversal at runtime requires a full Canvas + WebGLRenderer setup which
  * is heavy and fragile in vitest. Locking the source pattern catches every
@@ -49,25 +63,29 @@ function read(relPath: string): string {
 }
 
 describe("R3F dispose={null} contract — cached texture render sites", () => {
-  it("WallMesh.tsx uses <primitive attach=\"map\" ... dispose={null}> for wallpaper + wallArt, and map={userTex} direct prop for user-texture branch", () => {
+  it("WallMesh.tsx uses <primitive attach=\"map\" ... dispose={null}> for preset wallpaper; direct map={} prop for user-texture (Phase 49) and wallArt (Phase 50) branches", () => {
     const src = read("src/three/WallMesh.tsx");
 
     // Phase 49: user-texture branch uses direct map={userTex} prop (BUG-02 fix).
     // R3F does NOT auto-dispose externally-passed textures — userTextureCache owns lifetime.
     expect(src).toMatch(/map=\{userTex\}/);
 
-    // The wallpaper (imageUrl) and wallArt branches still use <primitive attach="map" dispose={null}>.
-    // There are 3 remaining sites: pattern/imageUrl wallpaper overlay (1),
-    // wall art unframed (1), wall art framed inner mesh (1).
+    // Phase 50: wallArt branches use direct map={tex} prop (BUG-03 fix).
+    // wallArtTextureCache retains ownership — same contract as Phase 49.
+    expect(src).toMatch(/map=\{tex\}/);  // Phase 50: wallArt direct-prop fix
+
+    // Only the preset wallpaper (imageUrl/pattern) site still uses <primitive attach="map" dispose={null}>.
+    // There is 1 remaining site: pattern/imageUrl wallpaper overlay.
     const attachCount = (src.match(/attach="map"/g) ?? []).length;
-    expect(attachCount).toBeGreaterThanOrEqual(3);
+    expect(attachCount).toBeGreaterThanOrEqual(1);
 
     const disposeNullCount = (src.match(/dispose=\{null\}/g) ?? []).length;
-    expect(disposeNullCount).toBeGreaterThanOrEqual(3);
+    expect(disposeNullCount).toBeGreaterThanOrEqual(1);
 
-    // Must NOT use map={wallpaperATex} / map={wallpaperBTex} / map={artTex} / generic map={tex}
-    // (these are the exact shorthand forms that trigger R3F auto-dispose for cached textures)
-    const badShorthand = src.match(/map=\{(wallpaper[AB]Tex|artTex|tex)\}/g) ?? [];
+    // Must NOT use map={wallpaperATex} / map={wallpaperBTex} / map={artTex}
+    // (these are the exact shorthand forms that trigger R3F auto-dispose for cached textures).
+    // Note: map={tex} is now CORRECT (wallArt direct-prop fix Phase 50) — not in bad-shorthand list.
+    const badShorthand = src.match(/map=\{(wallpaper[AB]Tex|artTex)\}/g) ?? [];
     expect(badShorthand).toEqual([]);
   });
 

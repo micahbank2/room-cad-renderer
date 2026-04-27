@@ -10,7 +10,7 @@
 // for a given wall id after setWallpaper is called.
 
 import * as THREE from "three";
-import { saveUserTexture } from "@/lib/userTextureStore";
+import { saveUserTexture, getUserTexture } from "@/lib/userTextureStore";
 import { getUserTextureCached } from "@/three/userTextureCache";
 import { USER_TEXTURE_ID_PREFIX } from "@/types/userTexture";
 import { uid } from "@/lib/geometry";
@@ -64,6 +64,23 @@ export function getWallMeshMapResolved(wallId: string): boolean {
 }
 
 /**
+ * Returns an ObjectURL for the blob stored under `id` in the user-texture IDB.
+ * Use this as `imageUrl` in an `addWallArt` call to exercise the blob-URL path
+ * through `wallArtTextureCache` (keyed by imageUrl).
+ *
+ * Caller must revoke the URL when done: `URL.revokeObjectURL(url)`.
+ * Gated by MODE === "test".
+ */
+export async function getWallArtBlobUrl(id: string): Promise<string> {
+  if (import.meta.env.MODE !== "test") {
+    throw new Error("getWallArtBlobUrl must not be called outside test mode");
+  }
+  const entry = await getUserTexture(id);
+  if (!entry) throw new Error(`getWallArtBlobUrl: no UserTexture found for id="${id}"`);
+  return URL.createObjectURL(entry.blob);
+}
+
+/**
  * Phase 49: install user-texture test drivers. Production no-op.
  */
 export function installUserTextureDrivers(): void {
@@ -81,6 +98,9 @@ export function installUserTextureDrivers(): void {
   (
     window as unknown as { __wallMeshMaterials: typeof wallMeshMaterials }
   ).__wallMeshMaterials = wallMeshMaterials;
+
+  (window as unknown as { __getWallArtBlobUrl: typeof getWallArtBlobUrl }).__getWallArtBlobUrl =
+    getWallArtBlobUrl;
 }
 
 declare global {
@@ -88,6 +108,7 @@ declare global {
     __seedUserTexture?: (blob: Blob, name: string, sizeFt: number) => Promise<string>;
     __getWallMeshMapResolved?: (wallId: string) => boolean;
     __wallMeshMaterials?: Record<string, THREE.MeshStandardMaterial | null>;
+    __getWallArtBlobUrl?: (id: string) => Promise<string>;
   }
 }
 

@@ -137,7 +137,7 @@
   1. User applies a custom wallpaper, toggles to 2D, toggles back to 3D — wallpaper still renders.
   2. Same round-trip works for custom-uploaded wallArt.
   3. Phase 36 Playwright regression harness passes without modification.
-**Plans:** TBD
+**Plans:** 1/1 plans complete
 **UI hint**: no
 
 #### Phase 51: Legacy FloorMaterial Snapshot Migration (DEBT-05)
@@ -190,7 +190,7 @@
 | 47. Room Display Modes | 3/3 | Complete    | 2026-04-26 |
 | 48. Per-Node Saved Camera + Focus | 2/3 | Complete    | 2026-04-26 |
 | 49. Wall Texture First-Apply Fix | 1/1 | Complete    | 2026-04-27 |
-| 50. Wallpaper/WallArt View-Toggle Persistence | 0/? | Not started | - |
+| 50. Wallpaper/WallArt View-Toggle Persistence | 1/1 | Complete    | 2026-04-27 |
 | 51. Legacy FloorMaterial Snapshot Migration | 0/? | Not started | - |
 | 52. Keyboard Shortcuts Overlay | 0/? | Not started | - |
 
