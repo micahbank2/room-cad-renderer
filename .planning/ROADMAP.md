@@ -125,7 +125,7 @@
   1. User uploads a wall texture and applies it while in 3D view — the wall renders the texture immediately, no toggle needed.
   2. Applying a texture while in 2D then switching to 3D shows it on first render.
   3. No regression on Phase 32 PBR preset textures.
-**Plans:** TBD
+**Plans:** 1 plan
 **UI hint**: no
 
 #### Phase 50: Wallpaper/WallArt View-Toggle Persistence (BUG-03)
@@ -189,7 +189,7 @@
 | 46. Rooms Hierarchy Sidebar Tree | 4/4 | Complete    | 2026-04-26 |
 | 47. Room Display Modes | 3/3 | Complete    | 2026-04-26 |
 | 48. Per-Node Saved Camera + Focus | 2/3 | Complete    | 2026-04-26 |
-| 49. Wall Texture First-Apply Fix | 0/? | Not started | - |
+| 49. Wall Texture First-Apply Fix | 0/1 | In progress | - |
 | 50. Wallpaper/WallArt View-Toggle Persistence | 0/? | Not started | - |
 | 51. Legacy FloorMaterial Snapshot Migration | 0/? | Not started | - |
 | 52. Keyboard Shortcuts Overlay | 0/? | Not started | - |
