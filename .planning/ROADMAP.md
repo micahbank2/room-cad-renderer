@@ -15,6 +15,7 @@
 - ✅ **v1.9 Polish & Feedback** — Phases 38, 39, 42 (Phases 40 + 41 cancelled mid-milestone) — shipped 2026-04-25 — see [milestones/v1.9-ROADMAP.md](milestones/v1.9-ROADMAP.md)
 - ✅ **v1.10 Evidence-Driven UX Polish** — Phases 43–44 (shipped 2026-04-25) — see [milestones/v1.10-ROADMAP.md](milestones/v1.10-ROADMAP.md)
 - ✅ **v1.11 Pascal Feature Set** — shipped 2026-04-26
+- 🚧 **v1.12 Maintenance Pass** — Phases 49–52 (in progress)
 
 ---
 
@@ -93,7 +94,7 @@
 <details>
 <summary>✅ v1.10 Evidence-Driven UX Polish (Phases 43–44) — SHIPPED 2026-04-25</summary>
 
-2 phases, 2 plans, 5/5 shipped requirements (UX-01/02/03, DEFAULT-01, A11Y-01). Phase 43 UI polish bundle: 4 atomic commits closing #100 (templates ship with default ceiling at room.wallHeight), #98 (`--color-text-ghost` #484554 → #888494, ~5.15:1 WCAG AA, fixes 124+ usages globally), #101 (SAVED/SAVING/SAVE_FAILED badges enlarged text-[10px] → text-base 13px), #99 (PropertiesPanel empty-state copy when nothing selected). Phase 44 reduced-motion sweep: 2 honest guards on wall-side camera tween + SAVING spinner; snap guides verified to need no guard (render at static GUIDE_OPACITY=0.6, no animation existed despite GH #76 issue body claim). Pattern validated: "evidence-driven prioritization" — 5 evidence-driven items shipped, 6 speculative items deferred (Pascal competitor-set committed for v1.11; #97/#81 deferred until evidence). 19 commits, +1,180/-42 LOC, single-day milestone. **AUDIT-01 systemic resolution:** three milestones of recurring "phases ship with SUMMARY-only" pattern (v1.8/v1.9/v1.10) resolved during v1.10 audit by editing `~/.claude/get-shit-done/workflows/audit-milestone.md` to formalize substitute-evidence policy. SUMMARY.md is now canonical evidence; VERIFICATION.md optional. Audit `passed_with_carry_over`. See [milestones/v1.10-ROADMAP.md](milestones/v1.10-ROADMAP.md).
+2 phases, 2 plans, 5/5 shipped requirements (UX-01/02/03, DEFAULT-01, A11Y-01). Phase 43 UI polish bundle: 4 atomic commits closing #100 (templates ship with default ceiling at room.wallHeight), #98 (`--color-text-ghost` #484554 → #888494, ~5.15:1 WCAG AA, fixes 124+ usages globally), #101 (SAVED/SAVING/SAVE_FAILED badges enlarged text-[10px] → text-base 13px), #99 (ProspectSheet empty-state copy when nothing selected). Phase 44 reduced-motion sweep: 2 honest guards on wall-side camera tween + SAVING spinner; snap guides verified to need no guard (render at static GUIDE_OPACITY=0.6, no animation existed despite GH #76 issue body claim). Pattern validated: "evidence-driven prioritization" — 5 evidence-driven items shipped, 6 speculative items deferred (Pascal competitor-set committed for v1.11; #97/#81 deferred until evidence). 19 commits, +1,180/-42 LOC, single-day milestone. **AUDIT-01 systemic resolution:** three milestones of recurring "phases ship with SUMMARY-only" pattern (v1.8/v1.9/v1.10) resolved during v1.10 audit by editing `~/.claude/get-shit-done/workflows/audit-milestone.md` to formalize substitute-evidence policy. SUMMARY.md is now canonical evidence; VERIFICATION.md optional. Audit `passed_with_carry_over`. See [milestones/v1.10-ROADMAP.md](milestones/v1.10-ROADMAP.md).
 
 </details>
 
@@ -102,7 +103,68 @@
 ## v1.11 Pascal Feature Set (shipped 2026-04-26)
 
 4 phases (45-48), 13 plans, 4/4 requirements (THUMB-01, TREE-01, DISPLAY-01, CAM-04). Auto-rendered material swatches, sidebar rooms hierarchy tree, NORMAL/SOLO/EXPLODE display modes, per-node saved cameras with tree double-click focus. Audit passed_with_carry_over (Phase 999.4 EXPLODE+saved-camera offset gap deferred). 60+ commits, single-day milestone span. See [milestones/v1.11-ROADMAP.md](milestones/v1.11-ROADMAP.md).
+
 ---
+
+## v1.12 Maintenance Pass
+
+**Goal:** Close 2 carry-over texture bugs and 1 snapshot bloat item before adding new features, then ship one evidence-backed UX polish item.
+
+**Source:** GH [#94](https://github.com/micahbank2/room-cad-renderer/issues/94) (BUG-02), [#71](https://github.com/micahbank2/room-cad-renderer/issues/71) (BUG-03), [#95](https://github.com/micahbank2/room-cad-renderer/issues/95) (DEBT-05), [#72](https://github.com/micahbank2/room-cad-renderer/issues/72) (HOTKEY-01).
+
+**Sequencing:** Bugs first (49-51) so the texture/snapshot foundation is stable before adding the overlay component in Phase 52.
+
+### Phase Details
+
+#### Phase 49: Wall Texture First-Apply Fix (BUG-02)
+
+**Goal:** Uploaded wall textures render in 3D on first apply without requiring a view-mode toggle.
+**Depends on:** Phase 34 user-texture pipeline; Phase 32 PBR foundation (`pbrTextureCache`).
+**Requirements:** BUG-02 ([#94](https://github.com/micahbank2/room-cad-renderer/issues/94))
+**Success Criteria** (what must be TRUE):
+  1. User uploads a wall texture and applies it while in 3D view — the wall renders the texture immediately, no toggle needed.
+  2. Applying a texture while in 2D then switching to 3D shows it on first render.
+  3. No regression on Phase 32 PBR preset textures.
+**Plans:** TBD
+**UI hint**: no
+
+#### Phase 50: Wallpaper/WallArt View-Toggle Persistence (BUG-03)
+
+**Goal:** Custom-uploaded wallpaper and wallArt survive 2D↔3D view-mode switches.
+**Depends on:** Phase 49 (sequencing — both touch WallMesh texture resolution); Phase 36 VIZ-10 regression harness.
+**Requirements:** BUG-03 ([#71](https://github.com/micahbank2/room-cad-renderer/issues/71))
+**Success Criteria** (what must be TRUE):
+  1. User applies a custom wallpaper, toggles to 2D, toggles back to 3D — wallpaper still renders.
+  2. Same round-trip works for custom-uploaded wallArt.
+  3. Phase 36 Playwright regression harness passes without modification.
+**Plans:** TBD
+**UI hint**: no
+
+#### Phase 51: Legacy FloorMaterial Snapshot Migration (DEBT-05)
+
+**Goal:** Saved project snapshots no longer embed raw data-URL strings for custom floor textures.
+**Depends on:** Phase 50 (sequencing); Phase 34 `userTextureId` reference system + IDB texture store.
+**Requirements:** DEBT-05 ([#95](https://github.com/micahbank2/room-cad-renderer/issues/95))
+**Success Criteria** (what must be TRUE):
+  1. Loading a legacy project with a `kind: "custom"` FloorMaterial produces a snapshot with `userTextureId`, not a `data:image/...` string.
+  2. Exported JSON for a project with 5 custom textures is under 50 KB.
+  3. No data loss — the texture still renders correctly after migration.
+  4. Subsequent saves persist the migrated shape; no re-migration on next load.
+**Plans:** TBD
+**UI hint**: no
+
+#### Phase 52: Keyboard Shortcuts Overlay (HOTKEY-01)
+
+**Goal:** Pressing `?` anywhere in the app opens a keyboard shortcuts cheat sheet overlay.
+**Depends on:** Phase 51 (sequencing); Phase 33 design tokens + lucide icons; `useReducedMotion` hook.
+**Requirements:** HOTKEY-01 ([#72](https://github.com/micahbank2/room-cad-renderer/issues/72))
+**Success Criteria** (what must be TRUE):
+  1. Pressing `?` (Shift+/) opens the overlay; pressing Escape or clicking the backdrop closes it.
+  2. Overlay lists all shortcuts grouped by category (Tools, View, Camera, Selection).
+  3. `?` is inert when focus is inside a form input.
+  4. Entrance animation respects `useReducedMotion` (snap open when reduced-motion active).
+**Plans:** TBD
+**UI hint**: yes
 
 ---
 
@@ -127,6 +189,10 @@
 | 46. Rooms Hierarchy Sidebar Tree | 4/4 | Complete    | 2026-04-26 |
 | 47. Room Display Modes | 3/3 | Complete    | 2026-04-26 |
 | 48. Per-Node Saved Camera + Focus | 2/3 | Complete    | 2026-04-26 |
+| 49. Wall Texture First-Apply Fix | 0/? | Not started | - |
+| 50. Wallpaper/WallArt View-Toggle Persistence | 0/? | Not started | - |
+| 51. Legacy FloorMaterial Snapshot Migration | 0/? | Not started | - |
+| 52. Keyboard Shortcuts Overlay | 0/? | Not started | - |
 
 ## Backlog
 

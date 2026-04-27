@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.11
-milestone_name: Pascal Feature Set
+milestone: v1.12
+milestone_name: Maintenance Pass
 status: executing
 stopped_at: Completed 48-02-PLAN.md (cadStore types + NoHistory actions + getCameraCapture bridge)
-last_updated: "2026-04-26T20:57:57.211Z"
+last_updated: "2026-04-27T15:22:54.264Z"
 progress:
-  total_phases: 7
-  completed_phases: 3
-  total_plans: 12
-  completed_plans: 11
+  total_phases: 44
+  completed_phases: 41
+  total_plans: 112
+  completed_plans: 111
 ---
 
 # Project State
@@ -19,15 +19,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-25 — v1.10 archived; v1.11 Pascal Feature Set queued next)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 48 — per-node-saved-camera-focus-action-cam-04
+**Current focus:** Phase 49 — TBD
 
 ## Current Position
 
-Phase: 999.1
+Phase: 49 (TBD) — EXECUTING
 Milestone: v1.11 Pascal Feature Set
 Phases: 4 (45, 46, 47, 48) — none planned yet
-Plan: Not started
-Status: Ready to execute
+Plan: 1 of ?
+Status: Executing Phase 49
 
 ## v1.11 Phase Sequence
 
