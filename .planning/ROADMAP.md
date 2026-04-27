@@ -14,7 +14,7 @@
 - ✅ **v1.8 3D Realism Completion** — Phases 34–37 (shipped 2026-04-25) — see [milestones/v1.8-ROADMAP.md](milestones/v1.8-ROADMAP.md)
 - ✅ **v1.9 Polish & Feedback** — Phases 38, 39, 42 (Phases 40 + 41 cancelled mid-milestone) — shipped 2026-04-25 — see [milestones/v1.9-ROADMAP.md](milestones/v1.9-ROADMAP.md)
 - ✅ **v1.10 Evidence-Driven UX Polish** — Phases 43–44 (shipped 2026-04-25) — see [milestones/v1.10-ROADMAP.md](milestones/v1.10-ROADMAP.md)
-- 🚧 **v1.11 Pascal Feature Set** — Phases 45–48 (in progress)
+- ✅ **v1.11 Pascal Feature Set** — shipped 2026-04-26
 
 ---
 
@@ -99,57 +99,9 @@
 
 ---
 
-## v1.11 Pascal Feature Set
+## v1.11 Pascal Feature Set (shipped 2026-04-26)
 
-**Goal:** Adopt the 4 strongest features from the Pascal Editor competitive audit. v1.9 Phase 39 deferred these as "speculative" because there was no demand signal at the time; the user explicitly committed to them as the next direction during v1.10 scoping.
-
-**Source:** Pascal Editor competitive audit (`.planning/competitive/pascal-audit.md`). All 4 issues filed during v1.7.5 design-system work with `competitor-insight` labels.
-
-**Sequencing rationale:** Easy → hard. Each phase ships a tangible UX win; later phases depend on earlier infrastructure. Cancellation of any later phase still leaves earlier phases' value behind.
-
-### Phase Details
-
-#### Phase 45: Auto-Generated Material Swatch Thumbnails (THUMB-01)
-**Goal:** Material picker swatches render from the live PBR/material pipeline rather than hand-curated static images.
-**Depends on:** Phase 32 PBR foundation (texture cache, color-space helper); existing `surfaceMaterials.ts` data + picker components.
-**Requirements:** THUMB-01
-**UI hint:** yes (visible in FloorMaterialPicker / SwatchPicker / ceiling material picker)
-**Plans:** 2/2 plans complete
-- [x] 45-01-PLAN.md — Renderer + cache module (`swatchThumbnailGenerator.ts`) + Wave 0 vitest
-- [x] 45-02-PLAN.md — `MaterialThumbnail` component + `SurfaceMaterialPicker` wiring + Wave 0 vitest
-
-#### Phase 46: Rooms Hierarchy Sidebar Tree (TREE-01)
-**Goal:** Sidebar gains a Rooms tree — collapsible per-room, nested children (walls/ceilings/products/custom-elements), click-to-focus, per-node visibility toggle.
-**Depends on:** Phase 45 (sequencing, not code); Phase 33 `CollapsibleSection` primitive; existing `cadStore.rooms` structure; `uiStore.selectedIds`.
-**Requirements:** TREE-01
-**UI hint:** yes (new Sidebar panel)
-**Plans:** 4/4 plans complete
-- [x] 46-01-PLAN.md — Wave 0 RED test scaffolding (8 test files + pure-function stubs)
-- [x] 46-02-PLAN.md — Wave 1 pure logic + uiStore additions (treeBuilder, wallLabels, hiddenIds, pendingCameraTarget)
-- [x] 46-03-PLAN.md — Wave 1 component family + Sidebar integration (RoomsTreePanel, TreeRow, focusDispatch)
-- [x] 46-04-PLAN.md — Wave 2 ThreeViewport wiring (visibility filter + pendingCameraTarget consumer)
-
-#### Phase 47: Room Display Modes (DISPLAY-01)
-**Goal:** Toolbar (or sidebar) gains a NORMAL / SOLO / EXPLODE display-mode selector.
-**Depends on:** Phase 46 (rooms tree provides "active room" semantic); existing `uiStore.cameraMode` pattern (mirror for `displayMode`).
-**Requirements:** DISPLAY-01
-**UI hint:** yes (new toggle in Toolbar or sidebar)
-**Plans:** 3/3 plans complete
-**Plans:**
-- [x] 47-01-PLAN.md — Wave 0 RED scaffolding (4 test files + 2 source stubs at canonical paths)
-- [x] 47-02-PLAN.md — Wave 1 uiStore.displayMode + multi-room ThreeViewport refactor (RoomGroup, computeRoomOffsets)
-- [x] 47-03-PLAN.md — Wave 1 Toolbar 3-button segmented control (NORMAL/SOLO/EXPLODE)
-
-#### Phase 48: Per-Node Saved Camera + Focus Action (CAM-04)
-**Goal:** Each placed product / wall / ceiling / custom-element can have a bookmarked camera angle saved via PropertiesPanel button. Double-click in the rooms tree dispatches the saved pose through Phase 46's pendingCameraTarget bridge (easeInOutCubic + reduced-motion snap inherited).
-**Depends on:** Phase 35 preset-tween infrastructure (easeInOutCubic); Phase 46 (`pendingCameraTarget` bridge + tree click-to-focus); Phase 28 (autosave debounce — saves persist via existing snapshot path).
-**Requirements:** CAM-04
-**UI hint:** yes (PropertiesPanel Save/Clear buttons; tree-row Camera icon indicator; tree double-click triggers Focus)
-**Plans:** 2/3 plans complete
-- [x] 48-01-PLAN.md — Wave 0 RED scaffolding (3 vitest + 1 playwright + 2 source stubs at canonical paths)
-- [x] 48-02-PLAN.md — Wave 1 cadStore type additions (D-03) + 5 NoHistory setters (D-04) + uiStore getCameraCapture bridge + ThreeViewport install
-- [ ] 48-03-PLAN.md — Wave 1 PropertiesPanel Save/Clear buttons (D-01/D-09/D-11) + TreeRow Camera icon indicator (D-07) + double-click dispatch (D-02) + focusOnSavedCamera helper + savedCameraDrivers fill
-
+4 phases (45-48), 13 plans, 4/4 requirements (THUMB-01, TREE-01, DISPLAY-01, CAM-04). Auto-rendered material swatches, sidebar rooms hierarchy tree, NORMAL/SOLO/EXPLODE display modes, per-node saved cameras with tree double-click focus. Audit passed_with_carry_over (Phase 999.4 EXPLODE+saved-camera offset gap deferred). 60+ commits, single-day milestone span. See [milestones/v1.11-ROADMAP.md](milestones/v1.11-ROADMAP.md).
 ---
 
 ---
@@ -210,3 +162,24 @@ Plans:
 **Discovered:** 2026-04-25 during Phase 35 HUMAN-UAT — user asked why wood oak doesn't grow with the floor. Confirmed by-design behavior; captured as a natural follow-up enhancement.
 **Promoted to v1.9 as Phase 41 (TILE-01)** during 2026-04-25 v1.9 scoping.
 **Re-deferred 2026-04-25** after Phase 39 feedback signal showed Jessica reported zero pain on texture sizing ("feels right"). Full design-effect override is hypothesis-only; the narrower BUG-01 fix (Phase 42) handles the per-surface isolation that's needed regardless. Revisit design-effect scaling when a future feedback session surfaces demand.
+
+### Phase 999.4: Saved camera EXPLODE-mode offset correction (BACKLOG — v1.11 carry-over)
+
+**Goal:** When a user double-clicks a tree node with a saved camera while in EXPLODE display mode, the focus tween should target the room's CURRENT world position (post-offset), not the saved absolute coordinates from when the camera was captured in NORMAL/SOLO.
+
+**Requirements:** AUDIT-01 (filed 2026-04-26 during v1.11 milestone audit). Single integration gap between CAM-04 (Phase 48) and DISPLAY-01 (Phase 47).
+**GH Issue:** [#127](https://github.com/micahbank2/room-cad-renderer/issues/127)
+**Plans:** 0 plans
+
+**Trigger conditions (all 3 required):**
+1. User saves a camera while in NORMAL or SOLO (room rendered at offsetX = 0)
+2. User switches to EXPLODE display mode (`cumulativeX += max(width, length) × 1.25` per room)
+3. User double-clicks the saved-camera node in the rooms tree
+
+**Mitigation paths:**
+- Apply `roomOffsets[roomId]` from `computeRoomOffsets()` to savedCameraPos/Target inside `focusOnSavedCamera` before dispatching to `requestCameraTarget`
+- Or: store saved cameras in room-relative coordinates and add the offset at focus-dispatch time
+
+**Why deferred:** Narrow trigger (cross-mode use of saved camera). Most users save + use bookmarks within a single display mode. EXPLODE is an inspection mode, not a navigation mode. Revisit if real-use feedback surfaces the bug.
+
+**Discovered:** 2026-04-26 during v1.11 milestone audit (gsd-integration-checker).
