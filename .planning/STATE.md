@@ -4,7 +4,7 @@ milestone: v1.12
 milestone_name: Maintenance Pass
 status: verifying
 stopped_at: Completed 49-01-PLAN.md (BUG-02 wall user-texture first-apply fix)
-last_updated: "2026-04-27T16:04:00.081Z"
+last_updated: "2026-04-27T16:06:17.211Z"
 progress:
   total_phases: 8
   completed_phases: 1
@@ -23,10 +23,10 @@ See: .planning/PROJECT.md (updated 2026-04-25 — v1.10 archived; v1.11 Pascal F
 
 ## Current Position
 
-Phase: 49 (bug-02-wall-user-texture-first-apply) — EXECUTING
+Phase: 999.1
 Milestone: v1.11 Pascal Feature Set
 Phases: 4 (45, 46, 47, 48) — none planned yet
-Plan: 1 of 1
+Plan: Not started
 Status: Phase complete — ready for verification
 
 ## v1.11 Phase Sequence
