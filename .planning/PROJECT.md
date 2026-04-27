@@ -54,6 +54,24 @@ See `.planning/ROADMAP.md` for links to each milestone archive.
 
 </details>
 
+## Current Milestone: v1.12 Maintenance Pass
+
+**Goal:** Close 3 carry-over bugs that affect actual use, plus one small UX win. Maintenance milestone after the v1.11 sprint — clean up before the next big swing.
+
+**Target requirements (4 issues, 4 phases):**
+- **Phase 49 / BUG-02 / [#94](https://github.com/micahbank2/room-cad-renderer/issues/94)** — Wall user-texture renders correctly on first apply (no 2D→3D toggle workaround required)
+- **Phase 50 / BUG-03 / [#71](https://github.com/micahbank2/room-cad-renderer/issues/71)** — Uploaded wallpaper + wallArt persist across 2D↔3D toggle (closes Phase 999.2 deferred-from-v1.8)
+- **Phase 51 / DEBT-05 / [#95](https://github.com/micahbank2/room-cad-renderer/issues/95)** — Migrate legacy FloorMaterial `kind="custom"` data URLs out of snapshots (LIB-08 bloat)
+- **Phase 52 / HOTKEY-01 / [#72](https://github.com/micahbank2/room-cad-renderer/issues/72)** — `?` opens keyboard shortcuts cheat sheet overlay
+
+**Sequencing intent:** Bugs first (49–51), polish last (52). Each phase ships independently. Cancellation of any later phase still leaves earlier value behind.
+
+**Out of v1.12:** Right-click context menus ([#74](https://github.com/micahbank2/room-cad-renderer/issues/74)), in-app feedback dialog ([#73](https://github.com/micahbank2/room-cad-renderer/issues/73)), properties-in-3D ([#97](https://github.com/micahbank2/room-cad-renderer/issues/97)), EXPLODE+saved-camera offset ([#127](https://github.com/micahbank2/room-cad-renderer/issues/127)), big swings (GLTF/GLB upload, material system overhaul, PBR extensions). Revisit pending real-use signal or after maintenance ships.
+
+**Tech debt acknowledged + accepted:**
+- 6 pre-existing vitest failures permanently accepted (Phase 37 D-02); CI vitest stays disabled
+- AUDIT-01 substitute-evidence policy formalized in v1.10 audit. SUMMARY.md is canonical evidence.
+
 ## Target User
 
 One person. Non-technical. Interior design enthusiast, not a professional. Comfortable with basic computer use. Thinks visually. Saves products from Pinterest, Instagram, and store websites.

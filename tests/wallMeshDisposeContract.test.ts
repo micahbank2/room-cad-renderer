@@ -5,6 +5,14 @@
 // Runtime verification: tests/e2e/specs/wallpaper-2d-3d-toggle.spec.ts,
 // wallart-2d-3d-toggle.spec.ts, floor-user-texture-toggle.spec.ts,
 // ceiling-user-texture-toggle.spec.ts (Plan 36-01).
+//
+// Phase 49 update: the user-texture branch (formerly a <primitive attach="map">
+// site) was converted to a direct `map={userTex}` prop per BUG-02 fix.
+// R3F does NOT auto-dispose externally-passed texture props — only objects it
+// created internally. The userTextureCache module retains ownership, which is
+// equivalent to the dispose={null} contract on the removed <primitive>.
+// This test now asserts: (a) the wallpaper + wallArt <primitive> sites are
+// unchanged, AND (b) the user-texture branch uses the direct map={} prop.
 
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
@@ -24,6 +32,12 @@ import { resolve } from "node:path";
  * for the next mount cycle — producing the wallpaper-disappears-on-toggle
  * bug that Plans 32-05 and 32-06 misdiagnosed before 32-07 identified it.
  *
+ * Exception (Phase 49 / BUG-02): the user-texture branch uses `map={userTex}`
+ * as a direct prop instead of `<primitive>`. This is safe because R3F does NOT
+ * auto-dispose externally-passed texture objects — only internally created ones.
+ * The module-level userTextureCache owns the texture lifetime. The test below
+ * explicitly asserts this direct-prop pattern exists.
+ *
  * This test is static-source-level on purpose. Testing R3F's actual dispose
  * traversal at runtime requires a full Canvas + WebGLRenderer setup which
  * is heavy and fragile in vitest. Locking the source pattern catches every
@@ -35,17 +49,24 @@ function read(relPath: string): string {
 }
 
 describe("R3F dispose={null} contract — cached texture render sites", () => {
-  it("WallMesh.tsx uses <primitive attach=\"map\" ... dispose={null}> for wallpaper + wallArt", () => {
+  it("WallMesh.tsx uses <primitive attach=\"map\" ... dispose={null}> for wallpaper + wallArt, and map={userTex} direct prop for user-texture branch", () => {
     const src = read("src/three/WallMesh.tsx");
-    // Must attach cached textures via primitive pattern
+
+    // Phase 49: user-texture branch uses direct map={userTex} prop (BUG-02 fix).
+    // R3F does NOT auto-dispose externally-passed textures — userTextureCache owns lifetime.
+    expect(src).toMatch(/map=\{userTex\}/);
+
+    // The wallpaper (imageUrl) and wallArt branches still use <primitive attach="map" dispose={null}>.
+    // There are 3 remaining sites: pattern/imageUrl wallpaper overlay (1),
+    // wall art unframed (1), wall art framed inner mesh (1).
     const attachCount = (src.match(/attach="map"/g) ?? []).length;
-    expect(attachCount).toBeGreaterThanOrEqual(2);
+    expect(attachCount).toBeGreaterThanOrEqual(3);
 
     const disposeNullCount = (src.match(/dispose=\{null\}/g) ?? []).length;
-    expect(disposeNullCount).toBeGreaterThanOrEqual(2);
+    expect(disposeNullCount).toBeGreaterThanOrEqual(3);
 
     // Must NOT use map={wallpaperATex} / map={wallpaperBTex} / map={artTex} / generic map={tex}
-    // (these are the exact shorthand forms that trigger R3F auto-dispose)
+    // (these are the exact shorthand forms that trigger R3F auto-dispose for cached textures)
     const badShorthand = src.match(/map=\{(wallpaper[AB]Tex|artTex|tex)\}/g) ?? [];
     expect(badShorthand).toEqual([]);
   });
