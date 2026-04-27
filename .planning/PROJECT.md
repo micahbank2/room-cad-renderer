@@ -12,6 +12,11 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
+**v1.11 Pascal Feature Set shipped 2026-04-26** (2-day milestone span). 4 phases (45–48), 13 plans across 9 waves, 60+ commits, 4/4 requirements (THUMB-01, TREE-01, DISPLAY-01, CAM-04). Adopted the 4 strongest features from the Pascal Editor competitive audit. Phase 45 (THUMB-01): material picker swatches now auto-render from the live PBR pipeline via offscreen `swatchThumbnailGenerator` + `<MaterialThumbnail>` host. Phase 46 (TREE-01): sidebar Rooms hierarchy tree at the top of the panel with collapsible per-room nodes, click-to-focus camera via new `pendingCameraTarget` bridge, per-node eye-icon visibility cascade through `isHiddenInTree`. Phase 47 (DISPLAY-01): NORMAL/SOLO/EXPLODE Toolbar segmented control with architectural shift — ThreeViewport's Scene refactored from active-room-only to multi-room iteration via new `RoomGroup` wrapper. Phase 48 (CAM-04): each wall/product/ceiling/custom-element gains optional `savedCameraPos`/`savedCameraTarget` tuples (5 new `*NoHistory` setters mirror Phase 25/31 precedent), PropertiesPanel Save/Clear buttons capture live R3F camera via `getCameraCapture` bridge installed by ThreeViewport, tree double-click dispatches `focusOnSavedCamera` through Phase 46's bridge. Audit `passed_with_carry_over`: 1 medium-severity cross-phase gap deferred to Phase 999.4 ([GH #127](https://github.com/micahbank2/room-cad-renderer/issues/127)) — saved cameras don't account for EXPLODE room offsets in cross-mode use. 3 low-severity tech-debt items tracked. Each phase shipped through the same loop: discuss → plan → verify-plan → execute → preview-test → merge.
+
+<details>
+<summary>Earlier milestones</summary>
+
 **v1.10 Evidence-Driven UX Polish shipped 2026-04-25** (single-day milestone). 2 phases (43, 44), 2 plans, 19 commits, +1,180/-42 LOC. Smallest milestone in project history. Phase 43 UI polish bundle closed 4 GH issues atomically — templates ship with default ceiling, `--color-text-ghost` token bumped to meet WCAG AA (fixes 124+ usages), SAVED badge enlarged, PropertiesPanel gains empty-state copy. Phase 44 reduced-motion sweep closed [GH #76](https://github.com/micahbank2/room-cad-renderer/issues/76) with two honest guards (wall-side camera tween + SAVING spinner) plus the verified-and-documented finding that snap guides needed no guard (no animation existed despite issue claim). **AUDIT-01 systemic resolution:** three milestones of recurring "phases ship with SUMMARY-only" pattern resolved by editing the global GSD workflow (`~/.claude/get-shit-done/workflows/audit-milestone.md`) to formalize SUMMARY.md as canonical evidence — future audits across all GSD projects benefit. Audit `passed_with_carry_over`. The "evidence-driven prioritization" pattern validated: 5 evidence-driven items shipped, 6 speculative items deferred (Pascal competitor-set committed for v1.11; rest parked).
 
 <details>
@@ -46,52 +51,6 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 See `.planning/ROADMAP.md` for links to each milestone archive.
 
 </details>
-
-## Current Milestone: v1.11 Pascal Feature Set
-
-**Goal:** Adopt the 4 strongest features from the Pascal Editor competitive audit. v1.9 Phase 39 deferred these as "speculative"; user explicitly committed to them during v1.10 scoping as the next direction.
-
-**Target features (4 issues, 4 phases — easy → hard):**
-- **Phase 45 / THUMB-01 / [#77](https://github.com/micahbank2/room-cad-renderer/issues/77)** — Auto-generated material swatch thumbnails from the renderer (replaces hand-curated swatches in pickers)
-- **Phase 46 / TREE-01 / [#78](https://github.com/micahbank2/room-cad-renderer/issues/78)** — Rooms hierarchy sidebar tree (collapsible per-room, click-to-focus, per-node visibility toggle)
-- **Phase 47 / DISPLAY-01 / [#80](https://github.com/micahbank2/room-cad-renderer/issues/80)** — Room display modes (NORMAL / SOLO / EXPLODE) for inspecting individual rooms or seeing exploded layouts
-- **Phase 48 / CAM-04 / [#79](https://github.com/micahbank2/room-cad-renderer/issues/79)** — Per-node saved camera with Focus action (each product/wall/ceiling can bookmark a camera angle; double-click in tree jumps camera there via Phase 35 tween)
-
-**Phase numbering:** Phases 45–48 (continues from 44).
-
-**Phase 45 (THUMB-01) shipped 2026-04-25** — Material picker swatches now render from the live PBR/material pipeline. New offscreen `swatchThumbnailGenerator` (lazy single `THREE.WebGLRenderer` + studio rig + plane mesh + in-memory cache, `"fallback"` sentinel on PBR failure) feeds a new `<MaterialThumbnail>` host that crossfades from hex placeholder to rendered PNG (gated by `useReducedMotion`); `SurfaceMaterialPicker` warms the cache via `generateBatch` on mount. Adding new SURFACE_MATERIALS entries no longer requires committing PNG assets. 12/12 vitest GREEN, zero new regressions, 6 perceptual UAT items pending real-browser visual inspection. Closes [GH #77](https://github.com/micahbank2/room-cad-renderer/issues/77).
-
-**Phase 48 (CAM-04) shipped 2026-04-26** — Each wall / placed product / ceiling / placed custom element gains optional `savedCameraPos` + `savedCameraTarget` tuples in cadStore (serializes with project, no undo pollution via 5 new `*NoHistory` setters mirroring Phase 25/31 precedent). PropertiesPanel adds Save / Clear buttons (lucide `Camera` / `CameraOff`) — Save captures live R3F camera via new `getCameraCapture` bridge installed by ThreeViewport's Scene useEffect at mount; disabled in 2D viewMode (D-09 with verbatim "Switch to 3D view to save a camera angle" tooltip). RoomsTreePanel TreeRow renders a small accent-purple `Camera` indicator (14px, `text-accent-light`) next to the eye-toggle on leaf nodes that have a saved camera; group + room rows never show it (D-07 leaf-only). Tree double-click on a leaf dispatches `focusOnSavedCamera` which routes through Phase 46's `pendingCameraTarget` bridge — easeInOutCubic tween + reduced-motion snap inherited (D-06, D-08). Fall-through preserved: double-click on a leaf without a saved camera triggers Phase 46's default focus (no dead clicks, D-02). 3 plans across 3 waves, 11 commits, 24/24 vitest tests GREEN, +24 net passing tests. lucide-only icons (D-33), zero arbitrary spacing (D-34). 10 perceptual + e2e items pending human verification ([48-HUMAN-UAT.md](.planning/phases/48-per-node-saved-camera-focus-action-cam-04/48-HUMAN-UAT.md)). Closes [GH #79](https://github.com/micahbank2/room-cad-renderer/issues/79). v1.11 Pascal Feature Set milestone now complete (4/4 phases shipped).
-
-**Phase 47 (DISPLAY-01) shipped 2026-04-26** — Toolbar gains a NORMAL/SOLO/EXPLODE segmented control (3 lucide buttons: LayoutGrid, Square, Move3d) gated to viewMode === "3d" || "split", placed after the camera-preset cluster. Architectural shift: ThreeViewport's Scene now iterates `Object.entries(rooms)` via new `RoomGroup` wrapper component (Phase 46's single-room rendering extended to multi-room). EXPLODE math: `cumulativeX += max(width, length) × 1.25` per room, X-axis only (D-03). SOLO filters to `activeRoomId` (renders empty if null per D-06). NORMAL renders all. Switching is INSTANT — no tween/lerp on mode change (D-07). Phase 46 hiddenIds composes per-room inside RoomGroup (D-04 orthogonal filters preserved). Persists to `gsd:displayMode` localStorage (lazy initializer pattern). View-state only — zero cadStore touch, zero undo entries, zero autosave triggers. 3 plans across 2 waves, 9 commits, 23/23 vitest tests GREEN, +27 net passing tests. lucide-only icons (D-33), zero arbitrary spacing in Toolbar (D-34). 9 perceptual + e2e items pending human verification ([47-HUMAN-UAT.md](.planning/phases/47-room-display-modes-display-01/47-HUMAN-UAT.md)). Closes [GH #80](https://github.com/micahbank2/room-cad-renderer/issues/80).
-
-**Phase 46 (TREE-01) shipped 2026-04-26** — Sidebar gains a Rooms hierarchy tree mounted as topmost panel above Room config (D-01). Per-room collapsible nodes with nested groups (walls / ceiling / products / custom) and leaves, click-to-focus via new `pendingCameraTarget` (mirrors Phase 35 `pendingPresetRequest` useEffect at lines 252–302; D-39 reduced-motion snap), per-node eye-icon visibility toggle with cascade resolver `isHiddenInTree` driving `ThreeViewport` filter at all 4 render sites (D-11/D-12). Per-room expand state persists to `gsd:tree:room:{roomId}:expanded` (D-13). UI-SPEC anatomy verbatim: chevron 16px (`w-4 h-4`), eye 24×24 (`w-6 h-6`), eye glyph 14px, row 24px (`h-6`), accent-purple selection on `bg-obsidian-highest border-l-2 border-accent` with `aria-current="true"`. New `uiStore` surfaces: `hiddenIds`, `toggleHidden/setHidden/clearHidden`, `pendingCameraTarget`, `requestCameraTarget/clearPendingCameraTarget`. lucide-react icons only (no Material Symbols). 4 plans across 3 waves, 14 commits, 12/12 vitest files (46/46 tests) GREEN, 4 Playwright e2e specs ready. Pre-existing failures (SaveIndicator/AddProductModal/SidebarProductPicker/productStore) confirmed unchanged. 6 perceptual + e2e items pending human verification ([46-HUMAN-UAT.md](.planning/phases/46-rooms-hierarchy-sidebar-tree-tree-01/46-HUMAN-UAT.md)). Closes [GH #78](https://github.com/micahbank2/room-cad-renderer/issues/78).
-
-**Sequencing intent:** Easy → hard. Phase 45 (cheapest, isolated, no schema changes). Phase 46 (rooms tree depends on existing room data — provides infrastructure for Focus). Phase 47 (display modes layer on top of room rendering + tree's "active room" semantic). Phase 48 (per-node camera reuses Phase 35 tween + Phase 46 tree double-click trigger). Each phase ships a tangible UX win — cancellation of any later phase still leaves earlier phases' value behind.
-
-**Out of v1.11:** Backend / auth / cloud sync / mobile / iPad — major-version leap territory. R3F v9 / React 19 upgrade — still gated on R3F v9 stability ([#56](https://github.com/micahbank2/room-cad-renderer/issues/56)). [#97](https://github.com/micahbank2/room-cad-renderer/issues/97) Properties panel in 3D/split — separate concern. [#81](https://github.com/micahbank2/room-cad-renderer/issues/81) PBR extensions — different domain. Phase 999.1 (ceiling drag-resize) + Phase 999.3 (full design-effect tile override) — re-deferred from v1.9 cancellation; revisit pending demand signal.
-
-**Tech debt acknowledged + accepted:**
-- 6 pre-existing vitest failures permanently accepted (Phase 37 D-02); CI vitest stays disabled
-- AUDIT-01 systemic resolution: substitute-evidence policy formalized in `~/.claude/get-shit-done/workflows/audit-milestone.md` during v1.10 audit. SUMMARY.md is canonical evidence.
-
-<details>
-<summary>v1.10 milestone (now shipped)</summary>
-
-## Previous Milestone: v1.10 Evidence-Driven UX Polish
-
-**Goal:** Tighten the v1.9 surface by closing 5 GH-tracked UX issues with real evidence behind them. Skip speculative items.
-
-**Final shape:**
-- ✅ UX-01 / Phase 43 — SAVED badge enlarged
-- ✅ UX-02 / Phase 43 — Muted text contrast WCAG AA (token bump fixes 124+ usages)
-- ✅ UX-03 / Phase 43 — PropertiesPanel empty-state copy
-- ✅ DEFAULT-01 / Phase 43 — Templates ship with default ceiling
-- ✅ A11Y-01 / Phase 44 — `prefers-reduced-motion` guards on wall-side camera tween + SAVING spinner (snap guides verified to need no guard)
-
-**Pattern validated:** Evidence-driven prioritization. 5 evidence-driven items shipped, 6 speculative items deferred. Smallest, cleanest milestone in project history.
-
-**AUDIT-01 systemic resolution:** Three milestones of recurring "phases ship with SUMMARY-only" pattern resolved via global GSD workflow edit. SUMMARY.md is now formally canonical evidence. Future audits across all GSD projects benefit.
 
 </details>
 
