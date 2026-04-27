@@ -6,7 +6,7 @@
 // Removing the prop re-enters R3F dispose logic, which calls `tex.dispose()`
 // on the module-level cache's stored reference and re-opens VIZ-10. Do NOT
 // remove without landing a reproducer in the harness first.
-// Sites: 182 (pattern/imageUrl wallpaper), 268 + 288 (wall art framed + unframed).
+// Sites: 182 (pattern/imageUrl wallpaper only; wallArt converted to direct-prop pattern).
 //
 // Phase 49 exception (BUG-02 fix): the user-texture branch (formerly line 136)
 // was converted to a direct `map={userTex}` prop (see comment block above that
@@ -14,6 +14,12 @@
 // only objects it created internally. The module-level userTextureCache retains
 // ownership, equivalent to the dispose={null} contract removed from that site.
 // See ROOT-CAUSE.md §4.2 and 49-RESEARCH.md §Fix Design for the analysis.
+//
+// Phase 50 exception (BUG-03 fix): the two wallArt render sites (unframed line ~317,
+// framed inner ~337) were also converted to direct `map={tex}` props with mesh-level
+// tex-conditional split. The wallArtTextureCache retains ownership — same contract
+// as Phase 49. See 50-RESEARCH.md §Fix Design. Only the preset wallpaper site remains
+// using <primitive attach="map" ... dispose={null}>.
 
 import { useEffect, useMemo, useRef, type Ref } from "react";
 import * as THREE from "three";
@@ -306,16 +312,19 @@ export default function WallMesh({ wall, isSelected }: Props) {
           const frameColor = art.frameColorOverride ?? preset?.color ?? "#ffffff";
 
           if (!preset || art.frameStyle === "none" || frameW === 0) {
-            return (
+            // Phase 50 fix (BUG-03): gate mesh on tex — material constructed with map slot
+            // filled from the start. Same pattern as Phase 49 BUG-02 fix on wallpaper branch.
+            // wallArtTextureCache retains ownership (non-disposing); R3F does not auto-dispose
+            // externally-passed texture props. No dispose={null} guard needed.
+            return tex ? (
               <mesh key={art.id} position={[artX, artY, baseZ]}>
                 <planeGeometry args={[art.width, art.height]} />
-                <meshStandardMaterial
-                  roughness={0.5}
-                  metalness={0}
-                  side={THREE.DoubleSide}
-                >
-                  {tex && <primitive attach="map" object={tex} dispose={null} />}
-                </meshStandardMaterial>
+                <meshStandardMaterial roughness={0.5} metalness={0} side={THREE.DoubleSide} map={tex} />
+              </mesh>
+            ) : (
+              <mesh key={art.id} position={[artX, artY, baseZ]}>
+                <planeGeometry args={[art.width, art.height]} />
+                <meshStandardMaterial roughness={0.5} metalness={0} side={THREE.DoubleSide} />
               </mesh>
             );
           }
@@ -327,16 +336,18 @@ export default function WallMesh({ wall, isSelected }: Props) {
 
           return (
             <group key={art.id} position={[artX, artY, 0]}>
-              <mesh position={[0, 0, artZ]}>
-                <planeGeometry args={[innerW, innerH]} />
-                <meshStandardMaterial
-                  roughness={0.5}
-                  metalness={0}
-                  side={THREE.DoubleSide}
-                >
-                  {tex && <primitive attach="map" object={tex} dispose={null} />}
-                </meshStandardMaterial>
-              </mesh>
+              {/* Phase 50 fix (BUG-03): direct map prop — same mechanism as Site 1 fix above */}
+              {tex ? (
+                <mesh position={[0, 0, artZ]}>
+                  <planeGeometry args={[innerW, innerH]} />
+                  <meshStandardMaterial roughness={0.5} metalness={0} side={THREE.DoubleSide} map={tex} />
+                </mesh>
+              ) : (
+                <mesh position={[0, 0, artZ]}>
+                  <planeGeometry args={[innerW, innerH]} />
+                  <meshStandardMaterial roughness={0.5} metalness={0} side={THREE.DoubleSide} />
+                </mesh>
+              )}
               <mesh position={[0, art.height / 2 - frameW / 2, frameCenterZ]} castShadow>
                 <boxGeometry args={[art.width, frameW, frameD]} />
                 <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.2} />
