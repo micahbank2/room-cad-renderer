@@ -6,10 +6,16 @@
 // Removing the prop re-enters R3F dispose logic, which calls `tex.dispose()`
 // on the module-level cache's stored reference and re-opens VIZ-10. Do NOT
 // remove without landing a reproducer in the harness first.
-// Sites: lines 136 (user-texture wallpaper), 182 (pattern/imageUrl wallpaper),
-// 268 + 288 (wall art framed + unframed).
+// Sites: 182 (pattern/imageUrl wallpaper), 268 + 288 (wall art framed + unframed).
+//
+// Phase 49 exception (BUG-02 fix): the user-texture branch (formerly line 136)
+// was converted to a direct `map={userTex}` prop (see comment block above that
+// branch below). R3F does NOT auto-dispose externally-passed texture props —
+// only objects it created internally. The module-level userTextureCache retains
+// ownership, equivalent to the dispose={null} contract removed from that site.
+// See ROOT-CAUSE.md §4.2 and 49-RESEARCH.md §Fix Design for the analysis.
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, type Ref } from "react";
 import * as THREE from "three";
 import type { WallSegment, Wallpaper, WainscotConfig, CrownConfig, WallArt } from "@/types/cad";
 import { wallLength, angle } from "@/lib/geometry";
@@ -122,30 +128,62 @@ export default function WallMesh({ wall, isSelected }: Props) {
   );
   const artTextures = useWallArtTextures(allArt);
 
+  // Refs for user-texture material sides A and B.
+  // Used by the Phase 49 BUG-02 fix (direct map prop) and the test-mode
+  // registry useEffect below.
+  const matRefA = useRef<THREE.MeshStandardMaterial>(null);
+  const matRefB = useRef<THREE.MeshStandardMaterial>(null);
+
+  // Phase 49 BUG-02 fix: register material refs in the test-mode wallMeshMaterials
+  // registry so that __getWallMeshMapResolved(wallId) can verify material.map is
+  // populated after setWallpaper is called. Production no-op (import.meta.env.MODE
+  // is statically replaced by Vite — dead code eliminated in production bundles).
+  useEffect(() => {
+    if (import.meta.env.MODE === "test") {
+      const reg = (window as unknown as { __wallMeshMaterials?: Record<string, THREE.MeshStandardMaterial | null> }).__wallMeshMaterials;
+      if (reg) reg[wall.id] = matRefA.current;
+    }
+  }, [wall.id, userTexA]);
+
   // Build a wallpaper overlay plane for one face (null if no wallpaper on that side)
   const renderWallpaperOverlay = (
     wp: Wallpaper | undefined,
     tex: THREE.Texture | null,
     userTex: THREE.Texture | null,
     key: string,
+    matRef?: Ref<THREE.MeshStandardMaterial>,
   ) => {
     if (!wp) return null;
 
     // Phase 34 priority: user-uploaded texture beats the legacy data-URL
     // path when both are set. Null userTex (orphan) falls through to the
     // legacy branches below → base drywall color if nothing else matches.
+    //
+    // Phase 49 fix (BUG-02): use direct map={userTex} prop instead of
+    // <primitive attach="map">. The <primitive> pattern requires
+    // material.needsUpdate=true after null→Texture transition to trigger
+    // shader recompile; R3F does not set this automatically. With a direct
+    // map prop, this branch only renders when userTex is non-null (see
+    // condition above), so the fresh meshStandardMaterial is constructed
+    // with the map slot already set — Three.js compiles the shader WITH
+    // the map from the start, eliminating the needsUpdate requirement.
+    //
+    // VIZ-10 note: R3F does NOT auto-dispose externally-passed texture
+    // objects (only objects it created internally). The module-level cache
+    // in userTextureCache.ts retains ownership — equivalent contract to the
+    // dispose={null} guard on the removed <primitive>. See ROOT-CAUSE.md §4.2.
     if (wp.userTextureId && userTex) {
       return (
         <mesh key={key} position={[0, 0, thickness / 2 + bandOffset / 2]}>
           <planeGeometry args={[length, height]} />
           <meshStandardMaterial
+            ref={matRef}
             color="#ffffff"
             roughness={0.85}
             metalness={0}
             side={THREE.DoubleSide}
-          >
-            <primitive attach="map" object={userTex} dispose={null} />
-          </meshStandardMaterial>
+            map={userTex}
+          />
         </mesh>
       );
     }
@@ -336,13 +374,13 @@ export default function WallMesh({ wall, isSelected }: Props) {
 
       {/* Side B — positive Z face (matches +perp / right side in 2D) */}
       <group>
-        {renderWallpaperOverlay(wall.wallpaper?.B, wallpaperBTex, userTexB, "wp-B")}
+        {renderWallpaperOverlay(wall.wallpaper?.B, wallpaperBTex, userTexB, "wp-B", matRefB)}
         {renderSideDecor(wall.wainscoting?.B, wall.crownMolding?.B, artB)}
       </group>
 
       {/* Side A — flip 180° around Y to -Z face (matches -perp / left side in 2D) */}
       <group rotation={[0, Math.PI, 0]}>
-        {renderWallpaperOverlay(wall.wallpaper?.A, wallpaperATex, userTexA, "wp-A")}
+        {renderWallpaperOverlay(wall.wallpaper?.A, wallpaperATex, userTexA, "wp-A", matRefA)}
         {renderSideDecor(wall.wainscoting?.A, wall.crownMolding?.A, artA)}
       </group>
     </group>
