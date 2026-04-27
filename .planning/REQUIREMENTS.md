@@ -6,7 +6,7 @@ Maintenance milestone closing 3 carry-over bugs + 1 small UX polish item. Contin
 
 ### Bugs (BUG-)
 
-- [ ] **BUG-02** — Wall user-texture (uploaded JPEG/PNG/WebP) must render in 3D on first apply, without requiring a 2D→3D toggle workaround. The texture is correctly stored in IndexedDB; the 3D mesh only picks it up after a view-mode cycle. Source: [#94](https://github.com/micahbank2/room-cad-renderer/issues/94).
+- [x] **BUG-02** — Wall user-texture (uploaded JPEG/PNG/WebP) must render in 3D on first apply, without requiring a 2D→3D toggle workaround. The texture is correctly stored in IndexedDB; the 3D mesh only picks it up after a view-mode cycle. Source: [#94](https://github.com/micahbank2/room-cad-renderer/issues/94).
   - **Verifiable:** Upload a wall texture via "My Textures" tab, apply it to a wall while in 3D view (or while currently in 2D), switch to 3D — the wall renders the texture immediately. No 2D↔3D toggle required.
   - **Acceptance:** WallMesh resolves the texture from `pbrTextureCache` synchronously on first render after a `userTextureId` change. No regression on Phase 32 PBR pipeline. Existing texture upload flow (LIB-06/07/08) untouched. No new defensive code paths — find the actual cause.
   - **Hypothesis to test:** Likely a missing `useEffect` dependency on `userTextureId` in `WallMesh`, OR `pbrTextureCache.getEntry()` returning stale `null` because the IDB read is async but the React render is sync. Investigate with research phase.

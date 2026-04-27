@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.12
 milestone_name: Maintenance Pass
-status: executing
-stopped_at: Completed 48-02-PLAN.md (cadStore types + NoHistory actions + getCameraCapture bridge)
-last_updated: "2026-04-27T15:22:54.264Z"
+status: verifying
+stopped_at: Completed 49-01-PLAN.md (BUG-02 wall user-texture first-apply fix)
+last_updated: "2026-04-27T16:04:00.081Z"
 progress:
-  total_phases: 44
-  completed_phases: 41
-  total_plans: 112
-  completed_plans: 111
+  total_phases: 8
+  completed_phases: 1
+  total_plans: 1
+  completed_plans: 1
 ---
 
 # Project State
@@ -19,15 +19,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-25 — v1.10 archived; v1.11 Pascal Feature Set queued next)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 49 — TBD
+**Current focus:** Phase 49 — bug-02-wall-user-texture-first-apply
 
 ## Current Position
 
-Phase: 49 (TBD) — EXECUTING
+Phase: 49 (bug-02-wall-user-texture-first-apply) — EXECUTING
 Milestone: v1.11 Pascal Feature Set
 Phases: 4 (45, 46, 47, 48) — none planned yet
-Plan: 1 of ?
-Status: Executing Phase 49
+Plan: 1 of 1
+Status: Phase complete — ready for verification
 
 ## v1.11 Phase Sequence
 
@@ -65,6 +65,6 @@ When `/gsd:new-milestone` runs for v1.11, the starting input is already specifie
 
 ## Session Continuity
 
-Last session: 2026-04-26T18:00:38.596Z
-Stopped at: Completed 48-02-PLAN.md (cadStore types + NoHistory actions + getCameraCapture bridge)
+Last session: 2026-04-27T16:04:00.078Z
+Stopped at: Completed 49-01-PLAN.md (BUG-02 wall user-texture first-apply fix)
 Resume file: None
