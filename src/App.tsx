@@ -1,14 +1,13 @@
-import { useState, useEffect, lazy, Suspense } from "react";
-import type { ToolType, WallSegment, PlacedProduct } from "@/types/cad";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
+import type { ToolType } from "@/types/cad";
+import { buildRegistry } from "@/lib/shortcuts";
 import { useUIStore } from "@/stores/uiStore";
 import {
   useCADStore,
   useActiveWalls,
   useActivePlacedProducts,
   useActivePlacedCustomElements,
-  getActiveRoomDoc,
 } from "@/stores/cadStore";
-import { uid } from "@/lib/geometry";
 import { useProductStore } from "@/stores/productStore";
 import { useFramedArtStore } from "@/stores/framedArtStore";
 import { useWainscotStyleStore } from "@/stores/wainscotStyleStore";
@@ -31,15 +30,10 @@ import RoomTabs from "@/components/RoomTabs";
 import AddRoomDialog from "@/components/AddRoomDialog";
 import TemplatePickerDialog from "@/components/TemplatePickerDialog";
 import FabricCanvas from "@/canvas/FabricCanvas";
-import { PRESETS } from "@/three/cameraPresets";
 
 const ThreeViewport = lazy(() => import("@/three/ThreeViewport"));
 
 type ViewMode = "2d" | "3d" | "split" | "library";
-
-// Clipboard for copy/paste (module-level, not React state)
-let _clipboard: { walls: WallSegment[]; products: PlacedProduct[] } | null = null;
-const PASTE_OFFSET = 1; // feet offset on each paste
 
 export default function App() {
   const [viewMode, setViewMode] = useState<ViewMode>("2d");
@@ -121,150 +115,50 @@ export default function App() {
     }
   }, [hasStarted]);
 
-  // Keyboard shortcuts
+  // Phase 52 (HOTKEY-01): keyboard shortcuts dispatched via the registry in
+  // src/lib/shortcuts.ts. Adding a new shortcut means adding an entry there;
+  // the help overlay and the keyboard handler stay in sync automatically.
+  // Audit invariant: tests/lib/shortcuts.registry.test.ts asserts every
+  // expected action string is present in SHORTCUT_DISPLAY_LIST.
+  const registry = useMemo(
+    () => buildRegistry({ viewMode, setTool }),
+    [viewMode, setTool],
+  );
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      // Escape always closes help first (highest priority), regardless of focus
+      // Escape always closes help first (highest priority), regardless of focus.
       if (e.key === "Escape" && useUIStore.getState().showHelp) {
         useUIStore.getState().closeHelp();
         e.preventDefault();
         return;
       }
-
+      // Active-element guard: ignore all shortcuts when typing in a form field.
       if (
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement ||
         e.target instanceof HTMLSelectElement
       ) return;
-
-      // "?" opens help (Shift+/ on US layout). Check both key and shifted "/"
-      if (e.key === "?" || (e.key === "/" && e.shiftKey)) {
-        useUIStore.getState().openHelp();
-        e.preventDefault();
+      // While help is open, only ? re-focuses shortcuts section; everything else suppressed.
+      if (useUIStore.getState().showHelp) {
+        if (e.key === "?" || (e.key === "/" && e.shiftKey)) {
+          useUIStore.getState().openHelp("shortcuts");
+          e.preventDefault();
+        }
         return;
       }
-
-      // Ignore tool shortcuts while help is open
-      if (useUIStore.getState().showHelp) return;
-
-      const shortcuts: Record<string, ToolType> = {
-        v: "select", w: "wall", d: "door", n: "window", c: "ceiling",
-      };
-      const tool = shortcuts[e.key.toLowerCase()];
-      if (tool && viewMode !== "library") setTool(tool);
-      // "0" resets canvas view (fit-to-view) — Phase 6 NAV-03
-      if (e.key === "0" && (viewMode === "2d" || viewMode === "split")) {
-        useUIStore.getState().resetView();
-      }
-      // D-03: 'e' toggles camera mode in 3D/split views
-      if (e.key.toLowerCase() === "e" && (viewMode === "3d" || viewMode === "split")) {
-        useUIStore.getState().toggleCameraMode();
-      }
-      // Phase 35 CAM-01: bare 1/2/3/4 → camera preset dispatch.
-      // Full guard chain (Research §4):
-      //   - activeElement: handled by lines 133-137 above (skipped for INPUT/TEXTAREA/SELECT).
-      //   - Modifier keys: Ctrl+1 / Cmd+1 are browser tab switches — do NOT swallow.
-      //   - D-03: inert outside 3d/split viewMode.
-      //   - D-01: inert in walk mode.
-      {
-        const presetMeta = PRESETS.find((p) => p.key === e.key);
-        if (presetMeta) {
-          if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
-          if (viewMode !== "3d" && viewMode !== "split") return;
-          if (useUIStore.getState().cameraMode === "walk") return;
-          useUIStore.getState().requestPreset(presetMeta.id);
+      // Registry-driven dispatch — first match wins (iteration-order invariant honored).
+      for (const entry of registry) {
+        if (entry.match(e)) {
           e.preventDefault();
+          entry.handler();
           return;
         }
-      }
-      // Copy (Ctrl/Cmd+C) — copy selected walls and products to clipboard
-      if (e.key.toLowerCase() === "c" && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
-        const selectedIds = useUIStore.getState().selectedIds;
-        if (selectedIds.length === 0) return;
-        const doc = getActiveRoomDoc();
-        if (!doc) return;
-        const walls: WallSegment[] = [];
-        const products: PlacedProduct[] = [];
-        for (const id of selectedIds) {
-          if (doc.walls[id]) walls.push(JSON.parse(JSON.stringify(doc.walls[id])));
-          if (doc.placedProducts[id]) products.push(JSON.parse(JSON.stringify(doc.placedProducts[id])));
-        }
-        if (walls.length > 0 || products.length > 0) {
-          _clipboard = { walls, products };
-          e.preventDefault();
-        }
-        return;
-      }
-      // Paste (Ctrl/Cmd+V) — paste clipboard items with offset and new IDs
-      if (e.key.toLowerCase() === "v" && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
-        if (!_clipboard) return;
-        e.preventDefault();
-        const store = useCADStore.getState();
-        const newIds: string[] = [];
-        for (const w of _clipboard.walls) {
-          const newId = `wall_${uid()}`;
-          store.addWall(
-            { x: w.start.x + PASTE_OFFSET, y: w.start.y + PASTE_OFFSET },
-            { x: w.end.x + PASTE_OFFSET, y: w.end.y + PASTE_OFFSET },
-          );
-          // addWall creates a basic wall; apply remaining properties
-          const doc = getActiveRoomDoc();
-          if (doc) {
-            // Find the most recently added wall (last key)
-            const allIds = Object.keys(doc.walls);
-            const latestId = allIds[allIds.length - 1];
-            if (latestId) {
-              store.updateWall(latestId, {
-                thickness: w.thickness,
-                height: w.height,
-                openings: w.openings.map((o) => ({ ...o, id: `op_${uid()}` })),
-                wallpaper: w.wallpaper ? JSON.parse(JSON.stringify(w.wallpaper)) : undefined,
-                wainscoting: w.wainscoting ? JSON.parse(JSON.stringify(w.wainscoting)) : undefined,
-                crownMolding: w.crownMolding ? JSON.parse(JSON.stringify(w.crownMolding)) : undefined,
-                wallArt: w.wallArt?.map((a) => ({ ...a, id: `art_${uid()}` })),
-              });
-              newIds.push(latestId);
-            }
-          }
-        }
-        for (const p of _clipboard.products) {
-          const newId = store.placeProduct(p.productId, {
-            x: p.position.x + PASTE_OFFSET,
-            y: p.position.y + PASTE_OFFSET,
-          });
-          if (p.rotation) store.rotateProduct(newId, p.rotation);
-          if (p.sizeScale) store.resizeProduct(newId, p.sizeScale);
-          newIds.push(newId);
-        }
-        // Select the pasted items
-        if (newIds.length > 0) useUIStore.getState().select(newIds);
-        // Offset clipboard for next paste
-        _clipboard = {
-          walls: _clipboard.walls.map((w) => ({
-            ...w,
-            start: { x: w.start.x + PASTE_OFFSET, y: w.start.y + PASTE_OFFSET },
-            end: { x: w.end.x + PASTE_OFFSET, y: w.end.y + PASTE_OFFSET },
-          })),
-          products: _clipboard.products.map((p) => ({
-            ...p,
-            position: { x: p.position.x + PASTE_OFFSET, y: p.position.y + PASTE_OFFSET },
-          })),
-        };
-        return;
-      }
-      // D-10: Ctrl/Cmd+Tab cycles active room forward
-      if (e.key === "Tab" && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        const st = useCADStore.getState();
-        const ids = Object.keys(st.rooms);
-        if (ids.length < 2 || !st.activeRoomId) return;
-        const i = ids.indexOf(st.activeRoomId);
-        st.switchRoom(ids[(i + 1) % ids.length]);
       }
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [setTool, viewMode]);
+  }, [registry]);
 
   // Welcome screen
   if (!hasStarted) {
