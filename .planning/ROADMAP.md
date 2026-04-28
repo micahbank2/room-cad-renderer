@@ -15,7 +15,7 @@
 - ✅ **v1.9 Polish & Feedback** — Phases 38, 39, 42 (Phases 40 + 41 cancelled mid-milestone) — shipped 2026-04-25 — see [milestones/v1.9-ROADMAP.md](milestones/v1.9-ROADMAP.md)
 - ✅ **v1.10 Evidence-Driven UX Polish** — Phases 43–44 (shipped 2026-04-25) — see [milestones/v1.10-ROADMAP.md](milestones/v1.10-ROADMAP.md)
 - ✅ **v1.11 Pascal Feature Set** — shipped 2026-04-26
-- 🚧 **v1.12 Maintenance Pass** — Phases 49–52 (in progress)
+- ✅ **v1.12 Maintenance Pass** — shipped 2026-04-27
 
 ---
 
@@ -106,72 +106,10 @@
 
 ---
 
-## v1.12 Maintenance Pass
+## v1.12 Maintenance Pass (shipped 2026-04-27)
 
-**Goal:** Close 2 carry-over texture bugs and 1 snapshot bloat item before adding new features, then ship one evidence-backed UX polish item.
+4 phases (49-52), 7 plans, 4/4 requirements (BUG-02, BUG-03, DEBT-05, HOTKEY-01). Two carry-over texture bugs closed (wall first-apply + wallpaper/wallArt 2D↔3D persistence) using a shared direct-`map` prop pattern. Legacy FloorMaterial data-URL entries auto-migrate to userTextureId references on snapshot load — `loadSnapshot` is now async (Pattern A pre-pass before Immer produce; 23 caller sites updated). Keyboard shortcuts cheat sheet overlay shipped via new single-source-of-truth registry at `src/lib/shortcuts.ts` (26 entries, coverage-gate test prevents drift). Audit `passed` — zero gaps, zero carry-over. ~5,700 LOC, 4 PRs, single-day milestone. See [milestones/v1.12-ROADMAP.md](milestones/v1.12-ROADMAP.md).
 
-**Source:** GH [#94](https://github.com/micahbank2/room-cad-renderer/issues/94) (BUG-02), [#71](https://github.com/micahbank2/room-cad-renderer/issues/71) (BUG-03), [#95](https://github.com/micahbank2/room-cad-renderer/issues/95) (DEBT-05), [#72](https://github.com/micahbank2/room-cad-renderer/issues/72) (HOTKEY-01).
-
-**Sequencing:** Bugs first (49-51) so the texture/snapshot foundation is stable before adding the overlay component in Phase 52.
-
-### Phase Details
-
-#### Phase 49: Wall Texture First-Apply Fix (BUG-02)
-
-**Goal:** Uploaded wall textures render in 3D on first apply without requiring a view-mode toggle.
-**Depends on:** Phase 34 user-texture pipeline; Phase 32 PBR foundation (`pbrTextureCache`).
-**Requirements:** BUG-02 ([#94](https://github.com/micahbank2/room-cad-renderer/issues/94))
-**Success Criteria** (what must be TRUE):
-  1. User uploads a wall texture and applies it while in 3D view — the wall renders the texture immediately, no toggle needed.
-  2. Applying a texture while in 2D then switching to 3D shows it on first render.
-  3. No regression on Phase 32 PBR preset textures.
-**Plans:** 1/1 plans complete
-**UI hint**: no
-
-#### Phase 50: Wallpaper/WallArt View-Toggle Persistence (BUG-03)
-
-**Goal:** Custom-uploaded wallpaper and wallArt survive 2D↔3D view-mode switches.
-**Depends on:** Phase 49 (sequencing — both touch WallMesh texture resolution); Phase 36 VIZ-10 regression harness.
-**Requirements:** BUG-03 ([#71](https://github.com/micahbank2/room-cad-renderer/issues/71))
-**Success Criteria** (what must be TRUE):
-  1. User applies a custom wallpaper, toggles to 2D, toggles back to 3D — wallpaper still renders.
-  2. Same round-trip works for custom-uploaded wallArt.
-  3. Phase 36 Playwright regression harness passes without modification.
-**Plans:** 1/1 plans complete
-**UI hint**: no
-
-#### Phase 51: Legacy FloorMaterial Snapshot Migration (DEBT-05)
-
-**Goal:** Saved project snapshots no longer embed raw data-URL strings for custom floor textures.
-**Depends on:** Phase 50 (sequencing); Phase 34 `userTextureId` reference system + IDB texture store.
-**Requirements:** DEBT-05 ([#95](https://github.com/micahbank2/room-cad-renderer/issues/95))
-**Success Criteria** (what must be TRUE):
-  1. Loading a legacy project with a `kind: "custom"` FloorMaterial produces a snapshot with `userTextureId`, not a `data:image/...` string.
-  2. Exported JSON for a project with 5 custom textures is under 50 KB.
-  3. No data loss — the texture still renders correctly after migration.
-  4. Subsequent saves persist the migrated shape; no re-migration on next load.
-**Plans:** 1/1 plans complete
-Plans:
-- [x] 51-01-PLAN.md — async loadSnapshot refactor + migrateFloorMaterials + 23-caller updates + e2e regression spec
-**UI hint**: no
-
-#### Phase 52: Keyboard Shortcuts Overlay (HOTKEY-01)
-
-**Goal:** Pressing `?` anywhere in the app opens a keyboard shortcuts cheat sheet overlay.
-**Depends on:** Phase 51 (sequencing); Phase 33 design tokens + lucide icons; `useReducedMotion` hook.
-**Requirements:** HOTKEY-01 ([#72](https://github.com/micahbank2/room-cad-renderer/issues/72))
-**Success Criteria** (what must be TRUE):
-  1. Pressing `?` (Shift+/) opens the overlay; pressing Escape or clicking the backdrop closes it.
-  2. Overlay lists all shortcuts grouped by category (Tools, View, Camera, Selection).
-  3. `?` is inert when focus is inside a form input.
-  4. Entrance animation respects `useReducedMotion` (snap open when reduced-motion active).
-**Plans:** 1/1 plans complete
-**UI hint**: yes
-
-Plans:
-- [ ] 52-01-PLAN.md — Registry + App.tsx refactor + helpContent migration + e2e (HOTKEY-01)
-
----
 
 ## Progress
 

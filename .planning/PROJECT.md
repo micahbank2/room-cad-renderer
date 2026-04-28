@@ -12,6 +12,11 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
+**v1.12 Maintenance Pass shipped 2026-04-27** (single-day milestone). 4 phases (49-52), 7 plans, 4 PRs ([#129](https://github.com/micahbank2/room-cad-renderer/pull/129), [#130](https://github.com/micahbank2/room-cad-renderer/pull/130), [#131](https://github.com/micahbank2/room-cad-renderer/pull/131), [#132](https://github.com/micahbank2/room-cad-renderer/pull/132)), 4/4 requirements (BUG-02, BUG-03, DEBT-05, HOTKEY-01). Bug sweep + tech debt + 1 UX polish item — maintenance milestone after the v1.11 sprint. Phase 49 (BUG-02): wall user-textures render on first apply via direct `map={userTex}` prop on `<meshStandardMaterial>` — `<primitive attach="map">` was failing to set `material.needsUpdate=true` on null→Texture transition. Phase 50 (BUG-03): same direct-prop pattern applied to wallArt sites; research found Phase 49's fix incidentally fixed user-uploaded wallpaper (shared `useUserTexture` path). Phase 51 (DEBT-05): legacy FloorMaterial data-URL entries auto-migrate to userTextureId references on snapshot load — `loadSnapshot` refactored to async (Pattern A: async pre-pass before Immer `produce()`); 23 caller sites updated (7 production + 3 vitest + 12 e2e + 1 shared helper); snapshot version 2→3; idempotent + graceful-on-malformed; SHA-256 dedup via existing `saveUserTextureWithDedup`. Phase 52 (HOTKEY-01): keyboard shortcuts cheat sheet overlay via new single-source-of-truth registry at `src/lib/shortcuts.ts` consumed by both App.tsx keyboard handler AND helpContent.tsx display — 26 entries (was 19; added 7 missing: Ceiling C, Reset 0, Camera Presets 1-4, Copy/Paste); coverage-gate test prevents drift; one-char `openHelp("shortcuts")` bug fix. Audit `passed` — zero gaps, zero carry-over (cleanest milestone closeout in project history). ~5,700 LOC. The "bug sweep + 1 polish" thesis validated — every requirement shipped without scope creep, and Phase 51's heavy async refactor introduced zero regressions on Phase 32/35/36/46-48.
+
+<details>
+<summary>Earlier milestones</summary>
+
 **v1.11 Pascal Feature Set shipped 2026-04-26** (2-day milestone span). 4 phases (45–48), 13 plans across 9 waves, 60+ commits, 4/4 requirements (THUMB-01, TREE-01, DISPLAY-01, CAM-04). Adopted the 4 strongest features from the Pascal Editor competitive audit. Phase 45 (THUMB-01): material picker swatches now auto-render from the live PBR pipeline via offscreen `swatchThumbnailGenerator` + `<MaterialThumbnail>` host. Phase 46 (TREE-01): sidebar Rooms hierarchy tree at the top of the panel with collapsible per-room nodes, click-to-focus camera via new `pendingCameraTarget` bridge, per-node eye-icon visibility cascade through `isHiddenInTree`. Phase 47 (DISPLAY-01): NORMAL/SOLO/EXPLODE Toolbar segmented control with architectural shift — ThreeViewport's Scene refactored from active-room-only to multi-room iteration via new `RoomGroup` wrapper. Phase 48 (CAM-04): each wall/product/ceiling/custom-element gains optional `savedCameraPos`/`savedCameraTarget` tuples (5 new `*NoHistory` setters mirror Phase 25/31 precedent), PropertiesPanel Save/Clear buttons capture live R3F camera via `getCameraCapture` bridge installed by ThreeViewport, tree double-click dispatches `focusOnSavedCamera` through Phase 46's bridge. Audit `passed_with_carry_over`: 1 medium-severity cross-phase gap deferred to Phase 999.4 ([GH #127](https://github.com/micahbank2/room-cad-renderer/issues/127)) — saved cameras don't account for EXPLODE room offsets in cross-mode use. 3 low-severity tech-debt items tracked. Each phase shipped through the same loop: discuss → plan → verify-plan → execute → preview-test → merge.
 
 <details>
@@ -53,24 +58,6 @@ See `.planning/ROADMAP.md` for links to each milestone archive.
 </details>
 
 </details>
-
-## Current Milestone: v1.12 Maintenance Pass
-
-**Goal:** Close 3 carry-over bugs that affect actual use, plus one small UX win. Maintenance milestone after the v1.11 sprint — clean up before the next big swing.
-
-**Target requirements (4 issues, 4 phases):**
-- **Phase 49 / BUG-02 / [#94](https://github.com/micahbank2/room-cad-renderer/issues/94)** — Wall user-texture renders correctly on first apply (no 2D→3D toggle workaround required)
-- **Phase 50 / BUG-03 / [#71](https://github.com/micahbank2/room-cad-renderer/issues/71)** — Uploaded wallpaper + wallArt persist across 2D↔3D toggle (closes Phase 999.2 deferred-from-v1.8)
-- **Phase 51 / DEBT-05 / [#95](https://github.com/micahbank2/room-cad-renderer/issues/95)** — Migrate legacy FloorMaterial `kind="custom"` data URLs out of snapshots (LIB-08 bloat)
-- **Phase 52 / HOTKEY-01 / [#72](https://github.com/micahbank2/room-cad-renderer/issues/72)** — `?` opens keyboard shortcuts cheat sheet overlay
-
-**Sequencing intent:** Bugs first (49–51), polish last (52). Each phase ships independently. Cancellation of any later phase still leaves earlier value behind.
-
-**Out of v1.12:** Right-click context menus ([#74](https://github.com/micahbank2/room-cad-renderer/issues/74)), in-app feedback dialog ([#73](https://github.com/micahbank2/room-cad-renderer/issues/73)), properties-in-3D ([#97](https://github.com/micahbank2/room-cad-renderer/issues/97)), EXPLODE+saved-camera offset ([#127](https://github.com/micahbank2/room-cad-renderer/issues/127)), big swings (GLTF/GLB upload, material system overhaul, PBR extensions). Revisit pending real-use signal or after maintenance ships.
-
-**Tech debt acknowledged + accepted:**
-- 6 pre-existing vitest failures permanently accepted (Phase 37 D-02); CI vitest stays disabled
-- AUDIT-01 substitute-evidence policy formalized in v1.10 audit. SUMMARY.md is canonical evidence.
 
 ## Target User
 
