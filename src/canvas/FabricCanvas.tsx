@@ -433,6 +433,78 @@ export default function FabricCanvas({ productLibrary }: Props) {
     };
   }, []);
 
+  // Phase 53 CTXMENU-01: right-click context menu trigger (2D canvas).
+  // Mirrors pan handler pattern. Uses fc.getObjects() + containsPoint() because
+  // evented:false objects are skipped by fc.findTarget() (Research §Pitfall 1, Phase 25 PERF-01).
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+
+    const onRightClick = (e: MouseEvent) => {
+      if (e.button !== 2) return;
+      // D-07: skip when focused in a form field
+      if (isInput(document.activeElement)) return;
+      e.preventDefault();
+
+      const fc = fcRef.current;
+      if (!fc) return;
+
+      // Convert to Fabric viewport coordinates for containsPoint()
+      const pointer = fc.getViewportPoint(e);
+
+      let hit: { kind: import("@/stores/uiStore").ContextMenuKind; nodeId: string } | null = null;
+
+      for (const obj of fc.getObjects()) {
+        const d = (obj as unknown as { data?: Record<string, unknown> }).data;
+        if (!d) continue;
+
+        if ((d.type === "wall" || d.type === "wall-side" || d.type === "wall-limewash") && d.wallId) {
+          if ((obj as fabric.FabricObject).containsPoint(pointer)) {
+            hit = { kind: "wall", nodeId: d.wallId as string };
+            break;
+          }
+        } else if (d.type === "product" && d.placedProductId) {
+          if ((obj as fabric.FabricObject).containsPoint(pointer)) {
+            hit = { kind: "product", nodeId: d.placedProductId as string };
+            break;
+          }
+        } else if ((d.type === "ceiling" || d.type === "ceiling-limewash") && d.ceilingId) {
+          if ((obj as fabric.FabricObject).containsPoint(pointer)) {
+            hit = { kind: "ceiling", nodeId: d.ceilingId as string };
+            break;
+          }
+        } else if (d.type === "custom-element" && d.placedId) {
+          if ((obj as fabric.FabricObject).containsPoint(pointer)) {
+            hit = { kind: "custom", nodeId: d.placedId as string };
+            break;
+          }
+        } else if (d.type === "custom-element-label" && d.pceId) {
+          if ((obj as fabric.FabricObject).containsPoint(pointer)) {
+            hit = { kind: "custom", nodeId: d.pceId as string };
+            break;
+          }
+        }
+        // Skip: rotation-handle, resize-handle, opening, grid, dimension labels
+      }
+
+      if (hit) {
+        useUIStore.getState().openContextMenu(hit.kind, hit.nodeId, {
+          x: e.clientX,
+          y: e.clientY,
+        });
+      } else {
+        // Empty canvas — preventDefault already called above
+        useUIStore.getState().openContextMenu("empty", null, {
+          x: e.clientX,
+          y: e.clientY,
+        });
+      }
+    };
+
+    wrapper.addEventListener("mousedown", onRightClick);
+    return () => wrapper.removeEventListener("mousedown", onRightClick);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Undo/redo keyboard shortcuts
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {

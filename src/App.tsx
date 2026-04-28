@@ -30,6 +30,7 @@ import RoomTabs from "@/components/RoomTabs";
 import AddRoomDialog from "@/components/AddRoomDialog";
 import TemplatePickerDialog from "@/components/TemplatePickerDialog";
 import FabricCanvas from "@/canvas/FabricCanvas";
+import { CanvasContextMenu } from "@/components/CanvasContextMenu";
 
 const ThreeViewport = lazy(() => import("@/three/ThreeViewport"));
 
@@ -297,6 +298,9 @@ export default function App() {
 
       {/* Onboarding tour */}
       <OnboardingOverlay />
+
+      {/* Phase 53 CTXMENU-01: right-click context menu — mounted once at root */}
+      <CanvasContextMenu />
     </div>
   );
 }

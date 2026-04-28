@@ -1,7 +1,9 @@
+import type { ThreeEvent } from "@react-three/fiber";
 import type { PlacedProduct } from "@/types/cad";
 import type { Product } from "@/types/product";
 import { resolveEffectiveDims } from "@/types/product";
 import { useProductTexture } from "./productTextureCache";
+import { useUIStore } from "@/stores/uiStore";
 
 interface Props {
   placed: PlacedProduct;
@@ -25,6 +27,15 @@ export default function ProductMesh({ placed, product, isSelected }: Props) {
       rotation={[0, rotY, 0]}
       castShadow
       receiveShadow
+      onContextMenu={(e: ThreeEvent<MouseEvent>) => {
+        if (e.nativeEvent.button !== 2) return;
+        e.stopPropagation();
+        e.nativeEvent.preventDefault();
+        useUIStore.getState().openContextMenu("product", placed.id, {
+          x: e.nativeEvent.clientX,
+          y: e.nativeEvent.clientY,
+        });
+      }}
     >
       <boxGeometry args={[width, height, depth]} />
       <meshStandardMaterial

@@ -559,6 +559,17 @@ function LabelOverrideInput({
   );
   const [draft, setDraft] = useState<string>(pce.labelOverride ?? "");
   const originalRef = useRef<string | undefined>(pce.labelOverride);
+
+  // Phase 53 CTXMENU-01: auto-focus when "Rename label" context menu action fires.
+  const inputRef = useRef<HTMLInputElement>(null);
+  const pendingLabelFocus = useUIStore((s) => s.pendingLabelFocus);
+  useEffect(() => {
+    if (pendingLabelFocus === pce.id && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+      useUIStore.getState().setPendingLabelFocus(null);
+    }
+  }, [pendingLabelFocus, pce.id]);
   // Pitfall guard: Escape calls .blur() to clean up focus, which also fires
   // onBlur → commit(). Escape ran cancel() with the pre-edit value, but
   // commit() reads the stale draft closure (still has the typed text). Set
@@ -631,6 +642,7 @@ function LabelOverrideInput({
         LABEL_OVERRIDE
       </label>
       <input
+        ref={inputRef}
         type="text"
         value={draft}
         maxLength={40}

@@ -6,6 +6,8 @@
 
 import { useMemo } from "react";
 import * as THREE from "three";
+import type { ThreeEvent } from "@react-three/fiber";
+import { useUIStore } from "@/stores/uiStore";
 import type { Ceiling } from "@/types/cad";
 import { resolvePaintHex } from "@/lib/colorUtils";
 import { usePaintStore } from "@/stores/paintStore";
@@ -106,6 +108,15 @@ export default function CeilingMesh({ ceiling, isSelected }: Props) {
       geometry={geometry}
       position={[0, ceiling.height, 0]}
       receiveShadow
+      onContextMenu={(e: ThreeEvent<MouseEvent>) => {
+        if (e.nativeEvent.button !== 2) return;
+        e.stopPropagation();
+        e.nativeEvent.preventDefault();
+        useUIStore.getState().openContextMenu("ceiling", ceiling.id, {
+          x: e.nativeEvent.clientX,
+          y: e.nativeEvent.clientY,
+        });
+      }}
     >
       {useUserTextureBranch ? (
         <meshStandardMaterial

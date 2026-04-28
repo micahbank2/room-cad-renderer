@@ -145,6 +145,30 @@ interface UIState {
   displayMode: "normal" | "solo" | "explode";
   /** Phase 47 D-02 + D-05: setter writes to localStorage as a side effect. */
   setDisplayMode: (mode: "normal" | "solo" | "explode") => void;
+
+  /**
+   * Phase 53 CTXMENU-01: right-click context menu state.
+   * null = menu closed. Opened by openContextMenu(), closed by closeContextMenu().
+   */
+  contextMenu: {
+    kind: "wall" | "product" | "ceiling" | "custom" | "empty";
+    nodeId: string | null;
+    position: { x: number; y: number };
+  } | null;
+  openContextMenu: (
+    kind: "wall" | "product" | "ceiling" | "custom" | "empty",
+    nodeId: string | null,
+    position: { x: number; y: number },
+  ) => void;
+  closeContextMenu: () => void;
+
+  /**
+   * Phase 53 CTXMENU-01: signal for PropertiesPanel LabelOverrideInput to
+   * auto-focus. Set by CanvasContextMenu "Rename label" action; cleared by
+   * LabelOverrideInput after handling.
+   */
+  pendingLabelFocus: string | null;
+  setPendingLabelFocus: (pceId: string | null) => void;
 }
 
 const MIN_ZOOM = 0.25;
@@ -284,4 +308,15 @@ export const useUIStore = create<UIState>()((set) => ({
       // quota / privacy mode — silently swallow per Phase 35 / uiPersistence convention
     }
   },
+
+  // Phase 53 CTXMENU-01
+  contextMenu: null,
+  openContextMenu: (kind, nodeId, position) =>
+    set({ contextMenu: { kind, nodeId, position } }),
+  closeContextMenu: () => set({ contextMenu: null }),
+  pendingLabelFocus: null,
+  setPendingLabelFocus: (pceId) => set({ pendingLabelFocus: pceId }),
 }));
+
+export type ContextMenuState = NonNullable<ReturnType<typeof useUIStore.getState>["contextMenu"]>;
+export type ContextMenuKind = ContextMenuState["kind"];
