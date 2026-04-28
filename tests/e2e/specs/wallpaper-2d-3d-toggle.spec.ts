@@ -35,7 +35,7 @@ test.describe("VIZ-10 — wallpaper survives 5x 2D↔3D toggle", () => {
       // Works in both chromium-dev (Vite dev server) and chromium-preview
       // (production-minified bundle with hashed chunk names). Plan 36-02.
       // @ts-expect-error — window.__cadStore installed in test mode
-      (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } }).__cadStore.getState().loadSnapshot({
+      await (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => Promise<void> } } }).__cadStore.getState().loadSnapshot({
         version: 2,
         rooms: {
           room_main: {

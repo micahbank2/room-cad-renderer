@@ -15,7 +15,7 @@ test.describe("Tree expand persistence (D-03)", () => {
     // Seed a project with one room (must have ≥1 wall so App leaves WelcomeScreen).
     await page.evaluate(async () => {
       // @ts-expect-error — window.__cadStore installed in test mode
-      (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } }).__cadStore.getState().loadSnapshot({
+      await (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => Promise<void> } } }).__cadStore.getState().loadSnapshot({
         version: 2,
         rooms: {
           room_persist: {

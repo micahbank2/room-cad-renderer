@@ -12,9 +12,9 @@ export async function seedRoom(page: Page): Promise<void> {
     () => typeof (window as unknown as { __cadStore?: unknown }).__cadStore !== "undefined",
     { timeout: 10_000 },
   );
-  await page.evaluate(() => {
-    (window as unknown as {
-      __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } };
+  await page.evaluate(async () => {
+    await (window as unknown as {
+      __cadStore: { getState: () => { loadSnapshot: (s: unknown) => Promise<void> } };
     }).__cadStore.getState().loadSnapshot({
       version: 2,
       rooms: {

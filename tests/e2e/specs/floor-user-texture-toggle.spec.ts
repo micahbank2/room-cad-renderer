@@ -26,7 +26,7 @@ test.describe("VIZ-10 — floor user-texture 2-cycle smoke", () => {
     await page.evaluate(async () => {
       // Use window.__cadStore — test-mode handle works in both dev + preview (Plan 36-02).
       // @ts-expect-error — window.__cadStore installed in test mode
-      (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } }).__cadStore.getState().loadSnapshot({
+      await (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => Promise<void> } } }).__cadStore.getState().loadSnapshot({
         version: 2,
         rooms: {
           room_main: {
