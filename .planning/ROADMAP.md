@@ -163,7 +163,7 @@
   2. Overlay lists all shortcuts grouped by category (Tools, View, Camera, Selection).
   3. `?` is inert when focus is inside a form input.
   4. Entrance animation respects `useReducedMotion` (snap open when reduced-motion active).
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 **UI hint**: yes
 
 Plans:
@@ -195,7 +195,7 @@ Plans:
 | 49. Wall Texture First-Apply Fix | 1/1 | Complete    | 2026-04-27 |
 | 50. Wallpaper/WallArt View-Toggle Persistence | 1/1 | Complete    | 2026-04-27 |
 | 51. Legacy FloorMaterial Snapshot Migration | 0/? | Not started | - |
-| 52. Keyboard Shortcuts Overlay | 0/1 | Not started | - |
+| 52. Keyboard Shortcuts Overlay | 0/1 | Complete    | 2026-04-28 |
 
 ## Backlog
 

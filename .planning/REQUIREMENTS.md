@@ -24,7 +24,7 @@ Maintenance milestone closing 3 carry-over bugs + 1 small UX polish item. Contin
 
 ### UX Polish (HOTKEY-)
 
-- [ ] **HOTKEY-01** — Pressing `?` opens a keyboard shortcuts cheat sheet overlay. Common SaaS pattern (GitHub, Linear, Notion). Source: [#72](https://github.com/micahbank2/room-cad-renderer/issues/72). Pascal competitor-insight item.
+- [x] **HOTKEY-01** — Pressing `?` opens a keyboard shortcuts cheat sheet overlay. Common SaaS pattern (GitHub, Linear, Notion). Source: [#72](https://github.com/micahbank2/room-cad-renderer/issues/72). Pascal competitor-insight item.
   - **Verifiable:** Press `?` (Shift + /) anywhere in the app — a modal/drawer overlay appears listing all keyboard shortcuts grouped by category (Tools, View, Camera Presets, Selection, etc.). Press Escape or click outside — overlay closes.
   - **Acceptance:** New `KeyboardShortcutsOverlay` component using lucide icons + Phase 33 design tokens. Auto-discovers shortcuts from a single source-of-truth (avoid duplicating the list — read from existing keyboard handler in `App.tsx` or a new shared `shortcuts.ts` registry). Reduced-motion guard on entrance animation. Inert when focus is in a form input (matches CAM-01 active-element guard precedent). Closeable via Escape OR backdrop click.
 
