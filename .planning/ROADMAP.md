@@ -196,7 +196,7 @@ Plans:
 | 48. Per-Node Saved Camera + Focus | 2/3 | Complete    | 2026-04-26 |
 | 49. Wall Texture First-Apply Fix | 1/1 | Complete    | 2026-04-27 |
 | 50. Wallpaper/WallArt View-Toggle Persistence | 1/1 | Complete    | 2026-04-27 |
-| 51. Legacy FloorMaterial Snapshot Migration | 1/1 | Complete   | 2026-04-28 |
+| 51. Legacy FloorMaterial Snapshot Migration | 1/1 | Complete    | 2026-04-28 |
 | 52. Keyboard Shortcuts Overlay | 0/1 | Complete    | 2026-04-28 |
 
 ## Backlog
