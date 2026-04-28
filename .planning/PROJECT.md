@@ -59,6 +59,24 @@ See `.planning/ROADMAP.md` for links to each milestone archive.
 
 </details>
 
+## Current Milestone: v1.13 UX Polish Bundle
+
+**Goal:** Mature the editing flow before v1.14's real-3D-models work. Right-click context menus and Properties-panel-in-3D are the two biggest editing friction points the platform currently has. Fixing them now means GLTF furniture in v1.14 lands on a fully-developed editor.
+
+**Target requirements (2 issues, 2 phases):**
+- **Phase 53 / CTXMENU-01 / [#74](https://github.com/micahbank2/room-cad-renderer/issues/74)** — Right-click context menus on canvas objects (walls, products, ceilings, custom elements) with Copy/Paste/Delete/Focus camera/Hide/Save camera here actions
+- **Phase 54 / PROPS3D-01 / [#97](https://github.com/micahbank2/room-cad-renderer/issues/97)** — PropertiesPanel renders in 3D and split views (not just 2D)
+
+**Sequencing intent:** Phase 53 first (right-click menus stand alone), Phase 54 second (PropertiesPanel-in-3D may benefit from any new selection patterns Phase 53 surfaces). Each phase ships independently.
+
+**Out of v1.13:** [#73](https://github.com/micahbank2/room-cad-renderer/issues/73) In-app feedback dialog (no demand signal — Phase 39 async questionnaire was sufficient). All bigger swings ([#27](https://github.com/micahbank2/room-cad-renderer/issues/27), [#28](https://github.com/micahbank2/room-cad-renderer/issues/28), [#29](https://github.com/micahbank2/room-cad-renderer/issues/29), [#56](https://github.com/micahbank2/room-cad-renderer/issues/56), [#81](https://github.com/micahbank2/room-cad-renderer/issues/81)) deferred to v1.14+.
+
+**Forward commitment: v1.14 = Real 3D Models** ([#29](https://github.com/micahbank2/room-cad-renderer/issues/29)) — GLTF/GLB upload + render. Biggest "feel the space" win Jessica will notice. v1.13's editing-flow polish lays the foundation.
+
+**Tech debt acknowledged + accepted:**
+- 6 pre-existing vitest failures permanently accepted (Phase 37 D-02); CI vitest stays disabled
+- AUDIT-01 substitute-evidence policy formalized in v1.10 audit. SUMMARY.md is canonical evidence.
+
 ## Target User
 
 One person. Non-technical. Interior design enthusiast, not a professional. Comfortable with basic computer use. Thinks visually. Saves products from Pinterest, Instagram, and store websites.
