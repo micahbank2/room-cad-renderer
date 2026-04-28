@@ -1,4 +1,5 @@
 import type { HelpSectionId } from "@/stores/uiStore";
+import { SHORTCUT_DISPLAY_LIST, type ShortcutDisplay } from "@/lib/shortcuts";
 
 export interface HelpSectionMeta {
   id: HelpSectionId;
@@ -13,33 +14,12 @@ export const HELP_SECTIONS: HelpSectionMeta[] = [
   { id: "3d", label: "3D & WALK & ROOMS", icon: "view_in_ar" },
 ];
 
-export interface Shortcut {
-  keys: string[];
-  action: string;
-  group: "Tools" | "Editing" | "3D & Walk" | "Rooms" | "Help";
-  context?: string;
-}
-
-export const SHORTCUTS: Shortcut[] = [
-  { keys: ["V"], action: "Select tool", group: "Tools" },
-  { keys: ["W"], action: "Wall tool", group: "Tools" },
-  { keys: ["D"], action: "Door tool", group: "Tools" },
-  { keys: ["N"], action: "Window tool", group: "Tools" },
-  { keys: ["Shift"], action: "Orthogonal constraint while drawing walls", group: "Tools", context: "Hold while drawing" },
-  { keys: ["Ctrl", "Z"], action: "Undo", group: "Editing" },
-  { keys: ["Ctrl", "Shift", "Z"], action: "Redo", group: "Editing" },
-  { keys: ["Delete"], action: "Delete selected wall or product", group: "Editing" },
-  { keys: ["Backspace"], action: "Delete selected wall or product", group: "Editing" },
-  { keys: ["Escape"], action: "Cancel current action / close modal", group: "Editing" },
-  { keys: ["Double-click"], action: "Edit wall dimension label", group: "Editing", context: "On a wall length label" },
-  { keys: ["Shift"], action: "Free rotate (no 15° snap)", group: "Editing", context: "While dragging rotation handle" },
-  { keys: ["E"], action: "Toggle walk / orbit camera", group: "3D & Walk", context: "3D or split view" },
-  { keys: ["W", "A", "S", "D"], action: "Move forward / left / back / right", group: "3D & Walk", context: "Walk mode" },
-  { keys: ["Mouse"], action: "Look around", group: "3D & Walk", context: "Walk mode with pointer lock" },
-  { keys: ["Ctrl", "Tab"], action: "Cycle to next room", group: "Rooms" },
-  { keys: ["Cmd", "Tab"], action: "Cycle to next room (Mac)", group: "Rooms" },
-  { keys: ["?"], action: "Open this help", group: "Help" },
-];
+// Phase 52 (HOTKEY-01): SHORTCUTS is an alias for the registry's display list.
+// Source of truth: src/lib/shortcuts.ts SHORTCUT_DISPLAY_LIST.
+// Consumers (this file's section renderer at line ~140 + helpIndex.ts search)
+// keep working unchanged.
+export type Shortcut = ShortcutDisplay;
+export const SHORTCUTS: Shortcut[] = SHORTCUT_DISPLAY_LIST;
 
 function Kbd({ children }: { children: React.ReactNode }) {
   return (
