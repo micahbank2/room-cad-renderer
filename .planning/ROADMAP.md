@@ -134,7 +134,9 @@
   2. Right-clicking empty canvas shows a Paste option only when the clipboard is non-empty
   3. Pressing Escape or clicking outside the menu closes it; native browser right-click is suppressed only over canvas objects (toolbar/sidebar unaffected)
   4. Menu uses Phase 33 design tokens and lucide icons; all actions delegate to existing cadStore actions with no duplicate logic
-**Plans:** TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 53-01-PLAN.md — clipboardActions + uiStore slices + CanvasContextMenu + 2D/3D wiring + tests
 **UI hint:** yes
 
 #### Phase 54: PropertiesPanel in 3D & Split View (PROPS3D-01)
@@ -174,7 +176,7 @@
 | 50. Wallpaper/WallArt View-Toggle Persistence | 1/1 | Complete    | 2026-04-27 |
 | 51. Legacy FloorMaterial Snapshot Migration | 1/1 | Complete    | 2026-04-28 |
 | 52. Keyboard Shortcuts Overlay | 0/1 | Complete    | 2026-04-28 |
-| 53. Canvas Context Menus | 0/? | Not started | - |
+| 53. Canvas Context Menus | 0/1 | In progress | - |
 | 54. PropertiesPanel in 3D & Split View | 0/? | Not started | - |
 
 ## Backlog
