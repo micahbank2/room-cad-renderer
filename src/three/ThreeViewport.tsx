@@ -524,6 +524,15 @@ export default function ThreeViewport({ productLibrary }: Props) {
           near: 0.1,
           far: 200,
         }}
+        onContextMenu={(e: React.MouseEvent) => {
+          // Phase 53 CTXMENU-01: empty-canvas right-click in 3D.
+          // Only fires when no mesh handler called stopPropagation (D-03 empty-canvas case).
+          e.preventDefault();
+          useUIStore.getState().openContextMenu("empty", null, {
+            x: e.clientX,
+            y: e.clientY,
+          });
+        }}
       >
         <Scene productLibrary={productLibrary} />
       </Canvas>

@@ -23,7 +23,9 @@
 
 import { useEffect, useMemo, useRef, type Ref } from "react";
 import * as THREE from "three";
+import type { ThreeEvent } from "@react-three/fiber";
 import type { WallSegment, Wallpaper, WainscotConfig, CrownConfig, WallArt } from "@/types/cad";
+import { useUIStore } from "@/stores/uiStore";
 import { wallLength, angle } from "@/lib/geometry";
 import { FRAME_PRESETS } from "@/types/framedArt";
 import { useWainscotStyleStore } from "@/stores/wainscotStyleStore";
@@ -374,7 +376,20 @@ export default function WallMesh({ wall, isSelected }: Props) {
   return (
     <group position={position} rotation={rotation}>
       {/* Base wall — neutral drywall color */}
-      <mesh geometry={geometry} castShadow receiveShadow>
+      <mesh
+        geometry={geometry}
+        castShadow
+        receiveShadow
+        onContextMenu={(e: ThreeEvent<MouseEvent>) => {
+          if (e.nativeEvent.button !== 2) return;
+          e.stopPropagation();
+          e.nativeEvent.preventDefault();
+          useUIStore.getState().openContextMenu("wall", wall.id, {
+            x: e.nativeEvent.clientX,
+            y: e.nativeEvent.clientY,
+          });
+        }}
+      >
         <meshStandardMaterial
           color={baseColor}
           roughness={0.85}
