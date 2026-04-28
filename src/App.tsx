@@ -82,7 +82,7 @@ export default function App() {
         if (cancelled || !lastId) return;
         const project = await loadProject(lastId);
         if (cancelled || !project) return;
-        useCADStore.getState().loadSnapshot(project.snapshot);
+        await useCADStore.getState().loadSnapshot(project.snapshot);
         useProjectStore.getState().setActive(project.id, project.name);
         setHasStarted(true);
       } catch (err) {

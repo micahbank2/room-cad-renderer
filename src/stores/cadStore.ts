@@ -18,7 +18,7 @@ import type {
 } from "@/types/cad";
 import { uid, resizeWall } from "@/lib/geometry";
 import { ROOM_TEMPLATES, type RoomTemplateId } from "@/data/roomTemplates";
-import { migrateSnapshot } from "@/lib/snapshotMigration";
+import { migrateSnapshot, migrateFloorMaterials } from "@/lib/snapshotMigration";
 import type { PaintColor } from "@/types/paint";
 
 const MAX_HISTORY = 50;
@@ -115,7 +115,7 @@ interface CADState {
   removeSelected: (ids: string[]) => void;
   undo: () => void;
   redo: () => void;
-  loadSnapshot: (raw: unknown) => void;
+  loadSnapshot: (raw: unknown) => Promise<void>;
 
   // Surface material actions (Phase 20)
   setCeilingSurfaceMaterial: (ceilingId: string, materialId: string | undefined) => void;
@@ -152,7 +152,7 @@ function snapshot(state: CADState): CADSnapshot {
   const root = state as any;
   const t0 = import.meta.env.DEV ? performance.now() : 0;
   const snap: CADSnapshot = {
-    version: 2,
+    version: 3,
     rooms: structuredClone(toPlain(state.rooms)),
     activeRoomId: state.activeRoomId,
     ...(root.customElements
@@ -984,19 +984,22 @@ export const useCADStore = create<CADState>()((set) => ({
       })
     ),
 
-  loadSnapshot: (raw) =>
+  loadSnapshot: async (raw: unknown): Promise<void> => {
+    // Phase 51 Pattern A: async pre-pass runs BEFORE produce() (Immer constraint)
+    const shaped = migrateSnapshot(raw);             // sync: v1→v2
+    const migrated = await migrateFloorMaterials(shaped); // async: v2→v3 IDB migration
     set(
       produce((s: CADState) => {
-        const snap = migrateSnapshot(raw);
-        s.rooms = snap.rooms;
-        s.activeRoomId = snap.activeRoomId;
-        (s as any).customElements = (snap as any).customElements ?? {};
-        (s as any).customPaints = (snap as any).customPaints ?? [];
-        (s as any).recentPaints = (snap as any).recentPaints ?? [];
+        s.rooms = migrated.rooms;
+        s.activeRoomId = migrated.activeRoomId;
+        (s as any).customElements = (migrated as any).customElements ?? {};
+        (s as any).customPaints = (migrated as any).customPaints ?? [];
+        (s as any).recentPaints = (migrated as any).recentPaints ?? [];
         s.past = [];
         s.future = [];
       })
-    ),
+    );
+  },
 
   // Paint actions (Phase 18)
 

@@ -48,7 +48,7 @@ async function seedScene(page: Page): Promise<void> {
   await page.goto("/");
   await page.evaluate(async (snap) => {
     // @ts-expect-error — window.__cadStore installed in test mode (Phase 36)
-    (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } }).__cadStore.getState().loadSnapshot(snap);
+    await (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => Promise<void> } } }).__cadStore.getState().loadSnapshot(snap);
   }, SNAPSHOT);
   // Wait for canvas-bearing layout to render (sidebar + viewport)
   await page.waitForLoadState("domcontentloaded");

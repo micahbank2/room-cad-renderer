@@ -19,7 +19,7 @@ test.describe("Tree empty states (UI-SPEC § Empty States)", () => {
 
     await page.evaluate(async () => {
       // @ts-expect-error — window.__cadStore installed in test mode
-      (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } }).__cadStore.getState().loadSnapshot({
+      await (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => Promise<void> } } }).__cadStore.getState().loadSnapshot({
         version: 2,
         rooms: {
           room_empty_groups: {

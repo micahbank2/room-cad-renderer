@@ -46,7 +46,7 @@ export default function ProjectManager() {
   async function handleLoad(id: string) {
     const project = await loadProject(id);
     if (project) {
-      loadSnapshot(project.snapshot);
+      await loadSnapshot(project.snapshot);
       setActive(project.id, project.name);
     }
   }
@@ -58,9 +58,9 @@ export default function ProjectManager() {
     setProjects(updated);
   }
 
-  function handleNew() {
+  async function handleNew() {
     clearActive();
-    loadSnapshot(defaultSnapshot());
+    await loadSnapshot(defaultSnapshot());
   }
 
   return (

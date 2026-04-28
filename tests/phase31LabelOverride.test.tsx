@@ -198,7 +198,7 @@ describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
     resetCADStoreForTests();
     expect(activeDoc().placedCustomElements?.[PCE_ID]).toBeUndefined();
 
-    useCADStore.getState().loadSnapshot({
+    await useCADStore.getState().loadSnapshot({
       version: 2,
       rooms: snap.rooms,
       activeRoomId: snap.activeRoomId,

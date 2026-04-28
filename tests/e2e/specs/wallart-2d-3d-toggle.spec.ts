@@ -27,7 +27,7 @@ test.describe("VIZ-10 — wallArt survives 5x 2D↔3D toggle", () => {
     await page.evaluate(async () => {
       // Use window.__cadStore — test-mode handle works in both dev + preview (Plan 36-02).
       // @ts-expect-error — window.__cadStore installed in test mode
-      (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } }).__cadStore.getState().loadSnapshot({
+      await (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => Promise<void> } } }).__cadStore.getState().loadSnapshot({
         version: 2,
         rooms: {
           room_main: {
@@ -108,7 +108,7 @@ test.describe("VIZ-10 — wallArt survives 5x 2D↔3D toggle", () => {
     // 1. Seed room + wall — same snapshot as the existing test
     await page.evaluate(async () => {
       // @ts-expect-error — window.__cadStore installed in test mode
-      (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } })
+      await (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => Promise<void> } } })
         .__cadStore.getState().loadSnapshot({
           version: 2,
           rooms: {

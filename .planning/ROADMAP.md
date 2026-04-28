@@ -150,7 +150,9 @@
   2. Exported JSON for a project with 5 custom textures is under 50 KB.
   3. No data loss — the texture still renders correctly after migration.
   4. Subsequent saves persist the migrated shape; no re-migration on next load.
-**Plans:** TBD
+**Plans:** 1/1 plans complete
+Plans:
+- [x] 51-01-PLAN.md — async loadSnapshot refactor + migrateFloorMaterials + 23-caller updates + e2e regression spec
 **UI hint**: no
 
 #### Phase 52: Keyboard Shortcuts Overlay (HOTKEY-01)
@@ -194,7 +196,7 @@ Plans:
 | 48. Per-Node Saved Camera + Focus | 2/3 | Complete    | 2026-04-26 |
 | 49. Wall Texture First-Apply Fix | 1/1 | Complete    | 2026-04-27 |
 | 50. Wallpaper/WallArt View-Toggle Persistence | 1/1 | Complete    | 2026-04-27 |
-| 51. Legacy FloorMaterial Snapshot Migration | 0/? | Not started | - |
+| 51. Legacy FloorMaterial Snapshot Migration | 1/1 | Complete    | 2026-04-28 |
 | 52. Keyboard Shortcuts Overlay | 0/1 | Complete    | 2026-04-28 |
 
 ## Backlog

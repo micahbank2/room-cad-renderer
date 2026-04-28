@@ -50,9 +50,9 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
     onClose();
   };
 
-  const pickTemplate = (id: RoomTemplateId) => {
+  const pickTemplate = async (id: RoomTemplateId) => {
     if (id === "BLANK") {
-      loadSnapshot(defaultSnapshot());
+      await loadSnapshot(defaultSnapshot());
     } else {
       const tpl = ROOM_TEMPLATES[id];
       const roomId = `room_${uid()}`;
@@ -72,7 +72,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
         },
         activeRoomId: roomId,
       };
-      loadSnapshot(snap);
+      await loadSnapshot(snap);
     }
     onPicked?.();
     onClose();

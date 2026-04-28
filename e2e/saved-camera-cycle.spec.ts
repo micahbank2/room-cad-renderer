@@ -39,7 +39,7 @@ const SNAPSHOT = {
 async function seedAndEnter3D(page: Page): Promise<void> {
   await page.evaluate(async (snap) => {
     // @ts-expect-error — window.__cadStore installed in test mode (Phase 36)
-    (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => void } } }).__cadStore.getState().loadSnapshot(snap);
+    await (window as unknown as { __cadStore: { getState: () => { loadSnapshot: (s: unknown) => Promise<void> } } }).__cadStore.getState().loadSnapshot(snap);
   }, SNAPSHOT);
   await page.getByTestId("view-mode-3d").click();
 }
