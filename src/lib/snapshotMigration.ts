@@ -1,4 +1,5 @@
-import type { CADSnapshot, RoomDoc, LegacySnapshotV1 } from "@/types/cad";
+import type { CADSnapshot, RoomDoc, LegacySnapshotV1, FloorMaterial } from "@/types/cad";
+import { computeSHA256, saveUserTextureWithDedup } from "@/lib/userTextureStore";
 
 export function defaultSnapshot(): CADSnapshot {
   const mainRoom: RoomDoc = {
@@ -9,7 +10,7 @@ export function defaultSnapshot(): CADSnapshot {
     placedProducts: {},
   };
   return {
-    version: 2,
+    version: 3,
     rooms: { room_main: mainRoom },
     activeRoomId: "room_main",
   };
@@ -45,6 +46,15 @@ function migrateWallsPerSide(rooms: Record<string, RoomDoc> | undefined): void {
 }
 
 export function migrateSnapshot(raw: unknown): CADSnapshot {
+  // v3 passthrough — already migrated, no mutations needed
+  if (
+    raw &&
+    typeof raw === "object" &&
+    (raw as CADSnapshot).version === 3 &&
+    (raw as CADSnapshot).rooms
+  ) {
+    return raw as CADSnapshot;
+  }
   // v2 passthrough
   if (
     raw &&
@@ -81,4 +91,51 @@ export function migrateSnapshot(raw: unknown): CADSnapshot {
   }
   // unknown / empty
   return defaultSnapshot();
+}
+
+/**
+ * Phase 51 — DEBT-05: migrate a single FloorMaterial entry from the legacy
+ * { kind: "custom", imageUrl: "data:..." } shape to { kind: "user-texture", userTextureId }.
+ * On any failure, preserves the original entry (graceful degradation per D-03).
+ */
+async function migrateOneFloorMaterial(mat: FloorMaterial): Promise<FloorMaterial> {
+  if (mat.kind !== "custom" || !(mat as any).imageUrl?.startsWith("data:")) return mat;
+  try {
+    const imageUrl = (mat as any).imageUrl as string;
+    const commaIdx = imageUrl.indexOf(",");
+    if (commaIdx === -1) throw new Error("no comma in data URL");
+    const header = imageUrl.slice(5, commaIdx);
+    const mimeType = header.split(";")[0] || "image/jpeg";
+    const b64 = imageUrl.slice(commaIdx + 1);
+    if (!b64) throw new Error("empty base64 payload");
+    const binary = atob(b64);
+    const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+    const blob = new Blob([bytes], { type: mimeType });
+    const sha256 = await computeSHA256(bytes.buffer);
+    const { id } = await saveUserTextureWithDedup(
+      { name: "Imported Floor", tileSizeFt: mat.scaleFt ?? 4, blob, mimeType },
+      sha256,
+    );
+    return { kind: "user-texture", userTextureId: id, scaleFt: mat.scaleFt, rotationDeg: mat.rotationDeg };
+  } catch (err) {
+    console.warn("[Phase51] FloorMaterial migration failed — entry preserved as legacy:", err);
+    return mat;
+  }
+}
+
+/**
+ * Phase 51 — DEBT-05: async migration pass. Runs AFTER migrateSnapshot (sync v1→v2).
+ * Converts any { kind: "custom", imageUrl: "data:..." } FloorMaterial to
+ * { kind: "user-texture", userTextureId } via the SHA-256 dedup IDB pipeline.
+ * Idempotent: v3 snapshots are returned immediately with no IDB calls.
+ * Bumps snap.version to 3 (D-05).
+ */
+export async function migrateFloorMaterials(snap: CADSnapshot): Promise<CADSnapshot> {
+  if (snap.version >= 3) return snap; // idempotency gate — v3 already migrated
+  for (const doc of Object.values(snap.rooms)) {
+    if (!doc?.floorMaterial) continue;
+    (doc as any).floorMaterial = await migrateOneFloorMaterial(doc.floorMaterial as FloorMaterial);
+  }
+  snap.version = 3;
+  return snap;
 }

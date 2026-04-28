@@ -27,7 +27,8 @@ describe("migrateSnapshot", () => {
 
   it("empty/unknown input returns default single-room snapshot", () => {
     const d = migrateSnapshot(null);
-    expect(d.version).toBe(2);
+    // Phase 51 (D-05): defaultSnapshot() now returns version 3
+    expect(d.version).toBe(3);
     expect(Object.keys(d.rooms)).toEqual(["room_main"]);
     expect(d.activeRoomId).toBe("room_main");
     expect(defaultSnapshot().rooms.room_main.room).toEqual({ width: 20, length: 16, wallHeight: 8 });
