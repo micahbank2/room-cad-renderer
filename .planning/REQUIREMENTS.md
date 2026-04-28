@@ -6,7 +6,7 @@ Editor-flow maturity milestone before v1.14's real-3D-models work. Continues pha
 
 ### Editor UX (CTXMENU- + PROPS3D-)
 
-- [ ] **CTXMENU-01** — Right-click on a canvas object (wall, product, ceiling, custom element) opens a context menu with relevant actions for that object kind. Mirrors competitor patterns (Pascal Editor, SketchUp). Source: [#74](https://github.com/micahbank2/room-cad-renderer/issues/74).
+- [x] **CTXMENU-01** — Right-click on a canvas object (wall, product, ceiling, custom element) opens a context menu with relevant actions for that object kind. Mirrors competitor patterns (Pascal Editor, SketchUp). Source: [#74](https://github.com/micahbank2/room-cad-renderer/issues/74).
   - **Verifiable:** Right-click any selected wall in 2D → context menu appears with: Focus camera, Save camera here, Copy, Paste, Hide/Show, Delete. Same for products, ceilings, custom elements. Right-click on empty canvas → menu with Paste (only if clipboard non-empty). Press Escape → menu closes. Click outside → menu closes.
   - **Acceptance:** New `CanvasContextMenu` component using lucide icons + Phase 33 design tokens. Reuses existing `cadStore` actions (no duplicate logic). Reuses Phase 48 saved-camera infra (Save camera here, Focus camera). Reuses Phase 46 hidden-ids (Hide/Show). Inert when typing in a form input. Closes on Escape OR backdrop click. Native browser right-click is suppressed only when over a canvas object — right-click on toolbar/sidebar still works normally.
   - **Hypothesis to test:** Likely needs raycasting for 3D right-click (which mesh did the user click on?) and Fabric.js targetFinder for 2D. Research phase confirms.
