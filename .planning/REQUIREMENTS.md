@@ -18,7 +18,7 @@ Maintenance milestone closing 3 carry-over bugs + 1 small UX polish item. Contin
 
 ### Tech Debt (DEBT-)
 
-- [ ] **DEBT-05** — Migrate legacy FloorMaterial `kind: "custom"` entries out of snapshots. They still embed full `data:image/...` URL strings, bloating saved projects. Phase 32 (LIB-08) introduced `userTextureId` references but didn't migrate the legacy path. Source: [#95](https://github.com/micahbank2/room-cad-renderer/issues/95).
+- [x] **DEBT-05** — Migrate legacy FloorMaterial `kind: "custom"` entries out of snapshots. They still embed full `data:image/...` URL strings, bloating saved projects. Phase 32 (LIB-08) introduced `userTextureId` references but didn't migrate the legacy path. Source: [#95](https://github.com/micahbank2/room-cad-renderer/issues/95).
   - **Verifiable:** Open a project that has a custom FloorMaterial. The exported snapshot JSON contains a `userTextureId` reference, NOT a `data:image/...` string. Saved JSON size for a project with 5 custom textures should be <50KB (down from potentially MBs).
   - **Acceptance:** One-time migration on `loadSnapshot()` rewrites legacy data-URL FloorMaterial entries → `userTextureId` (using SHA-256 dedup if texture already exists in IDB; storing it if not). Subsequent saves use the new shape. Old projects load cleanly. Document the migration version-bump in cadStore snapshot version. No data loss.
 

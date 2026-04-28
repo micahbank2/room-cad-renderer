@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.12
 milestone_name: Maintenance Pass
-status: executing
-stopped_at: Completed 50-01-PLAN.md (BUG-03 wallArt view-toggle persistence fix)
-last_updated: "2026-04-28T00:09:19.797Z"
+status: verifying
+stopped_at: Completed 51-01-PLAN.md (DEBT-05 FloorMaterial legacy data-URL migration)
+last_updated: "2026-04-28T01:13:30.738Z"
 progress:
   total_phases: 8
-  completed_phases: 3
-  total_plans: 3
-  completed_plans: 3
+  completed_phases: 4
+  total_plans: 4
+  completed_plans: 4
 ---
 
 # Project State
@@ -19,15 +19,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-25 — v1.10 archived; v1.11 Pascal Feature Set queued next)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 52 — keyboard-shortcuts-overlay-hotkey-01
+**Current focus:** Phase 51 — debt-05-floormaterial-migration
 
 ## Current Position
 
-Phase: 999.1
+Phase: 51 (debt-05-floormaterial-migration) — EXECUTING
 Milestone: v1.11 Pascal Feature Set
 Phases: 4 (45, 46, 47, 48) — none planned yet
-Plan: Not started
-Status: Executing Phase 52
+Plan: 1 of 1
+Status: Phase complete — ready for verification
 
 ## v1.11 Phase Sequence
 
@@ -65,6 +65,6 @@ When `/gsd:new-milestone` runs for v1.11, the starting input is already specifie
 
 ## Session Continuity
 
-Last session: 2026-04-27T18:46:55.409Z
-Stopped at: Completed 50-01-PLAN.md (BUG-03 wallArt view-toggle persistence fix)
+Last session: 2026-04-28T01:13:30.736Z
+Stopped at: Completed 51-01-PLAN.md (DEBT-05 FloorMaterial legacy data-URL migration)
 Resume file: None
