@@ -150,7 +150,9 @@
   2. Exported JSON for a project with 5 custom textures is under 50 KB.
   3. No data loss — the texture still renders correctly after migration.
   4. Subsequent saves persist the migrated shape; no re-migration on next load.
-**Plans:** TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 51-01-PLAN.md — async loadSnapshot refactor + migrateFloorMaterials + 23-caller updates + e2e regression spec
 **UI hint**: no
 
 #### Phase 52: Keyboard Shortcuts Overlay (HOTKEY-01)
