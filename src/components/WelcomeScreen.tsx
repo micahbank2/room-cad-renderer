@@ -29,7 +29,7 @@ export default function WelcomeScreen({ onStart }: Props) {
   const handleOpenProject = async (project: SavedProject) => {
     const full = await loadProject(project.id);
     if (full) {
-      loadSnapshot(full.snapshot);
+      await loadSnapshot(full.snapshot);
       setActive(full.id, full.name);
       onStart();
     }
@@ -43,7 +43,7 @@ export default function WelcomeScreen({ onStart }: Props) {
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result as string;
-      loadSnapshot(defaultSnapshot());
+      void loadSnapshot(defaultSnapshot()); // Phase 51: defaultSnapshot() is v3, no async migration work needed
       setFloorPlanImage(dataUrl);
       onStart();
     };

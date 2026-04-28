@@ -80,7 +80,7 @@ describe("cadStore paint snapshot safety", () => {
     expect(state.customPaints[0].id).toBe("custom_redo1");
   });
 
-  it("loadSnapshot restores customPaints", () => {
+  it("loadSnapshot restores customPaints", async () => {
     const color: PaintColor = { id: "custom_load1", name: "Load Color", hex: "#667788", source: "custom" };
     const snap = {
       version: 2 as const,
@@ -88,20 +88,20 @@ describe("cadStore paint snapshot safety", () => {
       activeRoomId: useCADStore.getState().activeRoomId,
       customPaints: [color],
     };
-    useCADStore.getState().loadSnapshot(snap);
+    await useCADStore.getState().loadSnapshot(snap);
     const state = useCADStore.getState() as any;
     expect(state.customPaints).toHaveLength(1);
     expect(state.customPaints[0].id).toBe("custom_load1");
   });
 
-  it("loadSnapshot restores recentPaints", () => {
+  it("loadSnapshot restores recentPaints", async () => {
     const snap = {
       version: 2 as const,
       rooms: useCADStore.getState().rooms,
       activeRoomId: useCADStore.getState().activeRoomId,
       recentPaints: ["fb_010", "fb_020"],
     };
-    useCADStore.getState().loadSnapshot(snap);
+    await useCADStore.getState().loadSnapshot(snap);
     const state = useCADStore.getState() as any;
     expect(state.recentPaints).toEqual(["fb_010", "fb_020"]);
   });
