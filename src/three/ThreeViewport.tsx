@@ -103,9 +103,6 @@ function Scene({ productLibrary }: Props) {
   const orbitTargetRef = useRef<[number, number, number]>([halfW, room.wallHeight / 3, halfL]);
   const orbitControlsRef = useRef<any>(null);
 
-  // Phase 54 PROPS3D-01: track canvas pointer-down position for drag-threshold check.
-  const canvasDownPos = useRef<{ x: number; y: number } | null>(null);
-
   // Phase 36 Plan 01 — VIZ-10 harness: deterministic camera pose helper.
   // Mirrors Phase 31 `window.__drive*` convention (install/cleanup via
   // useEffect; test-mode gated).
@@ -175,16 +172,6 @@ function Scene({ productLibrary }: Props) {
     };
     return () => {
       delete (window as unknown as { __getCameraPose?: unknown }).__getCameraPose;
-    };
-  }, []);
-
-  // Phase 54 PROPS3D-01: test driver for selection-state setup without testing the click path.
-  useEffect(() => {
-    if (import.meta.env.MODE !== "test" || typeof window === "undefined") return;
-    (window as unknown as { __driveMeshSelect?: (id: string) => void }).__driveMeshSelect =
-      (id: string) => useUIStore.getState().select([id]);
-    return () => {
-      delete (window as unknown as { __driveMeshSelect?: unknown }).__driveMeshSelect;
     };
   }, []);
 
@@ -515,6 +502,19 @@ export default function ThreeViewport({ productLibrary }: Props) {
   const cameraMode = useUIStore((s) => s.cameraMode);
   const halfW = room.width / 2;
   const halfL = room.length / 2;
+
+  // Phase 54 PROPS3D-01: track canvas pointer-down position for drag-threshold check.
+  const canvasDownPos = useRef<{ x: number; y: number } | null>(null);
+
+  // Phase 54 PROPS3D-01: test driver for selection-state setup without testing the click path.
+  useEffect(() => {
+    if (import.meta.env.MODE !== "test" || typeof window === "undefined") return;
+    (window as unknown as { __driveMeshSelect?: (id: string) => void }).__driveMeshSelect =
+      (id: string) => useUIStore.getState().select([id]);
+    return () => {
+      delete (window as unknown as { __driveMeshSelect?: unknown }).__driveMeshSelect;
+    };
+  }, []);
 
   const [showToast, setShowToast] = useState(false);
   useEffect(() => {
