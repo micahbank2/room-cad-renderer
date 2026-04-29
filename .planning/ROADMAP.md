@@ -177,7 +177,7 @@ Plans:
 | 51. Legacy FloorMaterial Snapshot Migration | 1/1 | Complete    | 2026-04-28 |
 | 52. Keyboard Shortcuts Overlay | 0/1 | Complete    | 2026-04-28 |
 | 53. Canvas Context Menus | 1/1 | Complete    | 2026-04-28 |
-| 54. PropertiesPanel in 3D & Split View | 1/1 | Complete   | 2026-04-29 |
+| 54. PropertiesPanel in 3D & Split View | 1/1 | Complete    | 2026-04-29 |
 
 ## Backlog
 
