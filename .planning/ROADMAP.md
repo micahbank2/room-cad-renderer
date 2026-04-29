@@ -141,10 +141,10 @@
   3. Dropping a file over the 25MB cap shows a size-cap error and creates no product
   4. Dropping two files with identical content stores only one IDB entry; both products reference the same `gltfId` (SHA-256 dedup)
   5. Existing image-only products continue to work unchanged — no regressions on the upload, display, or placement flow
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 55-01-PLAN.md — gltfStore IDB layer + Product.gltfId + AddProductModal GLTF extension + e2e
+- [x] 55-01-PLAN.md — gltfStore IDB layer + Product.gltfId + AddProductModal GLTF extension + e2e
 
 **UI hint:** yes
 
@@ -215,7 +215,7 @@ Plans:
 | 52. Keyboard Shortcuts Overlay | 0/1 | Complete    | 2026-04-28 |
 | 53. Canvas Context Menus | 1/1 | Complete    | 2026-04-28 |
 | 54. PropertiesPanel in 3D & Split View | 1/1 | Complete    | 2026-04-29 |
-| 55. GLTF Upload & Storage | 0/1 | In progress | - |
+| 55. GLTF Upload & Storage | 1/1 | Complete   | 2026-04-29 |
 | 56. GLTF Render in 3D | 0/? | Not started | - |
 | 57. GLTF Top-Down Silhouette in 2D | 0/? | Not started | - |
 | 58. GLTF Integration Verification | 0/? | Not started | - |
