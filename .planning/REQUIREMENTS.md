@@ -14,7 +14,7 @@ Editor-flow maturity milestone before v1.14's real-3D-models work. Continues pha
 
 ### 3D / Split View (PROPS3D-)
 
-- [ ] **PROPS3D-01** — PropertiesPanel renders the selected object's properties in 3D and split view modes, not just 2D. Source: [#97](https://github.com/micahbank2/room-cad-renderer/issues/97).
+- [x] **PROPS3D-01** — PropertiesPanel renders the selected object's properties in 3D and split view modes, not just 2D. Source: [#97](https://github.com/micahbank2/room-cad-renderer/issues/97).
   - **Verifiable:** Select a wall in 2D → PropertiesPanel shows wall properties. Switch to 3D → click the same wall in 3D → PropertiesPanel still shows wall properties (currently shows nothing). Same flow for products, ceilings, custom elements. Switch to split view → both 2D click AND 3D click drive the panel.
   - **Acceptance:** PropertiesPanel mounts unconditionally when an object is selected, regardless of viewMode. 3D click handler dispatches selection (raycast → match mesh → call `useUIStore.select([id])`). Split view: clicking in either pane drives same selection. No regression on Phase 31 inline-editing, Phase 48 saved-camera buttons, Phase 47 displayMode interactions.
   - **Hypothesis to test:** Likely a viewMode gate exists somewhere in App.tsx or PropertiesPanel that hides the panel outside 2D. Research confirms with file:line.
