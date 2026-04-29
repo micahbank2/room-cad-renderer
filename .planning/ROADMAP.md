@@ -148,7 +148,7 @@ Plans:
   2. In split view, clicking in either the 2D or 3D pane drives the same PropertiesPanel — selection is view-agnostic
   3. All Phase 31 inline-editing, Phase 48 saved-camera buttons, and Phase 47 display-mode interactions continue to work without regression
   4. Switching view modes (2D → 3D → split) preserves the current selection and panel state
-**Plans:** TBD
+**Plans:** 1/1 plans complete
 **UI hint:** yes
 
 ## Progress
@@ -177,7 +177,7 @@ Plans:
 | 51. Legacy FloorMaterial Snapshot Migration | 1/1 | Complete    | 2026-04-28 |
 | 52. Keyboard Shortcuts Overlay | 0/1 | Complete    | 2026-04-28 |
 | 53. Canvas Context Menus | 1/1 | Complete    | 2026-04-28 |
-| 54. PropertiesPanel in 3D & Split View | 0/? | Not started | - |
+| 54. PropertiesPanel in 3D & Split View | 1/1 | Complete   | 2026-04-29 |
 
 ## Backlog
 
