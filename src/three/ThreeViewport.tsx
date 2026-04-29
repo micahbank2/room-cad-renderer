@@ -13,6 +13,7 @@ import WalkCameraController from "./WalkCameraController";
 import { GestureChip } from "@/components/ui/GestureChip";
 import { getPresetPose, type PresetId } from "@/three/cameraPresets";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { isClick } from "@/hooks/useClickDetect";
 
 /**
  * Phase 35 CAM-02: cubic-in-out easing for preset tween.
@@ -102,6 +103,9 @@ function Scene({ productLibrary }: Props) {
   const orbitTargetRef = useRef<[number, number, number]>([halfW, room.wallHeight / 3, halfL]);
   const orbitControlsRef = useRef<any>(null);
 
+  // Phase 54 PROPS3D-01: track canvas pointer-down position for drag-threshold check.
+  const canvasDownPos = useRef<{ x: number; y: number } | null>(null);
+
   // Phase 36 Plan 01 — VIZ-10 harness: deterministic camera pose helper.
   // Mirrors Phase 31 `window.__drive*` convention (install/cleanup via
   // useEffect; test-mode gated).
@@ -171,6 +175,16 @@ function Scene({ productLibrary }: Props) {
     };
     return () => {
       delete (window as unknown as { __getCameraPose?: unknown }).__getCameraPose;
+    };
+  }, []);
+
+  // Phase 54 PROPS3D-01: test driver for selection-state setup without testing the click path.
+  useEffect(() => {
+    if (import.meta.env.MODE !== "test" || typeof window === "undefined") return;
+    (window as unknown as { __driveMeshSelect?: (id: string) => void }).__driveMeshSelect =
+      (id: string) => useUIStore.getState().select([id]);
+    return () => {
+      delete (window as unknown as { __driveMeshSelect?: unknown }).__driveMeshSelect;
     };
   }, []);
 
@@ -532,6 +546,22 @@ export default function ThreeViewport({ productLibrary }: Props) {
             x: e.clientX,
             y: e.clientY,
           });
+        }}
+        onPointerDown={(e: React.PointerEvent) => {
+          // Phase 54 PROPS3D-01: record down position for drag-threshold check on empty-space click.
+          // D-02: only left button.
+          if (e.button === 0) canvasDownPos.current = { x: e.clientX, y: e.clientY };
+        }}
+        onPointerMissed={(e: MouseEvent) => {
+          // Phase 54 PROPS3D-01: left-click on empty 3D space deselects.
+          // D-02: only fires when no mesh called e.stopPropagation() (confirmed by RESEARCH §2).
+          // Drag-threshold guard: don't deselect after orbit-drag release.
+          if (e.button === 0 && canvasDownPos.current) {
+            if (isClick(canvasDownPos.current.x, canvasDownPos.current.y, e.clientX, e.clientY)) {
+              useUIStore.getState().select([]);
+            }
+            canvasDownPos.current = null;
+          }
         }}
       >
         <Scene productLibrary={productLibrary} />
