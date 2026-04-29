@@ -12,6 +12,11 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 ## Current State
 
+**v1.13 UX Polish Bundle shipped 2026-04-28** (single-day milestone). 2 phases (53-54), 2 plans, 2 PRs ([#134](https://github.com/micahbank2/room-cad-renderer/pull/134), [#135](https://github.com/micahbank2/room-cad-renderer/pull/135)), 2/2 requirements (CTXMENU-01, PROPS3D-01). Editor-flow maturity milestone before v1.14's real-3D-models work. Phase 53 (CTXMENU-01): right-click context menus on canvas objects via single `CanvasContextMenu` component with `getActionsForKind()` registry; 2D Fabric `mousedown` button=2 + `getObjects()` scan (avoids Phase 25 PERF-01 evented:false pitfall); 3D R3F per-mesh `onContextMenu` + Canvas-level empty-canvas handler; auto-flip + 5 close paths (Escape / backdrop / item-click / right-click-elsewhere / resize-or-scroll); reuses Phase 46 hiddenIds, Phase 48 saved-camera, Phase 31 copy/paste (extracted to `src/lib/clipboardActions.ts` shared module). Phase 54 (PROPS3D-01): scope reality bigger than issue title — no 3D click-to-select existed at all; new `src/hooks/useClickDetect.ts` shared hook with 5px drag-threshold + button=0 check applied to all 4 mesh kinds; Canvas-level `onPointerMissed` clears selection with same drag guard; Phase 53 right-click coexists (different DOM events). Audit caught one cross-phase gap (CustomElementMesh missing `onContextMenu` after Phase 53 wired Wall/Product/Ceiling but not CustomElement) — 10-line fix committed inline before milestone tag. Forward commitment: **v1.14 = Real 3D Models** ([GH #29](https://github.com/micahbank2/room-cad-renderer/issues/29)) — GLTF/GLB upload + render. The "polish editor before real 3D models" thesis validated — both requirements shipped without scope creep, audit caught real integration gap inline, no carry-over.
+
+<details>
+<summary>Earlier milestones</summary>
+
 **v1.12 Maintenance Pass shipped 2026-04-27** (single-day milestone). 4 phases (49-52), 7 plans, 4 PRs ([#129](https://github.com/micahbank2/room-cad-renderer/pull/129), [#130](https://github.com/micahbank2/room-cad-renderer/pull/130), [#131](https://github.com/micahbank2/room-cad-renderer/pull/131), [#132](https://github.com/micahbank2/room-cad-renderer/pull/132)), 4/4 requirements (BUG-02, BUG-03, DEBT-05, HOTKEY-01). Bug sweep + tech debt + 1 UX polish item — maintenance milestone after the v1.11 sprint. Phase 49 (BUG-02): wall user-textures render on first apply via direct `map={userTex}` prop on `<meshStandardMaterial>` — `<primitive attach="map">` was failing to set `material.needsUpdate=true` on null→Texture transition. Phase 50 (BUG-03): same direct-prop pattern applied to wallArt sites; research found Phase 49's fix incidentally fixed user-uploaded wallpaper (shared `useUserTexture` path). Phase 51 (DEBT-05): legacy FloorMaterial data-URL entries auto-migrate to userTextureId references on snapshot load — `loadSnapshot` refactored to async (Pattern A: async pre-pass before Immer `produce()`); 23 caller sites updated (7 production + 3 vitest + 12 e2e + 1 shared helper); snapshot version 2→3; idempotent + graceful-on-malformed; SHA-256 dedup via existing `saveUserTextureWithDedup`. Phase 52 (HOTKEY-01): keyboard shortcuts cheat sheet overlay via new single-source-of-truth registry at `src/lib/shortcuts.ts` consumed by both App.tsx keyboard handler AND helpContent.tsx display — 26 entries (was 19; added 7 missing: Ceiling C, Reset 0, Camera Presets 1-4, Copy/Paste); coverage-gate test prevents drift; one-char `openHelp("shortcuts")` bug fix. Audit `passed` — zero gaps, zero carry-over (cleanest milestone closeout in project history). ~5,700 LOC. The "bug sweep + 1 polish" thesis validated — every requirement shipped without scope creep, and Phase 51's heavy async refactor introduced zero regressions on Phase 32/35/36/46-48.
 
 <details>
@@ -59,23 +64,6 @@ See `.planning/ROADMAP.md` for links to each milestone archive.
 
 </details>
 
-## Current Milestone: v1.13 UX Polish Bundle
-
-**Goal:** Mature the editing flow before v1.14's real-3D-models work. Right-click context menus and Properties-panel-in-3D are the two biggest editing friction points the platform currently has. Fixing them now means GLTF furniture in v1.14 lands on a fully-developed editor.
-
-**Target requirements (2 issues, 2 phases):**
-- **Phase 53 / CTXMENU-01 / [#74](https://github.com/micahbank2/room-cad-renderer/issues/74)** — Right-click context menus on canvas objects (walls, products, ceilings, custom elements) with Copy/Paste/Delete/Focus camera/Hide/Save camera here actions
-- **Phase 54 / PROPS3D-01 / [#97](https://github.com/micahbank2/room-cad-renderer/issues/97)** — PropertiesPanel renders in 3D and split views (not just 2D)
-
-**Sequencing intent:** Phase 53 first (right-click menus stand alone), Phase 54 second (PropertiesPanel-in-3D may benefit from any new selection patterns Phase 53 surfaces). Each phase ships independently.
-
-**Out of v1.13:** [#73](https://github.com/micahbank2/room-cad-renderer/issues/73) In-app feedback dialog (no demand signal — Phase 39 async questionnaire was sufficient). All bigger swings ([#27](https://github.com/micahbank2/room-cad-renderer/issues/27), [#28](https://github.com/micahbank2/room-cad-renderer/issues/28), [#29](https://github.com/micahbank2/room-cad-renderer/issues/29), [#56](https://github.com/micahbank2/room-cad-renderer/issues/56), [#81](https://github.com/micahbank2/room-cad-renderer/issues/81)) deferred to v1.14+.
-
-**Forward commitment: v1.14 = Real 3D Models** ([#29](https://github.com/micahbank2/room-cad-renderer/issues/29)) — GLTF/GLB upload + render. Biggest "feel the space" win Jessica will notice. v1.13's editing-flow polish lays the foundation.
-
-**Tech debt acknowledged + accepted:**
-- 6 pre-existing vitest failures permanently accepted (Phase 37 D-02); CI vitest stays disabled
-- AUDIT-01 substitute-evidence policy formalized in v1.10 audit. SUMMARY.md is canonical evidence.
 
 ## Target User
 
