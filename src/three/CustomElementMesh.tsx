@@ -1,3 +1,4 @@
+import type { ThreeEvent } from "@react-three/fiber";
 import type { CustomElement, PlacedCustomElement } from "@/types/cad";
 import { useClickDetect } from "@/hooks/useClickDetect";
 import { useUIStore } from "@/stores/uiStore";
@@ -14,6 +15,18 @@ export default function CustomElementMesh({ placed, element, isSelected }: Props
   const { handlePointerDown, handlePointerUp } = useClickDetect(() => {
     useUIStore.getState().select([placed.id]);
   });
+
+  // Phase 53 CTXMENU-01: right-click → custom element context menu (6 actions).
+  // v1.13 audit caught this as a missing integration — Phase 53 wired
+  // Wall/Product/Ceiling but Phase 54 didn't retrofit CustomElement.
+  const handleContextMenu = (e: ThreeEvent<MouseEvent>) => {
+    e.stopPropagation();
+    e.nativeEvent.preventDefault();
+    useUIStore.getState().openContextMenu("custom", placed.id, {
+      x: e.nativeEvent.clientX,
+      y: e.nativeEvent.clientY,
+    });
+  };
 
   if (!element) return null;
   const sc = placed.sizeScale ?? 1;
@@ -32,6 +45,7 @@ export default function CustomElementMesh({ placed, element, isSelected }: Props
       receiveShadow
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
+      onContextMenu={handleContextMenu}
     >
       <boxGeometry args={[w, h, d]} />
       <meshStandardMaterial
