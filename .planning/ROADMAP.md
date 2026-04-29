@@ -16,7 +16,7 @@
 - ✅ **v1.10 Evidence-Driven UX Polish** — Phases 43–44 (shipped 2026-04-25) — see [milestones/v1.10-ROADMAP.md](milestones/v1.10-ROADMAP.md)
 - ✅ **v1.11 Pascal Feature Set** — shipped 2026-04-26
 - ✅ **v1.12 Maintenance Pass** — shipped 2026-04-27
-- 🚧 **v1.13 UX Polish Bundle** — Phases 53-54 (in progress)
+- ✅ **v1.13 UX Polish Bundle** — shipped 2026-04-28
 
 ---
 
@@ -113,43 +113,10 @@
 
 ---
 
-## v1.13 UX Polish Bundle (in progress)
+## v1.13 UX Polish Bundle (shipped 2026-04-28)
 
-**Goal:** Mature the editing flow before v1.14's real-3D-models work by closing the two biggest editor friction points: missing right-click context menus and a PropertiesPanel that only works in 2D.
+2 phases (53-54), 2 plans, 2/2 requirements (CTXMENU-01, PROPS3D-01). Editor-flow maturity milestone before v1.14's real-3D-models work. Phase 53: right-click context menus via `CanvasContextMenu` (2D Fabric + 3D R3F, auto-flip, 5 close paths). Phase 54: 3D click-to-select via new `useClickDetect` hook (5px drag-threshold) + Canvas `onPointerMissed` deselect. Audit caught + fixed one cross-phase gap (CustomElementMesh missing right-click). ~21 files modified, 2 PRs, single-day milestone. Audit `passed` — zero carry-over. See [milestones/v1.13-ROADMAP.md](milestones/v1.13-ROADMAP.md).
 
-**Source:** [#74](https://github.com/micahbank2/room-cad-renderer/issues/74) (CTXMENU-01), [#97](https://github.com/micahbank2/room-cad-renderer/issues/97) (PROPS3D-01).
-
-**Sequencing:** Phase 53 (context menus) ships first as a self-contained editor primitive; Phase 54 (PropertiesPanel in 3D) may benefit from any selection-dispatch patterns Phase 53 surfaces.
-
-**Forward commitment:** v1.14 = Real 3D Models ([#29](https://github.com/micahbank2/room-cad-renderer/issues/29)) — GLTF/GLB upload + render. v1.13's editing-flow polish lays the foundation.
-
-### Phase Details
-
-#### Phase 53: Canvas Context Menus (CTXMENU-01)
-**Goal:** Right-clicking any canvas object opens a contextual action menu — eliminating the need to hunt toolbar buttons for common actions.
-**Depends on:** Phase 48 (saved-camera infra), Phase 46 (hidden-ids), Phase 33 (design tokens + lucide icons)
-**Requirements:** CTXMENU-01 — [#74](https://github.com/micahbank2/room-cad-renderer/issues/74)
-**Success Criteria** (what must be TRUE):
-  1. Right-clicking a selected wall, product, ceiling, or custom element in 2D opens a context menu with relevant actions (Delete, Copy, Hide/Show, Focus Camera, Save Camera Here)
-  2. Right-clicking empty canvas shows a Paste option only when the clipboard is non-empty
-  3. Pressing Escape or clicking outside the menu closes it; native browser right-click is suppressed only over canvas objects (toolbar/sidebar unaffected)
-  4. Menu uses Phase 33 design tokens and lucide icons; all actions delegate to existing cadStore actions with no duplicate logic
-**Plans:** 1/1 plans complete
-Plans:
-- [x] 53-01-PLAN.md — clipboardActions + uiStore slices + CanvasContextMenu + 2D/3D wiring + tests
-**UI hint:** yes
-
-#### Phase 54: PropertiesPanel in 3D & Split View (PROPS3D-01)
-**Goal:** The PropertiesPanel renders the selected object's properties in 3D and split view modes, not just 2D.
-**Depends on:** Phase 53 (selection patterns may inform 3D click dispatch)
-**Requirements:** PROPS3D-01 — [#97](https://github.com/micahbank2/room-cad-renderer/issues/97)
-**Success Criteria** (what must be TRUE):
-  1. Clicking a wall, product, ceiling, or custom element in the 3D viewport selects it and shows its properties in PropertiesPanel
-  2. In split view, clicking in either the 2D or 3D pane drives the same PropertiesPanel — selection is view-agnostic
-  3. All Phase 31 inline-editing, Phase 48 saved-camera buttons, and Phase 47 display-mode interactions continue to work without regression
-  4. Switching view modes (2D → 3D → split) preserves the current selection and panel state
-**Plans:** 1/1 plans complete
-**UI hint:** yes
 
 ## Progress
 
