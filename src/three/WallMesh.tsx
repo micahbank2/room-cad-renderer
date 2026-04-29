@@ -36,6 +36,7 @@ import { usePaintStore } from "@/stores/paintStore";
 import { useWallpaperTexture } from "./wallpaperTextureCache";
 import { useWallArtTextures } from "./wallArtTextureCache";
 import { useUserTexture } from "@/hooks/useUserTexture";
+import { useClickDetect } from "@/hooks/useClickDetect";
 
 interface Props {
   wall: WallSegment;
@@ -43,6 +44,11 @@ interface Props {
 }
 
 export default function WallMesh({ wall, isSelected }: Props) {
+  // Phase 54 PROPS3D-01: left-click to select (drag-threshold-aware)
+  const { handlePointerDown, handlePointerUp } = useClickDetect(() => {
+    useUIStore.getState().select([wall.id]);
+  });
+
   const wainscotStyles = useWainscotStyleStore((s) => s.items);
   const customColors = usePaintStore((s) => s.customColors);
   const { position, rotation, dimensions } = useMemo(() => {
@@ -380,6 +386,8 @@ export default function WallMesh({ wall, isSelected }: Props) {
         geometry={geometry}
         castShadow
         receiveShadow
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
         onContextMenu={(e: ThreeEvent<MouseEvent>) => {
           if (e.nativeEvent.button !== 2) return;
           e.stopPropagation();

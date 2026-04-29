@@ -15,6 +15,7 @@ import { SURFACE_MATERIALS } from "@/data/surfaceMaterials";
 import { PbrSurface } from "./PbrSurface";
 import { useUserTexture } from "@/hooks/useUserTexture";
 import { useUserTextures } from "@/hooks/useUserTextures";
+import { useClickDetect } from "@/hooks/useClickDetect";
 
 interface Props {
   ceiling: Ceiling;
@@ -23,6 +24,11 @@ interface Props {
 
 /** Ceiling rendered as a horizontal polygon mesh at its height, facing down. */
 export default function CeilingMesh({ ceiling, isSelected }: Props) {
+  // Phase 54 PROPS3D-01: left-click to select (drag-threshold-aware)
+  const { handlePointerDown, handlePointerUp } = useClickDetect(() => {
+    useUIStore.getState().select([ceiling.id]);
+  });
+
   const customColors = usePaintStore((s) => s.customColors);
 
   // Phase 34 — user-texture branch is HIGHEST priority. Hook returns null on
@@ -108,6 +114,8 @@ export default function CeilingMesh({ ceiling, isSelected }: Props) {
       geometry={geometry}
       position={[0, ceiling.height, 0]}
       receiveShadow
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
       onContextMenu={(e: ThreeEvent<MouseEvent>) => {
         if (e.nativeEvent.button !== 2) return;
         e.stopPropagation();

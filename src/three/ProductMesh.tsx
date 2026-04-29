@@ -4,6 +4,7 @@ import type { Product } from "@/types/product";
 import { resolveEffectiveDims } from "@/types/product";
 import { useProductTexture } from "./productTextureCache";
 import { useUIStore } from "@/stores/uiStore";
+import { useClickDetect } from "@/hooks/useClickDetect";
 
 interface Props {
   placed: PlacedProduct;
@@ -12,6 +13,11 @@ interface Props {
 }
 
 export default function ProductMesh({ placed, product, isSelected }: Props) {
+  // Phase 54 PROPS3D-01: left-click to select (drag-threshold-aware)
+  const { handlePointerDown, handlePointerUp } = useClickDetect(() => {
+    useUIStore.getState().select([placed.id]);
+  });
+
   // Phase 31: per-axis overrides resolved here so 3D mesh respects edge drags.
   const { width, depth, height, isPlaceholder } = resolveEffectiveDims(product, placed);
 
@@ -27,6 +33,8 @@ export default function ProductMesh({ placed, product, isSelected }: Props) {
       rotation={[0, rotY, 0]}
       castShadow
       receiveShadow
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
       onContextMenu={(e: ThreeEvent<MouseEvent>) => {
         if (e.nativeEvent.button !== 2) return;
         e.stopPropagation();
