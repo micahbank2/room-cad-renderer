@@ -7,7 +7,12 @@ export interface Product {
   height: number | null;  // feet, null = unspecified
   material: string;
   imageUrl: string;       // data URL or blob URL
-  modelUrl?: string;      // .glb/.obj blob URL
+  /** @deprecated use gltfId instead — modelUrl is a non-persistent blob URL that
+   *  does not survive snapshot reload. Field retained for backwards-compatibility. */
+  modelUrl?: string;
+  /** IDB key into gltfIdbStore (Phase 55). Set when user uploads a .gltf/.glb file.
+   *  Phase 56 reads getGltf(gltfId) and passes blob to drei useGLTF as a blob URL. */
+  gltfId?: string;
   textureUrls: string[];
 }
 
