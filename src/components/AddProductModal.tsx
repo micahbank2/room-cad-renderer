@@ -1,7 +1,9 @@
 import { useState, useRef } from "react";
+import { X } from "lucide-react";
 import { uid } from "@/lib/geometry";
 import type { Product } from "@/types/product";
 import { PRODUCT_CATEGORIES } from "@/types/product";
+import { saveGltfWithDedup } from "@/lib/gltfStore";
 
 interface Props {
   onAdd: (product: Product) => void;
@@ -18,8 +20,11 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
   const [material, setMaterial] = useState("");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageName, setImageName] = useState("");
+  const [gltfFile, setGltfFile] = useState<File | null>(null);
+  const [gltfError, setGltfError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
+  const gltfRef = useRef<HTMLInputElement>(null);
 
   function handleFile(file: File) {
     setImageName(file.name);
@@ -28,15 +33,29 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
     reader.readAsDataURL(file);
   }
 
+  function validateGltf(file: File): string | null {
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+    if (ext !== "gltf" && ext !== "glb") return "FILE MUST BE .GLTF OR .GLB";
+    if (file.size > 25 * 1024 * 1024) return "FILE EXCEEDS 25MB LIMIT";
+    return null;
+    // DO NOT check file.type — MIME is inconsistent across browsers (Research §Focus Area 5)
+  }
+
   function handleDrop(e: React.DragEvent) {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file?.type.startsWith("image/")) handleFile(file);
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name) return;
+
+    let gltfId: string | undefined;
+    if (gltfFile) {
+      const result = await saveGltfWithDedup({ blob: gltfFile, name: gltfFile.name });
+      gltfId = result.id;
+    }
 
     onAdd({
       id: `prod_${uid()}`,
@@ -48,6 +67,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
       material,
       imageUrl: imageUrl ?? "",
       textureUrls: [],
+      ...(gltfId ? { gltfId } : {}),
     });
     onClose();
   }
@@ -232,6 +252,49 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                   className="w-full px-3 py-2 text-xs"
                 />
               </label>
+
+              {/* 3D Model — optional (Phase 55 GLTF-UPLOAD-01) */}
+              <div className="space-y-1">
+                <span className="font-mono text-[9px] text-text-ghost tracking-wider">
+                  3D MODEL (OPTIONAL)
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => gltfRef.current?.click()}
+                    className="font-mono text-[9px] px-3 py-1.5 border border-outline-variant/30 rounded-sm text-text-dim hover:text-text-primary hover:border-accent/40 transition-colors"
+                  >
+                    {gltfFile ? gltfFile.name.toUpperCase() : "CHOOSE .GLTF / .GLB"}
+                  </button>
+                  {gltfFile && (
+                    <button
+                      type="button"
+                      onClick={() => { setGltfFile(null); setGltfError(null); }}
+                      className="text-text-ghost hover:text-error transition-colors"
+                    >
+                      <X size={12} />
+                    </button>
+                  )}
+                  <input
+                    ref={gltfRef}
+                    data-testid="gltf-file-input"
+                    type="file"
+                    accept=".gltf,.glb"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (!f) return;
+                      const err = validateGltf(f);
+                      if (err) { setGltfError(err); setGltfFile(null); }
+                      else { setGltfFile(f); setGltfError(null); }
+                      e.target.value = ""; // allow re-select of same file
+                    }}
+                    className="hidden"
+                  />
+                </div>
+                {gltfError && (
+                  <span className="font-mono text-[8px] text-error block">{gltfError}</span>
+                )}
+              </div>
             </div>
           </div>
 

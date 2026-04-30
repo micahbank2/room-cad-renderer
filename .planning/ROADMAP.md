@@ -17,6 +17,7 @@
 - ✅ **v1.11 Pascal Feature Set** — shipped 2026-04-26
 - ✅ **v1.12 Maintenance Pass** — shipped 2026-04-27
 - ✅ **v1.13 UX Polish Bundle** — shipped 2026-04-28
+- 🚧 **v1.14 Real 3D Models** — Phases 55-58 (in progress)
 
 ---
 
@@ -117,6 +118,75 @@
 
 2 phases (53-54), 2 plans, 2/2 requirements (CTXMENU-01, PROPS3D-01). Editor-flow maturity milestone before v1.14's real-3D-models work. Phase 53: right-click context menus via `CanvasContextMenu` (2D Fabric + 3D R3F, auto-flip, 5 close paths). Phase 54: 3D click-to-select via new `useClickDetect` hook (5px drag-threshold) + Canvas `onPointerMissed` deselect. Audit caught + fixed one cross-phase gap (CustomElementMesh missing right-click). ~21 files modified, 2 PRs, single-day milestone. Audit `passed` — zero carry-over. See [milestones/v1.13-ROADMAP.md](milestones/v1.13-ROADMAP.md).
 
+---
+
+## v1.14 Real 3D Models
+
+**Goal:** Jessica can upload a real GLTF/GLB model of actual furniture she's considering and see it rendered in her room — not a textured placeholder box, but the actual object with its embedded PBR materials. Source: [#29](https://github.com/micahbank2/room-cad-renderer/issues/29).
+
+**Sequencing rationale:** Upload must exist before render can reference a model; 3D render ships before 2D silhouette because Three.js geometry is the source of truth for the projection; integration validates that all existing platform systems (size-override, saved cameras, context menus, click-to-select) compose correctly with the new model type before the milestone closes.
+
+**Forward signal:** Biggest user-visible win in project history; validates v1.0–v1.13 platform.
+
+### Phase Details
+
+#### Phase 55: GLTF Upload & Storage (GLTF-UPLOAD-01)
+
+**Goal:** Users can upload `.gltf` or `.glb` files through the existing product upload flow; files are validated, stored in IndexedDB with SHA-256 dedup, and attached to products via `gltfId`.
+**Depends on:** Phase 32 (userTextureStore IDB pattern), Phase 34 (SHA-256 dedup), Phase 51 (async loadSnapshot)
+**Requirements:** [GLTF-UPLOAD-01](https://github.com/micahbank2/room-cad-renderer/issues/29)
+**Success Criteria** (what must be TRUE):
+  1. AddProductModal file picker accepts `.gltf` and `.glb` extensions and rejects all other formats with a clear error message
+  2. Dropping a valid GLTF under the 25MB cap creates a product with `gltfId` set; the file is retrievable from IndexedDB
+  3. Dropping a file over the 25MB cap shows a size-cap error and creates no product
+  4. Dropping two files with identical content stores only one IDB entry; both products reference the same `gltfId` (SHA-256 dedup)
+  5. Existing image-only products continue to work unchanged — no regressions on the upload, display, or placement flow
+**Plans:** 1/1 plans complete
+
+Plans:
+- [x] 55-01-PLAN.md — gltfStore IDB layer + Product.gltfId + AddProductModal GLTF extension + e2e
+
+**UI hint:** yes
+
+#### Phase 56: GLTF Render in 3D (GLTF-RENDER-3D-01)
+
+**Goal:** Products with a `gltfId` render as the actual GLTF model in the 3D viewport, with their embedded PBR materials, correct transforms, and graceful load/failure handling.
+**Depends on:** Phase 55 (gltfId on Product), Phase 53 (right-click on 3D mesh), Phase 54 (click-to-select on 3D mesh)
+**Requirements:** [GLTF-RENDER-3D-01](https://github.com/micahbank2/room-cad-renderer/issues/29)
+**Success Criteria** (what must be TRUE):
+  1. A placed product with a GLTF model renders with its embedded PBR materials in 3D — not a textured box
+  2. Position, rotation, and Phase 31 sizeScale all apply correctly to the GLTF root group
+  3. A Suspense loading spinner appears while the model loads; Phase 53 right-click and Phase 54 click-to-select both work on the rendered model via its wrapping `<group>`
+  4. If the GLTF file is corrupt or fails to load, the product falls back to the bounding-box placeholder with no console errors that block render
+**Plans:** TBD
+**UI hint:** no
+
+#### Phase 57: GLTF Top-Down Silhouette in 2D (GLTF-RENDER-2D-01)
+
+**Goal:** Products with GLTF models render a top-down silhouette outline in the 2D floor plan instead of a textured rectangle.
+**Depends on:** Phase 56 (GLTF geometry loaded and proven in Three.js), Phase 55 (gltfId)
+**Requirements:** [GLTF-RENDER-2D-01](https://github.com/micahbank2/room-cad-renderer/issues/29)
+**Success Criteria** (what must be TRUE):
+  1. A GLTF chair placed in the 2D floor plan shows a chair-shaped silhouette polygon, not a rectangle
+  2. Image-only products continue to render as the existing textured rectangle — no regressions
+  3. Switching between GLTF-backed and image-only products in the same room produces no visual glitches or Fabric canvas errors
+  4. If silhouette computation fails for a given model, the product falls back to the bounding-box rectangle silently
+**Plans:** TBD
+**UI hint:** no
+
+#### Phase 58: GLTF Integration Verification (GLTF-INTEGRATION-01)
+
+**Goal:** All existing platform systems — size-override handles, saved cameras, context menus, click-to-select, and the product library UI — compose correctly with GLTF-backed products.
+**Depends on:** Phase 55, Phase 56, Phase 57 (full GLTF pipeline in place)
+**Requirements:** [GLTF-INTEGRATION-01](https://github.com/micahbank2/room-cad-renderer/issues/29)
+**Success Criteria** (what must be TRUE):
+  1. Dragging a Phase 31 edge resize handle on a GLTF product scales the 3D model group and the 2D silhouette; dragging a corner handle applies sizeScale uniformly
+  2. Right-clicking the GLTF mesh in 3D opens the full 6-action product context menu (Phase 53); left-clicking selects it and updates the PropertiesPanel (Phase 54)
+  3. Saving a camera on a GLTF product's tree node and double-clicking it focuses the camera correctly (Phase 48)
+  4. The product library list shows a small lucide `Box` icon next to GLTF-backed products; image-only products show no icon
+**Plans:** TBD
+**UI hint:** yes
+
 
 ## Progress
 
@@ -145,6 +215,10 @@
 | 52. Keyboard Shortcuts Overlay | 0/1 | Complete    | 2026-04-28 |
 | 53. Canvas Context Menus | 1/1 | Complete    | 2026-04-28 |
 | 54. PropertiesPanel in 3D & Split View | 1/1 | Complete    | 2026-04-29 |
+| 55. GLTF Upload & Storage | 1/1 | Complete    | 2026-04-29 |
+| 56. GLTF Render in 3D | 0/? | Not started | - |
+| 57. GLTF Top-Down Silhouette in 2D | 0/? | Not started | - |
+| 58. GLTF Integration Verification | 0/? | Not started | - |
 
 ## Backlog
 

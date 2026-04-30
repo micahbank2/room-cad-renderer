@@ -65,6 +65,33 @@ See `.planning/ROADMAP.md` for links to each milestone archive.
 </details>
 
 
+## Current Milestone: v1.14 Real 3D Models
+
+**Goal:** Jessica uploads actual furniture from real GLTF files and sees them in 3D — not textured boxes. The biggest single user-visible win the platform has ever shipped. Validates everything from v1.0–v1.13: textures, materials, multi-room, presets, tree, displayMode, saved cameras, click-to-select, context menus all become more meaningful when products are real.
+
+**Target requirements (4 issues, 4 phases):**
+- **Phase 55 / GLTF-UPLOAD-01 / [#29](https://github.com/micahbank2/room-cad-renderer/issues/29)** — GLTF/GLB upload + IDB storage with SHA-256 dedup; 25MB cap; new optional `gltfId` field on Product
+- **Phase 56 / GLTF-RENDER-3D-01** — ProductMesh branches on `gltfId`; renders via drei's `useGLTF` hook; loading spinner; bbox fallback on failure
+- **Phase 57 / GLTF-RENDER-2D-01** — Top-down silhouette computed from GLTF geometry; cached per gltfId; rendered as Fabric polygon path; bbox-rectangle fallback
+- **Phase 58 / GLTF-INTEGRATION-01** — Polish + verify Phase 31 size-override, Phase 48 saved-camera, Phase 53 right-click menus, Phase 54 click-to-select all work on GLTF products; library UI indicator
+
+**Sequencing intent:** Upload before render (Phase 55 → 56). 3D render before 2D silhouette (3D is the magic moment; 2D is enhancement). Integration verification last (builds on complete pipeline). Each phase ships independently — even Phase 55 alone has user value (uploaded models stored, ready for render in 56).
+
+**Out of v1.14:** OBJ format (older, separate codepath; defer to v1.15+ if demand surfaces). Animations (furniture rarely needs them). Custom material overrides on GLTF (use embedded materials). Walls/ceilings/custom-elements as GLTF (parametric, don't need it). LOD / progressive loading (premature). Cloud-hosted GLTF library (storage scope).
+
+**Format / scope locks:**
+- GLTF + GLB only
+- Static rendering (no animations)
+- GLTF embedded PBR materials used as-is
+- 25MB hard cap per file (validation on upload)
+- IDB storage mirroring user-texture pipeline (Phase 32 LIB-08 reference)
+- drei `useGLTF` for caching
+- Top-down silhouette in 2D (computed once, cached)
+
+**Tech debt acknowledged + accepted:**
+- 6 pre-existing vitest failures permanently accepted (Phase 37 D-02); CI vitest stays disabled
+- AUDIT-01 substitute-evidence policy formalized in v1.10 audit. SUMMARY.md is canonical evidence.
+
 ## Target User
 
 One person. Non-technical. Interior design enthusiast, not a professional. Comfortable with basic computer use. Thinks visually. Saves products from Pinterest, Instagram, and store websites.

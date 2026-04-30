@@ -7,6 +7,7 @@ import { installTreeDrivers } from "./test-utils/treeDrivers";
 import { installDisplayModeDrivers } from "./test-utils/displayModeDrivers";
 import { installSavedCameraDrivers } from "./test-utils/savedCameraDrivers";
 import { installUserTextureDrivers } from "./test-utils/userTextureDrivers";
+import { installGltfDrivers } from "./test-utils/gltfDrivers";
 
 // Phase 46: install tree test drivers (gated by MODE==="test", production no-op)
 installTreeDrivers();
@@ -16,6 +17,8 @@ installDisplayModeDrivers();
 installSavedCameraDrivers();
 // Phase 49: install user-texture test drivers (gated by MODE==="test", production no-op)
 installUserTextureDrivers();
+// Phase 55: install GLTF upload test drivers (gated by MODE==="test", production no-op)
+installGltfDrivers();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
