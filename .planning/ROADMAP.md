@@ -158,7 +158,10 @@ Plans:
   2. Position, rotation, and Phase 31 sizeScale all apply correctly to the GLTF root group
   3. A Suspense loading spinner appears while the model loads; Phase 53 right-click and Phase 54 click-to-select both work on the rendered model via its wrapping `<group>`
   4. If the GLTF file is corrupt or fails to load, the product falls back to the bounding-box placeholder with no console errors that block render
-**Plans:** TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 56-01-PLAN.md — useGltfBlobUrl hook + ProductBox extraction + GltfProduct component + ProductMesh branching + e2e fixture
+
 **UI hint:** no
 
 #### Phase 57: GLTF Top-Down Silhouette in 2D (GLTF-RENDER-2D-01)
@@ -216,7 +219,7 @@ Plans:
 | 53. Canvas Context Menus | 1/1 | Complete    | 2026-04-28 |
 | 54. PropertiesPanel in 3D & Split View | 1/1 | Complete    | 2026-04-29 |
 | 55. GLTF Upload & Storage | 1/1 | Complete    | 2026-04-29 |
-| 56. GLTF Render in 3D | 0/? | Not started | - |
+| 56. GLTF Render in 3D | 0/1 | Planned | - |
 | 57. GLTF Top-Down Silhouette in 2D | 0/? | Not started | - |
 | 58. GLTF Integration Verification | 0/? | Not started | - |
 
