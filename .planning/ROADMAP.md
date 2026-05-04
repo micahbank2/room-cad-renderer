@@ -174,7 +174,9 @@ Plans:
   2. Image-only products continue to render as the existing textured rectangle — no regressions
   3. Switching between GLTF-backed and image-only products in the same room produces no visual glitches or Fabric canvas errors
   4. If silhouette computation fails for a given model, the product falls back to the bounding-box rectangle silently
-**Plans:** TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 57-01-PLAN.md — gltfSilhouette.ts (compute+cache TDD), fabricSync.ts polygon branch, test driver, e2e
 **UI hint:** no
 
 #### Phase 58: GLTF Integration Verification (GLTF-INTEGRATION-01)
