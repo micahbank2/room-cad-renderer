@@ -9,6 +9,7 @@ import type { Product } from "@/types/product";
 import { angle as wallAngleRad } from "@/lib/geometry";
 import Lighting from "./Lighting";
 import { RoomGroup, computeRoomOffsets } from "./RoomGroup";
+import { computeRoomBboxCenter, getCutawayWallId } from "./cutawayDetection";
 import WalkCameraController from "./WalkCameraController";
 import { GestureChip } from "@/components/ui/GestureChip";
 import { getPresetPose, type PresetId } from "@/three/cameraPresets";
@@ -65,6 +66,11 @@ function Scene({ productLibrary }: Props) {
   // Phase 47 D-02: multi-room render gate.
   const rooms = useCADStore((s) => s.rooms);
   const displayMode = useUIStore((s) => s.displayMode);
+
+  // Phase 59 CUTAWAY-01: subscriptions for the per-frame cutaway-detection loop.
+  // useFrame block below reads these via closure on each tick.
+  const cutawayMode = useUIStore((s) => s.cutawayMode);
+  const setCutawayAutoDetectedWall = useUIStore((s) => s.setCutawayAutoDetectedWall);
 
   // Phase 47 D-03: per-room X offsets (cumulative sum for EXPLODE; 0 for NORMAL/SOLO).
   const roomOffsets = useMemo(
@@ -419,6 +425,45 @@ function Scene({ productLibrary }: Props) {
       orbitTargetRef.current = [t.toTarget.x, t.toTarget.y, t.toTarget.z];
       ctrl.enableDamping = true;
       presetTween.current = null;
+    }
+  });
+
+  // Phase 59 CUTAWAY-01: per-frame cutaway-detection loop.
+  // Gated on cutawayMode !== "off" + cameraMode !== "walk" (D-08).
+  // viewMode gate is implicit — Scene only mounts in 3D / split (App.tsx).
+  // Per-room iteration follows displayMode (D-03):
+  //   normal: only activeRoomId
+  //   solo:   only activeRoomId (the visible room)
+  //   explode: every room in `rooms`
+  // Setter is compare-then-set in uiStore — same value on consecutive frames
+  // does NOT trigger React re-renders. Allocation budget for the loop is the
+  // single `{x,y}` object returned by computeRoomBboxCenter per room per
+  // frame (≤6 rooms × 60fps = 360 small objects/sec — negligible GC).
+  useFrame(({ camera }) => {
+    if (cutawayMode === "off") return;
+    if (cameraMode === "walk") return;
+
+    // Choose room set per displayMode (D-03).
+    let roomIdsToScan: string[];
+    if (displayMode === "explode") {
+      roomIdsToScan = Object.keys(rooms);
+    } else {
+      roomIdsToScan = activeRoomId ? [activeRoomId] : [];
+    }
+
+    for (const roomId of roomIdsToScan) {
+      const room = rooms[roomId];
+      if (!room) continue;
+      const wallsArray = Object.values(room.walls ?? {});
+      const offsetX = roomOffsets[roomId] ?? 0;
+      // Bbox center + wall coords are in room-LOCAL 2D space. The outward
+      // normal is a DIRECTION, not a position — translation by offsetX does
+      // not change it. Pass local center; sign test stays consistent.
+      // (offsetX retained as the 4th arg for future "world-space sign test"
+      // refactors; cutawayDetection currently treats it as documentation.)
+      const localCenter = computeRoomBboxCenter(wallsArray);
+      const { wallId } = getCutawayWallId(wallsArray, camera, localCenter, offsetX);
+      setCutawayAutoDetectedWall(roomId, wallId);
     }
   });
 
