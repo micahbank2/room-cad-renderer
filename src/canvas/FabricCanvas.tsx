@@ -189,10 +189,11 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // 3. Walls
     renderWalls(fc, walls, scale, origin, selectedIds);
 
-    // 4. Products — onImageReady bumps the tick so this redraw re-runs once
-    // the async image load populates the cache, rebuilding the product Group
-    // with the FabricImage child (FIX-01). Functional setState avoids stale
-    // closures when multiple products finish loading concurrently (D-03).
+    // 4. Products — onAssetReady bumps the tick so this redraw re-runs once
+    // an async asset (image cache OR Phase 57 GLTF silhouette compute)
+    // populates its cache, rebuilding the product Group with the new child.
+    // Functional setState avoids stale closures when multiple products
+    // finish loading concurrently (D-03).
     renderProducts(
       fc,
       placedProducts,
@@ -233,6 +234,13 @@ export default function FabricCanvas({ productLibrary }: Props) {
     });
     fcRef.current = fc;
 
+    // Phase 57: expose the canvas in test mode so __getProductRenderShape
+    // (e2e driver) can walk fc.getObjects() to assert polygon vs rect.
+    // Mirrors the Phase 31 __driveResize global-driver pattern.
+    if (import.meta.env.MODE === "test") {
+      (window as unknown as { __fabricCanvas?: fabric.Canvas }).__fabricCanvas = fc;
+    }
+
     const detachDragDrop = attachDragDropHandlers(wrapperRef.current!, () => {
       const wrapper = wrapperRef.current!;
       const rect = wrapper.getBoundingClientRect();
@@ -261,6 +269,9 @@ export default function FabricCanvas({ productLibrary }: Props) {
       toolCleanupRef.current = null;
       fc.dispose();
       fcRef.current = null;
+      if (import.meta.env.MODE === "test") {
+        delete (window as unknown as { __fabricCanvas?: fabric.Canvas }).__fabricCanvas;
+      }
     };
   }, []);
 
