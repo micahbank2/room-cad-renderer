@@ -18,6 +18,7 @@
 - ✅ **v1.12 Maintenance Pass** — shipped 2026-04-27
 - ✅ **v1.13 UX Polish Bundle** — shipped 2026-04-28
 - ✅ **v1.14 Real 3D Models** — Phases 55–58 (shipped 2026-05-05)
+- 🚧 **v1.15 Architectural Toolbar Expansion** — Phases 59–62 (in progress)
 
 ---
 
@@ -124,6 +125,76 @@
 
 4 phases (55-58), 4 plans, 4/4 requirements (GLTF-UPLOAD-01, GLTF-RENDER-3D-01, GLTF-RENDER-2D-01, GLTF-INTEGRATION-01). Biggest user-visible win in project history. Phase 55: `.gltf`/`.glb` upload to IDB with SHA-256 dedup (mirrors Phase 32 user-texture pattern). Phase 56: drei `useGLTF` 3D rendering with auto-scale + Y-floor + `<box3Helper>` selection outline. Phase 57: top-down convex-hull silhouette polygons via Andrew's monotone chain + FIX-01 async cache. Phase 58: library Box badge top-LEFT + auto-thumbnail (mirrors Phase 45 swatch generator) + Phase 48 × GLTF e2e closing the only untested combo. 59 files modified, 11K LOC, 4 PRs ([#137](https://github.com/micahbank2/room-cad-renderer/pull/137), [#138](https://github.com/micahbank2/room-cad-renderer/pull/138), [#139](https://github.com/micahbank2/room-cad-renderer/pull/139), [#140](https://github.com/micahbank2/room-cad-renderer/pull/140)). Audit `passed` — zero regressions on Phase 31/48/53/54. Post-merge fix for React StrictMode double-mount in thumbnail callback. See [milestones/v1.14-ROADMAP.md](milestones/v1.14-ROADMAP.md).
 
+---
+
+## v1.15 Architectural Toolbar Expansion
+
+**Goal:** After v1.14 made the *furniture* real, v1.15 makes the *room itself* richer. The toolbar currently has walls, doors, windows, and ceilings — that's it. Add wall cutaway viewing, stairs, archway/passthrough/niche openings, and measurement + annotation tools. Source: [#21](https://github.com/micahbank2/room-cad-renderer/issues/21), [#19](https://github.com/micahbank2/room-cad-renderer/issues/19) (partial), [#22](https://github.com/micahbank2/room-cad-renderer/issues/22).
+
+**Sequencing rationale:** Wall cutaway ships first because it's 3D-only and doesn't depend on new primitives — fastest visible value. Stairs second because it sets the new-primitive pattern (2D draw + 3D extrusion + tree integration). Openings third because it extends both the existing wall-cut codepath (doors/windows) and intersects with stairs in stairwell scenarios. Measurement last as the annotation layer that overlays everything.
+
+**Forward signal:** Closes the architectural-toolbar gap before any further library / material work. After v1.15, Jessica can model her actual home, not just a rectangle with furniture in it.
+
+### Phase Details
+
+#### Phase 59: Wall Cutaway Mode (CUTAWAY-01)
+
+**Goal:** In 3D, the wall closest to the camera ghosts or hides so the room interior is visible from any angle. Auto-mode detects the blocking wall via raycast each frame; manual mode hides a specific wall via right-click action.
+**Depends on:** Phase 47 (RoomGroup architecture), Phase 53 (right-click menus on walls), Phase 46 (hiddenIds pattern)
+**Requirements:** [CUTAWAY-01](https://github.com/micahbank2/room-cad-renderer/issues/21)
+**Success Criteria** (what must be TRUE):
+  1. In 3D, when the camera is at a side angle, the nearest wall ghosts (semi-transparent) so the interior is visible — no more "blocked by foreground wall" frustration
+  2. Toggle works: Toolbar button cycles `auto / off / manual:<wallId>`; right-click any wall in 3D → "Hide wall in 3D" action
+  3. Cutaway respects Phase 47 SOLO/EXPLODE display modes and Phase 46 hiddenIds (already-hidden walls stay hidden)
+  4. No regression on Phase 32 PBR materials, Phase 36 wallpaper/wallArt, Phase 49–50 user-textures (cutaway is a render-state-only feature)
+  5. Cutaway state is session-only — NOT persisted to snapshots (geometry doesn't change based on viewing angle)
+**Plans:** 0/1 plans complete
+**UI hint:** yes
+
+#### Phase 60: Stairs (STAIRS-01)
+
+**Goal:** New architectural primitive. Click in 2D → place a stair element with configurable rise / run / width / step count. Renders as a stair-symbol polygon in 2D and connected step boxes in 3D.
+**Depends on:** Phase 31 (size-override resolver pattern), Phase 53/54 (right-click + click-to-select), Phase 46 (tree integration), Phase 48 (saved-camera per node)
+**Requirements:** [STAIRS-01](https://github.com/micahbank2/room-cad-renderer/issues/19)
+**Success Criteria** (what must be TRUE):
+  1. New "Stairs" tool in Toolbar; click in 2D places a stair with default config (7" rise, 11" run, 36" width, 12 steps)
+  2. 2D shows a top-down stair symbol with arrow indicating rise direction; 3D renders connected stepped boxes that look like real stairs
+  3. PropertiesPanel exposes editable rise / run / width / step count; Phase 31 drag-handles adjust width
+  4. Tree integration: stairs appear under their containing room with a `Stairs` lucide icon
+  5. Phase 53 right-click and Phase 54 click-to-select work; Phase 48 saved-camera works on stair tree node
+  6. Snapshot serialization preserves stairs across reloads
+**Plans:** 0/1 plans complete
+**UI hint:** yes
+
+#### Phase 61: Openings — Archway / Passthrough / Niche (OPEN-01)
+
+**Goal:** Extend the existing wall-opening codepath beyond doors and windows. Three new opening kinds: archway (rounded top), passthrough (full-height rectangle), niche (recessed cutout that doesn't go through the wall).
+**Depends on:** Phase 60 (sets the "new primitive" precedent), existing Wall + Opening types from v1.0, Phase 33 design tokens
+**Requirements:** [OPEN-01](https://github.com/micahbank2/room-cad-renderer/issues/19)
+**Success Criteria** (what must be TRUE):
+  1. Toolbar adds 3 new opening tools: Archway, Passthrough, Niche (or extends Door/Window into a multi-kind menu)
+  2. Click on a wall in 2D → places opening at click point with kind-specific defaults; 2D shows kind-specific symbol
+  3. 3D renders correct cutout shape: archway has rounded top via `THREE.Shape` bezier curve; passthrough is full-height rectangle; niche is a recessed face mesh (NOT a through-hole)
+  4. PropertiesPanel exposes kind-specific dimensions (width / height / depth-for-niche / arch-radius-for-archway)
+  5. Snapshot back-compat: existing snapshots with `kind: "door" | "window"` load unchanged
+**Plans:** 0/1 plans complete
+**UI hint:** yes
+
+#### Phase 62: Measurement + Annotation Tools (MEASURE-01)
+
+**Goal:** Add dimension lines, free-form text labels, and automatic per-room area calculation in square feet. Communication layer over the room — useful for verifying layouts and sharing with contractors.
+**Depends on:** Phase 30 (smart-snap to wall endpoints), Phase 31 (inline-edit pattern for label text), Phase 33 (typography tokens), Phase 53/54 (right-click + click-to-select)
+**Requirements:** [MEASURE-01](https://github.com/micahbank2/room-cad-renderer/issues/22)
+**Success Criteria** (what must be TRUE):
+  1. New Toolbar tools: "Measure" (lucide `Ruler`) and "Label" (lucide `Type`)
+  2. Measure tool: click two points in 2D → dimension line drawn between them, auto-formatted feet+inches label centered on the line; Phase 30 smart-snap to wall endpoints
+  3. Label tool: click in 2D → places editable text annotation; Phase 31 inline-edit (double-click to edit text)
+  4. Auto room-area: PropertiesPanel + RoomSettings for a Room shows `Area: XX sq ft` from shoelace formula on the wall polygon
+  5. Phase 53 right-click delete + Phase 54 click-to-select work on measurements and annotations
+  6. Snapshot includes measurements + annotations; reload preserves them
+**Plans:** 0/1 plans complete
+**UI hint:** yes
+
 
 ## Progress
 
@@ -156,6 +227,10 @@
 | 56. GLTF Render in 3D | 1/1 | Complete    | 2026-05-04 |
 | 57. GLTF Top-Down Silhouette in 2D | 1/1 | Complete    | 2026-05-05 |
 | 58. GLTF Integration Verification | 1/1 | Complete    | 2026-05-05 |
+| 59. Wall Cutaway Mode | 0/1 | Pending    |   |
+| 60. Stairs | 0/1 | Pending    |   |
+| 61. Openings — Archway/Passthrough/Niche | 0/1 | Pending    |   |
+| 62. Measurement + Annotation Tools | 0/1 | Pending    |   |
 
 ## Backlog
 
