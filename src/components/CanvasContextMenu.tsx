@@ -30,7 +30,9 @@ interface ContextAction {
 
 // D-02 (LOCKED): action sets per kind in display order.
 // Exported for unit testing.
-export function getActionsForKind(kind: ContextMenuKind, nodeId: string | null): ContextAction[] {
+// Phase 61 OPEN-01 (D-11'): adds 'opening' branch with 4 actions
+// (Focus camera, Save camera here, Hide/Show, Delete). Copy/Paste deferred.
+export function getActionsForKind(kind: ContextMenuKind, nodeId: string | null, parentId?: string): ContextAction[] {
   const store = useCADStore.getState();
   const ui = useUIStore.getState();
   const doc = getActiveRoomDoc();
@@ -131,6 +133,29 @@ export function getActionsForKind(kind: ContextMenuKind, nodeId: string | null):
       { id: "paste", label: "Paste", icon: <Clipboard size={14} />, handler: () => { pasteSelection(); } },
     ];
   }
+  // Phase 61 OPEN-01 (D-11'): opening — 4 actions (Focus camera, Save camera here,
+  // Hide/Show, Delete). Copy/Paste deferred (Opening is a sub-entity of WallSegment).
+  if (kind === "opening") {
+    const wallId = parentId;
+    const focusOpening = () => {
+      if (!wallId || !doc) return;
+      const wall = doc.walls[wallId];
+      if (wall) focusOnWall(wall);
+    };
+    const saveCameraForOpening = () => {
+      const capture = ui.getCameraCapture?.();
+      if (!capture || !wallId) return;
+      // Phase 61 v1.15 simplification: persist saved-camera on the parent wall;
+      // per-opening camera bookmarks deferred to v1.16.
+      store.setSavedCameraOnWallNoHistory(wallId, capture.pos, capture.target);
+    };
+    return [
+      { id: "focus",    label: "Focus camera",    icon: <Camera size={14} />,                                    handler: focusOpening },
+      { id: "save-cam", label: "Save camera here", icon: <Camera size={14} className="text-accent" />,           handler: saveCameraForOpening },
+      { id: "hide-show", label: isHidden ? "Show" : "Hide", icon: isHidden ? <Eye size={14} /> : <EyeOff size={14} />, handler: hideShow },
+      { id: "delete", label: "Delete", icon: <Trash2 size={14} />, handler: () => { if (wallId && nodeId) store.removeOpening(wallId, nodeId); }, destructive: true },
+    ];
+  }
   return [];
 }
 
@@ -192,7 +217,7 @@ export function CanvasContextMenu() {
 
   if (!contextMenu) return null;
 
-  const actions = getActionsForKind(contextMenu.kind, contextMenu.nodeId);
+  const actions = getActionsForKind(contextMenu.kind, contextMenu.nodeId, contextMenu.parentId);
   if (actions.length === 0) return null; // empty-canvas with no clipboard
 
   return (

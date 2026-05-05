@@ -467,13 +467,20 @@ export default function FabricCanvas({ productLibrary }: Props) {
       // Convert to Fabric viewport coordinates for containsPoint()
       const pointer = fc.getViewportPoint(e);
 
-      let hit: { kind: import("@/stores/uiStore").ContextMenuKind; nodeId: string } | null = null;
+      let hit: { kind: import("@/stores/uiStore").ContextMenuKind; nodeId: string; parentId?: string } | null = null;
 
       for (const obj of fc.getObjects()) {
         const d = (obj as unknown as { data?: Record<string, unknown> }).data;
         if (!d) continue;
 
-        if ((d.type === "wall" || d.type === "wall-side" || d.type === "wall-limewash") && d.wallId) {
+        // Phase 61 OPEN-01 (D-11'): match openings BEFORE wall — opening
+        // polygons render on top of walls and should win the hit-test.
+        if (d.type === "opening" && d.openingId && d.wallId) {
+          if ((obj as fabric.FabricObject).containsPoint(pointer)) {
+            hit = { kind: "opening", nodeId: d.openingId as string, parentId: d.wallId as string };
+            break;
+          }
+        } else if ((d.type === "wall" || d.type === "wall-side" || d.type === "wall-limewash") && d.wallId) {
           if ((obj as fabric.FabricObject).containsPoint(pointer)) {
             hit = { kind: "wall", nodeId: d.wallId as string };
             break;
@@ -499,14 +506,14 @@ export default function FabricCanvas({ productLibrary }: Props) {
             break;
           }
         }
-        // Skip: rotation-handle, resize-handle, opening, grid, dimension labels
+        // Skip: rotation-handle, resize-handle, grid, dimension labels
       }
 
       if (hit) {
         useUIStore.getState().openContextMenu(hit.kind, hit.nodeId, {
           x: e.clientX,
           y: e.clientY,
-        });
+        }, hit.parentId);
       } else {
         // Empty canvas — preventDefault already called above
         useUIStore.getState().openContextMenu("empty", null, {

@@ -81,7 +81,7 @@ function pointInPolygon(pt: Point, polygon: Point[]): boolean {
 function hitTestStore(
   feetPos: Point,
   productLibrary: Product[]
-): { id: string; type: "wall" | "product" | "ceiling" } | null {
+): { id: string; type: "wall" | "product" | "ceiling" | "opening"; wallId?: string } | null {
   const doc = getActiveRoomDoc();
   if (!doc) return null;
 
@@ -145,6 +145,21 @@ function hitTestStore(
   }
 
   if (closestWallId) {
+    // Phase 61 OPEN-01 (D-11'): if the cursor is inside an opening's offset
+    // range on this wall, the opening wins (it sits on top of the wall).
+    const wall = doc.walls[closestWallId];
+    if (wall && wall.openings && wall.openings.length > 0) {
+      const len = Math.sqrt((wall.end.x - wall.start.x) ** 2 + (wall.end.y - wall.start.y) ** 2);
+      if (len > 1e-6) {
+        const { t } = closestPointOnWall(wall, feetPos);
+        const offset = t * len;
+        for (const op of wall.openings) {
+          if (offset >= op.offset && offset <= op.offset + op.width) {
+            return { id: op.id, type: "opening", wallId: wall.id };
+          }
+        }
+      }
+    }
     return { id: closestWallId, type: "wall" };
   }
 
@@ -803,6 +818,18 @@ export function activateSelectTool(
       _dragActive = true;
       try { useUIStore.getState().setDragging(true); } catch { /* Phase 33 D-13 bridge; non-fatal */ }
       useUIStore.getState().select([hit.id]);
+
+      // Phase 61 OPEN-01 (D-11'): opening click selects but does NOT start a
+      // drag — opening drag is handled by the existing opening-handle path
+      // above. This makes the 2D opening polygon a passive selection target.
+      if (hit.type === "opening") {
+        _dragActive = false;
+        try { useUIStore.getState().setDragging(false); } catch { /* non-fatal */ }
+        dragging = false;
+        dragId = null;
+        dragType = null;
+        return;
+      }
 
       dragging = true;
       dragId = hit.id;
