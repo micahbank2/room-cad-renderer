@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.15
 milestone_name: Architectural Toolbar Expansion
-status: ready-to-plan
-stopped_at: Milestone scoped — ready for /gsd:plan-phase 59
-last_updated: "2026-05-05T00:00:00.000Z"
+status: phase-in-progress
+stopped_at: Phase 59 plan 01 (CUTAWAY-01) complete — ready for /gsd:verify-phase 59 or Phase 60 STAIRS-01
+last_updated: "2026-05-04T12:30:00.000Z"
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 0
+  completed_plans: 1
 ---
 
 # Project State
@@ -23,17 +23,17 @@ See: .planning/PROJECT.md (updated 2026-05-05 — v1.14 archived; v1.15 Architec
 
 ## Current Position
 
-Phase: 59 (next to plan)
+Phase: 59 (Plan 01 CUTAWAY-01 complete; phase-level verification pending)
 Milestone: v1.15 Architectural Toolbar Expansion
-Phases: 4 (59, 60, 61, 62) — none planned yet
-Plan: Not started
-Status: Ready for `/gsd:plan-phase 59`
+Phases: 4 (59, 60, 61, 62) — Phase 59 has 1 plan shipped
+Plan: 59-01 complete (7 atomic commits, 5/5 e2e + 4 pre-existing vitest baseline preserved)
+Status: Ready for `/gsd:verify-phase 59` or to plan Phase 60 STAIRS-01
 
 ## v1.15 Roadmap
 
 | Phase | Requirement | Goal | Status |
 |-------|-------------|------|--------|
-| 59 | CUTAWAY-01 | Wall cutaway mode in 3D — ghost the nearest blocking wall | Pending |
+| 59 | CUTAWAY-01 | Wall cutaway mode in 3D — ghost the nearest blocking wall | Plan 01 complete (2026-05-04) |
 | 60 | STAIRS-01 | New architectural primitive: stairs with rise/run/width config | Pending |
 | 61 | OPEN-01 | Archway / passthrough / niche wall openings (extends doors/windows) | Pending |
 | 62 | MEASURE-01 | Dimension lines, labels, auto room-area calculation | Pending |

@@ -227,7 +227,7 @@
 | 56. GLTF Render in 3D | 1/1 | Complete    | 2026-05-04 |
 | 57. GLTF Top-Down Silhouette in 2D | 1/1 | Complete    | 2026-05-05 |
 | 58. GLTF Integration Verification | 1/1 | Complete    | 2026-05-05 |
-| 59. Wall Cutaway Mode | 0/1 | Pending    |   |
+| 59. Wall Cutaway Mode | 1/1 | Plan complete; phase verify pending | 2026-05-04 |
 | 60. Stairs | 0/1 | Pending    |   |
 | 61. Openings — Archway/Passthrough/Niche | 0/1 | Pending    |   |
 | 62. Measurement + Annotation Tools | 0/1 | Pending    |   |
