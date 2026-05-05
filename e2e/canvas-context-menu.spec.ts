@@ -77,14 +77,14 @@ test.describe("CTXMENU-01 — right-click context menus", () => {
     await seedScene(page);
   });
 
-  // Scenario 1: right-click wall in 2D → 5-entry menu
-  test("right-click a wall in 2D shows 5-entry menu", async ({ page }) => {
+  // Scenario 1: right-click wall in 2D → 6-entry menu (Phase 59 added cutaway-toggle)
+  test("right-click a wall in 2D shows 6-entry menu", async ({ page }) => {
     await enter2D(page);
     await rightClickWallArea(page);
     const menu = page.locator('[data-testid="context-menu"]');
     const menuVisible = await menu.isVisible().catch(() => false);
     if (menuVisible) {
-      await expect(page.locator('[data-testid="ctx-action"]')).toHaveCount(5);
+      await expect(page.locator('[data-testid="ctx-action"]')).toHaveCount(6);
     }
     // If wall position not hit precisely → vacuous pass (CI-stable pattern)
   });

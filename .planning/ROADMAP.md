@@ -148,7 +148,7 @@
   3. Cutaway respects Phase 47 SOLO/EXPLODE display modes and Phase 46 hiddenIds (already-hidden walls stay hidden)
   4. No regression on Phase 32 PBR materials, Phase 36 wallpaper/wallArt, Phase 49–50 user-textures (cutaway is a render-state-only feature)
   5. Cutaway state is session-only — NOT persisted to snapshots (geometry doesn't change based on viewing angle)
-**Plans:** 0/1 plans complete
+**Plans:** 1/1 plans complete
 **UI hint:** yes
 
 #### Phase 60: Stairs (STAIRS-01)
@@ -227,7 +227,7 @@
 | 56. GLTF Render in 3D | 1/1 | Complete    | 2026-05-04 |
 | 57. GLTF Top-Down Silhouette in 2D | 1/1 | Complete    | 2026-05-05 |
 | 58. GLTF Integration Verification | 1/1 | Complete    | 2026-05-05 |
-| 59. Wall Cutaway Mode | 0/1 | Pending    |   |
+| 59. Wall Cutaway Mode | 1/1 | Complete    | 2026-05-05 |
 | 60. Stairs | 0/1 | Pending    |   |
 | 61. Openings — Archway/Passthrough/Niche | 0/1 | Pending    |   |
 | 62. Measurement + Annotation Tools | 0/1 | Pending    |   |

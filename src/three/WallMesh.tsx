@@ -41,9 +41,30 @@ import { useClickDetect } from "@/hooks/useClickDetect";
 interface Props {
   wall: WallSegment;
   isSelected: boolean;
+  /** Phase 59 CUTAWAY-01: room id used to look up cutawayAutoDetectedWallId.
+   *  Optional for backward compatibility — undefined skips auto-cutaway match. */
+  roomId?: string;
 }
 
-export default function WallMesh({ wall, isSelected }: Props) {
+/**
+ * Phase 59 CUTAWAY-01 (RESEARCH Q3 + Q6): material-prop helper that animates
+ * ONLY opacity (1.0 ↔ 0.15) — `transparent: true` is constant. Avoids the
+ * Phase 49 BUG-02 shader-recompile trap (toggling `transparent` mid-render
+ * forces program recompile and unbinds uniforms; toggling `opacity` is just
+ * a uniform write — safe per-frame).
+ *
+ * `depthWrite: false` when ghosted prevents the ghosted wall from blocking
+ * occlusion of objects behind it (D-07).
+ */
+function ghostMaterialProps(isGhosted: boolean) {
+  return {
+    transparent: true as const,
+    opacity: isGhosted ? 0.15 : 1.0,
+    depthWrite: !isGhosted,
+  };
+}
+
+export default function WallMesh({ wall, isSelected, roomId }: Props) {
   // Phase 54 PROPS3D-01: left-click to select (drag-threshold-aware)
   const { handlePointerDown, handlePointerUp } = useClickDetect(() => {
     useUIStore.getState().select([wall.id]);
@@ -51,6 +72,19 @@ export default function WallMesh({ wall, isSelected }: Props) {
 
   const wainscotStyles = useWainscotStyleStore((s) => s.items);
   const customColors = usePaintStore((s) => s.customColors);
+
+  // Phase 59 CUTAWAY-01: ghost-state derivation (RESEARCH Q6).
+  // Three subscriptions (split selectors so subscribers re-render only on
+  // the slice they observe — avoids Map-instance churn from auto-detected
+  // updates triggering manual-set selectors and vice versa).
+  const cutawayMode = useUIStore((s) => s.cutawayMode);
+  const autoDetectedForRoom = useUIStore((s) =>
+    roomId ? s.cutawayAutoDetectedWallId.get(roomId) : null,
+  );
+  const isManualGhosted = useUIStore((s) => s.cutawayManualWallIds.has(wall.id));
+  const isAutoGhosted = cutawayMode === "auto" && autoDetectedForRoom === wall.id;
+  const isGhosted = isAutoGhosted || isManualGhosted;
+  const ghost = ghostMaterialProps(isGhosted);
   const { position, rotation, dimensions } = useMemo(() => {
     const len = wallLength(wall);
     const midX = (wall.start.x + wall.end.x) / 2;
@@ -197,6 +231,7 @@ export default function WallMesh({ wall, isSelected }: Props) {
             metalness={0}
             side={THREE.DoubleSide}
             map={userTex}
+            {...ghost}
           />
         </mesh>
       );
@@ -214,6 +249,7 @@ export default function WallMesh({ wall, isSelected }: Props) {
             roughness={roughness}
             metalness={0}
             side={THREE.DoubleSide}
+            {...ghost}
           />
         </mesh>
       );
@@ -241,6 +277,7 @@ export default function WallMesh({ wall, isSelected }: Props) {
           roughness={0.85}
           metalness={0}
           side={THREE.DoubleSide}
+          {...ghost}
         >
           {tex && <primitive attach="map" object={tex} dispose={null} />}
         </meshStandardMaterial>
@@ -283,6 +320,7 @@ export default function WallMesh({ wall, isSelected }: Props) {
             halfH,
             thickness,
             item: wainscotItem,
+            ghostProps: ghost,
           })}
 
         {/* Crown molding */}
@@ -297,6 +335,7 @@ export default function WallMesh({ wall, isSelected }: Props) {
               color={crown!.color}
               roughness={0.6}
               metalness={0}
+              {...ghost}
             />
           </mesh>
         )}
@@ -327,12 +366,12 @@ export default function WallMesh({ wall, isSelected }: Props) {
             return tex ? (
               <mesh key={art.id} position={[artX, artY, baseZ]}>
                 <planeGeometry args={[art.width, art.height]} />
-                <meshStandardMaterial roughness={0.5} metalness={0} side={THREE.DoubleSide} map={tex} />
+                <meshStandardMaterial roughness={0.5} metalness={0} side={THREE.DoubleSide} map={tex} {...ghost} />
               </mesh>
             ) : (
               <mesh key={art.id} position={[artX, artY, baseZ]}>
                 <planeGeometry args={[art.width, art.height]} />
-                <meshStandardMaterial roughness={0.5} metalness={0} side={THREE.DoubleSide} />
+                <meshStandardMaterial roughness={0.5} metalness={0} side={THREE.DoubleSide} {...ghost} />
               </mesh>
             );
           }
@@ -348,29 +387,29 @@ export default function WallMesh({ wall, isSelected }: Props) {
               {tex ? (
                 <mesh position={[0, 0, artZ]}>
                   <planeGeometry args={[innerW, innerH]} />
-                  <meshStandardMaterial roughness={0.5} metalness={0} side={THREE.DoubleSide} map={tex} />
+                  <meshStandardMaterial roughness={0.5} metalness={0} side={THREE.DoubleSide} map={tex} {...ghost} />
                 </mesh>
               ) : (
                 <mesh position={[0, 0, artZ]}>
                   <planeGeometry args={[innerW, innerH]} />
-                  <meshStandardMaterial roughness={0.5} metalness={0} side={THREE.DoubleSide} />
+                  <meshStandardMaterial roughness={0.5} metalness={0} side={THREE.DoubleSide} {...ghost} />
                 </mesh>
               )}
               <mesh position={[0, art.height / 2 - frameW / 2, frameCenterZ]} castShadow>
                 <boxGeometry args={[art.width, frameW, frameD]} />
-                <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.2} />
+                <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.2} {...ghost} />
               </mesh>
               <mesh position={[0, -(art.height / 2 - frameW / 2), frameCenterZ]} castShadow>
                 <boxGeometry args={[art.width, frameW, frameD]} />
-                <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.2} />
+                <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.2} {...ghost} />
               </mesh>
               <mesh position={[-(art.width / 2 - frameW / 2), 0, frameCenterZ]} castShadow>
                 <boxGeometry args={[frameW, innerH, frameD]} />
-                <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.2} />
+                <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.2} {...ghost} />
               </mesh>
               <mesh position={[art.width / 2 - frameW / 2, 0, frameCenterZ]} castShadow>
                 <boxGeometry args={[frameW, innerH, frameD]} />
-                <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.2} />
+                <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.2} {...ghost} />
               </mesh>
             </group>
           );
@@ -403,6 +442,7 @@ export default function WallMesh({ wall, isSelected }: Props) {
           roughness={0.85}
           metalness={0}
           side={THREE.DoubleSide}
+          {...ghost}
         />
       </mesh>
 

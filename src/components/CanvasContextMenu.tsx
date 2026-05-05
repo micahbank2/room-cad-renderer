@@ -83,9 +83,19 @@ export function getActionsForKind(kind: ContextMenuKind, nodeId: string | null):
   ];
 
   if (kind === "wall") {
+    // Phase 59 CUTAWAY-01 (D-05): per-wall right-click toggle for 3D-only
+    // ghost. Independent from baseActions[2] hide-show (which uses hiddenIds
+    // and applies to 2D + 3D + tree). The "in 3D" suffix disambiguates.
+    const isCutawayManual = nodeId ? ui.cutawayManualWallIds.has(nodeId) : false;
     return [
       ...baseActions,
       { id: "copy",   label: "Copy",   icon: <Copy size={14} />,   handler: () => { copySelection(); } },
+      {
+        id: "cutaway-toggle",
+        label: isCutawayManual ? "Show in 3D" : "Hide in 3D",
+        icon: isCutawayManual ? <Eye size={14} /> : <EyeOff size={14} />,
+        handler: () => { if (nodeId) ui.toggleCutawayManualWall(nodeId); },
+      },
       { id: "delete", label: "Delete", icon: <Trash2 size={14} />, handler: () => { if (nodeId) store.removeWall(nodeId); }, destructive: true },
     ];
   }

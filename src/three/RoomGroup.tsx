@@ -112,7 +112,12 @@ export function RoomGroup({
       {Object.values(walls ?? {})
         .filter((w) => !effectivelyHidden.has(w.id))
         .map((w) => (
-          <WallMesh key={w.id} wall={w} isSelected={selectedIds.includes(w.id)} />
+          <WallMesh
+            key={w.id}
+            wall={w}
+            isSelected={selectedIds.includes(w.id)}
+            roomId={roomId}
+          />
         ))}
       {Object.values(placedProducts ?? {})
         .filter((pp) => !effectivelyHidden.has(pp.id))
