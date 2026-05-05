@@ -12,6 +12,7 @@ import { wallCorners, angle as wallAngle } from "@/lib/geometry";
 import { getWallHandleWorldPos } from "./wallRotationHandle";
 import { drawWallDimension } from "./dimensions";
 import { getCachedImage } from "./productImageCache";
+import { getCachedSilhouette } from "@/lib/gltfSilhouette";
 import { getHandleWorldPos } from "./rotationHandle";
 import { getResizeHandles, getEdgeHandles } from "./resizeHandles";
 import { getWallEndpointHandles, getWallThicknessHandle } from "./wallEditHandles";
@@ -822,6 +823,43 @@ function computeCornerCap(
 }
 
 /**
+ * Phase 57: scale a top-down convex-hull silhouette (in feet) to the
+ * user-specified `widthFt × depthFt` product bbox in canvas pixels.
+ *
+ * Uniform scale (smaller axis wins) preserves aspect ratio (D-07). The
+ * returned points are in fabric.Polygon-local coords (origin at center)
+ * because the wrapping Group positions via `left, top, originX/Y: center`.
+ */
+function scaleHullToProduct(
+  hull: Array<[number, number]>,
+  widthFt: number,
+  depthFt: number,
+  scalePxPerFt: number,
+): Array<{ x: number; y: number }> {
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minZ = Infinity;
+  let maxZ = -Infinity;
+  for (const [x, z] of hull) {
+    if (x < minX) minX = x;
+    if (x > maxX) maxX = x;
+    if (z < minZ) minZ = z;
+    if (z > maxZ) maxZ = z;
+  }
+  const hullW = maxX - minX;
+  const hullD = maxZ - minZ;
+  const pw = widthFt * scalePxPerFt;
+  const pd = depthFt * scalePxPerFt;
+  const s = hullW > 0 && hullD > 0 ? Math.min(pw / hullW, pd / hullD) : 1;
+  const hullCx = (minX + maxX) / 2;
+  const hullCz = (minZ + maxZ) / 2;
+  return hull.map(([x, z]) => ({
+    x: (x - hullCx) * s,
+    y: (z - hullCz) * s, // Fabric Y = Three.js Z in top-down projection
+  }));
+}
+
+/**
  * Render placed products on the Fabric canvas.
  */
 export function renderProducts(
@@ -831,7 +869,9 @@ export function renderProducts(
   scale: number,
   origin: { x: number; y: number },
   selectedIds: string[],
-  onImageReady?: () => void,
+  // Phase 57: renamed from onImageReady — both async image loads and
+  // GLTF silhouette compute trigger this re-render callback.
+  onAssetReady?: () => void,
 ) {
   for (const pp of Object.values(placedProducts)) {
     const product = productLibrary.find((p) => p.id === pp.productId);
@@ -892,16 +932,48 @@ export function renderProducts(
       top: pd / 2 + 3,
     });
 
-    const children: fabric.FabricObject[] = [border, nameLabel, dimLabel];
+    // Phase 57: GLTF products replace the border rect with a top-down
+    // convex-hull polygon when the silhouette is ready. Image-only products
+    // and computing/failed GLTF products fall through to the existing rect.
+    let shapeChild: fabric.FabricObject = border;
 
-    // Async image loading via cache — only for real products with images
-    if (!showPlaceholder && product!.imageUrl) {
+    if (!showPlaceholder && product?.gltfId) {
+      const hull = getCachedSilhouette(product.gltfId, () => {
+        // Mirror FIX-01: renderAll repaints existing objects; onAssetReady
+        // signals FabricCanvas to re-invoke renderProducts so the Group
+        // rebuilds with the polygon child once compute finishes (D-05).
+        fc.renderAll();
+        onAssetReady?.();
+      });
+
+      if (hull && hull.length >= 3) {
+        // Auto-scale silhouette to user-specified width × depth bbox (D-07).
+        const hullPts = scaleHullToProduct(hull, width, depth, scale);
+        shapeChild = new fabric.Polygon(hullPts, {
+          // D-06 fill: --color-text-muted (#cac3d7 = rgb 202,195,215) at 15% opacity.
+          fill: "rgba(202,195,215,0.15)",
+          stroke: "#7c5bf0",
+          strokeWidth: isSelected ? 2 : 1,
+          originX: "center",
+          originY: "center",
+        });
+      }
+      // hull === null   → permanent failure sentinel; keep border rect (D-08)
+      // hull === undefined → compute in flight; keep border rect placeholder (D-08)
+    }
+
+    const children: fabric.FabricObject[] = [shapeChild, nameLabel, dimLabel];
+
+    // Async image loading via cache — only for real products with images.
+    // Phase 57: GLTF products skip this branch (gltfId already replaced border
+    // with a polygon, and we don't layer an image on top of a silhouette).
+    if (!showPlaceholder && !product?.gltfId && product!.imageUrl) {
       const cachedImg = getCachedImage(product!.id, product!.imageUrl, () => {
-        // fc.renderAll() repaints existing objects; onImageReady signals the
+        // fc.renderAll() repaints existing objects; onAssetReady signals the
         // caller (FabricCanvas) to re-invoke renderProducts so the Group
         // rebuilds and includes the newly-cached FabricImage child (FIX-01).
         fc.renderAll();
-        onImageReady?.();
+        onAssetReady?.();
       });
       if (cachedImg) {
         const fImg = new fabric.FabricImage(cachedImg, {

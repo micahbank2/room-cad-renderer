@@ -15,6 +15,7 @@ import { saveGltfWithDedup } from "@/lib/gltfStore";
 import { useProductStore } from "@/stores/productStore";
 import { useCADStore } from "@/stores/cadStore";
 import { uid } from "@/lib/geometry";
+import * as fabric from "fabric";
 
 /**
  * Write a GLTF/GLB blob directly to IDB via the same saveGltfWithDedup path
@@ -81,7 +82,75 @@ export async function driveAddGltfProduct(
 }
 
 /**
- * Phase 55 + 56: install GLTF test drivers. Production no-op.
+ * Phase 57 regression-helper: add an image-only Product (no gltfId) and place
+ * it in the active room. Used by the e2e spec's "rect regression" scenario
+ * to confirm image-only products still render as fabric.Rect.
+ *
+ * @param dims  Optional dimensions (default 3×3×3 ft)
+ */
+export function driveAddImageProduct(
+  dims: { width: number; depth: number; height: number } = { width: 3, depth: 3, height: 3 },
+): { productId: string; placedId: string } {
+  if (import.meta.env.MODE !== "test") {
+    throw new Error("driveAddImageProduct must not be called outside test mode");
+  }
+  const productId = `prod_${uid()}`;
+  useProductStore.getState().addProduct({
+    id: productId,
+    name: "Test Image Product",
+    category: "Other",
+    width: dims.width,
+    depth: dims.depth,
+    height: dims.height,
+    material: "none",
+    imageUrl: "",
+    textureUrls: [],
+  });
+  const cadState = useCADStore.getState();
+  const activeRoomId = cadState.activeRoomId;
+  if (!activeRoomId) throw new Error("No active room");
+  const placedId = cadState.placeProduct(productId, { x: 10, y: 8 });
+  return { productId, placedId };
+}
+
+/**
+ * Phase 57: Returns "polygon" | "rect" | null for the first shape child
+ * inside the fabric.Group wrapping the given placedProductId.
+ *
+ * Walks fc.getObjects(), finds the Group whose data.placedProductId matches,
+ * inspects whether its first shape child (non-text, non-image) is a Polygon
+ * or a Rect. Returns null when the canvas isn't registered, the group isn't
+ * found, or no shape child exists.
+ *
+ * Requires window.__fabricCanvas to be registered by FabricCanvas.tsx
+ * (test mode only — gated by import.meta.env.MODE === "test").
+ */
+export function getProductRenderShape(
+  placedProductId: string,
+): "polygon" | "rect" | null {
+  if (typeof window === "undefined") return null;
+  const fc = (window as unknown as { __fabricCanvas?: fabric.Canvas }).__fabricCanvas;
+  if (!fc) return null;
+
+  const group = fc
+    .getObjects()
+    .find(
+      (obj) =>
+        (obj as fabric.Group & { data?: { placedProductId?: string } }).data
+          ?.placedProductId === placedProductId,
+    ) as fabric.Group | undefined;
+  if (!group) return null;
+
+  const shapeChild = group
+    .getObjects()
+    .find((o) => o instanceof fabric.Polygon || o instanceof fabric.Rect);
+  if (!shapeChild) return null;
+
+  return shapeChild instanceof fabric.Polygon ? "polygon" : "rect";
+}
+
+/**
+ * Phase 55 + 56 + 57: install GLTF test drivers. Production no-op.
  */
 export function installGltfDrivers(): void {
   if (typeof window === "undefined") return;
@@ -90,9 +159,13 @@ export function installGltfDrivers(): void {
   const w = window as unknown as {
     __driveUploadGltf: typeof driveUploadGltf;
     __driveAddGltfProduct: typeof driveAddGltfProduct;
+    __driveAddImageProduct: typeof driveAddImageProduct;
+    __getProductRenderShape: typeof getProductRenderShape;
   };
   w.__driveUploadGltf = driveUploadGltf;
   w.__driveAddGltfProduct = driveAddGltfProduct;
+  w.__driveAddImageProduct = driveAddImageProduct;
+  w.__getProductRenderShape = getProductRenderShape;
 }
 
 declare global {
@@ -103,6 +176,14 @@ declare global {
       name: string,
       dims?: { width: number; depth: number; height: number },
     ) => Promise<{ gltfId: string; productId: string; placedId: string }>;
+    // Phase 57 — image-only product helper (regression scenario E2)
+    __driveAddImageProduct?: (
+      dims?: { width: number; depth: number; height: number },
+    ) => { productId: string; placedId: string };
+    // Phase 57 — shape introspection driver
+    __getProductRenderShape?: (placedProductId: string) => "polygon" | "rect" | null;
+    // Phase 57 — registered by FabricCanvas.tsx in test mode
+    __fabricCanvas?: fabric.Canvas;
   }
 }
 
