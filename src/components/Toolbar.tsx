@@ -15,6 +15,7 @@ import {
   LayoutGrid,
   Square,
   Move3d,
+  EyeOff,
   type LucideIcon,
 } from "lucide-react";
 
@@ -63,6 +64,9 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
   // Phase 47 D-02: displayMode subscriptions
   const displayMode = useUIStore((s) => s.displayMode);
   const setDisplayMode = useUIStore((s) => s.setDisplayMode);
+  // Phase 59 CUTAWAY-01: cutaway-mode subscriptions
+  const cutawayMode = useUIStore((s) => s.cutawayMode);
+  const setCutawayMode = useUIStore((s) => s.setCutawayMode);
 
   // Phase 33 GH #88 — inline-edit document title in Toolbar center slot.
   // Live-preview writes go to `draftName` (auto-save does NOT subscribe);
@@ -209,6 +213,32 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
             );
           })}
         </div>
+      )}
+
+      {/* Phase 59 CUTAWAY-01 (D-06): single cycling button — off ↔ auto.
+          Active state mirrors Phase 47 displayMode active styling.
+          Manual hide is per-wall via right-click (CanvasContextMenu); not exposed here. */}
+      {(viewMode === "3d" || viewMode === "split") && (
+        <Tooltip
+          content={cutawayMode === "auto" ? "Cutaway: AUTO (click to disable)" : "Cutaway: OFF (click to auto-ghost the wall closest to the camera)"}
+          placement="bottom"
+        >
+          <button
+            data-testid="cutaway-toggle"
+            onClick={() => setCutawayMode(cutawayMode === "off" ? "auto" : "off")}
+            aria-label="Toggle wall cutaway"
+            aria-pressed={cutawayMode === "auto"}
+            title={`CUTAWAY: ${cutawayMode === "auto" ? "AUTO" : "OFF"}`}
+            className={`flex items-center justify-center gap-1 px-2 py-1 rounded-sm font-mono text-sm transition-colors duration-150 border mr-6 ${
+              cutawayMode === "auto"
+                ? "bg-accent/10 text-accent border-accent/30 accent-glow"
+                : "text-text-dim hover:text-accent-light border-transparent"
+            }`}
+          >
+            <EyeOff size={14} strokeWidth={1.5} />
+            <span>CUTAWAY</span>
+          </button>
+        </Tooltip>
       )}
 
       {/* Document title — inline-editable (Phase 33 GH #88) */}
