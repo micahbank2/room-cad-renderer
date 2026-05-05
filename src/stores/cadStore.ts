@@ -1359,6 +1359,14 @@ export const useActivePlacedCustomElements = () =>
       : EMPTY_PLACED_CUSTOMS,
   );
 
+// Phase 60 STAIRS-01: active-room stairs selector. Defensive `?? {}` per
+// research Pitfall 2 — ensures consumers never see `undefined`.
+const EMPTY_STAIRS: Record<string, Stair> = Object.freeze({});
+export const useActiveStairs = () =>
+  useCADStore((s) =>
+    s.activeRoomId ? s.rooms[s.activeRoomId]?.stairs ?? EMPTY_STAIRS : EMPTY_STAIRS,
+  );
+
 // Non-hook for imperative paths (tools)
 export function getActiveRoomDoc(): RoomDoc | undefined {
   const s = useCADStore.getState();

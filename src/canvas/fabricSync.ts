@@ -5,7 +5,10 @@ import type {
   Ceiling,
   CustomElement,
   PlacedCustomElement,
+  Stair,
 } from "@/types/cad";
+import { buildStairSymbolShapes } from "./stairSymbol";
+import { DEFAULT_STAIR_WIDTH_FT } from "@/types/cad";
 import type { Product } from "@/types/product";
 import { hasDimensions, resolveEffectiveDims, resolveEffectiveCustomDims } from "@/types/product";
 import { wallCorners, angle as wallAngle } from "@/lib/geometry";
@@ -1073,6 +1076,66 @@ export function renderProducts(
         );
       }
     }
+  }
+}
+
+/**
+ * Phase 60 STAIRS-01 — render placed stairs as fabric.Group on the 2D canvas.
+ *
+ * Group placement: bbox-center (NOT bottom-step center). Stair.position is
+ * the bottom-step center per D-04; we translate by `totalRunFt/2` along the
+ * UP axis (rotated by stair.rotation) to find the bbox center for Group
+ * left/top. originX/Y "center" + Group.angle = stair.rotation handles the
+ * rotation about the bbox center.
+ *
+ * data: { type: "stair", stairId } — Phase 53/54 dispatch keys on this.
+ *
+ * Skips render for stairs in `hiddenIds` (Phase 46 cascade).
+ */
+export function renderStairs(
+  fc: fabric.Canvas,
+  stairs: Record<string, Stair>,
+  scale: number,
+  origin: { x: number; y: number },
+  selectedIds: string[],
+  hiddenIds: Set<string>,
+) {
+  for (const stair of Object.values(stairs ?? {})) {
+    if (hiddenIds.has(stair.id)) continue;
+
+    const widthFt = stair.widthFtOverride ?? DEFAULT_STAIR_WIDTH_FT;
+    const totalRunFt = (stair.runIn / 12) * stair.stepCount;
+    const isSelected = selectedIds.includes(stair.id);
+
+    // D-04 origin asymmetry: bottom-step center + (UP * halfRun) = bbox center.
+    // UP at rotation=0 is -y in feet space. Rotate by stair.rotation (deg).
+    const r = (stair.rotation * Math.PI) / 180;
+    const upX = -Math.sin(r);
+    const upY = -Math.cos(r);
+    const halfRun = totalRunFt / 2;
+    const bboxCxFt = stair.position.x + upX * halfRun;
+    const bboxCyFt = stair.position.y + upY * halfRun;
+    const cx = origin.x + bboxCxFt * scale;
+    const cy = origin.y + bboxCyFt * scale;
+
+    const children = buildStairSymbolShapes(stair, scale, origin, isSelected);
+
+    const group = new fabric.Group(children, {
+      left: cx,
+      top: cy,
+      originX: "center",
+      originY: "center",
+      angle: stair.rotation,
+      selectable: false,
+      evented: false,
+      // Width/height props on FabricObject — kept loose so containsPoint()
+      // hits over the whole footprint (children expose visual; Group bbox
+      // is auto-derived from child bboxes).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data: { type: "stair", stairId: stair.id, widthFt, totalRunFt } as any,
+    });
+
+    fc.add(group);
   }
 }
 

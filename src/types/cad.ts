@@ -276,4 +276,4 @@ export interface LegacySnapshotV1 {
   placedProducts: Record<string, PlacedProduct>;
 }
 
-export type ToolType = "select" | "wall" | "door" | "window" | "product" | "ceiling";
+export type ToolType = "select" | "wall" | "door" | "window" | "product" | "ceiling" | "stair";

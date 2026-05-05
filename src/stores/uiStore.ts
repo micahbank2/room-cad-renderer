@@ -151,12 +151,12 @@ interface UIState {
    * null = menu closed. Opened by openContextMenu(), closed by closeContextMenu().
    */
   contextMenu: {
-    kind: "wall" | "product" | "ceiling" | "custom" | "empty";
+    kind: "wall" | "product" | "ceiling" | "custom" | "stair" | "empty";
     nodeId: string | null;
     position: { x: number; y: number };
   } | null;
   openContextMenu: (
-    kind: "wall" | "product" | "ceiling" | "custom" | "empty",
+    kind: "wall" | "product" | "ceiling" | "custom" | "stair" | "empty",
     nodeId: string | null,
     position: { x: number; y: number },
   ) => void;
