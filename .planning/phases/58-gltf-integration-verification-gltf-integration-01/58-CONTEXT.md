@@ -31,11 +31,11 @@ Source: REQUIREMENTS.md `GLTF-INTEGRATION-01`. Closes v1.14 milestone.
 
 ## Decisions
 
-### D-01 — Box icon position: top-right corner of LibraryCard
+### D-01 — Box icon position: top-LEFT corner of LibraryCard
 
-User-facing choice. A 12px lucide `Box` icon in a small badge at the top-right corner of each card when `product.gltfId` is set. Visible regardless of whether the card has a thumbnail or a placeholder. Does not crowd the product name.
+User-facing choice (revised after research surfaced collision). A 12px lucide `Box` icon at the top-LEFT corner of each card when `product.gltfId` is set. The existing `onRemove` X button lives in the top-right corner (`LibraryCard.tsx:84-92`); placing the badge in the opposite corner avoids collision. Always-visible (the X button is hover-revealed, so no overlap).
 
-Implementation: extend `LibraryCardProps` with an optional `badge?: ReactNode` slot at the top-right corner (mirrors the existing `onRemove` X button placement but on the opposite corner). `ProductLibrary.tsx` passes `<Box size={12} className="text-text-dim" />` as the badge when `p.gltfId` is truthy.
+Implementation: extend `LibraryCardProps` with an optional `badge?: ReactNode` slot at the top-left corner. `ProductLibrary.tsx` passes `<Box size={12} className="text-text-dim" />` as the badge when `p.gltfId` is truthy.
 
 **Why a badge slot vs. a `gltfBadge` boolean prop:** keeps `LibraryCard` agnostic of the GLTF concept. Other call sites can use the slot too without growing the API.
 
