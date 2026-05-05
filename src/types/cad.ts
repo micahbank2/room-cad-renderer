@@ -110,6 +110,54 @@ export interface Room {
   wallHeight: number;
 }
 
+/**
+ * Phase 60 STAIRS-01 (D-01): straight-run stair primitive.
+ *
+ * Stored at the room level (`RoomDoc.stairs`). NOT a customElement kind because
+ * stair-specific fields (rise, run, stepCount) don't fit the customElement
+ * catalog/placement model.
+ *
+ * IMPORTANT (D-04): `position` is the BOTTOM-STEP CENTER, NOT the bbox center.
+ * The stair extends AWAY from `position` along the UP direction defined by
+ * `rotation` (0° = +Y in 2D feet). Tools and consumers must translate between
+ * bottom-step center and bbox center where bbox-center is needed (e.g. snap).
+ */
+export interface Stair {
+  /** Format: `stair_<uid>`. */
+  id: string;
+  /** Bottom-step center, in feet (D-04 — NOT bbox center). */
+  position: Point;
+  /** Continuous degrees (D-02). Shift-snap to 15° handled by the placement tool. */
+  rotation: number;
+  /** Per-step rise in inches (default 7). */
+  riseIn: number;
+  /** Per-step run in inches (default 11). */
+  runIn: number;
+  /** Phase 31 width drag override. When undefined → DEFAULT_STAIR_WIDTH_FT (3 ft / 36"). */
+  widthFtOverride?: number;
+  /** Number of steps (default 12). */
+  stepCount: number;
+  /** Per-placement label override (D-08). Empty/undefined renders default "STAIRS". Max 40 chars. */
+  labelOverride?: string;
+  /** Phase 48 CAM-04 mirror (D-14). */
+  savedCameraPos?: [number, number, number];
+  /** Phase 48 CAM-04 mirror (D-14). */
+  savedCameraTarget?: [number, number, number];
+}
+
+/** Phase 60 (D-13): default per-stair width when widthFtOverride is undefined. */
+export const DEFAULT_STAIR_WIDTH_FT = 3; // 36"
+
+/** Phase 60 (D-13): non-id, non-position default config (residential IBC R311). */
+export const DEFAULT_STAIR: Omit<Stair, "id" | "position"> = {
+  rotation: 0,
+  riseIn: 7,
+  runIn: 11,
+  stepCount: 12,
+  widthFtOverride: undefined,
+  labelOverride: undefined,
+};
+
 export interface CustomElement {
   id: string;
   name: string;
@@ -203,10 +251,14 @@ export interface RoomDoc {
   floorMaterial?: FloorMaterial;
   /** Placed custom elements (references customElements catalog on snapshot). */
   placedCustomElements?: Record<string, PlacedCustomElement>;
+  /** Phase 60 STAIRS-01 (D-01): per-room stairs. Optional — older snapshots
+   *  load with empty `{}` via v3→v4 migration. Consumers MUST use `?? {}`
+   *  defensive fallback (research Pitfall 2). */
+  stairs?: Record<string, Stair>;
 }
 
 export interface CADSnapshot {
-  version: 2;
+  version: 4;
   rooms: Record<string, RoomDoc>;
   activeRoomId: string | null;
   /** Per-project catalog of custom elements (reusable across rooms). */

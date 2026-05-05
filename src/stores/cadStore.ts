@@ -15,7 +15,9 @@ import type {
   WallSide,
   CustomElement,
   PlacedCustomElement,
+  Stair,
 } from "@/types/cad";
+import { DEFAULT_STAIR } from "@/types/cad";
 import { uid, resizeWall } from "@/lib/geometry";
 import { ROOM_TEMPLATES, type RoomTemplateId } from "@/data/roomTemplates";
 import { migrateSnapshot, migrateFloorMaterials } from "@/lib/snapshotMigration";
@@ -108,9 +110,24 @@ interface CADState {
   ) => void;
   /** Phase 48 CAM-04 (D-04): NoHistory clearer — remove savedCamera fields from any leaf entity. */
   clearSavedCameraNoHistory: (
-    kind: "wall" | "product" | "ceiling" | "custom",
+    kind: "wall" | "product" | "ceiling" | "custom" | "stair",
     id: string,
   ) => void;
+  // Phase 60 STAIRS-01 (D-01): stair CRUD + override + saved-camera mirrors.
+  addStair: (roomId: string, partial: Partial<Stair> & { position: Point }) => string;
+  updateStair: (roomId: string, stairId: string, patch: Partial<Stair>) => void;
+  updateStairNoHistory: (roomId: string, stairId: string, patch: Partial<Stair>) => void;
+  removeStair: (roomId: string, stairId: string) => void;
+  removeStairNoHistory: (roomId: string, stairId: string) => void;
+  resizeStairWidth: (roomId: string, stairId: string, widthFt: number) => void;
+  resizeStairWidthNoHistory: (roomId: string, stairId: string, widthFt: number) => void;
+  clearStairOverrides: (roomId: string, stairId: string) => void;
+  setSavedCameraOnStairNoHistory: (
+    stairId: string,
+    pos: [number, number, number],
+    target: [number, number, number],
+  ) => void;
+  clearStairSavedCameraNoHistory: (stairId: string) => void;
   removeProduct: (id: string) => void;
   removeSelected: (ids: string[]) => void;
   undo: () => void;
@@ -152,7 +169,7 @@ function snapshot(state: CADState): CADSnapshot {
   const root = state as any;
   const t0 = import.meta.env.DEV ? performance.now() : 0;
   const snap: CADSnapshot = {
-    version: 3,
+    version: 4,
     rooms: structuredClone(toPlain(state.rooms)),
     activeRoomId: state.activeRoomId,
     ...(root.customElements
@@ -926,7 +943,129 @@ export const useCADStore = create<CADState>()((set) => ({
           if (!placed || !placed[id]) return;
           placed[id].savedCameraPos = undefined;
           placed[id].savedCameraTarget = undefined;
+        } else if (kind === "stair") {
+          // Phase 60 STAIRS-01 (D-14)
+          const stairs = doc.stairs;
+          if (!stairs || !stairs[id]) return;
+          stairs[id].savedCameraPos = undefined;
+          stairs[id].savedCameraTarget = undefined;
         }
+      })
+    ),
+
+  // -------------------------------------------------------------------------
+  // Phase 60 STAIRS-01 — stair CRUD + saved-camera mirrors.
+  // -------------------------------------------------------------------------
+
+  addStair: (roomId, partial) => {
+    const id = `stair_${uid()}`;
+    set(
+      produce((s: CADState) => {
+        const doc = s.rooms[roomId];
+        if (!doc) return;
+        pushHistory(s);
+        if (!doc.stairs) doc.stairs = {};
+        const { position, ...rest } = partial;
+        doc.stairs[id] = {
+          ...DEFAULT_STAIR,
+          ...rest,
+          id,
+          position,
+        } as Stair;
+      })
+    );
+    return id;
+  },
+
+  updateStair: (roomId, stairId, patch) =>
+    set(
+      produce((s: CADState) => {
+        const stair = s.rooms[roomId]?.stairs?.[stairId];
+        if (!stair) return;
+        pushHistory(s);
+        Object.assign(stair, patch);
+      })
+    ),
+
+  updateStairNoHistory: (roomId, stairId, patch) =>
+    set(
+      produce((s: CADState) => {
+        const stair = s.rooms[roomId]?.stairs?.[stairId];
+        if (!stair) return;
+        Object.assign(stair, patch);
+      })
+    ),
+
+  removeStair: (roomId, stairId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = s.rooms[roomId];
+        if (!doc?.stairs?.[stairId]) return;
+        pushHistory(s);
+        delete doc.stairs[stairId];
+      })
+    ),
+
+  removeStairNoHistory: (roomId, stairId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = s.rooms[roomId];
+        if (!doc?.stairs?.[stairId]) return;
+        delete doc.stairs[stairId];
+      })
+    ),
+
+  resizeStairWidth: (roomId, stairId, widthFt) =>
+    set(
+      produce((s: CADState) => {
+        const stair = s.rooms[roomId]?.stairs?.[stairId];
+        if (!stair) return;
+        pushHistory(s);
+        stair.widthFtOverride = Math.max(0.5, Math.min(20, widthFt));
+      })
+    ),
+
+  resizeStairWidthNoHistory: (roomId, stairId, widthFt) =>
+    set(
+      produce((s: CADState) => {
+        const stair = s.rooms[roomId]?.stairs?.[stairId];
+        if (!stair) return;
+        stair.widthFtOverride = Math.max(0.5, Math.min(20, widthFt));
+      })
+    ),
+
+  clearStairOverrides: (roomId, stairId) =>
+    set(
+      produce((s: CADState) => {
+        const stair = s.rooms[roomId]?.stairs?.[stairId];
+        if (!stair) return;
+        pushHistory(s);
+        stair.widthFtOverride = undefined;
+      })
+    ),
+
+  setSavedCameraOnStairNoHistory: (stairId, pos, target) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const stair = doc.stairs?.[stairId];
+        if (!stair) return;
+        // No pushHistory — Phase 48 D-04 bypass.
+        stair.savedCameraPos = pos;
+        stair.savedCameraTarget = target;
+      })
+    ),
+
+  clearStairSavedCameraNoHistory: (stairId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const stair = doc.stairs?.[stairId];
+        if (!stair) return;
+        stair.savedCameraPos = undefined;
+        stair.savedCameraTarget = undefined;
       })
     ),
 
@@ -952,6 +1091,8 @@ export const useCADStore = create<CADState>()((set) => ({
           delete doc.placedProducts[id];
           if (doc.placedCustomElements) delete doc.placedCustomElements[id];
           if (doc.ceilings) delete doc.ceilings[id];
+          // Phase 60 STAIRS-01 — bulk-delete stairs too.
+          if (doc.stairs) delete doc.stairs[id];
         }
       })
     ),
@@ -1141,6 +1282,9 @@ export const useCADStore = create<CADState>()((set) => ({
           room: { ...template.room },
           walls: template.makeWalls(),
           placedProducts: {},
+          // Phase 60 STAIRS-01 (D-13, research Pitfall 2): seed `stairs: {}` so
+          // consumers can rely on `Object.values(doc.stairs)` without `?? {}`.
+          stairs: {},
         };
         s.activeRoomId = newId;
       })
