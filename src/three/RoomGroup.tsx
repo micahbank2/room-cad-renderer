@@ -9,6 +9,7 @@ import ProductMesh from "./ProductMesh";
 import CeilingMesh from "./CeilingMesh";
 import FloorMesh from "./FloorMesh";
 import CustomElementMesh from "./CustomElementMesh";
+import StairMesh from "./StairMesh";
 import { getFloorTexture } from "./floorTexture";
 
 type DisplayMode = "normal" | "solo" | "explode";
@@ -67,7 +68,7 @@ export function RoomGroup({
   hiddenIds,
   customCatalog,
 }: RoomGroupProps): JSX.Element | null {
-  const { id: roomId, room, walls, placedProducts, placedCustomElements, ceilings, floorMaterial } = roomDoc;
+  const { id: roomId, room, walls, placedProducts, placedCustomElements, ceilings, floorMaterial, stairs } = roomDoc;
 
   // Per-room cascade — Phase 46 D-12 logic scoped to this room's roomId.
   const effectivelyHidden = useMemo(() => {
@@ -77,6 +78,8 @@ export function RoomGroup({
       Object.values(placedProducts ?? {}).forEach((p) => out.add(p.id));
       Object.values(ceilings ?? {}).forEach((c) => out.add(c.id));
       Object.values(placedCustomElements ?? {}).forEach((p) => out.add(p.id));
+      // Phase 60: stair-cascade follows the same id-keyed Set (research Q6).
+      Object.values(stairs ?? {}).forEach((s) => out.add(s.id));
       return out;
     }
     if (hiddenIds.has(`${roomId}:walls`)) {
@@ -91,9 +94,12 @@ export function RoomGroup({
     if (hiddenIds.has(`${roomId}:custom`)) {
       Object.values(placedCustomElements ?? {}).forEach((p) => out.add(p.id));
     }
+    if (hiddenIds.has(`${roomId}:stairs`)) {
+      Object.values(stairs ?? {}).forEach((s) => out.add(s.id));
+    }
     for (const id of hiddenIds) out.add(id);
     return out;
-  }, [hiddenIds, roomId, walls, placedProducts, ceilings, placedCustomElements]);
+  }, [hiddenIds, roomId, walls, placedProducts, ceilings, placedCustomElements, stairs]);
 
   const halfW = room.width / 2;
   const halfL = room.length / 2;
@@ -151,6 +157,18 @@ export function RoomGroup({
             />
           );
         })}
+      {/* Phase 60 STAIRS-01 (D-06): per-room stairs. Defensive `?? {}` per
+          research Pitfall 2. */}
+      {Object.values(stairs ?? {})
+        .filter((s) => !effectivelyHidden.has(s.id))
+        .map((s) => (
+          <StairMesh
+            key={s.id}
+            stair={s}
+            roomId={roomId}
+            isSelected={selectedIds.includes(s.id)}
+          />
+        ))}
     </group>
   );
 }
