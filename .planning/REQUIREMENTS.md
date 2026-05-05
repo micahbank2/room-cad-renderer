@@ -16,7 +16,7 @@ The biggest single user-visible win the platform has ever shipped. Continues pha
   - **Acceptance:** `ProductMesh.tsx` branches on `product.gltfId`: GLTF → use drei `useGLTF(blobUrl)` → render `<primitive object={scene}>`; image → existing textured box. Position / rotation / Phase 31 sizeScale applied to the GLTF root group via standard transform props. Suspense boundary for the async load. ErrorBoundary fallback to bbox box on failure. Phase 53 right-click + Phase 54 left-click handlers attach to a wrapping `<group>` so they work on the GLTF model.
   - **Hypothesis to test:** drei `useGLTF` is Suspense-friendly and works with ObjectURL paths. Confirm during research.
 
-- [ ] **GLTF-RENDER-2D-01** — Products with GLTF models render a top-down silhouette in 2D, not a textured rectangle.
+- [x] **GLTF-RENDER-2D-01** — Products with GLTF models render a top-down silhouette in 2D, not a textured rectangle.
   - **Verifiable:** A GLTF chair placed in 2D shows a chair-shaped outline (not a rectangle). Image-only products continue to show the textured rectangle. Switching between products with and without GLTF works without visual glitches.
   - **Acceptance:** New `src/lib/gltfSilhouette.ts` computes a 2D top-down silhouette by projecting GLTF geometry onto the XY plane and computing the convex hull (or alpha shape). Cached per `gltfId` in memory. Fabric renders the silhouette as a `fabric.Polygon` path instead of `fabric.Rect`. Fall back to bbox rectangle if silhouette compute fails. No regression on image-only products.
   - **Hypothesis to test:** Three.js can compute geometry projections via `BufferGeometry`. Need to confirm the convex-hull library available (or compute inline).
@@ -54,7 +54,7 @@ See `.planning/milestones/v1.0-REQUIREMENTS.md` through `.planning/milestones/v1
 |-------------|-------|-------|
 | GLTF-UPLOAD-01 | Phase 55 | TBD |
 | GLTF-RENDER-3D-01 | Phase 56 | TBD |
-| GLTF-RENDER-2D-01 | Phase 57 | TBD |
+| GLTF-RENDER-2D-01 | Phase 57 | 57-01-SUMMARY.md |
 | GLTF-INTEGRATION-01 | Phase 58 | TBD |
 
 ---

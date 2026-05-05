@@ -176,7 +176,7 @@ Plans:
   4. If silhouette computation fails for a given model, the product falls back to the bounding-box rectangle silently
 **Plans:** 1 plan
 Plans:
-- [ ] 57-01-PLAN.md — gltfSilhouette.ts (compute+cache TDD), fabricSync.ts polygon branch, test driver, e2e
+- [x] 57-01-PLAN.md — gltfSilhouette.ts (compute+cache TDD), fabricSync.ts polygon branch, test driver, e2e
 **UI hint:** no
 
 #### Phase 58: GLTF Integration Verification (GLTF-INTEGRATION-01)
@@ -222,7 +222,7 @@ Plans:
 | 54. PropertiesPanel in 3D & Split View | 1/1 | Complete    | 2026-04-29 |
 | 55. GLTF Upload & Storage | 1/1 | Complete    | 2026-04-29 |
 | 56. GLTF Render in 3D | 1/1 | Complete    | 2026-05-04 |
-| 57. GLTF Top-Down Silhouette in 2D | 0/? | Not started | - |
+| 57. GLTF Top-Down Silhouette in 2D | 1/1 | Complete | 57-01-SUMMARY.md |
 | 58. GLTF Integration Verification | 0/? | Not started | - |
 
 ## Backlog
