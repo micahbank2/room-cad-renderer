@@ -2,13 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.15
 milestone_name: Architectural Toolbar Expansion
-status: phase-in-progress
-stopped_at: Phase 59 plan 01 (CUTAWAY-01) complete — ready for /gsd:verify-phase 59 or Phase 60 STAIRS-01
-last_updated: "2026-05-04T12:30:00.000Z"
+status: verifying
+last_updated: "2026-05-05T16:36:17.007Z"
 progress:
-  total_phases: 4
-  completed_phases: 0
-  total_plans: 4
+  total_phases: 8
+  completed_phases: 1
+  total_plans: 1
   completed_plans: 1
 ---
 
@@ -23,10 +22,10 @@ See: .planning/PROJECT.md (updated 2026-05-05 — v1.14 archived; v1.15 Architec
 
 ## Current Position
 
-Phase: 59 (Plan 01 CUTAWAY-01 complete; phase-level verification pending)
+Phase: 999.1
 Milestone: v1.15 Architectural Toolbar Expansion
 Phases: 4 (59, 60, 61, 62) — Phase 59 has 1 plan shipped
-Plan: 59-01 complete (7 atomic commits, 5/5 e2e + 4 pre-existing vitest baseline preserved)
+Plan: Not started
 Status: Ready for `/gsd:verify-phase 59` or to plan Phase 60 STAIRS-01
 
 ## v1.15 Roadmap
@@ -48,6 +47,7 @@ Status: Ready for `/gsd:verify-phase 59` or to plan Phase 60 STAIRS-01
 ## Next Step
 
 Run `/gsd:discuss-phase 59` to scope Phase 59 (Wall Cutaway Mode). Decisions to lock during discuss:
+
 - Auto-mode raycast frequency (every frame vs. every camera-move)
 - Ghost opacity value + transparency style
 - How cutaway interacts with Phase 47 SOLO/EXPLODE modes
