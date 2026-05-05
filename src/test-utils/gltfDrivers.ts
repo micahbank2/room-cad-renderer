@@ -15,6 +15,7 @@ import { saveGltfWithDedup } from "@/lib/gltfStore";
 import { useProductStore } from "@/stores/productStore";
 import { useCADStore } from "@/stores/cadStore";
 import { uid } from "@/lib/geometry";
+import * as fabric from "fabric";
 
 /**
  * Write a GLTF/GLB blob directly to IDB via the same saveGltfWithDedup path
@@ -81,7 +82,43 @@ export async function driveAddGltfProduct(
 }
 
 /**
- * Phase 55 + 56: install GLTF test drivers. Production no-op.
+ * Phase 57: Returns "polygon" | "rect" | null for the first shape child
+ * inside the fabric.Group wrapping the given placedProductId.
+ *
+ * Walks fc.getObjects(), finds the Group whose data.placedProductId matches,
+ * inspects whether its first shape child (non-text, non-image) is a Polygon
+ * or a Rect. Returns null when the canvas isn't registered, the group isn't
+ * found, or no shape child exists.
+ *
+ * Requires window.__fabricCanvas to be registered by FabricCanvas.tsx
+ * (test mode only — gated by import.meta.env.MODE === "test").
+ */
+export function getProductRenderShape(
+  placedProductId: string,
+): "polygon" | "rect" | null {
+  if (typeof window === "undefined") return null;
+  const fc = (window as unknown as { __fabricCanvas?: fabric.Canvas }).__fabricCanvas;
+  if (!fc) return null;
+
+  const group = fc
+    .getObjects()
+    .find(
+      (obj) =>
+        (obj as fabric.Group & { data?: { placedProductId?: string } }).data
+          ?.placedProductId === placedProductId,
+    ) as fabric.Group | undefined;
+  if (!group) return null;
+
+  const shapeChild = group
+    .getObjects()
+    .find((o) => o instanceof fabric.Polygon || o instanceof fabric.Rect);
+  if (!shapeChild) return null;
+
+  return shapeChild instanceof fabric.Polygon ? "polygon" : "rect";
+}
+
+/**
+ * Phase 55 + 56 + 57: install GLTF test drivers. Production no-op.
  */
 export function installGltfDrivers(): void {
   if (typeof window === "undefined") return;
@@ -90,9 +127,11 @@ export function installGltfDrivers(): void {
   const w = window as unknown as {
     __driveUploadGltf: typeof driveUploadGltf;
     __driveAddGltfProduct: typeof driveAddGltfProduct;
+    __getProductRenderShape: typeof getProductRenderShape;
   };
   w.__driveUploadGltf = driveUploadGltf;
   w.__driveAddGltfProduct = driveAddGltfProduct;
+  w.__getProductRenderShape = getProductRenderShape;
 }
 
 declare global {
@@ -103,6 +142,10 @@ declare global {
       name: string,
       dims?: { width: number; depth: number; height: number },
     ) => Promise<{ gltfId: string; productId: string; placedId: string }>;
+    // Phase 57 — shape introspection driver
+    __getProductRenderShape?: (placedProductId: string) => "polygon" | "rect" | null;
+    // Phase 57 — registered by FabricCanvas.tsx in test mode
+    __fabricCanvas?: fabric.Canvas;
   }
 }
 
