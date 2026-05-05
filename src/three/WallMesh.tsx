@@ -47,6 +47,14 @@ interface Props {
 }
 
 /**
+ * Phase 61 OPEN-01 (D-07, research Q6): module-level base wall color.
+ * Hoisted so NicheMesh can apply the same color to its 5-plane group, keeping
+ * the recess visually flush with the surrounding wall. Selected-state color
+ * (#93c5fd) is still applied inline at the material site for the wall body.
+ */
+export const WALL_BASE_COLOR = "#f8f5ef";
+
+/**
  * Phase 59 CUTAWAY-01 (RESEARCH Q3 + Q6): material-prop helper that animates
  * ONLY opacity (1.0 ↔ 0.15) — `transparent: true` is constant. Avoids the
  * Phase 49 BUG-02 shader-recompile trap (toggling `transparent` mid-render
@@ -101,9 +109,16 @@ export default function WallMesh({ wall, isSelected, roomId }: Props) {
   const halfLen = length / 2;
   const halfH = height / 2;
 
-  // Base wall geometry (with openings cut out)
+  // Base wall geometry (with openings cut out).
+  // Phase 61 OPEN-01 (D-04, D-07, research Q2): kind-discriminated holes.
+  //   - door / window / passthrough → 4-point rectangle (existing path)
+  //   - archway → moveTo + lineTo×2 + absarc(0,π,false) + lineTo close
+  //   - niche → SKIPPED (NicheMesh renders separately on the interior face)
+  // For zero through-hole openings (no openings, or all niches), use the
+  // simpler BoxGeometry to avoid ExtrudeGeometry overhead.
   const geometry = useMemo(() => {
-    if (wall.openings.length === 0) {
+    const throughOpenings = wall.openings.filter((o) => o.type !== "niche");
+    if (throughOpenings.length === 0) {
       return new THREE.BoxGeometry(length, height, thickness);
     }
     const shape = new THREE.Shape();
@@ -112,17 +127,31 @@ export default function WallMesh({ wall, isSelected, roomId }: Props) {
     shape.lineTo(halfLen, halfH);
     shape.lineTo(-halfLen, halfH);
     shape.lineTo(-halfLen, -halfH);
-    for (const opening of wall.openings) {
+    for (const opening of throughOpenings) {
       const oLeft = opening.offset - halfLen;
       const oRight = oLeft + opening.width;
       const oBottom = opening.sillHeight - halfH;
-      const oTop = oBottom + opening.height;
       const hole = new THREE.Path();
-      hole.moveTo(oLeft, oBottom);
-      hole.lineTo(oRight, oBottom);
-      hole.lineTo(oRight, oTop);
-      hole.lineTo(oLeft, oTop);
-      hole.lineTo(oLeft, oBottom);
+      if (opening.type === "archway") {
+        // Phase 61 D-04 + research Q2 verified derivation.
+        const archCenterX = oLeft + opening.width / 2;
+        const archRadius = opening.width / 2;
+        const shaftTop = oBottom + opening.height - archRadius;
+        hole.moveTo(oLeft, oBottom);
+        hole.lineTo(oRight, oBottom);
+        hole.lineTo(oRight, shaftTop);
+        hole.absarc(archCenterX, shaftTop, archRadius, 0, Math.PI, false);
+        hole.lineTo(oLeft, oBottom);
+      } else {
+        // door / window / passthrough — rectangle. Passthrough's caller has
+        // already set opening.height = wall.height so this spans full-height.
+        const oTop = oBottom + opening.height;
+        hole.moveTo(oLeft, oBottom);
+        hole.lineTo(oRight, oBottom);
+        hole.lineTo(oRight, oTop);
+        hole.lineTo(oLeft, oTop);
+        hole.lineTo(oLeft, oBottom);
+      }
       shape.holes.push(hole);
     }
     const geo = new THREE.ExtrudeGeometry(shape, { depth: thickness, bevelEnabled: false });
@@ -130,7 +159,7 @@ export default function WallMesh({ wall, isSelected, roomId }: Props) {
     return geo;
   }, [length, height, thickness, halfLen, halfH, wall.openings]);
 
-  const baseColor = isSelected ? "#93c5fd" : "#f8f5ef"; // neutral drywall
+  const baseColor = isSelected ? "#93c5fd" : WALL_BASE_COLOR;
   const bandOffset = 0.01;
 
   // Hoisted hooks: resolve textures once at component top level (Rules of Hooks).
