@@ -142,9 +142,22 @@ Existing PropertiesPanel `OpeningSection` already shows `width / height / sillHe
 
 Single-undo via `*NoHistory` mid-drag commits on Enter/blur (Phase 31 pattern).
 
-### D-11 — Phase 53 + 54 inheritance (no new code)
+### D-11' — Phase 53 + 54 wiring (REVISED — NEW code required)
 
-Right-click and click-to-select on openings already work. The kind discriminator is `data.openingType`. New kinds inherit automatically. Confirm via e2e that the existing 6-action context menu opens on archway / passthrough / niche.
+**Research correction:** the original D-11 assumption was wrong. Phase 53 right-click and Phase 54 click-to-select do NOT currently work for openings. Verified by research:
+- `ContextMenuKind` union has no `"opening"` kind
+- `FabricCanvas.tsx:498` explicitly comments `// Skip: ... opening` in the right-click hit-test
+- Openings render with `selectable: false, evented: false` so no click-to-select either
+
+Phase 61 must ADD opening support to both:
+
+1. **Phase 53 right-click:** extend `ContextMenuKind` union with `"opening"`; add hit-test branch in `FabricCanvas.tsx`; add `getActionsForKind('opening')` branch in `CanvasContextMenu.tsx` (5 actions: Focus camera, Save camera here, Hide/Show, Delete; Copy/Paste deferred since Opening is a sub-entity of WallSegment)
+2. **Phase 54 click-to-select:** make the 2D opening overlay `selectable + evented`; in 3D, add `onContextMenu` + `onClick` to a wrapping group at the niche/archway/passthrough render site (mirror Phase 56 `WallMesh.tsx:430-438` pattern)
+3. **Selection state:** openings use the existing `selectedIds: Set<string>` model — opening IDs are first-class
+
+This adds ~30-40 LOC across `src/canvas/FabricCanvas.tsx`, `src/components/CanvasContextMenu.tsx`, `src/stores/uiStore.ts`, and the new opening tools / mesh files. Counts as a new task in the plan.
+
+**Inclusion in Phase 61:** Phase 54 click-to-select for openings COULD theoretically spin out as a separate phase, but research recommends inclusion — it's small (one hook per mesh kind), and shipping new opening kinds without click-to-select would feel half-done.
 
 ### D-12 — Test coverage
 
