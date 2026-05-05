@@ -5,7 +5,8 @@
 import { useUIStore } from "@/stores/uiStore";
 import { useCADStore } from "@/stores/cadStore";
 import { resolveEffectiveDims } from "@/types/product";
-import type { WallSegment, RoomDoc, Ceiling, PlacedProduct, PlacedCustomElement } from "@/types/cad";
+import type { WallSegment, RoomDoc, Ceiling, PlacedProduct, PlacedCustomElement, Stair } from "@/types/cad";
+import { DEFAULT_STAIR_WIDTH_FT } from "@/types/cad";
 import type { Product } from "@/types/product";
 
 // ---------------------------------------------------------------------------
@@ -146,6 +147,42 @@ export function focusOnSavedCamera(
 // ---------------------------------------------------------------------------
 // D-08 variant: Custom element focus — bbox-fit (Phase 31 overrides honored)
 // ---------------------------------------------------------------------------
+
+/**
+ * Phase 60 STAIRS-01 (D-10, D-14): focus camera on a stair.
+ * Camera target = mid-height of stair envelope. Camera position = bbox-center
+ * + offset along inverse-UP axis at eye-level (~5 ft default), framing the
+ * stair from a 1.5× diagonal away. Mirrors focusOnPlacedProduct.
+ */
+export function focusOnStair(stair: Stair): void {
+  const widthFt = stair.widthFtOverride ?? DEFAULT_STAIR_WIDTH_FT;
+  const riseFt = stair.riseIn / 12;
+  const runFt = stair.runIn / 12;
+  const totalRise = riseFt * stair.stepCount;
+  const totalRun = runFt * stair.stepCount;
+
+  // Bbox center (D-04): bottom_center + (UP * totalRun/2). UP at rotation=0
+  // is -y in 2D feet space (mirroring stairTool / fabricSync convention).
+  const r = (stair.rotation * Math.PI) / 180;
+  const upX = -Math.sin(r);
+  const upY = -Math.cos(r);
+  const bboxCx = stair.position.x + upX * (totalRun / 2);
+  const bboxCy = stair.position.y + upY * (totalRun / 2);
+
+  const cx = bboxCx;
+  const cy = totalRise / 2;
+  const cz = bboxCy;
+
+  const diag = Math.sqrt(widthFt * widthFt + totalRun * totalRun + totalRise * totalRise);
+  const dist = diag * 1.5;
+  const offset = dist / Math.sqrt(3);
+
+  const camPos: [number, number, number] = [cx + offset, cy + offset, cz + offset];
+  const camTarget: [number, number, number] = [cx, cy, cz];
+
+  requestCameraTarget(camPos, camTarget);
+  useUIStore.getState().select([stair.id]);
+}
 
 /**
  * Focus camera on a placed custom element.
