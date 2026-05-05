@@ -169,6 +169,39 @@ interface UIState {
    */
   pendingLabelFocus: string | null;
   setPendingLabelFocus: (pceId: string | null) => void;
+
+  /**
+   * Phase 59 CUTAWAY-01: 3D wall-cutaway state. Session-only — NOT persisted
+   * to localStorage, NOT serialized into snapshots, NOT pushed to undo history.
+   *
+   * - cutawayMode: toolbar Cutaway button toggles "off" ↔ "auto" (D-06).
+   * - cutawayAutoDetectedWallId: Map<roomId, wallId|null> — which wall to
+   *   ghost in each room when in "auto" mode. Written by ThreeViewport
+   *   useFrame block per-room. DEVIATION from CONTEXT D-09 (single string)
+   *   — Map is required for per-room cutaway in EXPLODE display mode (D-03).
+   * - cutawayManualWallIds: Set<wallId> — walls hidden via right-click
+   *   "Hide in 3D". Independent from hiddenIds (D-05).
+   */
+  cutawayMode: "off" | "auto";
+  cutawayAutoDetectedWallId: Map<string, string | null>;
+  cutawayManualWallIds: Set<string>;
+
+  /**
+   * Phase 59 CUTAWAY-01: setter cycles "off" ↔ "auto" (toolbar button).
+   * Side-effect: setting "off" also clears cutawayManualWallIds (D-05
+   * "Clear-all is implicit: switching cutaway mode to off clears manual hides").
+   */
+  setCutawayMode: (mode: "off" | "auto") => void;
+  /**
+   * Phase 59 CUTAWAY-01: compare-then-set writer. ThreeViewport useFrame
+   * calls this every frame; if value unchanged, the Map instance is NOT
+   * replaced — avoids spurious Zustand subscriber renders in WallMesh.
+   */
+  setCutawayAutoDetectedWall: (roomId: string, wallId: string | null) => void;
+  /** Phase 59 CUTAWAY-01: per-wall right-click toggle (D-05). */
+  toggleCutawayManualWall: (wallId: string) => void;
+  /** Phase 59 CUTAWAY-01: empty the manual-hide set. */
+  clearCutawayManualWalls: () => void;
 }
 
 const MIN_ZOOM = 0.25;
@@ -196,6 +229,11 @@ export const useUIStore = create<UIState>()((set) => ({
   pendingCameraTarget: null,
   getCameraCapture: null,
   displayMode: readDisplayMode(),
+
+  // Phase 59 CUTAWAY-01: session-only cutaway state.
+  cutawayMode: "off" as const,
+  cutawayAutoDetectedWallId: new Map<string, string | null>(),
+  cutawayManualWallIds: new Set<string>(),
 
   setTool: (tool) => set({ activeTool: tool, selectedIds: [] }),
   select: (ids) => set({ selectedIds: ids }),
@@ -316,6 +354,43 @@ export const useUIStore = create<UIState>()((set) => ({
   closeContextMenu: () => set({ contextMenu: null }),
   pendingLabelFocus: null,
   setPendingLabelFocus: (pceId) => set({ pendingLabelFocus: pceId }),
+
+  // Phase 59 CUTAWAY-01 actions
+  setCutawayMode: (mode) =>
+    set((s) => {
+      if (mode === "off") {
+        // D-05: switching cutaway mode to off clears manual hides.
+        return {
+          cutawayMode: "off",
+          cutawayManualWallIds: new Set<string>(),
+        };
+      }
+      return { cutawayMode: mode };
+      // Touching s avoids unused-param lint while documenting that `set`
+      // here is a functional update (read current state if needed in future).
+      void s;
+    }),
+  setCutawayAutoDetectedWall: (roomId, wallId) =>
+    set((s) => {
+      // Compare-then-set: if value unchanged, return same Map instance so
+      // Zustand subscribers do not re-render. Required for useFrame loop.
+      const current = s.cutawayAutoDetectedWallId;
+      if (current.has(roomId) && current.get(roomId) === wallId) {
+        return s;
+      }
+      const next = new Map(current);
+      next.set(roomId, wallId);
+      return { cutawayAutoDetectedWallId: next };
+    }),
+  toggleCutawayManualWall: (wallId) =>
+    set((s) => {
+      const next = new Set(s.cutawayManualWallIds);
+      if (next.has(wallId)) next.delete(wallId);
+      else next.add(wallId);
+      return { cutawayManualWallIds: next };
+    }),
+  clearCutawayManualWalls: () =>
+    set({ cutawayManualWallIds: new Set<string>() }),
 }));
 
 export type ContextMenuState = NonNullable<ReturnType<typeof useUIStore.getState>["contextMenu"]>;
