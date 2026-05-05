@@ -163,7 +163,7 @@
   4. Tree integration: stairs appear under their containing room with a `Stairs` lucide icon
   5. Phase 53 right-click and Phase 54 click-to-select work; Phase 48 saved-camera works on stair tree node
   6. Snapshot serialization preserves stairs across reloads
-**Plans:** 0/1 plans complete
+**Plans:** 1/1 plans complete
 **UI hint:** yes
 
 #### Phase 61: Openings — Archway / Passthrough / Niche (OPEN-01)
@@ -228,7 +228,7 @@
 | 57. GLTF Top-Down Silhouette in 2D | 1/1 | Complete    | 2026-05-05 |
 | 58. GLTF Integration Verification | 1/1 | Complete    | 2026-05-05 |
 | 59. Wall Cutaway Mode | 1/1 | Complete    | 2026-05-05 |
-| 60. Stairs | 0/1 | Pending    |   |
+| 60. Stairs | 0/1 | Complete    | 2026-05-05 |
 | 61. Openings — Archway/Passthrough/Niche | 0/1 | Pending    |   |
 | 62. Measurement + Annotation Tools | 0/1 | Pending    |   |
 
