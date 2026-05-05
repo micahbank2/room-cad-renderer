@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { Box } from "lucide-react";
 import type { Product } from "@/types/product";
 import { PRODUCT_CATEGORIES } from "@/types/product";
 import { useUIStore } from "@/stores/uiStore";
 import { setPendingProduct } from "@/canvas/tools/productTool";
 import { LibraryCard, CategoryTabs } from "@/components/library";
 import type { CategoryTab } from "@/components/library";
+import { getCachedGltfThumbnail } from "@/three/gltfThumbnailGenerator";
 
 interface Props {
   products: Product[];
@@ -21,7 +23,27 @@ export function ProductLibrary({
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Phase 58: re-render tick when an async GLTF thumbnail compute resolves.
+  const [, setThumbTick] = useState(0);
+  const onThumbReady = () => setThumbTick((t) => t + 1);
   const setTool = useUIStore((s) => s.setTool);
+
+  /**
+   * Phase 58 D-09 thumbnail-source priority:
+   *   1. imageUrl (user-uploaded image wins)
+   *   2. gltfId  (auto-rendered GLTF thumbnail; "fallback" sentinel → undefined)
+   *   3. undefined (placeholder)
+   * Note: gltfId thumbnail is NOT written back to Product.imageUrl — render-time only.
+   */
+  function resolveThumbnail(p: Product): string | undefined {
+    if (p.imageUrl) return p.imageUrl;
+    if (p.gltfId) {
+      const cached = getCachedGltfThumbnail(p.gltfId, onThumbReady);
+      if (cached === "fallback") return undefined;
+      return cached; // dataURL OR undefined (in-flight)
+    }
+    return undefined;
+  }
 
   const filtered = products.filter((p) => {
     const matchesCategory =
@@ -112,12 +134,21 @@ export function ProductLibrary({
             {filtered.map((p) => (
               <LibraryCard
                 key={p.id}
-                thumbnail={p.imageUrl || undefined}
+                thumbnail={resolveThumbnail(p)}
                 label={p.name}
                 selected={selectedId === p.id}
                 onClick={() => handlePlace(p.id)}
                 onRemove={() => onRemove(p.id)}
                 variant="grid"
+                badge={
+                  p.gltfId ? (
+                    <Box
+                      size={12}
+                      className="text-text-dim"
+                      data-testid="gltf-badge"
+                    />
+                  ) : undefined
+                }
               />
             ))}
           </div>
