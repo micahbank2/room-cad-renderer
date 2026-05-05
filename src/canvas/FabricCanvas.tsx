@@ -28,6 +28,10 @@ import { activateProductTool, setProductToolLibrary } from "./tools/productTool"
 import { activateDoorTool } from "./tools/doorTool";
 import { activateWindowTool } from "./tools/windowTool";
 import { activateCeilingTool } from "./tools/ceilingTool";
+// Phase 61 OPEN-01 (D-09): three new wall-cutout placement tools.
+import { activateArchwayTool } from "./tools/archwayTool";
+import { activatePassthroughTool } from "./tools/passthroughTool";
+import { activateNicheTool } from "./tools/nicheTool";
 import { attachDragDropHandlers } from "./dragDrop";
 import { computeLabelPx, hitTestDimLabel, validateInput } from "./dimensionEditor";
 import { closestPointOnWall, distance, formatFeet } from "@/lib/geometry";
@@ -534,7 +538,8 @@ export default function FabricCanvas({ productLibrary }: Props) {
 
   const cursorClass =
     activeTool === "wall" || activeTool === "product" ||
-    activeTool === "door" || activeTool === "window"
+    activeTool === "door" || activeTool === "window" ||
+    activeTool === "archway" || activeTool === "passthrough" || activeTool === "niche"
       ? "cursor-crosshair"
       : "";
 
@@ -652,6 +657,10 @@ function activateCurrentTool(
     case "door":    return activateDoorTool(fc, scale, origin);
     case "window":  return activateWindowTool(fc, scale, origin);
     case "ceiling": return activateCeilingTool(fc, scale, origin);
+    // Phase 61 OPEN-01 (D-09)
+    case "archway":     return activateArchwayTool(fc, scale, origin);
+    case "passthrough": return activatePassthroughTool(fc, scale, origin);
+    case "niche":       return activateNicheTool(fc, scale, origin);
     default:        return null;
   }
 }
