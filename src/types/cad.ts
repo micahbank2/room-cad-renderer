@@ -77,11 +77,17 @@ export interface WallArt {
 
 export interface Opening {
   id: string;
-  type: "door" | "window";
+  /** Phase 61 OPEN-01: extended union — adds archway / passthrough / niche.
+   *  Existing snapshots with "door" | "window" remain valid (superset extension). */
+  type: "door" | "window" | "archway" | "passthrough" | "niche";
   offset: number; // distance along wall from start
   width: number; // feet
   height: number; // feet
-  sillHeight: number; // feet from floor (0 for doors)
+  sillHeight: number; // feet from floor (0 for doors / archways / passthroughs)
+  /** Phase 61 OPEN-01: niche-only — depth of the recess into the wall body, in feet.
+   *  Optional; ignored for through-hole kinds (door / window / archway / passthrough).
+   *  Default 0.5 (6"). Clamped at placement + edit to wallThickness − 1″. */
+  depthFt?: number;
 }
 
 export interface PlacedProduct {
@@ -224,4 +230,48 @@ export interface LegacySnapshotV1 {
   placedProducts: Record<string, PlacedProduct>;
 }
 
-export type ToolType = "select" | "wall" | "door" | "window" | "product" | "ceiling";
+export type ToolType =
+  | "select"
+  | "wall"
+  | "door"
+  | "window"
+  | "product"
+  | "ceiling"
+  // Phase 61 OPEN-01: three new wall-cutout placement tools.
+  | "archway"
+  | "passthrough"
+  | "niche";
+
+/** Phase 61 OPEN-01: per-kind default dimensions for new openings.
+ *  - door: 3ft × 6.67ft (6'-8" std), sill 0
+ *  - window: 3ft × 4ft, sill 3ft
+ *  - archway: 3ft × 7ft, sill 0 (full-height + arched top, no door)
+ *  - passthrough: 5ft × wallHeight, sill 0 (full wall height; falls back to 8ft)
+ *  - niche: 2ft × 3ft, sill 3ft, depth 0.5ft (typical shelf-height recess)
+ */
+export function getOpeningDefaults(
+  type: Opening["type"],
+  wallHeight?: number,
+): { width: number; height: number; sillHeight: number; depthFt?: number } {
+  switch (type) {
+    case "door":
+      return { width: 3, height: 6.67, sillHeight: 0 };
+    case "window":
+      return { width: 3, height: 4, sillHeight: 3 };
+    case "archway":
+      return { width: 3, height: 7, sillHeight: 0 };
+    case "passthrough":
+      return { width: 5, height: wallHeight ?? 8, sillHeight: 0 };
+    case "niche":
+      return { width: 2, height: 3, sillHeight: 3, depthFt: 0.5 };
+  }
+}
+
+/** Phase 61 OPEN-01 (D-05 Pitfall 1): clamp niche depth so the recess
+ *  never breaks through the wall back face. Min 1″ (recess is readable);
+ *  max wallThickness − 1″ (preserve a 1″ wall back). All inputs in feet. */
+export function clampNicheDepth(depthFt: number, wallThickness: number): number {
+  const minFt = 1 / 12; // 1 inch
+  const maxFt = Math.max(minFt, wallThickness - 1 / 12);
+  return Math.min(Math.max(depthFt, minFt), maxFt);
+}
