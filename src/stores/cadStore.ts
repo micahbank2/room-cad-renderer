@@ -20,7 +20,7 @@ import type {
 import { DEFAULT_STAIR } from "@/types/cad";
 import { uid, resizeWall } from "@/lib/geometry";
 import { ROOM_TEMPLATES, type RoomTemplateId } from "@/data/roomTemplates";
-import { migrateSnapshot, migrateFloorMaterials } from "@/lib/snapshotMigration";
+import { migrateSnapshot, migrateFloorMaterials, migrateV3ToV4 } from "@/lib/snapshotMigration";
 import type { PaintColor } from "@/types/paint";
 
 const MAX_HISTORY = 50;
@@ -1127,8 +1127,9 @@ export const useCADStore = create<CADState>()((set) => ({
 
   loadSnapshot: async (raw: unknown): Promise<void> => {
     // Phase 51 Pattern A: async pre-pass runs BEFORE produce() (Immer constraint)
-    const shaped = migrateSnapshot(raw);             // sync: v1→v2
-    const migrated = await migrateFloorMaterials(shaped); // async: v2→v3 IDB migration
+    const shaped = migrateSnapshot(raw);             // sync: v1→v2 (or v3/v4 passthrough)
+    const migratedV3 = await migrateFloorMaterials(shaped); // async: v2→v3 IDB migration
+    const migrated = migrateV3ToV4(migratedV3);      // sync: v3→v4 stair seed (Phase 60)
     set(
       produce((s: CADState) => {
         s.rooms = migrated.rooms;

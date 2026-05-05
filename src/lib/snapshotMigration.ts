@@ -146,20 +146,41 @@ async function migrateOneFloorMaterial(mat: FloorMaterial): Promise<FloorMateria
  * Phase 51 — DEBT-05: async migration pass. Runs AFTER migrateSnapshot (sync v1→v2).
  * Converts any { kind: "custom", imageUrl: "data:..." } FloorMaterial to
  * { kind: "user-texture", userTextureId } via the SHA-256 dedup IDB pipeline.
- * Idempotent: v4 snapshots are returned immediately with no IDB calls.
+ * Idempotent: v3+ snapshots are returned immediately with no IDB calls.
  *
- * Phase 60 STAIRS-01 (D-12): also seeds `stairs: {}` per RoomDoc and bumps to v4.
- * This is the v2 → v3 → v4 chain runner — Phase 51 used to bump to v3 here, but
- * Phase 60 collapses both into one pass since cadStore.loadSnapshot calls this
- * AFTER migrateSnapshot (which handles v3 → v4 directly when input is already v3).
+ * Contract: ends at version 3 (Phase 51 boundary). Phase 60 v3 → v4 stair
+ * migration runs separately via migrateV3ToV4() so the Phase 51 floorMaterial
+ * test fixtures (which assert `version === 3` post-migration) keep working.
  */
 export async function migrateFloorMaterials(snap: CADSnapshot): Promise<CADSnapshot> {
-  if (snap.version >= 4) return snap; // idempotency gate — v4 already migrated
+  if (snap.version >= 3) return snap; // idempotency gate — v3+ already past Phase 51
   for (const doc of Object.values(snap.rooms)) {
     if (doc?.floorMaterial) {
       (doc as any).floorMaterial = await migrateOneFloorMaterial(doc.floorMaterial as FloorMaterial);
     }
-    // Phase 60 — defensive seed; safe even if doc is partially-migrated.
+  }
+  (snap as { version: number }).version = 3;
+  return snap;
+}
+
+/**
+ * Phase 60 STAIRS-01 (D-12): v3 → v4 — seed `stairs: {}` per RoomDoc.
+ *
+ * Runs AFTER migrateFloorMaterials in the cadStore.loadSnapshot pipeline.
+ * Idempotent: v4 inputs returned unchanged.
+ *
+ * Why a separate function (vs. inlining into migrateSnapshot or
+ * migrateFloorMaterials):
+ *   - migrateSnapshot is synchronous and handles raw → v2 (or passthrough);
+ *     it would short-circuit when given a v2 input.
+ *   - migrateFloorMaterials must end at v3 to preserve the Phase 51 test
+ *     contract (D-17 zero-regression).
+ *   - The cadStore pipeline runs migrateSnapshot → migrateFloorMaterials →
+ *     migrateV3ToV4 in sequence so a v2 snapshot reaches v4 cleanly.
+ */
+export function migrateV3ToV4(snap: CADSnapshot): CADSnapshot {
+  if ((snap as { version: number }).version >= 4) return snap;
+  for (const doc of Object.values(snap.rooms)) {
     if (!(doc as RoomDoc).stairs) (doc as RoomDoc).stairs = {};
   }
   (snap as { version: number }).version = 4;

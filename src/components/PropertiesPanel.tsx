@@ -6,8 +6,10 @@ import {
   useActivePlacedProducts,
   useActiveCeilings,
   useActivePlacedCustomElements,
+  useActiveStairs,
   useCustomElements,
 } from "@/stores/cadStore";
+import { StairSection } from "./PropertiesPanel.StairSection";
 import { useUIStore } from "@/stores/uiStore";
 import { useProductStore } from "@/stores/productStore";
 import { formatFeet, wallLength } from "@/lib/geometry";
@@ -90,12 +92,12 @@ function SavedCameraButtons({
   onSave,
   onClear,
 }: {
-  kind: "wall" | "product" | "ceiling" | "custom";
+  kind: "wall" | "product" | "ceiling" | "custom" | "stair";
   id: string;
   hasSavedCamera: boolean;
   viewMode: "2d" | "3d" | "split" | "library";
   onSave: (id: string, pos: [number, number, number], target: [number, number, number]) => void;
-  onClear: (kind: "wall" | "product" | "ceiling" | "custom", id: string) => void;
+  onClear: (kind: "wall" | "product" | "ceiling" | "custom" | "stair", id: string) => void;
 }) {
   const disabled = viewMode === "2d" || viewMode === "library";
   const saveTitle = disabled
@@ -115,11 +117,13 @@ function SavedCameraButtons({
       setSavedCameraOnProductNoHistory?: typeof onSave;
       setSavedCameraOnCeilingNoHistory?: typeof onSave;
       setSavedCameraOnCustomElementNoHistory?: typeof onSave;
+      setSavedCameraOnStairNoHistory?: (id: string, pos: [number, number, number], target: [number, number, number]) => void;
     };
     if (kind === "wall") cadState.setSavedCameraOnWallNoHistory?.(id, capture.pos, capture.target);
     else if (kind === "product") cadState.setSavedCameraOnProductNoHistory?.(id, capture.pos, capture.target);
     else if (kind === "ceiling") cadState.setSavedCameraOnCeilingNoHistory?.(id, capture.pos, capture.target);
     else if (kind === "custom") cadState.setSavedCameraOnCustomElementNoHistory?.(id, capture.pos, capture.target);
+    else if (kind === "stair") cadState.setSavedCameraOnStairNoHistory?.(id, capture.pos, capture.target);
     else onSave(id, capture.pos, capture.target);
   };
 
@@ -186,6 +190,8 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
   // Phase 31 CUSTOM-06 — custom-element placement selectors (open question 1).
   const placedCustoms = useActivePlacedCustomElements();
   const customCatalog = useCustomElements();
+  const stairs = useActiveStairs();
+  const activeRoomId = useCADStore((s) => s.activeRoomId);
   const clearCustomElementOverrides = useCADStore(
     (s) => s.clearCustomElementOverrides,
   );
@@ -204,6 +210,8 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
   const ceiling = id ? ceilings[id] : undefined;
   const pce = id ? placedCustoms[id] : undefined;
   const ce = pce ? customCatalog[pce.customElementId] : undefined;
+  // Phase 60 STAIRS-01 (D-08, research Q4): sequential `if (entity)` discriminator.
+  const stair = id ? stairs[id] : undefined;
 
   function handleDelete() {
     removeSelected(selectedIds);
@@ -261,7 +269,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
   // Phase 43 (UX-03 / GH #99): empty-state when nothing is selected.
   // First-time users had no cue that selecting reveals editing controls.
   // Static copy — no animation, no dismissible state.
-  if (!wall && !pp && !ceiling && !pce) {
+  if (!wall && !pp && !ceiling && !pce && !stair) {
     return (
       <div
         className="absolute right-3 top-3 z-10 w-64 glass-panel rounded-sm p-4"
@@ -522,6 +530,21 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
             Reset size
           </button>
         )}
+
+      {/* Phase 60 STAIRS-01 (D-08): stair-specific properties section. */}
+      {stair && activeRoomId && (
+        <>
+          <StairSection stair={stair} roomId={activeRoomId} />
+          <SavedCameraButtons
+            kind="stair"
+            id={stair.id}
+            hasSavedCamera={!!stair.savedCameraPos}
+            viewMode={viewMode}
+            onSave={() => { /* dispatched via cadState typed-extension above */ }}
+            onClear={clearSavedCameraNoHistory}
+          />
+        </>
+      )}
 
       <button
         onClick={handleDelete}
