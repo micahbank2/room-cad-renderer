@@ -189,7 +189,7 @@ Plans:
   2. Right-clicking the GLTF mesh in 3D opens the full 6-action product context menu (Phase 53); left-clicking selects it and updates the PropertiesPanel (Phase 54)
   3. Saving a camera on a GLTF product's tree node and double-clicking it focuses the camera correctly (Phase 48)
   4. The product library list shows a small lucide `Box` icon next to GLTF-backed products; image-only products show no icon
-**Plans:** TBD
+**Plans:** 1/1 plans complete
 **UI hint:** yes
 
 
@@ -223,7 +223,7 @@ Plans:
 | 55. GLTF Upload & Storage | 1/1 | Complete    | 2026-04-29 |
 | 56. GLTF Render in 3D | 1/1 | Complete    | 2026-05-04 |
 | 57. GLTF Top-Down Silhouette in 2D | 1/1 | Complete    | 2026-05-05 |
-| 58. GLTF Integration Verification | 0/? | Not started | - |
+| 58. GLTF Integration Verification | 1/1 | Complete    | 2026-05-05 |
 
 ## Backlog
 
