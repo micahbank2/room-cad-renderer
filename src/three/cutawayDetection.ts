@@ -127,6 +127,12 @@ export function getCutawayWallId(
   // We accept it so future refactors that move offset application here work.
   void roomOffsetX;
 
+  // Ensure the camera's world matrix is fresh before sampling its direction.
+  // Required because R3F's useFrame ordering does not guarantee OrbitControls'
+  // useFrame ran before ours on the same tick — without this, getWorldDirection
+  // can sample a stale matrixWorld for one frame after camera reposition. Cost
+  // is one matrix multiply, negligible against the per-room dot-product budget.
+  camera.updateMatrixWorld(true);
   // Camera forward — the direction the camera is LOOKING (negative z in cam space).
   camera.getWorldDirection(_cameraForward);
 
