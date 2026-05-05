@@ -37,6 +37,10 @@ const VIEW_DIRECTION = new THREE.Vector3(1, 0.7, 1).normalize(); // 3/4 perspect
 
 const thumbnailCache = new Map<string, string>(); // gltfId → dataURL OR "fallback"
 const computing = new Set<string>(); // in-flight gltfIds (FIX-01 pattern)
+// React StrictMode (dev) double-mounts components: the first mount's onReady
+// closure becomes stale before compute resolves. Track ALL onReady callbacks
+// per gltfId and fire each one on resolve so the surviving mount re-renders.
+const pendingCallbacks = new Map<string, Set<() => void>>();
 
 let renderer: THREE.WebGLRenderer | null = null;
 let scene: THREE.Scene | null = null;
@@ -161,6 +165,16 @@ export function getCachedGltfThumbnail(
 ): string | undefined {
   const hit = thumbnailCache.get(gltfId);
   if (hit !== undefined) return hit; // dataURL OR "fallback"
+
+  // Register this caller's onReady callback (StrictMode-safe — every render gets
+  // its own closure, all are tracked, all fire on resolve).
+  let callbacks = pendingCallbacks.get(gltfId);
+  if (!callbacks) {
+    callbacks = new Set();
+    pendingCallbacks.set(gltfId, callbacks);
+  }
+  callbacks.add(onReady);
+
   if (computing.has(gltfId)) return undefined;
 
   computing.add(gltfId);
@@ -172,7 +186,9 @@ export function getCachedGltfThumbnail(
       thumbnailCache.set(gltfId, FALLBACK_SENTINEL);
     } finally {
       computing.delete(gltfId);
-      onReady();
+      const cbs = pendingCallbacks.get(gltfId);
+      pendingCallbacks.delete(gltfId);
+      cbs?.forEach((cb) => cb());
     }
   })();
   return undefined;
@@ -182,6 +198,7 @@ export function getCachedGltfThumbnail(
 export function __resetGltfThumbnailCache(): void {
   thumbnailCache.clear();
   computing.clear();
+  pendingCallbacks.clear();
 }
 
 if (typeof window !== "undefined" && import.meta.env.MODE === "test") {
