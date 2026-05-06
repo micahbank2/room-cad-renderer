@@ -7,7 +7,7 @@
  *
  * UI-SPEC §2: grid, empty state, ⋮ menu, aria-label, copy.
  */
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import React from "react";
 import type { UserTexture } from "@/types/userTexture";
@@ -60,15 +60,18 @@ beforeEach(() => {
     remove: removeMock,
     reload: reloadMock,
   });
-  // URL.createObjectURL / revokeObjectURL shim (happy-dom has it but make it deterministic)
-  if (!global.URL.createObjectURL) {
-    // @ts-expect-error — assigning for tests
-    global.URL.createObjectURL = (_b: Blob) => `blob:mock/${Math.random()}`;
-  }
-  if (!global.URL.revokeObjectURL) {
-    // @ts-expect-error
-    global.URL.revokeObjectURL = () => {};
-  }
+  // Phase 63 (DEBT-06, #146): vi.spyOn auto-cleans up via restoreAllMocks.
+  // Replaced top-level global.URL mutation (which persisted across vitest
+  // worker pool and polluted unrelated tests). Pattern mirrors
+  // userTextureCache.test.tsx:42-56.
+  vi.spyOn(URL, "createObjectURL").mockImplementation(
+    (_b: Blob) => `blob:mock/${Math.random()}`,
+  );
+  vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
 });
 
 describe("MyTexturesList — loading + empty + populated", () => {
