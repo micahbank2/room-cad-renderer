@@ -154,14 +154,14 @@ interface UIState {
     /** Phase 60 STAIRS-01 adds 'stair'. Phase 61 OPEN-01 (D-11') adds 'opening'
      *  for archway / passthrough / niche / door / window. parentId = wallId
      *  for opening kind. */
-    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "stair" | "opening";
+    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "stair" | "opening" | "measureLine" | "annotation";
     nodeId: string | null;
     position: { x: number; y: number };
     /** Phase 61 OPEN-01: when kind === 'opening', the parent wall id. */
     parentId?: string;
   } | null;
   openContextMenu: (
-    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "stair" | "opening",
+    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "stair" | "opening" | "measureLine" | "annotation",
     nodeId: string | null,
     position: { x: number; y: number },
     parentId?: string,
@@ -175,6 +175,15 @@ interface UIState {
    */
   pendingLabelFocus: string | null;
   setPendingLabelFocus: (pceId: string | null) => void;
+
+  /**
+   * Phase 62 MEASURE-01 (D-07): id of the annotation currently in DOM-overlay
+   * edit mode. null when no edit is active. Set by labelTool after addAnnotation,
+   * by CanvasContextMenu "Edit text" action, and by FabricCanvas double-click
+   * handler. Cleared on commit/cancel by the InlineEditableText overlay.
+   */
+  editingAnnotationId: string | null;
+  setEditingAnnotationId: (id: string | null) => void;
 
   /**
    * Phase 59 CUTAWAY-01: 3D wall-cutaway state. Session-only — NOT persisted
@@ -360,6 +369,10 @@ export const useUIStore = create<UIState>()((set) => ({
   closeContextMenu: () => set({ contextMenu: null }),
   pendingLabelFocus: null,
   setPendingLabelFocus: (pceId) => set({ pendingLabelFocus: pceId }),
+
+  // Phase 62 MEASURE-01 (D-07)
+  editingAnnotationId: null,
+  setEditingAnnotationId: (id) => set({ editingAnnotationId: id }),
 
   // Phase 59 CUTAWAY-01 actions
   setCutawayMode: (mode) =>
