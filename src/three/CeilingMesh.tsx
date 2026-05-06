@@ -10,6 +10,7 @@ import type { ThreeEvent } from "@react-three/fiber";
 import { useUIStore } from "@/stores/uiStore";
 import type { Ceiling } from "@/types/cad";
 import { resolvePaintHex } from "@/lib/colorUtils";
+import { polygonBbox, resolveCeilingPoints } from "@/lib/geometry";
 import { usePaintStore } from "@/stores/paintStore";
 import { SURFACE_MATERIALS } from "@/data/surfaceMaterials";
 import { PbrSurface } from "./PbrSurface";
@@ -53,31 +54,46 @@ export default function CeilingMesh({ ceiling, isSelected }: Props) {
     return mat?.pbr ? { mat, pbr: mat.pbr } : null;
   }, [ceiling.surfaceMaterialId]);
 
+  // Phase 65 CEIL-02 — resolved points apply width/depth/anchor overrides
+  // when set. Returns referential-identity ceiling.points when no overrides
+  // (fast path) so this useMemo cheaply detects "no resize" via reference
+  // equality on the next render.
+  //
+  // PERF v1.17 NOTE: re-extrudes ShapeGeometry mid-drag (~60 fps). Acceptable
+  // for v1.16 — flat ShapeGeometry, small polygons (≤10 verts in practice).
+  // If profiling shows GPU thrashing on 6+ vertex L-shapes mid-drag, apply
+  // Phase 25 PERF-01 16ms-throttle (debounce useMemo input via a ref + RAF)
+  // as a v1.17 mitigation.
+  const renderedPoints = useMemo(
+    () => resolveCeilingPoints(ceiling),
+    [
+      ceiling.points,
+      ceiling.widthFtOverride,
+      ceiling.depthFtOverride,
+      ceiling.anchorXFt,
+      ceiling.anchorYFt,
+    ],
+  );
+
   const bbox = useMemo(() => {
-    if (ceiling.points.length === 0) return { w: 1, l: 1 };
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    for (const p of ceiling.points) {
-      if (p.x < minX) minX = p.x;
-      if (p.x > maxX) maxX = p.x;
-      if (p.y < minY) minY = p.y;
-      if (p.y > maxY) maxY = p.y;
-    }
-    return { w: Math.max(0.1, maxX - minX), l: Math.max(0.1, maxY - minY) };
-  }, [ceiling.points]);
+    if (renderedPoints.length === 0) return { w: 1, l: 1 };
+    const b = polygonBbox(renderedPoints);
+    return { w: Math.max(0.1, b.width), l: Math.max(0.1, b.depth) };
+  }, [renderedPoints]);
 
   const geometry = useMemo(() => {
     const shape = new THREE.Shape();
-    if (ceiling.points.length === 0) return new THREE.ShapeGeometry(shape);
-    shape.moveTo(ceiling.points[0].x, ceiling.points[0].y);
-    for (let i = 1; i < ceiling.points.length; i++) {
-      shape.lineTo(ceiling.points[i].x, ceiling.points[i].y);
+    if (renderedPoints.length === 0) return new THREE.ShapeGeometry(shape);
+    shape.moveTo(renderedPoints[0].x, renderedPoints[0].y);
+    for (let i = 1; i < renderedPoints.length; i++) {
+      shape.lineTo(renderedPoints[i].x, renderedPoints[i].y);
     }
     shape.closePath();
     const geom = new THREE.ShapeGeometry(shape);
     // ShapeGeometry sits in XY; rotate to XZ (ground plane), then flip normal to face down
     geom.rotateX(Math.PI / 2);
     return geom;
-  }, [ceiling.points]);
+  }, [renderedPoints]);
 
   const { color, roughness } = useMemo(() => {
     // Tier 1: surface material preset

@@ -18,7 +18,7 @@ After two big feature milestones back-to-back (v1.14 GLTF, v1.15 architectural t
 
 ### User-Facing Polish (promoted from backlog)
 
-- [ ] **CEIL-02** — Add edge-handle resize for ceilings (currently users can only delete + redraw). Mirror the Phase 31 product-resize pattern. Promoted from Phase 999.1 backlog (re-deferred from v1.9 twice). Source: [#70](https://github.com/micahbank2/room-cad-renderer/issues/70).
+- [x] **CEIL-02** — Add edge-handle resize for ceilings (currently users can only delete + redraw). Mirror the Phase 31 product-resize pattern. Promoted from Phase 999.1 backlog (re-deferred from v1.9 twice). Source: [#70](https://github.com/micahbank2/room-cad-renderer/issues/70). **Shipped:** Phase 65 plan 01 (2026-05-04).
   - **Verifiable:** Select a ceiling in 2D. Edge handles appear on the ceiling polygon (4 sides minimum for a rectangular ceiling). Drag an edge → ceiling resizes; PropertiesPanel dimensions update live; 3D ceiling mesh re-extrudes. Single Ctrl+Z undoes the entire drag. Phase 30 smart-snap engages (snap to wall edges). Hold Alt to disable smart-snap.
   - **Acceptance:** New `widthFtOverride?: number` and `depthFtOverride?: number` fields on `Ceiling` type (mirrors `PlacedProduct` pattern). New cadStore actions `resizeCeilingAxis` + `resizeCeilingAxisNoHistory`. fabricSync.ts renders 4 edge handles per selected ceiling (mirrors product edge-handle code path). Phase 53 right-click "Reset size" action clears the overrides. RESET_SIZE affordance in PropertiesPanel.
   - **Hypothesis to test:** Ceiling polygons are not always rectangles (Phase 12+ allows arbitrary polygon vertices). v1.16 first-pass: handles only on rectangular ceilings; non-rectangular ceilings get a "convert to rectangle to resize" tooltip OR continue to delete-and-redraw. Confirm during research.
@@ -57,7 +57,7 @@ See `.planning/milestones/v1.0-REQUIREMENTS.md` through `.planning/milestones/v1
 |-------------|-------|-------|
 | DEBT-06 | Phase 63 | TBD |
 | BUG-04 | Phase 64 | TBD |
-| CEIL-02 | Phase 65 | TBD |
+| CEIL-02 | Phase 65 | 65-01-SUMMARY.md (2026-05-04) |
 | TILE-02 | Phase 66 | TBD |
 
 ---

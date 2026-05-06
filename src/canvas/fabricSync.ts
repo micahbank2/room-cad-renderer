@@ -14,7 +14,7 @@ import { buildStairSymbolShapes } from "./stairSymbol";
 import { DEFAULT_STAIR_WIDTH_FT } from "@/types/cad";
 import type { Product } from "@/types/product";
 import { hasDimensions, resolveEffectiveDims, resolveEffectiveCustomDims } from "@/types/product";
-import { wallCorners, angle as wallAngle } from "@/lib/geometry";
+import { wallCorners, angle as wallAngle, polygonBbox, resolveCeilingPoints } from "@/lib/geometry";
 import { getWallHandleWorldPos } from "./wallRotationHandle";
 import { drawWallDimension } from "./dimensions";
 import { getCachedImage } from "./productImageCache";
@@ -242,6 +242,44 @@ export function renderCeilings(
           data: { type: "ceiling-limewash", ceilingId: c.id },
         }),
       );
+    }
+
+    // Phase 65 CEIL-02 — 4 edge handles at bbox midpoints when ceiling is selected.
+    // Mirrors the Phase 31 product edge-handle visual style (10x10 obsidian fill,
+    // accent stroke, originX/Y center, evented=false so hit-testing is done by
+    // selectTool against feet-space coordinates rather than Fabric's pointer
+    // pipeline — matches existing product handle pattern at lines 170-190).
+    if (isSelected) {
+      const renderedPoints = resolveCeilingPoints(c);
+      if (renderedPoints.length >= 3) {
+        const bb = polygonBbox(renderedPoints);
+        const midX = (bb.minX + bb.maxX) / 2;
+        const midY = (bb.minY + bb.maxY) / 2;
+        const handles = [
+          { edge: "n" as const, fx: midX, fy: bb.minY },
+          { edge: "s" as const, fx: midX, fy: bb.maxY },
+          { edge: "w" as const, fx: bb.minX, fy: midY },
+          { edge: "e" as const, fx: bb.maxX, fy: midY },
+        ];
+        for (const h of handles) {
+          fc.add(
+            new fabric.Rect({
+              left: origin.x + h.fx * scale,
+              top: origin.y + h.fy * scale,
+              width: 10,
+              height: 10,
+              fill: "#12121d",
+              stroke: "#7c5bf0",
+              strokeWidth: 2,
+              originX: "center",
+              originY: "center",
+              selectable: false,
+              evented: false,
+              data: { type: "resize-handle-edge", edge: h.edge, ceilingId: c.id },
+            }),
+          );
+        }
+      }
     }
   }
 }

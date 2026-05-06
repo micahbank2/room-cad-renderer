@@ -12,11 +12,11 @@ import {
 import { StairSection } from "./PropertiesPanel.StairSection";
 import { useUIStore } from "@/stores/uiStore";
 import { useProductStore } from "@/stores/productStore";
-import { formatFeet, wallLength, polygonArea } from "@/lib/geometry";
+import { formatFeet, wallLength, polygonArea, polygonBbox } from "@/lib/geometry";
 import { validateInput } from "@/canvas/dimensionEditor";
 import type { Product } from "@/types/product";
 import { hasDimensions } from "@/types/product";
-import type { PlacedCustomElement } from "@/types/cad";
+import type { PlacedCustomElement, Ceiling } from "@/types/cad";
 import WallSurfacePanel from "./WallSurfacePanel";
 import CeilingPaintSection from "./CeilingPaintSection";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
@@ -316,10 +316,35 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
           </div>
           <CollapsibleSection id="dimensions" label="Dimensions">
             <div className="space-y-1.5">
+              {/* Phase 65 CEIL-02 — WIDTH + DEPTH override inputs above HEIGHT.
+                  Live-preview via NoHistory on every keystroke; Enter/blur
+                  commits via the history-pushing variant (single undo). */}
+              <CeilingDimInput
+                ceiling={ceiling}
+                axis="width"
+                label="WIDTH"
+              />
+              <CeilingDimInput
+                ceiling={ceiling}
+                axis="depth"
+                label="DEPTH"
+              />
               <Row label="HEIGHT" value={`${ceiling.height.toFixed(1)} FT`} />
               <Row label="VERTICES" value={String(ceiling.points.length)} />
             </div>
           </CollapsibleSection>
+          {(ceiling.widthFtOverride !== undefined ||
+            ceiling.depthFtOverride !== undefined ||
+            ceiling.anchorXFt !== undefined ||
+            ceiling.anchorYFt !== undefined) && (
+            <button
+              type="button"
+              onClick={() => useCADStore.getState().clearCeilingOverrides(ceiling.id)}
+              className="w-full font-mono text-sm font-normal text-accent hover:text-accent-light tracking-wider py-1 border border-accent/30 rounded-sm"
+            >
+              Reset size
+            </button>
+          )}
           <CeilingPaintSection ceilingId={ceiling.id} ceiling={ceiling} />
           <SavedCameraButtons
             kind="ceiling"
@@ -704,6 +729,96 @@ function LabelOverrideInput({
         }}
         onBlur={commit}
         className="px-2 py-1 font-mono text-[11px] text-text-primary bg-obsidian-deepest border border-outline-variant/30 rounded-sm"
+      />
+    </div>
+  );
+}
+
+/**
+ * Phase 65 CEIL-02 — WIDTH/DEPTH input for a selected ceiling.
+ *
+ * Live-preview via resizeCeilingAxisNoHistory on every keystroke; commit on
+ * Enter or blur via resizeCeilingAxis (single undo per edit session). Empty
+ * commit is a no-op (the dedicated RESET_SIZE button handles clearing).
+ *
+ * Default value when no override is set: derived from polygonBbox of the
+ * original points so users see the current size before editing.
+ */
+function CeilingDimInput({
+  ceiling,
+  axis,
+  label,
+}: {
+  ceiling: Ceiling;
+  axis: "width" | "depth";
+  label: string;
+}) {
+  const resizeCeilingAxis = useCADStore((s) => s.resizeCeilingAxis);
+  const resizeCeilingAxisNoHistory = useCADStore((s) => s.resizeCeilingAxisNoHistory);
+  const baseValue =
+    axis === "width"
+      ? (ceiling.widthFtOverride ?? polygonBbox(ceiling.points).width)
+      : (ceiling.depthFtOverride ?? polygonBbox(ceiling.points).depth);
+  const [draft, setDraft] = useState<string>(baseValue.toFixed(2));
+  // Track the value at the start of an edit session so we can:
+  //   1. Roll back live-preview on Escape (mirror Phase 31 LabelOverride).
+  //   2. Suppress redundant commit() calls when blur fires after Enter.
+  const editStartedRef = useRef<boolean>(false);
+  const originalOverrideRef = useRef<number | undefined>(
+    axis === "width" ? ceiling.widthFtOverride : ceiling.depthFtOverride,
+  );
+  // Reseed when ceiling changes / override changes externally (e.g. drag).
+  useEffect(() => {
+    if (!editStartedRef.current) {
+      setDraft(baseValue.toFixed(2));
+    }
+  }, [ceiling.id, ceiling.widthFtOverride, ceiling.depthFtOverride]);
+
+  function commit() {
+    if (!editStartedRef.current) return; // no-op if no edit in progress
+    editStartedRef.current = false;
+    const trimmed = draft.trim();
+    if (trimmed === "") return;
+    const v = parseFloat(trimmed);
+    if (!isFinite(v) || v <= 0) return;
+    // Push exactly one history entry. resizeCeilingAxis pushes its own
+    // snapshot; the live-preview NoHistory writes did NOT push anything,
+    // so this is the single undo entry for the edit session.
+    resizeCeilingAxis(ceiling.id, axis, v);
+    originalOverrideRef.current =
+      axis === "width" ? v : originalOverrideRef.current;
+  }
+
+  return (
+    <div className="flex justify-between items-center">
+      <label
+        className="font-mono text-[11px] text-text-ghost tracking-wider"
+        htmlFor={`ceiling-dim-${axis}-${ceiling.id}`}
+      >
+        {label}
+      </label>
+      <input
+        id={`ceiling-dim-${axis}-${ceiling.id}`}
+        type="text"
+        aria-label={label}
+        value={draft}
+        onChange={(e) => {
+          const v = e.target.value;
+          setDraft(v);
+          editStartedRef.current = true;
+          const num = parseFloat(v);
+          if (isFinite(num) && num > 0) {
+            resizeCeilingAxisNoHistory(ceiling.id, axis, num);
+          }
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            commit();
+            (e.target as HTMLInputElement).blur();
+          }
+        }}
+        onBlur={commit}
+        className="w-20 px-1 py-0.5 text-right font-mono text-[11px] text-accent-light bg-obsidian-deepest border border-accent/30 rounded-sm outline-none"
       />
     </div>
   );

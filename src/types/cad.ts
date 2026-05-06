@@ -225,6 +225,22 @@ export interface Ceiling {
   savedCameraPos?: [number, number, number];
   /** Phase 48 CAM-04 (D-03). */
   savedCameraTarget?: [number, number, number];
+  /** Phase 65 CEIL-02 — target absolute bbox width in feet. When set,
+   *  resolveCeilingPoints scales every vertex along x from anchorXFt
+   *  (default bbox.minX of original points). */
+  widthFtOverride?: number;
+  /** Phase 65 CEIL-02 — target absolute bbox depth in feet. When set,
+   *  resolveCeilingPoints scales every vertex along y from anchorYFt
+   *  (default bbox.minY of original points). */
+  depthFtOverride?: number;
+  /** Phase 65 CEIL-02 — fixed bbox-X point during scaling. Defaults to
+   *  original bbox.minX. Set to bbox.maxX explicitly when the user drags
+   *  the WEST edge so the east edge stays put. */
+  anchorXFt?: number;
+  /** Phase 65 CEIL-02 — fixed bbox-Y point during scaling. Defaults to
+   *  original bbox.minY. Set to bbox.maxY when the user drags the NORTH
+   *  edge so the south edge stays put. */
+  anchorYFt?: number;
 }
 
 export interface FloorMaterial {

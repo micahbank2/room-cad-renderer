@@ -181,7 +181,7 @@
   4. Phase 30 smart-snap engages (snap to wall edges); Alt disables
   5. Phase 53 right-click "Reset size" clears overrides
   6. Snapshot serialization preserves new override fields
-**Plans:** 0/1 plans complete
+**Plans:** 1/1 plans complete
 **UI hint:** yes
 
 #### Phase 66: Per-surface tile-size UI (TILE-02)
@@ -235,9 +235,9 @@
 | 60. Stairs | 1/1 | Complete    | 2026-05-06 |
 | 61. Openings — Archway/Passthrough/Niche | 1/1 | Complete    | 2026-05-06 |
 | 62. Measurement + Annotation Tools | 1/1 | Complete    | 2026-05-06 |
-| 63. Vitest Pollution Fix | 0/1 | Pending    |   |
-| 64. Wall-Texture Flake Fix | 0/1 | Pending    |   |
-| 65. Ceiling Resize Handles | 0/1 | Pending    |   |
+| 63. Vitest Pollution Fix | 1/1 | Complete    | 2026-05-04 |
+| 64. Wall-Texture Flake Fix | 1/1 | Complete    | 2026-05-04 |
+| 65. Ceiling Resize Handles | 1/1 | Complete    | 2026-05-06 |
 | 66. Per-Surface Tile-Size UI | 0/1 | Pending    |   |
 
 ## Backlog

@@ -62,6 +62,21 @@ interface CADState {
   addCeiling: (points: Point[], height: number, material?: string) => string;
   updateCeiling: (id: string, changes: Partial<Ceiling>) => void;
   updateCeilingNoHistory: (id: string, changes: Partial<Ceiling>) => void;
+  // Phase 65 CEIL-02 — per-axis ceiling polygon resize via width/depth + anchor
+  // overrides. Mirrors Phase 31 resizeProductAxis pattern.
+  resizeCeilingAxis: (
+    id: string,
+    axis: "width" | "depth",
+    valueFt: number,
+    anchor?: number,
+  ) => void;
+  resizeCeilingAxisNoHistory: (
+    id: string,
+    axis: "width" | "depth",
+    valueFt: number,
+    anchor?: number,
+  ) => void;
+  clearCeilingOverrides: (id: string) => void;
   removeCeiling: (id: string) => void;
   setFloorMaterial: (material: FloorMaterial | undefined) => void;
   setWallpaper: (wallId: string, side: WallSide, wallpaper: Wallpaper | undefined) => void;
@@ -575,6 +590,59 @@ export const useCADStore = create<CADState>()((set) => ({
         const doc = activeDoc(s);
         if (!doc || !doc.ceilings || !doc.ceilings[id]) return;
         Object.assign(doc.ceilings[id], changes);
+      })
+    ),
+
+  // Phase 65 CEIL-02 — per-axis ceiling polygon resize. Mirrors Phase 31
+  // resizeProductAxis pattern. Optional `anchor` writes anchorXFt / anchorYFt
+  // atomically with the override value (used by west / north edge drags so
+  // the opposite edge stays put).
+  resizeCeilingAxis: (id, axis, valueFt, anchor) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.ceilings?.[id]) return;
+        const v = Math.max(0.1, Math.min(500, valueFt));
+        pushHistory(s);
+        const c = doc.ceilings[id];
+        if (axis === "width") {
+          c.widthFtOverride = v;
+          if (anchor !== undefined) c.anchorXFt = anchor;
+        } else {
+          c.depthFtOverride = v;
+          if (anchor !== undefined) c.anchorYFt = anchor;
+        }
+      })
+    ),
+
+  resizeCeilingAxisNoHistory: (id, axis, valueFt, anchor) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.ceilings?.[id]) return;
+        const v = Math.max(0.1, Math.min(500, valueFt));
+        const c = doc.ceilings[id];
+        if (axis === "width") {
+          c.widthFtOverride = v;
+          if (anchor !== undefined) c.anchorXFt = anchor;
+        } else {
+          c.depthFtOverride = v;
+          if (anchor !== undefined) c.anchorYFt = anchor;
+        }
+      })
+    ),
+
+  clearCeilingOverrides: (id) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.ceilings?.[id]) return;
+        pushHistory(s);
+        const c = doc.ceilings[id];
+        c.widthFtOverride = undefined;
+        c.depthFtOverride = undefined;
+        c.anchorXFt = undefined;
+        c.anchorYFt = undefined;
       })
     ),
 
