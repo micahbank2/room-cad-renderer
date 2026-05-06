@@ -2,15 +2,18 @@ import type { CADSnapshot, RoomDoc, LegacySnapshotV1, FloorMaterial } from "@/ty
 import { computeSHA256, saveUserTextureWithDedup } from "@/lib/userTextureStore";
 
 export function defaultSnapshot(): CADSnapshot {
+  // Phase 60 STAIRS-01 (D-12, D-13): seed `stairs: {}` so consumers don't
+  // need to defensively check for undefined on freshly-created rooms.
   const mainRoom: RoomDoc = {
     id: "room_main",
     name: "Main Room",
     room: { width: 20, length: 16, wallHeight: 8 },
     walls: {},
     placedProducts: {},
+    stairs: {},
   };
   return {
-    version: 3,
+    version: 4,
     rooms: { room_main: mainRoom },
     activeRoomId: "room_main",
   };
@@ -46,14 +49,30 @@ function migrateWallsPerSide(rooms: Record<string, RoomDoc> | undefined): void {
 }
 
 export function migrateSnapshot(raw: unknown): CADSnapshot {
-  // v3 passthrough — already migrated, no mutations needed
+  // Phase 60 STAIRS-01 (D-12): v4 passthrough.
   if (
     raw &&
     typeof raw === "object" &&
-    (raw as CADSnapshot).version === 3 &&
+    (raw as CADSnapshot).version === 4 &&
     (raw as CADSnapshot).rooms
   ) {
     return raw as CADSnapshot;
+  }
+  // Phase 60 STAIRS-01 (D-12): v3 → v4 — seed `stairs: {}` per RoomDoc.
+  if (
+    raw &&
+    typeof raw === "object" &&
+    (raw as { version?: number }).version === 3 &&
+    (raw as CADSnapshot).rooms
+  ) {
+    const snap = raw as CADSnapshot;
+    for (const doc of Object.values(snap.rooms)) {
+      if (!(doc as RoomDoc).stairs) {
+        (doc as RoomDoc).stairs = {};
+      }
+    }
+    (snap as { version: number }).version = 4;
+    return snap;
   }
   // v2 passthrough
   if (
@@ -127,15 +146,43 @@ async function migrateOneFloorMaterial(mat: FloorMaterial): Promise<FloorMateria
  * Phase 51 — DEBT-05: async migration pass. Runs AFTER migrateSnapshot (sync v1→v2).
  * Converts any { kind: "custom", imageUrl: "data:..." } FloorMaterial to
  * { kind: "user-texture", userTextureId } via the SHA-256 dedup IDB pipeline.
- * Idempotent: v3 snapshots are returned immediately with no IDB calls.
- * Bumps snap.version to 3 (D-05).
+ * Idempotent: v3+ snapshots are returned immediately with no IDB calls.
+ *
+ * Contract: ends at version 3 (Phase 51 boundary). Phase 60 v3 → v4 stair
+ * migration runs separately via migrateV3ToV4() so the Phase 51 floorMaterial
+ * test fixtures (which assert `version === 3` post-migration) keep working.
  */
 export async function migrateFloorMaterials(snap: CADSnapshot): Promise<CADSnapshot> {
-  if (snap.version >= 3) return snap; // idempotency gate — v3 already migrated
+  if (snap.version >= 3) return snap; // idempotency gate — v3+ already past Phase 51
   for (const doc of Object.values(snap.rooms)) {
-    if (!doc?.floorMaterial) continue;
-    (doc as any).floorMaterial = await migrateOneFloorMaterial(doc.floorMaterial as FloorMaterial);
+    if (doc?.floorMaterial) {
+      (doc as any).floorMaterial = await migrateOneFloorMaterial(doc.floorMaterial as FloorMaterial);
+    }
   }
-  snap.version = 3;
+  (snap as { version: number }).version = 3;
+  return snap;
+}
+
+/**
+ * Phase 60 STAIRS-01 (D-12): v3 → v4 — seed `stairs: {}` per RoomDoc.
+ *
+ * Runs AFTER migrateFloorMaterials in the cadStore.loadSnapshot pipeline.
+ * Idempotent: v4 inputs returned unchanged.
+ *
+ * Why a separate function (vs. inlining into migrateSnapshot or
+ * migrateFloorMaterials):
+ *   - migrateSnapshot is synchronous and handles raw → v2 (or passthrough);
+ *     it would short-circuit when given a v2 input.
+ *   - migrateFloorMaterials must end at v3 to preserve the Phase 51 test
+ *     contract (D-17 zero-regression).
+ *   - The cadStore pipeline runs migrateSnapshot → migrateFloorMaterials →
+ *     migrateV3ToV4 in sequence so a v2 snapshot reaches v4 cleanly.
+ */
+export function migrateV3ToV4(snap: CADSnapshot): CADSnapshot {
+  if ((snap as { version: number }).version >= 4) return snap;
+  for (const doc of Object.values(snap.rooms)) {
+    if (!(doc as RoomDoc).stairs) (doc as RoomDoc).stairs = {};
+  }
+  (snap as { version: number }).version = 4;
   return snap;
 }

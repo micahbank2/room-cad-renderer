@@ -18,6 +18,7 @@ import {
   focusOnPlacedProduct,
   focusOnCeiling,
   focusOnPlacedCustomElement,
+  focusOnStair,
 } from "@/components/RoomsTreePanel/focusDispatch";
 
 interface ContextAction {
@@ -63,6 +64,9 @@ export function getActionsForKind(kind: ContextMenuKind, nodeId: string | null, 
           focusOnPlacedCustomElement(pce, catalog);
         });
       }
+    } else if (kind === "stair") {
+      const s = doc.stairs?.[nodeId];
+      if (s) focusOnStair(s);
     }
   };
 
@@ -73,6 +77,7 @@ export function getActionsForKind(kind: ContextMenuKind, nodeId: string | null, 
     else if (kind === "product") store.setSavedCameraOnProductNoHistory(nodeId, capture.pos, capture.target);
     else if (kind === "ceiling") store.setSavedCameraOnCeilingNoHistory(nodeId, capture.pos, capture.target);
     else if (kind === "custom")  store.setSavedCameraOnCustomElementNoHistory(nodeId, capture.pos, capture.target);
+    else if (kind === "stair")   store.setSavedCameraOnStairNoHistory(nodeId, capture.pos, capture.target);
   };
 
   const isHidden = nodeId ? ui.hiddenIds.has(nodeId) : false;
@@ -111,6 +116,24 @@ export function getActionsForKind(kind: ContextMenuKind, nodeId: string | null, 
   }
   if (kind === "ceiling") {
     return [...baseActions];
+  }
+  if (kind === "stair") {
+    // Phase 60 STAIRS-01 (D-11, research Q5): NEW branch (not product reuse)
+    // — `delete` calls removeStair(roomId, stairId), distinct from removeProduct.
+    return [
+      ...baseActions,
+      { id: "copy",   label: "Copy",   icon: <Copy size={14} />,      handler: () => { copySelection(); } },
+      { id: "paste",  label: "Paste",  icon: <Clipboard size={14} />, handler: () => { pasteSelection(); } },
+      {
+        id: "delete", label: "Delete", icon: <Trash2 size={14} />,
+        handler: () => {
+          if (!nodeId) return;
+          const activeDocLocal = getActiveRoomDoc();
+          if (activeDocLocal) store.removeStair(activeDocLocal.id, nodeId);
+        },
+        destructive: true,
+      },
+    ];
   }
   if (kind === "custom") {
     return [

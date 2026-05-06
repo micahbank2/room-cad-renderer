@@ -52,10 +52,12 @@ const mockCadStoreState = {
   removeWall: vi.fn(),
   removeProduct: vi.fn(),
   removePlacedCustomElement: vi.fn(),
+  removeStair: vi.fn(),
   setSavedCameraOnWallNoHistory: vi.fn(),
   setSavedCameraOnProductNoHistory: vi.fn(),
   setSavedCameraOnCeilingNoHistory: vi.fn(),
   setSavedCameraOnCustomElementNoHistory: vi.fn(),
+  setSavedCameraOnStairNoHistory: vi.fn(),
 };
 
 vi.mock("@/stores/cadStore", () => ({
@@ -84,6 +86,7 @@ vi.mock("@/components/RoomsTreePanel/focusDispatch", () => ({
   focusOnPlacedProduct: vi.fn(),
   focusOnCeiling: vi.fn(),
   focusOnPlacedCustomElement: vi.fn(),
+  focusOnStair: vi.fn(),
 }));
 
 describe("getActionsForKind — D-02 action count contract", () => {

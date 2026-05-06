@@ -9,6 +9,7 @@ import { installSavedCameraDrivers } from "./test-utils/savedCameraDrivers";
 import { installUserTextureDrivers } from "./test-utils/userTextureDrivers";
 import { installGltfDrivers } from "./test-utils/gltfDrivers";
 import { installCutawayDrivers } from "./test-utils/cutawayDrivers";
+import { installStairDrivers } from "./test-utils/stairDrivers";
 import { installOpeningDrivers } from "./test-utils/openingDrivers";
 
 // Phase 46: install tree test drivers (gated by MODE==="test", production no-op)
@@ -23,6 +24,8 @@ installUserTextureDrivers();
 installGltfDrivers();
 // Phase 59: install cutaway test drivers (gated by MODE==="test", production no-op)
 installCutawayDrivers();
+// Phase 60: install stair test drivers (gated by MODE==="test", production no-op)
+installStairDrivers();
 // Phase 61: install opening placement test drivers (gated by MODE==="test", production no-op)
 installOpeningDrivers();
 

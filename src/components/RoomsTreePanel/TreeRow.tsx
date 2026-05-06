@@ -160,6 +160,21 @@ export function TreeRow(props: TreeRowProps) {
         {/* 4px gap between chevron/spacer and label */}
         <span className="w-1" aria-hidden="true" />
 
+        {/* Phase 60 STAIRS-01: per-kind icon for stair leaf nodes.
+            Phase 33 D-33 exception — CAD-domain glyph; lucide-react has
+            no Stairs export. CLAUDE.md Material Symbols allowlist updated
+            to include this file. */}
+        {node.kind === "stair" && (
+          <span
+            className="material-symbols-outlined text-text-dim mr-1"
+            style={{ fontSize: 14 }}
+            aria-hidden="true"
+            data-stair-icon
+          >
+            stairs
+          </span>
+        )}
+
         {/* Label button — data-tree-row for test driver targeting */}
         <button
           data-tree-row
@@ -234,6 +249,7 @@ export function TreeRow(props: TreeRowProps) {
           {node.groupKey === "walls" && "No walls yet"}
           {node.groupKey === "products" && "No products placed"}
           {node.groupKey === "custom" && "No custom elements placed"}
+          {node.groupKey === "stairs" && "No stairs in this room"}
         </div>
       )}
     </div>

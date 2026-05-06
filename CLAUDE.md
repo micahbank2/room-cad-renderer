@@ -164,8 +164,8 @@ Zustand store keeps `past[]` and `future[]` arrays of `CADSnapshot` objects (roo
 Two icon libraries coexist:
 
 - **lucide-react** — ALL new UI chrome icons (chevrons, Copy, Trash2, X, Check, etc.). Stroke-based, tree-shaken. Introduced Phase 33.
-- **Material Symbols** — RESERVED for the 9 existing files using CAD-domain glyphs:
-  - `src/components/Toolbar.tsx` (grid_view, directions_walk, undo, redo, door_front, window, roofing, zoom_in/out, fit_screen)
+- **Material Symbols** — RESERVED for the 10 existing files using CAD-domain glyphs:
+  - `src/components/Toolbar.tsx` (grid_view, directions_walk, undo, redo, door_front, window, roofing, stairs, zoom_in/out, fit_screen)
   - `src/components/Toolbar.WallCutoutsDropdown.tsx` (Phase 61 — `arch` glyph for archway; no lucide equivalent)
   - `src/components/WelcomeScreen.tsx`
   - `src/components/TemplatePickerDialog.tsx`
@@ -173,6 +173,7 @@ Two icon libraries coexist:
   - `src/components/AddProductModal.tsx`
   - `src/components/HelpSearch.tsx`
   - `src/components/ProductLibrary.tsx`
+  - `src/components/RoomsTreePanel/TreeRow.tsx` (Phase 60 — `stairs` glyph for stair leaf rows; lucide-react has no Stairs export)
   - `src/index.css`
 
 Do NOT add new `material-symbols-outlined` imports outside the allowlist. Do NOT migrate existing Material Symbols sites — they're CAD-specific glyphs that lucide doesn't have equivalents for.

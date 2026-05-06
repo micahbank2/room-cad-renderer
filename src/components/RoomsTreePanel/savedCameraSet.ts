@@ -26,6 +26,10 @@ export function buildSavedCameraSet(
     for (const pce of Object.values(room.placedCustomElements ?? {})) {
       if (pce.savedCameraPos !== undefined) out.add(pce.id);
     }
+    // Phase 60 STAIRS-01 (D-14): stair saved-camera mirror.
+    for (const s of Object.values(room.stairs ?? {})) {
+      if (s.savedCameraPos !== undefined) out.add(s.id);
+    }
   }
   return out;
 }

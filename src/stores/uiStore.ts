@@ -151,16 +151,17 @@ interface UIState {
    * null = menu closed. Opened by openContextMenu(), closed by closeContextMenu().
    */
   contextMenu: {
-    /** Phase 61 OPEN-01 (D-11'): adds 'opening' kind for archway / passthrough /
-     *  niche / door / window. parentId = wallId for opening kind. */
-    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "opening";
+    /** Phase 60 STAIRS-01 adds 'stair'. Phase 61 OPEN-01 (D-11') adds 'opening'
+     *  for archway / passthrough / niche / door / window. parentId = wallId
+     *  for opening kind. */
+    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "stair" | "opening";
     nodeId: string | null;
     position: { x: number; y: number };
     /** Phase 61 OPEN-01: when kind === 'opening', the parent wall id. */
     parentId?: string;
   } | null;
   openContextMenu: (
-    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "opening",
+    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "stair" | "opening",
     nodeId: string | null,
     position: { x: number; y: number },
     parentId?: string,

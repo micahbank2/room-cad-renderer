@@ -9,12 +9,13 @@ import {
   useActiveCeilings,
   useActivePlacedCustomElements,
   useCustomElements,
+  useActiveStairs,
   getActiveRoomDoc,
 } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { drawGrid } from "./grid";
 import { drawRoomDimensions } from "./dimensions";
-import { renderWalls, renderProducts, renderCeilings, renderCustomElements, setLabelLookupCanvas } from "./fabricSync";
+import { renderWalls, renderProducts, renderCeilings, renderCustomElements, renderStairs, setLabelLookupCanvas } from "./fabricSync";
 import { activateWallTool } from "./tools/wallTool";
 import {
   activateSelectTool,
@@ -28,6 +29,7 @@ import { activateProductTool, setProductToolLibrary } from "./tools/productTool"
 import { activateDoorTool } from "./tools/doorTool";
 import { activateWindowTool } from "./tools/windowTool";
 import { activateCeilingTool } from "./tools/ceilingTool";
+import { activateStairTool, setStairToolLibrary } from "./tools/stairTool";
 // Phase 61 OPEN-01 (D-09): three new wall-cutout placement tools.
 import { activateArchwayTool } from "./tools/archwayTool";
 import { activatePassthroughTool } from "./tools/passthroughTool";
@@ -105,6 +107,8 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const ceilings = useActiveCeilings();
   const placedCustoms = useActivePlacedCustomElements();
   const customCatalog = useCustomElements();
+  const stairs = useActiveStairs();
+  const hiddenIds = useUIStore((s) => s.hiddenIds);
   const activeTool = useUIStore((s) => s.activeTool);
   const selectedIds = useUIStore((s) => s.selectedIds);
   const showGrid = useUIStore((s) => s.showGrid);
@@ -117,6 +121,9 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // Phase 30 — product tool needs the library too to resolve the
     // pending product's bbox for smart-snap.
     setProductToolLibrary(productLibrary);
+    // Phase 60 — stair tool consumes the same snap scene (research Q2);
+    // buildSceneGeometry needs productLibrary to resolve product bboxes.
+    setStairToolLibrary(productLibrary);
   }, [productLibrary]);
 
   /** Full redraw of the canvas from store state */
@@ -214,6 +221,10 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // 6. Custom elements
     renderCustomElements(fc, placedCustoms, customCatalog, scale, origin, selectedIds);
 
+    // 7. Stairs (Phase 60 STAIRS-01) — render after products + customs so
+    //    selection outlines layer above. Skips hidden via Phase 46 cascade.
+    renderStairs(fc, stairs, scale, origin, selectedIds, hiddenIds);
+
     // Phase 31 — install __getCustomElementLabel test bridge (test mode only).
     setLabelLookupCanvas(fc);
 
@@ -225,7 +236,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // Hotfix #2 — record the tool we just activated so the next redraw can
     // tell whether activeTool changed (affects the drag short-circuit above).
     prevActiveToolRef.current = activeTool as ToolType;
-  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog, productImageTick]);
+  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog, productImageTick, stairs, hiddenIds]);
 
   // Init canvas
   useEffect(() => {
@@ -505,8 +516,17 @@ export default function FabricCanvas({ productLibrary }: Props) {
             hit = { kind: "custom", nodeId: d.pceId as string };
             break;
           }
+        } else if (d.type === "stair" && d.stairId) {
+          // Phase 60 STAIRS-01: right-click on a stair Group opens the
+          // 6-action menu (Phase 53 D-11 + research Q5).
+          if ((obj as fabric.FabricObject).containsPoint(pointer)) {
+            hit = { kind: "stair", nodeId: d.stairId as string };
+            break;
+          }
         }
-        // Skip: rotation-handle, resize-handle, grid, dimension labels
+        // Skip: rotation-handle, resize-handle, grid, dimension labels,
+        //       stair-preview (evented:false anyway).
+        //       Phase 61 D-11': openings ARE now hit-tested (no longer in skip list).
       }
 
       if (hit) {
@@ -546,6 +566,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const cursorClass =
     activeTool === "wall" || activeTool === "product" ||
     activeTool === "door" || activeTool === "window" ||
+    activeTool === "stair" ||
     activeTool === "archway" || activeTool === "passthrough" || activeTool === "niche"
       ? "cursor-crosshair"
       : "";
@@ -664,6 +685,7 @@ function activateCurrentTool(
     case "door":    return activateDoorTool(fc, scale, origin);
     case "window":  return activateWindowTool(fc, scale, origin);
     case "ceiling": return activateCeilingTool(fc, scale, origin);
+    case "stair":       return activateStairTool(fc, scale, origin);
     // Phase 61 OPEN-01 (D-09)
     case "archway":     return activateArchwayTool(fc, scale, origin);
     case "passthrough": return activatePassthroughTool(fc, scale, origin);

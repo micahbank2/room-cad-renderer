@@ -21,6 +21,7 @@ import {
   ChevronDown,
   type LucideIcon,
 } from "lucide-react";
+import { setPendingStair } from "@/canvas/tools/stairTool";
 
 // Phase 35 CAM-01 — lucide icon map per PresetId (Phase 33 D-33).
 const PRESET_ICONS: Record<PresetId, LucideIcon> = {
@@ -43,6 +44,9 @@ const tools: { id: ToolType; label: string; icon: string }[] = [
   { id: "door", label: "DOOR", icon: "door_front" },
   { id: "window", label: "WINDOW", icon: "window" },
   { id: "ceiling", label: "CEILING", icon: "roofing" },
+  // Phase 60 STAIRS-01 (research Q1): Material Symbols `stairs` glyph;
+  // lucide-react has no Stairs export (Toolbar.tsx is on the D-33 allowlist).
+  { id: "stair", label: "STAIRS", icon: "stairs" },
 ];
 
 interface Props {
@@ -334,6 +338,7 @@ const TOOL_SHORTCUTS: Record<ToolType, string> = {
   window: "N",
   ceiling: "C",
   product: "",
+  stair: "",
   // Phase 61 OPEN-01 (D-03): no keyboard shortcuts for the 3 dropdown tools
   // (toolbar dropdown is the canonical entry; mirror the pattern of `product`
   // which has no shortcut).
@@ -401,6 +406,20 @@ function ToolbarSaveStatus() {
 export function ToolPalette() {
   const activeTool = useUIStore((s) => s.activeTool);
   const setTool = useUIStore((s) => s.setTool);
+  // Phase 60 STAIRS-01: clicking the Stairs tool button must also seed
+  // pendingStairConfig so the placement loop has dimensions to commit.
+  const onSelectTool = (id: ToolType) => {
+    if (id === "stair") {
+      setPendingStair({
+        rotation: 0,
+        widthFt: 3,
+        stepCount: 12,
+        riseIn: 7,
+        runIn: 11,
+      });
+    }
+    setTool(id);
+  };
   const showGrid = useUIStore((s) => s.showGrid);
   const toggleGrid = useUIStore((s) => s.toggleGrid);
   const userZoom = useUIStore((s) => s.userZoom);
@@ -421,8 +440,9 @@ export function ToolPalette() {
           placement="right"
         >
           <button
-            onClick={() => setTool(t.id)}
+            onClick={() => onSelectTool(t.id)}
             data-onboarding={`tool-${t.id}`}
+            data-testid={`tool-${t.id}`}
             className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-150 ${
               activeTool === t.id
                 ? "bg-accent text-white shadow-[0_0_15px_rgba(124,91,240,0.3)]"

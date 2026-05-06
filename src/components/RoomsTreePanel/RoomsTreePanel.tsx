@@ -13,6 +13,7 @@ import {
   focusOnPlacedProduct,
   focusOnCeiling,
   focusOnPlacedCustomElement,
+  focusOnStair,
   focusOnSavedCamera,
 } from "./focusDispatch";
 import { buildSavedCameraSet } from "./savedCameraSet";
@@ -227,6 +228,11 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
         focusOnPlacedCustomElement(placed, catalog);
         return;
       }
+      if (node.kind === "stair") {
+        const s = (doc.stairs ?? {})[node.id];
+        if (s) focusOnStair(s);
+        return;
+      }
     },
     [productLibrary],
   );
@@ -261,6 +267,10 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
         const pce = (doc.placedCustomElements ?? {})[node.id];
         savedPos = pce?.savedCameraPos;
         savedTarget = pce?.savedCameraTarget;
+      } else if (node.kind === "stair") {
+        const s = (doc.stairs ?? {})[node.id];
+        savedPos = s?.savedCameraPos;
+        savedTarget = s?.savedCameraTarget;
       }
 
       // D-02 fall-through: if no saved camera, dispatch the default focus

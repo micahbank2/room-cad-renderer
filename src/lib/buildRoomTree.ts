@@ -3,14 +3,14 @@ import type { RoomDoc } from "@/types/cad";
 import type { Product } from "@/types/product";
 import { wallCardinalLabel } from "./wallLabels";
 
-export type TreeNodeKind = "room" | "group" | "wall" | "ceiling" | "product" | "custom";
+export type TreeNodeKind = "room" | "group" | "wall" | "ceiling" | "product" | "custom" | "stair";
 
 export interface TreeNode {
   id: string;
   kind: TreeNodeKind;
   label: string;
   roomId: string;
-  groupKey?: "walls" | "ceiling" | "products" | "custom";
+  groupKey?: "walls" | "ceiling" | "products" | "custom" | "stairs";
   children?: TreeNode[];
 }
 
@@ -90,6 +90,27 @@ export function buildRoomTree(
         customNameCounts.set(baseName, count);
         const label = count === 1 ? baseName : `${baseName} (${count})`;
         return { id: placed.id, kind: "custom" as const, label, roomId: doc.id };
+      }),
+    });
+
+    // Phase 60 STAIRS-01 (D-10): stairs group — ALWAYS emit. labelOverride
+    // wins; otherwise auto-numbered "Stairs (N)" starting at 2.
+    // Defensive `?? {}` per research Pitfall 2.
+    const stairEntries = Object.values(doc.stairs ?? {});
+    const stairNameCounts = new Map<string, number>();
+    groups.push({
+      id: `${doc.id}:stairs`, kind: "group", label: "Stairs",
+      roomId: doc.id, groupKey: "stairs",
+      children: stairEntries.map((s) => {
+        const override = s.labelOverride;
+        if (override) {
+          return { id: s.id, kind: "stair" as const, label: override, roomId: doc.id };
+        }
+        const baseName = "Stairs";
+        const count = (stairNameCounts.get(baseName) ?? 0) + 1;
+        stairNameCounts.set(baseName, count);
+        const label = count === 1 ? baseName : `${baseName} (${count})`;
+        return { id: s.id, kind: "stair" as const, label, roomId: doc.id };
       }),
     });
 
