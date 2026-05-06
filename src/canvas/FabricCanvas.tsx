@@ -15,7 +15,7 @@ import {
 import { useUIStore } from "@/stores/uiStore";
 import { drawGrid } from "./grid";
 import { drawRoomDimensions } from "./dimensions";
-import { renderWalls, renderProducts, renderCeilings, renderCustomElements, renderStairs, setLabelLookupCanvas } from "./fabricSync";
+import { renderWalls, renderProducts, renderCeilings, renderCustomElements, renderStairs, renderMeasureLines, renderAnnotations, renderRoomAreaOverlay, setLabelLookupCanvas } from "./fabricSync";
 import { activateWallTool } from "./tools/wallTool";
 import {
   activateSelectTool,
@@ -34,6 +34,9 @@ import { activateStairTool, setStairToolLibrary } from "./tools/stairTool";
 import { activateArchwayTool } from "./tools/archwayTool";
 import { activatePassthroughTool } from "./tools/passthroughTool";
 import { activateNicheTool } from "./tools/nicheTool";
+// Phase 62 MEASURE-01 (D-05, D-07): measurement + annotation tools.
+import { activateMeasureTool } from "./tools/measureTool";
+import { activateLabelTool } from "./tools/labelTool";
 import { attachDragDropHandlers } from "./dragDrop";
 import { computeLabelPx, hitTestDimLabel, validateInput } from "./dimensionEditor";
 import { closestPointOnWall, distance, formatFeet } from "@/lib/geometry";
@@ -91,6 +94,9 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const prevActiveToolRef = useRef<ToolType | null>(null);
   const [editingWallId, setEditingWallId] = useState<string | null>(null);
   const [pendingValue, setPendingValue] = useState<string>("");
+  // Phase 62 MEASURE-01 — local draft for annotation overlay editor.
+  const [pendingAnnotationText, setPendingAnnotationText] = useState<string>("");
+  const annotationOriginalRef = useRef<string>("");
   const [wainscotEditWallId, setWainscotEditWallId] = useState<string | null>(null);
   const [wainscotEditSide, setWainscotEditSide] = useState<WallSide>("A");
   // FIX-01: bumping this tick forces redraw() to re-execute (and rebuild the
@@ -108,8 +114,12 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const placedCustoms = useActivePlacedCustomElements();
   const customCatalog = useCustomElements();
   const stairs = useActiveStairs();
+  // Phase 62 MEASURE-01 — subscribe to per-room measure/annotation maps so redraw fires.
+  const measureLines = activeDoc?.measureLines ?? {};
+  const annotations = activeDoc?.annotations ?? {};
   const hiddenIds = useUIStore((s) => s.hiddenIds);
   const activeTool = useUIStore((s) => s.activeTool);
+  const editingAnnotationId = useUIStore((s) => s.editingAnnotationId);
   const selectedIds = useUIStore((s) => s.selectedIds);
   const showGrid = useUIStore((s) => s.showGrid);
   const userZoom = useUIStore((s) => s.userZoom);
@@ -225,6 +235,12 @@ export default function FabricCanvas({ productLibrary }: Props) {
     //    selection outlines layer above. Skips hidden via Phase 46 cascade.
     renderStairs(fc, stairs, scale, origin, selectedIds, hiddenIds);
 
+    // 8. Phase 62 MEASURE-01 — measure lines + annotations + room-area overlay.
+    //    Rendered last so they layer above all geometry.
+    renderMeasureLines(fc, measureLines, scale, origin);
+    renderAnnotations(fc, annotations, scale, origin, editingAnnotationId);
+    renderRoomAreaOverlay(fc, walls, scale, origin);
+
     // Phase 31 — install __getCustomElementLabel test bridge (test mode only).
     setLabelLookupCanvas(fc);
 
@@ -236,7 +252,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // Hotfix #2 — record the tool we just activated so the next redraw can
     // tell whether activeTool changed (affects the drag short-circuit above).
     prevActiveToolRef.current = activeTool as ToolType;
-  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog, productImageTick, stairs, hiddenIds]);
+  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog, productImageTick, stairs, hiddenIds, measureLines, annotations, editingAnnotationId]);
 
   // Init canvas
   useEffect(() => {
@@ -334,6 +350,35 @@ export default function FabricCanvas({ productLibrary }: Props) {
             return;
           }
         }
+      }
+    };
+    fc.on("mouse:dblclick", onDblClick as any);
+    return () => { fc.off("mouse:dblclick", onDblClick as any); };
+  }, []);
+
+  // Phase 62 MEASURE-01 — seed annotation editor draft on edit-mode entry.
+  useEffect(() => {
+    if (!editingAnnotationId) {
+      setPendingAnnotationText("");
+      annotationOriginalRef.current = "";
+      return;
+    }
+    const doc = getActiveRoomDoc();
+    const ann = doc?.annotations?.[editingAnnotationId];
+    const initial = ann?.text ?? "";
+    setPendingAnnotationText(initial);
+    annotationOriginalRef.current = initial;
+  }, [editingAnnotationId]);
+
+  // Phase 62 MEASURE-01 — double-click on an annotation re-enters edit mode.
+  useEffect(() => {
+    const fc = fcRef.current;
+    if (!fc) return;
+    const onDblClick = (opt: { target?: fabric.FabricObject | null }) => {
+      const target = opt.target;
+      const data = (target as unknown as { data?: { type?: string; annotationId?: string } } | null)?.data;
+      if (data?.type === "annotation" && data.annotationId) {
+        useUIStore.getState().setEditingAnnotationId(data.annotationId);
       }
     };
     fc.on("mouse:dblclick", onDblClick as any);
@@ -484,9 +529,21 @@ export default function FabricCanvas({ productLibrary }: Props) {
         const d = (obj as unknown as { data?: Record<string, unknown> }).data;
         if (!d) continue;
 
-        // Phase 61 OPEN-01 (D-11'): match openings BEFORE wall — opening
-        // polygons render on top of walls and should win the hit-test.
-        if (d.type === "opening" && d.openingId && d.wallId) {
+        // Phase 62 MEASURE-01 (D-11): measure-line + annotation BEFORE wall —
+        // they render on top of geometry and should win the hit-test.
+        if (d.type === "measureLine" && d.measureLineId) {
+          if ((obj as fabric.FabricObject).containsPoint(pointer)) {
+            hit = { kind: "measureLine", nodeId: d.measureLineId as string };
+            break;
+          }
+        } else if (d.type === "annotation" && d.annotationId) {
+          if ((obj as fabric.FabricObject).containsPoint(pointer)) {
+            hit = { kind: "annotation", nodeId: d.annotationId as string };
+            break;
+          }
+        } else if (d.type === "opening" && d.openingId && d.wallId) {
+          // Phase 61 OPEN-01 (D-11'): match openings BEFORE wall — opening
+          // polygons render on top of walls and should win the hit-test.
           if ((obj as fabric.FabricObject).containsPoint(pointer)) {
             hit = { kind: "opening", nodeId: d.openingId as string, parentId: d.wallId as string };
             break;
@@ -593,6 +650,37 @@ export default function FabricCanvas({ productLibrary }: Props) {
     }
   }
 
+  // Phase 62 MEASURE-01 (D-07): annotation DOM overlay edit mode.
+  // Mirror wall-dim editor pattern (FabricCanvas.tsx:574-650). Use a raw
+  // <input> instead of InlineEditableText so we can implement empty-text
+  // removal (D-07 + research pitfall 3) — the InlineEditableText primitive
+  // hard-cancels on empty commit, which doesn't match our spec.
+  let annotationOverlayStyle: React.CSSProperties | null = null;
+  let editingAnnotation: import("@/types/cad").Annotation | null = null;
+  if (editingAnnotationId) {
+    const doc = getActiveRoomDoc();
+    const ann = doc?.annotations?.[editingAnnotationId];
+    const wrapper = wrapperRef.current;
+    if (ann && wrapper) {
+      const rect = wrapper.getBoundingClientRect();
+      const { userZoom, panOffset } = useUIStore.getState();
+      const { scale, origin } = getViewTransform(
+        room.width, room.length, rect.width, rect.height, userZoom, panOffset
+      );
+      const screenX = origin.x + ann.position.x * scale;
+      const screenY = origin.y + ann.position.y * scale;
+      annotationOverlayStyle = {
+        position: "absolute",
+        left: screenX - 70,
+        top: screenY - 12,
+        width: 140,
+        height: 24,
+        zIndex: 30, // above wainscot popover (20) and dimension input (10)
+      };
+      editingAnnotation = ann;
+    }
+  }
+
   let wainscotOverlayStyle: React.CSSProperties | null = null;
   if (wainscotEditWallId) {
     const wall = getActiveRoomDoc()?.walls[wainscotEditWallId];
@@ -628,6 +716,42 @@ export default function FabricCanvas({ productLibrary }: Props) {
     setPendingValue("");
   }
 
+  // Phase 62 MEASURE-01 (D-07 + research pitfall 3): commit/cancel for annotation.
+  // - Empty commit removes the annotation (whether just-placed or pre-existing).
+  // - Non-empty commit updates the text (single history entry via updateAnnotation).
+  // - Escape reverts to original; if original was empty (just-placed), removes it.
+  function commitAnnotation() {
+    const id = useUIStore.getState().editingAnnotationId;
+    const roomId = useCADStore.getState().activeRoomId;
+    if (!id || !roomId) {
+      useUIStore.getState().setEditingAnnotationId(null);
+      return;
+    }
+    const trimmed = pendingAnnotationText.trim();
+    if (trimmed === "") {
+      // Empty commit → remove annotation (D-07).
+      useCADStore.getState().removeAnnotation(roomId, id);
+    } else {
+      useCADStore.getState().updateAnnotation(roomId, id, { text: trimmed });
+    }
+    useUIStore.getState().setEditingAnnotationId(null);
+  }
+
+  function cancelAnnotation() {
+    const id = useUIStore.getState().editingAnnotationId;
+    const roomId = useCADStore.getState().activeRoomId;
+    if (id && roomId && annotationOriginalRef.current === "") {
+      // Just-placed annotation cancelled with empty original → remove it.
+      useCADStore.getState().removeAnnotation(roomId, id);
+    } else if (id && roomId) {
+      // Existing annotation: revert live-preview to original text.
+      useCADStore.getState().updateAnnotationNoHistory(roomId, id, {
+        text: annotationOriginalRef.current,
+      });
+    }
+    useUIStore.getState().setEditingAnnotationId(null);
+  }
+
   return (
     <div ref={wrapperRef} className={`relative w-full h-full overflow-hidden ${cursorClass}`}>
       <canvas ref={canvasElRef} />
@@ -654,6 +778,33 @@ export default function FabricCanvas({ productLibrary }: Props) {
           side={wainscotEditSide}
           style={wainscotOverlayStyle}
           onClose={() => setWainscotEditWallId(null)}
+        />
+      )}
+      {/* Phase 62 MEASURE-01 (D-07): annotation DOM overlay edit. */}
+      {annotationOverlayStyle && editingAnnotation && (
+        <input
+          type="text"
+          autoFocus
+          maxLength={200}
+          onFocus={(e) => e.currentTarget.select()}
+          value={pendingAnnotationText}
+          onChange={(e) => {
+            const v = e.target.value;
+            setPendingAnnotationText(v);
+            const id = useUIStore.getState().editingAnnotationId;
+            const roomId = useCADStore.getState().activeRoomId;
+            if (id && roomId) {
+              useCADStore.getState().updateAnnotationNoHistory(roomId, id, { text: v });
+            }
+          }}
+          onBlur={commitAnnotation}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") { e.preventDefault(); commitAnnotation(); }
+            if (e.key === "Escape") { e.preventDefault(); cancelAnnotation(); }
+          }}
+          style={annotationOverlayStyle}
+          className="font-mono text-[12px] bg-obsidian-low text-text-primary border border-accent px-1 outline-none rounded-sm"
+          data-testid={`annotation-edit-${editingAnnotation.id}`}
         />
       )}
       {/* Phase 33 GH #85 — floating toolbar anchors to selection bbox (D-10/D-12). */}
@@ -690,6 +841,9 @@ function activateCurrentTool(
     case "archway":     return activateArchwayTool(fc, scale, origin);
     case "passthrough": return activatePassthroughTool(fc, scale, origin);
     case "niche":       return activateNicheTool(fc, scale, origin);
+    // Phase 62 MEASURE-01 (D-05, D-07)
+    case "measure":     return activateMeasureTool(fc, scale, origin);
+    case "label":       return activateLabelTool(fc, scale, origin);
     default:        return null;
   }
 }

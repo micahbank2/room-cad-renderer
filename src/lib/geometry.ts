@@ -221,6 +221,71 @@ export function uid(): string {
 }
 
 /**
+ * Phase 62 MEASURE-01 (D-04): polygon area via the shoelace formula.
+ *
+ * Walks `walls[i].start` as ordered polygon vertices. Returns 0 when the
+ * loop is non-closed (any consecutive `walls[i].end` ≠ `walls[i+1].start`
+ * within 1e-3 ft tolerance — research pitfall 5) so we never display
+ * garbage data for in-progress wall layouts. `Math.abs` makes the result
+ * winding-agnostic so CCW and CW inputs return identical area.
+ *
+ * Returns 0 for fewer than 3 walls.
+ */
+export function polygonArea(walls: WallSegment[]): number {
+  if (walls.length < 3) return 0;
+  // Connectivity check (pitfall 5): every wall's end must match the next
+  // wall's start to a 1e-3 ft tolerance, AND the last wall must close to
+  // the first wall's start. Both conditions covered by the modular index.
+  for (let i = 0; i < walls.length; i++) {
+    const next = walls[(i + 1) % walls.length];
+    if (distance(walls[i].end, next.start) > 1e-3) return 0;
+  }
+  const verts = walls.map((w) => w.start);
+  let sum = 0;
+  for (let i = 0; i < verts.length; i++) {
+    const a = verts[i];
+    const b = verts[(i + 1) % verts.length];
+    sum += a.x * b.y - b.x * a.y;
+  }
+  return Math.abs(sum) / 2;
+}
+
+/**
+ * Phase 62 MEASURE-01 (D-04): area-weighted polygon centroid.
+ *
+ * For severe U/C concave shapes the centroid may land outside the polygon —
+ * acceptable v1.15 limitation per research Q4 (deferred to v1.16+). Falls
+ * back to the vertex average for degenerate (zero-area) input so callers
+ * always get a usable point.
+ */
+export function polygonCentroid(walls: WallSegment[]): Point {
+  const verts = walls.map((w) => w.start);
+  if (verts.length < 3) {
+    return verts[0] ?? { x: 0, y: 0 };
+  }
+  let cx = 0;
+  let cy = 0;
+  let signedArea = 0;
+  for (let i = 0; i < verts.length; i++) {
+    const a = verts[i];
+    const b = verts[(i + 1) % verts.length];
+    const cross = a.x * b.y - b.x * a.y;
+    signedArea += cross;
+    cx += (a.x + b.x) * cross;
+    cy += (a.y + b.y) * cross;
+  }
+  if (Math.abs(signedArea) < 1e-9) {
+    const avg = verts.reduce(
+      (acc, v) => ({ x: acc.x + v.x, y: acc.y + v.y }),
+      { x: 0, y: 0 },
+    );
+    return { x: avg.x / verts.length, y: avg.y / verts.length };
+  }
+  signedArea /= 2;
+  return { x: cx / (6 * signedArea), y: cy / (6 * signedArea) };
+}
+
+/**
  * Resize a wall by moving its end point along the wall's current unit vector
  * so the new segment length equals newLengthFt. Start is kept fixed.
  * Returns the new end point. For zero-length or invalid inputs, returns start.

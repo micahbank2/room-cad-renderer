@@ -154,14 +154,14 @@ interface UIState {
     /** Phase 60 STAIRS-01 adds 'stair'. Phase 61 OPEN-01 (D-11') adds 'opening'
      *  for archway / passthrough / niche / door / window. parentId = wallId
      *  for opening kind. */
-    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "stair" | "opening";
+    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "stair" | "opening" | "measureLine" | "annotation";
     nodeId: string | null;
     position: { x: number; y: number };
     /** Phase 61 OPEN-01: when kind === 'opening', the parent wall id. */
     parentId?: string;
   } | null;
   openContextMenu: (
-    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "stair" | "opening",
+    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "stair" | "opening" | "measureLine" | "annotation",
     nodeId: string | null,
     position: { x: number; y: number },
     parentId?: string,
@@ -175,6 +175,15 @@ interface UIState {
    */
   pendingLabelFocus: string | null;
   setPendingLabelFocus: (pceId: string | null) => void;
+
+  /**
+   * Phase 62 MEASURE-01 (D-07): id of the annotation currently in DOM-overlay
+   * edit mode. null when no edit is active. Set by labelTool after addAnnotation,
+   * by CanvasContextMenu "Edit text" action, and by FabricCanvas double-click
+   * handler. Cleared on commit/cancel by the InlineEditableText overlay.
+   */
+  editingAnnotationId: string | null;
+  setEditingAnnotationId: (id: string | null) => void;
 
   /**
    * Phase 59 CUTAWAY-01: 3D wall-cutaway state. Session-only — NOT persisted
@@ -361,6 +370,10 @@ export const useUIStore = create<UIState>()((set) => ({
   pendingLabelFocus: null,
   setPendingLabelFocus: (pceId) => set({ pendingLabelFocus: pceId }),
 
+  // Phase 62 MEASURE-01 (D-07)
+  editingAnnotationId: null,
+  setEditingAnnotationId: (id) => set({ editingAnnotationId: id }),
+
   // Phase 59 CUTAWAY-01 actions
   setCutawayMode: (mode) =>
     set((s) => {
@@ -401,3 +414,19 @@ export const useUIStore = create<UIState>()((set) => ({
 
 export type ContextMenuState = NonNullable<ReturnType<typeof useUIStore.getState>["contextMenu"]>;
 export type ContextMenuKind = ContextMenuState["kind"];
+
+// ─────────────────────────────────────────────────────────────────────
+// Phase 62 MEASURE-01 — window.__uiStore test-mode handle.
+//
+// Mirrors the Phase 36 cadStore pattern (see cadStore.ts:1605-1625).
+// Phase 62 e2e specs (e2e/measurements.spec.ts E2/E3/E7) need direct
+// access to activeTool + openContextMenu for tool-activation and
+// menu-action-count assertions. Per-domain drivers exist but for these
+// specific assertions a direct store handle is the cleanest API.
+//
+// Gated on `import.meta.env.MODE === "test"` — production bundles
+// tree-shake the whole branch.
+// ─────────────────────────────────────────────────────────────────────
+if (typeof window !== "undefined" && import.meta.env.MODE === "test") {
+  (window as unknown as Record<string, unknown>).__uiStore = useUIStore;
+}

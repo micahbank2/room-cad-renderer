@@ -11,6 +11,7 @@ import { installGltfDrivers } from "./test-utils/gltfDrivers";
 import { installCutawayDrivers } from "./test-utils/cutawayDrivers";
 import { installStairDrivers } from "./test-utils/stairDrivers";
 import { installOpeningDrivers } from "./test-utils/openingDrivers";
+import { installMeasureDrivers } from "./test-utils/measureDrivers";
 
 // Phase 46: install tree test drivers (gated by MODE==="test", production no-op)
 installTreeDrivers();
@@ -28,6 +29,8 @@ installCutawayDrivers();
 installStairDrivers();
 // Phase 61: install opening placement test drivers (gated by MODE==="test", production no-op)
 installOpeningDrivers();
+// Phase 62: install measure-line + annotation test drivers (gated by MODE==="test", production no-op)
+installMeasureDrivers();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

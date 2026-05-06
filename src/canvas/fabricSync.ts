@@ -6,7 +6,10 @@ import type {
   CustomElement,
   PlacedCustomElement,
   Stair,
+  MeasureLine,
+  Annotation,
 } from "@/types/cad";
+import { buildMeasureLineGroup, buildAnnotationGroup, buildRoomAreaOverlay } from "./measureSymbols";
 import { buildStairSymbolShapes } from "./stairSymbol";
 import { DEFAULT_STAIR_WIDTH_FT } from "@/types/cad";
 import type { Product } from "@/types/product";
@@ -1161,6 +1164,52 @@ export function renderStairs(
 
     fc.add(group);
   }
+}
+
+/**
+ * Phase 62 MEASURE-01 — render dimension lines as fabric.Group with selectable+evented.
+ * Right-click hit-test in FabricCanvas.tsx walks data.type === "measureLine".
+ */
+export function renderMeasureLines(
+  fc: fabric.Canvas,
+  measureLines: Record<string, MeasureLine>,
+  scale: number,
+  origin: { x: number; y: number },
+) {
+  for (const line of Object.values(measureLines ?? {})) {
+    fc.add(buildMeasureLineGroup(line, scale, origin));
+  }
+}
+
+/**
+ * Phase 62 MEASURE-01 — render text annotations as fabric.Group.
+ * Caller passes editingId to skip the annotation currently in DOM-overlay edit mode.
+ */
+export function renderAnnotations(
+  fc: fabric.Canvas,
+  annotations: Record<string, Annotation>,
+  scale: number,
+  origin: { x: number; y: number },
+  editingId: string | null,
+) {
+  for (const anno of Object.values(annotations ?? {})) {
+    if (editingId === anno.id) continue; // DOM overlay shows instead
+    fc.add(buildAnnotationGroup(anno, scale, origin));
+  }
+}
+
+/**
+ * Phase 62 MEASURE-01 — render decorative "XX SQ FT" overlay at room centroid.
+ * Returns null silently if walls don't form a closed loop.
+ */
+export function renderRoomAreaOverlay(
+  fc: fabric.Canvas,
+  walls: Record<string, WallSegment>,
+  scale: number,
+  origin: { x: number; y: number },
+) {
+  const overlay = buildRoomAreaOverlay(Object.values(walls), scale, origin);
+  if (overlay) fc.add(overlay);
 }
 
 // Phase 31 — install __getCustomElementLabel test bridge so the

@@ -179,6 +179,38 @@ export function getActionsForKind(kind: ContextMenuKind, nodeId: string | null, 
       { id: "delete", label: "Delete", icon: <Trash2 size={14} />, handler: () => { if (wallId && nodeId) store.removeOpening(wallId, nodeId); }, destructive: true },
     ];
   }
+  // Phase 62 MEASURE-01 (D-11): measureLine — single Delete action.
+  if (kind === "measureLine") {
+    return [
+      {
+        id: "delete", label: "Delete", icon: <Trash2 size={14} />,
+        handler: () => {
+          if (!nodeId) return;
+          const activeDocLocal = getActiveRoomDoc();
+          if (activeDocLocal) store.removeMeasureLine(activeDocLocal.id, nodeId);
+        },
+        destructive: true,
+      },
+    ];
+  }
+  // Phase 62 MEASURE-01 (D-11): annotation — Edit text + Delete (2 actions).
+  if (kind === "annotation") {
+    return [
+      {
+        id: "edit-text", label: "Edit text", icon: <Edit3 size={14} />,
+        handler: () => { if (nodeId) ui.setEditingAnnotationId(nodeId); },
+      },
+      {
+        id: "delete", label: "Delete", icon: <Trash2 size={14} />,
+        handler: () => {
+          if (!nodeId) return;
+          const activeDocLocal = getActiveRoomDoc();
+          if (activeDocLocal) store.removeAnnotation(activeDocLocal.id, nodeId);
+        },
+        destructive: true,
+      },
+    ];
+  }
   return [];
 }
 
