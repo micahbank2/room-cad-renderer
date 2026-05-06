@@ -1,7 +1,7 @@
 import * as fabric from "fabric";
 import { useCADStore, getActiveRoomDoc } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
-import { snapPoint, distance, closestPointOnWall, formatFeet } from "@/lib/geometry";
+import { snapPoint, distance, closestPointOnWall, formatFeet, polygonBbox, resolveCeilingPoints } from "@/lib/geometry";
 import type { Point, PlacedProduct, PlacedCustomElement, CustomElement } from "@/types/cad";
 import type { Product } from "@/types/product";
 import { resolveEffectiveDims, resolveEffectiveCustomDims } from "@/types/product";
@@ -50,6 +50,7 @@ type DragType =
   | "wall-rotate"
   | "product-resize"
   | "product-resize-edge" // Phase 31 EDIT-22 — per-axis edge-handle drag
+  | "ceiling-resize-edge" // Phase 65 CEIL-02 — per-axis ceiling polygon resize
   | "wall-endpoint"
   | "wall-thickness"
   | "opening-slide"
@@ -244,6 +245,18 @@ export function activateSelectTool(
         edge: EdgeHandle;
         isCustom: boolean;
         pp: PlacedProduct | PlacedCustomElement;
+      }
+    | null = null;
+
+  // Phase 65 CEIL-02 — ceiling edge-handle drag state. Cached origBbox is
+  // computed from ceiling.points at drag start so mid-drag scaling is always
+  // computed against the ORIGINAL polygon (not the live-overridden one),
+  // matching the Phase 31 product pp-snapshot pattern.
+  let ceilingEdgeDragInfo:
+    | {
+        ceilingId: string;
+        edge: "n" | "s" | "e" | "w";
+        origBbox: { minX: number; minY: number; maxX: number; maxY: number; width: number; depth: number };
       }
     | null = null;
 
@@ -790,6 +803,50 @@ export function activateSelectTool(
           }
         }
       }
+
+      // Phase 65 CEIL-02 — ceiling edge-handle hit-test. Mirror Phase 31 product
+      // edge-handle dispatch: compute world-feet handle positions from the
+      // resolved-points bbox, accept any pointer within EDGE_HANDLE_HIT_RADIUS_FT
+      // of one of the 4 midpoints. Push ONE history snapshot at drag start so
+      // a single Ctrl+Z undoes the entire drag.
+      const ceilingForHandle = (getActiveRoomDoc()?.ceilings ?? {})[selId];
+      if (ceilingForHandle && ceilingForHandle.points.length >= 3) {
+        const renderedPoints = resolveCeilingPoints(ceilingForHandle);
+        const liveBbox = polygonBbox(renderedPoints);
+        const midX = (liveBbox.minX + liveBbox.maxX) / 2;
+        const midY = (liveBbox.minY + liveBbox.maxY) / 2;
+        const ceilingHandles: Array<{ edge: "n" | "s" | "e" | "w"; pos: Point }> = [
+          { edge: "n", pos: { x: midX, y: liveBbox.minY } },
+          { edge: "s", pos: { x: midX, y: liveBbox.maxY } },
+          { edge: "w", pos: { x: liveBbox.minX, y: midY } },
+          { edge: "e", pos: { x: liveBbox.maxX, y: midY } },
+        ];
+        const HANDLE_RADIUS_FT = 0.5;
+        for (const h of ceilingHandles) {
+          const dx = feet.x - h.pos.x;
+          const dy = feet.y - h.pos.y;
+          if (Math.sqrt(dx * dx + dy * dy) <= HANDLE_RADIUS_FT) {
+            // Cache origBbox computed from the ORIGINAL ceiling.points, NOT
+            // from resolved points — anchor math relies on the pre-drag
+            // unscaled polygon so mid-drag updates are stable.
+            const origBbox = polygonBbox(ceilingForHandle.points);
+            ceilingEdgeDragInfo = {
+              ceilingId: selId,
+              edge: h.edge,
+              origBbox,
+            };
+            dragging = true;
+            dragId = selId;
+            dragType = "ceiling-resize-edge";
+            // Push exactly one history snapshot at drag start (Phase 31 pattern).
+            useCADStore.getState().updateCeiling(selId, {});
+            // PERF-01 fast path: avoid renderOnAddRemove on each NoHistory write.
+            _dragActive = true;
+            try { useUIStore.getState().setDragging(true); } catch { /* non-fatal */ }
+            return;
+          }
+        }
+      }
     }
 
     const hit = hitTestStore(feet, _productLibrary);
@@ -942,6 +999,77 @@ export function activateSelectTool(
       if (pce) {
         useCADStore.getState().rotateCustomElementNoHistory(dragId, next);
       }
+      return;
+    }
+
+    if (dragType === "ceiling-resize-edge") {
+      if (!ceilingEdgeDragInfo) return;
+      const { ceilingId, edge, origBbox } = ceilingEdgeDragInfo;
+      const altHeld = (opt.e as MouseEvent)?.altKey === true;
+      const gridSnap = useUIStore.getState().gridSnap;
+
+      // Phase 30 smart-snap (consume-only). Build a restricted scene that
+      // contains other-wall endpoints + midpoints (mirrors Phase 31 wall-
+      // endpoint snap pattern at lines 1042-1074). Pass excludeId so the
+      // ceiling does not snap to itself (no self-snap when bbox edges happen
+      // to align with other ceilings — research Pitfall 1).
+      const wallsMap = (getActiveRoomDoc()?.walls ?? {}) as Record<string, import("@/types/cad").WallSegment>;
+      const restrictedScene = altHeld ? null : buildWallEndpointSnapScene(wallsMap, ceilingId);
+
+      let snapped: Point = { x: feet.x, y: feet.y };
+      let guides: ReturnType<typeof computeSnap>["guides"] = [];
+      if (restrictedScene) {
+        const degenerateBBox: BBox = {
+          id: `ceiling-resize-${ceilingId}`,
+          minX: feet.x,
+          maxX: feet.x,
+          minY: feet.y,
+          maxY: feet.y,
+        };
+        const result = computeSnap({
+          candidate: { pos: feet, bbox: degenerateBBox },
+          scene: restrictedScene,
+          tolerancePx: SNAP_TOLERANCE_PX,
+          scale,
+          gridSnap,
+        });
+        snapped = result.snapped;
+        guides = result.guides;
+      } else if (gridSnap > 0) {
+        snapped = snapPoint(snapped, gridSnap);
+      }
+      renderSnapGuides(fc, guides, scale, origin);
+
+      // Resolve dragged-edge dimension + optional anchor write per LOCKED
+      // override-anchor model (see plan must-haves). For width drags the
+      // axis-of-interest is X; for depth drags it's Y.
+      let axis: "width" | "depth";
+      let value: number;
+      let anchor: number | undefined;
+      if (edge === "e") {
+        axis = "width";
+        value = Math.max(0.1, snapped.x - origBbox.minX);
+        anchor = undefined; // default: bbox.minX preserves west edge
+      } else if (edge === "w") {
+        axis = "width";
+        value = Math.max(0.1, origBbox.maxX - snapped.x);
+        anchor = origBbox.maxX; // east edge stays put
+      } else if (edge === "s") {
+        axis = "depth";
+        value = Math.max(0.1, snapped.y - origBbox.minY);
+        anchor = undefined; // default: bbox.minY preserves north edge
+      } else {
+        // n
+        axis = "depth";
+        value = Math.max(0.1, origBbox.maxY - snapped.y);
+        anchor = origBbox.maxY; // south edge stays put
+      }
+      _dragActive = true;
+      try { useUIStore.getState().setDragging(true); } catch { /* non-fatal */ }
+      useCADStore
+        .getState()
+        .resizeCeilingAxisNoHistory(ceilingId, axis, value, anchor);
+      fc.requestRenderAll();
       return;
     }
 
@@ -1307,6 +1435,7 @@ export function activateSelectTool(
     if (
       dragType === "product-resize" ||
       dragType === "product-resize-edge" ||
+      dragType === "ceiling-resize-edge" ||
       dragType === "wall-endpoint" ||
       dragType === "wall-thickness" ||
       dragType === "opening-slide" ||
@@ -1321,6 +1450,9 @@ export function activateSelectTool(
     // Phase 31 EDIT-23 — clear cached endpoint snap scene + edge-drag state.
     cachedEndpointScene = null;
     edgeDragInfo = null;
+    // Phase 65 CEIL-02 — clear ceiling edge-drag state. History snapshot was
+    // pushed at mousedown so no commit needed here.
+    ceilingEdgeDragInfo = null;
     dragging = false;
     _dragActive = false;
     try { useUIStore.getState().setDragging(false); } catch { /* Phase 33 D-13 bridge; non-fatal */ }
@@ -1596,6 +1728,54 @@ export function activateSelectTool(
     (window as unknown as {
       __driveWallEndpoint?: typeof driveWallEndpointHook;
     }).__driveWallEndpoint = driveWallEndpointHook;
+
+    // Phase 65 CEIL-02 — drive bridge for ceiling edge-handle drag. Mirrors
+    // driveResizeHook: start positions the synthesized pointer at the
+    // requested edge midpoint, .to() routes mousemoves through the existing
+    // handler with optional Shift/Alt, .end() runs mouseup.
+    const driveCeilingResizeHook = {
+      start: (ceilingId: string, edge: "n" | "s" | "e" | "w") => {
+        const doc = getActiveRoomDoc();
+        const ceiling = doc?.ceilings?.[ceilingId];
+        if (!ceiling || ceiling.points.length < 3) return;
+        useUIStore.getState().select([ceilingId]);
+        const pts = resolveCeilingPoints(ceiling);
+        const bb = polygonBbox(pts);
+        const midX = (bb.minX + bb.maxX) / 2;
+        const midY = (bb.minY + bb.maxY) / 2;
+        const handlePos: Point =
+          edge === "n"
+            ? { x: midX, y: bb.minY }
+            : edge === "s"
+              ? { x: midX, y: bb.maxY }
+              : edge === "w"
+                ? { x: bb.minX, y: midY }
+                : { x: bb.maxX, y: midY };
+        const opt = { e: fakeEvt(false) } as unknown as fabric.TEvent;
+        withDrivenPointer(handlePos, () => onMouseDown(opt));
+      },
+      to: (
+        feetX: number,
+        feetY: number,
+        opts: { shift?: boolean; alt?: boolean } = {},
+      ) => {
+        const evt = {
+          altKey: opts.alt === true,
+          shiftKey: opts.shift === true,
+          metaKey: false,
+          ctrlKey: false,
+        } as unknown as MouseEvent;
+        const opt = { e: evt } as unknown as fabric.TEvent;
+        withDrivenPointer({ x: feetX, y: feetY }, () => onMouseMove(opt));
+      },
+      end: () => {
+        onMouseUp();
+      },
+    };
+
+    (window as unknown as {
+      __driveCeilingResize?: typeof driveCeilingResizeHook;
+    }).__driveCeilingResize = driveCeilingResizeHook;
   }
 
   return () => {
@@ -1656,6 +1836,8 @@ export function activateSelectTool(
     // Phase 31 — clear cached endpoint snap scene + edge-drag info.
     cachedEndpointScene = null;
     edgeDragInfo = null;
+    // Phase 65 CEIL-02 — clear ceiling edge-drag info on tool-switch cleanup.
+    ceilingEdgeDragInfo = null;
     // Phase 30 — remove the test-mode driver hooks we installed.
     if (import.meta.env.MODE === "test") {
       const w = window as unknown as {
@@ -1663,11 +1845,13 @@ export function activateSelectTool(
         __getSnapGuides?: unknown;
         __driveResize?: unknown;
         __driveWallEndpoint?: unknown;
+        __driveCeilingResize?: unknown;
       };
       if (w.__driveSnap === driveSnapHook) delete w.__driveSnap;
       if (w.__getSnapGuides === getSnapGuidesHook) delete w.__getSnapGuides;
       delete w.__driveResize;
       delete w.__driveWallEndpoint;
+      delete w.__driveCeilingResize;
     }
   };
 }
