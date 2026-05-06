@@ -9,7 +9,7 @@
 // D-07: inert when document.activeElement is INPUT/TEXTAREA/SELECT.
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Camera, Eye, EyeOff, Copy, Clipboard, Trash2, Edit3 } from "lucide-react";
+import { Camera, Eye, EyeOff, Copy, Clipboard, Trash2, Edit3, RotateCcw } from "lucide-react";
 import { useUIStore, type ContextMenuKind } from "@/stores/uiStore";
 import { useCADStore, getActiveRoomDoc } from "@/stores/cadStore";
 import { copySelection, pasteSelection, hasClipboardContent } from "@/lib/clipboardActions";
@@ -115,6 +115,28 @@ export function getActionsForKind(kind: ContextMenuKind, nodeId: string | null, 
     ];
   }
   if (kind === "ceiling") {
+    // Phase 65 CEIL-02: Reset size action visible ONLY when at least one
+    // override field is set. Mirrors Phase 59 cutaway-toggle conditional
+    // pattern. Action removed from menu when no overrides exist (not just
+    // disabled) so the menu surface reflects available actions.
+    const ceiling = nodeId ? doc?.ceilings?.[nodeId] : undefined;
+    const hasCeilingOverrides = !!ceiling && (
+      ceiling.widthFtOverride !== undefined ||
+      ceiling.depthFtOverride !== undefined ||
+      ceiling.anchorXFt !== undefined ||
+      ceiling.anchorYFt !== undefined
+    );
+    if (hasCeilingOverrides) {
+      return [
+        ...baseActions,
+        {
+          id: "reset-size",
+          label: "Reset size",
+          icon: <RotateCcw size={14} />,
+          handler: () => { if (nodeId) store.clearCeilingOverrides(nodeId); },
+        },
+      ];
+    }
     return [...baseActions];
   }
   if (kind === "stair") {
