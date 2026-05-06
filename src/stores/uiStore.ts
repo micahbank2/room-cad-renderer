@@ -414,3 +414,19 @@ export const useUIStore = create<UIState>()((set) => ({
 
 export type ContextMenuState = NonNullable<ReturnType<typeof useUIStore.getState>["contextMenu"]>;
 export type ContextMenuKind = ContextMenuState["kind"];
+
+// ─────────────────────────────────────────────────────────────────────
+// Phase 62 MEASURE-01 — window.__uiStore test-mode handle.
+//
+// Mirrors the Phase 36 cadStore pattern (see cadStore.ts:1605-1625).
+// Phase 62 e2e specs (e2e/measurements.spec.ts E2/E3/E7) need direct
+// access to activeTool + openContextMenu for tool-activation and
+// menu-action-count assertions. Per-domain drivers exist but for these
+// specific assertions a direct store handle is the cleanest API.
+//
+// Gated on `import.meta.env.MODE === "test"` — production bundles
+// tree-shake the whole branch.
+// ─────────────────────────────────────────────────────────────────────
+if (typeof window !== "undefined" && import.meta.env.MODE === "test") {
+  (window as unknown as Record<string, unknown>).__uiStore = useUIStore;
+}
