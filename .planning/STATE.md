@@ -2,13 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.16
 milestone_name: Maintenance Pass
-status: ready-to-plan
-stopped_at: Phase 65 (CEIL-02) plan 01 shipped — ready for /gsd:discuss-phase 66
-last_updated: "2026-05-04T15:46:30.000Z"
+status: "Ready for `/gsd:discuss-phase 66`"
+last_updated: "2026-05-06T19:52:30.609Z"
 progress:
-  total_phases: 4
-  completed_phases: 3
-  total_plans: 4
+  total_phases: 8
+  completed_phases: 1
+  total_plans: 1
   completed_plans: 3
 ---
 
@@ -23,10 +22,10 @@ See: .planning/PROJECT.md (updated 2026-05-06 — v1.15 archived; v1.16 Maintena
 
 ## Current Position
 
-Phase: 66 (next to plan; 63, 64, 65 complete)
+Phase: 999.1
 Milestone: v1.16 Maintenance Pass
 Phases: 4 (63, 64, 65, 66) — 3 complete
-Plan: Phase 65 plan 01 complete (2026-05-04)
+Plan: Not started
 Status: Ready for `/gsd:discuss-phase 66`
 
 ## v1.16 Roadmap
