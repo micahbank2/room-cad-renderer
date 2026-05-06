@@ -12,7 +12,7 @@ import {
 import { StairSection } from "./PropertiesPanel.StairSection";
 import { useUIStore } from "@/stores/uiStore";
 import { useProductStore } from "@/stores/productStore";
-import { formatFeet, wallLength } from "@/lib/geometry";
+import { formatFeet, wallLength, polygonArea } from "@/lib/geometry";
 import { validateInput } from "@/canvas/dimensionEditor";
 import type { Product } from "@/types/product";
 import { hasDimensions } from "@/types/product";
@@ -267,20 +267,37 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
     );
   }
 
-  // Phase 43 (UX-03 / GH #99): empty-state when nothing is selected.
-  // First-time users had no cue that selecting reveals editing controls.
-  // Static copy — no animation, no dismissible state.
+  // Phase 62 MEASURE-01 (D-04 / research Q7): replace empty-state with Room
+  // properties. When nothing is selected, show width/length/height + auto-area
+  // for the active room (live-recalculates as walls move via Zustand subscription).
   if (!wall && !pp && !ceiling && !pce && !stair) {
+    const roomActive = useCADStore.getState().activeRoomId;
+    const activeDoc = roomActive ? useCADStore.getState().rooms[roomActive] : null;
+    const wallList = activeDoc ? Object.values(activeDoc.walls) : [];
+    // polygonArea returns 0 for non-closed loops (research pitfall 5) — hide
+    // the AREA row in that case so we never display garbage data.
+    const areaSqFt = polygonArea(wallList);
     return (
       <div
-        className="absolute right-3 top-3 z-10 w-64 glass-panel rounded-sm p-4"
-        aria-label="Properties (none selected)"
+        className="absolute right-3 top-3 z-10 w-64 glass-panel rounded-sm p-4 space-y-3"
+        aria-label="Properties (room)"
       >
-        <h3 className="font-mono text-base font-medium text-text-muted mb-2">
+        <h3 className="font-mono text-base font-medium text-text-muted">
           Properties
         </h3>
+        <div className="font-mono text-xs text-accent-light">
+          {(activeDoc?.name ?? "ROOM").toUpperCase()}
+        </div>
+        <CollapsibleSection id="dimensions" label="Dimensions">
+          <div className="space-y-1.5">
+            <Row label="WIDTH" value={`${activeDoc?.room.width ?? 0} FT`} />
+            <Row label="LENGTH" value={`${activeDoc?.room.length ?? 0} FT`} />
+            <Row label="HEIGHT" value={`${activeDoc?.room.wallHeight ?? 0} FT`} />
+            {areaSqFt > 0 && <Row label="AREA" value={`${Math.round(areaSqFt)} SQ FT`} />}
+          </div>
+        </CollapsibleSection>
         <p className="font-mono text-sm text-text-dim leading-snug">
-          Select a wall, product, or ceiling to see its properties here.
+          Select a wall, product, or ceiling to edit its properties.
         </p>
       </div>
     );
