@@ -12,6 +12,7 @@ import { installCutawayDrivers } from "./test-utils/cutawayDrivers";
 import { installStairDrivers } from "./test-utils/stairDrivers";
 import { installOpeningDrivers } from "./test-utils/openingDrivers";
 import { installMeasureDrivers } from "./test-utils/measureDrivers";
+import { installCeilingDrivers } from "./test-utils/ceilingDrivers";
 
 // Phase 46: install tree test drivers (gated by MODE==="test", production no-op)
 installTreeDrivers();
@@ -31,6 +32,8 @@ installStairDrivers();
 installOpeningDrivers();
 // Phase 62: install measure-line + annotation test drivers (gated by MODE==="test", production no-op)
 installMeasureDrivers();
+// Phase 65: install ceiling-resize test drivers (gated by MODE==="test", production no-op)
+installCeilingDrivers();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
