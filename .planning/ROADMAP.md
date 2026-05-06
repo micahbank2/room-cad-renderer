@@ -192,7 +192,7 @@
   4. Auto room-area: PropertiesPanel + RoomSettings for a Room shows `Area: XX sq ft` from shoelace formula on the wall polygon
   5. Phase 53 right-click delete + Phase 54 click-to-select work on measurements and annotations
   6. Snapshot includes measurements + annotations; reload preserves them
-**Plans:** 0/1 plans complete
+**Plans:** 1/1 plans complete
 **UI hint:** yes
 
 
@@ -230,7 +230,7 @@
 | 59. Wall Cutaway Mode | 1/1 | Complete    | 2026-05-05 |
 | 60. Stairs | 1/1 | Complete    | 2026-05-06 |
 | 61. Openings — Archway/Passthrough/Niche | 1/1 | Complete    | 2026-05-06 |
-| 62. Measurement + Annotation Tools | 0/1 | Pending    |   |
+| 62. Measurement + Annotation Tools | 0/1 | Complete    | 2026-05-06 |
 
 ## Backlog
 
