@@ -56,11 +56,23 @@ async function seedSnapshot(page: Page): Promise<void> {
 }
 
 async function waitForDrivers(page: Page): Promise<void> {
+  // App-boot driver: __drivePlaceCeiling installs from main.tsx via
+  // installCeilingDrivers(). __driveCeilingResize is installed by selectTool
+  // when activated — wait for it separately AFTER the canvas mounts.
   await page.waitForFunction(
     () =>
-      typeof (window as { __drivePlaceCeiling?: unknown }).__drivePlaceCeiling === "function" &&
+      typeof (window as { __drivePlaceCeiling?: unknown }).__drivePlaceCeiling === "function",
+    null,
+    { timeout: 10_000 },
+  );
+}
+
+async function waitForSelectToolDriver(page: Page): Promise<void> {
+  await page.waitForFunction(
+    () =>
       typeof (window as { __driveCeilingResize?: unknown }).__driveCeilingResize === "object",
-    { timeout: 5000 },
+    null,
+    { timeout: 10_000 },
   );
 }
 
@@ -96,6 +108,14 @@ async function placeLShapeCeiling(page: Page): Promise<string> {
 }
 
 test.beforeEach(async ({ page }) => {
+  // Skip onboarding so the canvas (and selectTool) mount immediately.
+  await page.addInitScript(() => {
+    try {
+      localStorage.setItem("room-cad-onboarding-completed", "1");
+    } catch {
+      /* noop */
+    }
+  });
   await page.goto("/");
   await waitForDrivers(page);
   await seedSnapshot(page);
@@ -177,6 +197,7 @@ test("E3: west-edge resize writes anchorXFt = bbox.maxX; east edge preserved", a
 });
 
 test("E4: smart-snap engages on west-edge drag near a parallel wall (consume-only)", async ({ page }) => {
+  await waitForSelectToolDriver(page);
   const id = await placeRectCeiling(page);
   // Use the selectTool drag bridge so Phase 30 computeSnap runs through the
   // real drag path (driver-only resize bypasses snap entirely).
@@ -203,6 +224,7 @@ test("E4: smart-snap engages on west-edge drag near a parallel wall (consume-onl
 });
 
 test("E5: complete drag pushes exactly one history entry; Ctrl+Z reverts", async ({ page }) => {
+  await waitForSelectToolDriver(page);
   const id = await placeRectCeiling(page);
   const beforeLen = await page.evaluate(() => window.__getCeilingHistoryLength!());
   // Run a multi-step drag through the selectTool bridge — many .to() calls
