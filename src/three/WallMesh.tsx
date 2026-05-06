@@ -215,11 +215,22 @@ export default function WallMesh({ wall, isSelected, roomId }: Props) {
   // registry so that __getWallMeshMapResolved(wallId) can verify material.map is
   // populated after setWallpaper is called. Production no-op (import.meta.env.MODE
   // is statically replaced by Vite — dead code eliminated in production bundles).
+  //
+  // Phase 64 BUG-04 fix (#141): added cleanup to clear the registry entry on
+  // unmount. Without this, a 2D→3D→2D→3D toggle cycle would leave stale refs
+  // pointing at discarded materials (same StrictMode double-mount class as the
+  // Phase 58 thumbnail-callback bug). Cleanup writes null on unmount; remount's
+  // effect re-registers the new instance's ref.
   useEffect(() => {
-    if (import.meta.env.MODE === "test") {
-      const reg = (window as unknown as { __wallMeshMaterials?: Record<string, THREE.MeshStandardMaterial | null> }).__wallMeshMaterials;
-      if (reg) reg[wall.id] = matRefA.current;
-    }
+    if (import.meta.env.MODE !== "test") return;
+    const reg = (window as unknown as { __wallMeshMaterials?: Record<string, THREE.MeshStandardMaterial | null> }).__wallMeshMaterials;
+    if (!reg) return;
+    reg[wall.id] = matRefA.current;
+    return () => {
+      // On unmount, clear the registry entry so a stale ref to a discarded
+      // material doesn't leak. The next mount's effect will re-register.
+      if (reg[wall.id] === matRefA.current) reg[wall.id] = null;
+    };
   }, [wall.id, userTexA]);
 
   // Build a wallpaper overlay plane for one face (null if no wallpaper on that side)
