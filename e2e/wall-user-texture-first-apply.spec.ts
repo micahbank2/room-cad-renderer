@@ -192,14 +192,19 @@ test.describe("BUG-02 — wall user-texture first-apply", () => {
     await page.getByTestId("view-mode-2d").click();
     await page.getByTestId("view-mode-3d").click();
 
-    // Wait for WallMesh to remount and re-register in __wallMeshMaterials
+    // Wait for WallMesh to remount and re-register in __wallMeshMaterials.
+    // Phase 64 BUG-04 (#141): bumped 3000ms → 8000ms. With React StrictMode
+    // active in chromium-dev, four view-mode toggles produce 4 unmount/remount
+    // cycles × 2 (StrictMode) = 8 effective render cycles + async texture
+    // re-resolve. 3000ms was tight on slower CI runners. 8000ms matches the
+    // other dev-server e2e timeouts in this repo.
     await page.waitForFunction(
       ({ wallId }: { wallId: string }) => {
         const fn = (window as unknown as { __getWallMeshMapResolved?: (id: string) => boolean }).__getWallMeshMapResolved;
         return fn ? fn(wallId) : false;
       },
       { wallId: WALL_ID },
-      { timeout: 3000 },
+      { timeout: 8000 },
     );
 
     const resolvedAfterToggle = await page.evaluate(
