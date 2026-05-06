@@ -19,6 +19,8 @@ import {
   Move3d,
   EyeOff,
   ChevronDown,
+  Ruler,
+  Type,
   type LucideIcon,
 } from "lucide-react";
 import { setPendingStair } from "@/canvas/tools/stairTool";
@@ -345,6 +347,9 @@ const TOOL_SHORTCUTS: Record<ToolType, string> = {
   archway: "",
   passthrough: "",
   niche: "",
+  // Phase 62 MEASURE-01 (D-14): keyboard shortcuts M / T.
+  measure: "M",
+  label: "T",
 };
 
 /** Prominent save indicator in the top toolbar (SAVE-04) */
@@ -480,6 +485,33 @@ export function ToolPalette() {
           }}
         />
       )}
+      {/* Phase 62 MEASURE-01 (D-14): Measure + Label buttons (lucide-only per D-33). */}
+      <Tooltip content="Measure tool" shortcut="M" placement="right">
+        <button
+          onClick={() => setTool("measure")}
+          data-testid="tool-measure"
+          className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-150 ${
+            activeTool === "measure"
+              ? "bg-accent text-white shadow-[0_0_15px_rgba(124,91,240,0.3)]"
+              : "text-text-dim hover:text-text-primary hover:bg-obsidian-high"
+          }`}
+        >
+          <Ruler size={18} />
+        </button>
+      </Tooltip>
+      <Tooltip content="Label tool" shortcut="T" placement="right">
+        <button
+          onClick={() => setTool("label")}
+          data-testid="tool-label"
+          className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-150 ${
+            activeTool === "label"
+              ? "bg-accent text-white shadow-[0_0_15px_rgba(124,91,240,0.3)]"
+              : "text-text-dim hover:text-text-primary hover:bg-obsidian-high"
+          }`}
+        >
+          <Type size={18} />
+        </button>
+      </Tooltip>
       <div className="w-full h-px bg-outline-variant/20 my-0.5" />
       <Tooltip content="Toggle grid" placement="right">
         <button

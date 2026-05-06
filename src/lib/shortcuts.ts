@@ -214,6 +214,9 @@ export function buildRegistry(ctx: ShortcutContext): Shortcut[] {
     d: { tool: "door", action: "Door tool" },
     n: { tool: "window", action: "Window tool" },
     c: { tool: "ceiling", action: "Ceiling tool" },
+    // Phase 62 MEASURE-01 (D-14)
+    m: { tool: "measure", action: "Measure tool" },
+    t: { tool: "label", action: "Label tool" },
   };
   for (const [letter, info] of Object.entries(toolMap)) {
     registry.push({
