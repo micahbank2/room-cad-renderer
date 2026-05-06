@@ -8,6 +8,11 @@
 # .planning/phases/36-viz-10-regression/ROOT-CAUSE.md. Retained per R-04 so
 # that any future defensive-code simplification or texture-pipeline refactor
 # surfaces a regression BEFORE it reaches main.
+#
+# v1.15 SHARDING (post-Phase 62, suite > 85 tests across 2 projects):
+# Each Playwright project (chromium-dev + chromium-preview) runs in its own
+# parallel job via matrix. Halves wall-clock for the regression sweep —
+# previous 35-min single-job runs now finish in ~10-12 min per shard.
 
 name: E2E Regression Harness
 
@@ -17,7 +22,13 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 25
+    strategy:
+      # Don't cancel the other shard if one fails — we want to see both projects' results.
+      fail-fast: false
+      matrix:
+        project: [chromium-dev, chromium-preview]
+    name: e2e (${{ matrix.project }})
     steps:
       - uses: actions/checkout@v4
 
@@ -32,14 +43,14 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Run E2E tests (Playwright — chromium-dev + chromium-preview)
-        run: npm run test:e2e
+      - name: Run E2E tests (${{ matrix.project }})
+        run: npx playwright test --project=${{ matrix.project }}
 
       - name: Upload Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.project }}
           path: |
             playwright-report/
             test-results/
