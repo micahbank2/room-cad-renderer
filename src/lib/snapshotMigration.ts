@@ -2,8 +2,9 @@ import type { CADSnapshot, RoomDoc, LegacySnapshotV1, FloorMaterial } from "@/ty
 import { computeSHA256, saveUserTextureWithDedup } from "@/lib/userTextureStore";
 
 export function defaultSnapshot(): CADSnapshot {
-  // Phase 60 STAIRS-01 (D-12, D-13): seed `stairs: {}` so consumers don't
-  // need to defensively check for undefined on freshly-created rooms.
+  // Phase 62 MEASURE-01 (D-02): seed `measureLines: {}` and `annotations: {}`
+  // alongside the Phase 60 `stairs: {}` seed so consumers don't need to
+  // defensively check for undefined on freshly-created rooms.
   const mainRoom: RoomDoc = {
     id: "room_main",
     name: "Main Room",
@@ -11,9 +12,11 @@ export function defaultSnapshot(): CADSnapshot {
     walls: {},
     placedProducts: {},
     stairs: {},
+    measureLines: {},
+    annotations: {},
   };
   return {
-    version: 4,
+    version: 5,
     rooms: { room_main: mainRoom },
     activeRoomId: "room_main",
   };
@@ -49,11 +52,20 @@ function migrateWallsPerSide(rooms: Record<string, RoomDoc> | undefined): void {
 }
 
 export function migrateSnapshot(raw: unknown): CADSnapshot {
-  // Phase 60 STAIRS-01 (D-12): v4 passthrough.
+  // Phase 62 MEASURE-01 (D-02): v5 passthrough.
   if (
     raw &&
     typeof raw === "object" &&
-    (raw as CADSnapshot).version === 4 &&
+    (raw as { version?: number }).version === 5 &&
+    (raw as CADSnapshot).rooms
+  ) {
+    return raw as CADSnapshot;
+  }
+  // Phase 60 STAIRS-01 (D-12): v4 passthrough (handed to migrateV4ToV5 in cadStore pipeline).
+  if (
+    raw &&
+    typeof raw === "object" &&
+    (raw as { version?: number }).version === 4 &&
     (raw as CADSnapshot).rooms
   ) {
     return raw as CADSnapshot;
@@ -184,5 +196,24 @@ export function migrateV3ToV4(snap: CADSnapshot): CADSnapshot {
     if (!(doc as RoomDoc).stairs) (doc as RoomDoc).stairs = {};
   }
   (snap as { version: number }).version = 4;
+  return snap;
+}
+
+/**
+ * Phase 62 MEASURE-01 (D-02): v4 → v5 — seed `measureLines: {}` and
+ * `annotations: {}` per RoomDoc.
+ *
+ * Runs AFTER migrateV3ToV4 in the cadStore.loadSnapshot pipeline.
+ * Idempotent: v5 inputs returned unchanged.
+ *
+ * Mirrors the Phase 60 v3→v4 8-line template exactly.
+ */
+export function migrateV4ToV5(snap: CADSnapshot): CADSnapshot {
+  if ((snap as { version: number }).version >= 5) return snap;
+  for (const doc of Object.values(snap.rooms)) {
+    if (!(doc as RoomDoc).measureLines) (doc as RoomDoc).measureLines = {};
+    if (!(doc as RoomDoc).annotations) (doc as RoomDoc).annotations = {};
+  }
+  (snap as { version: number }).version = 5;
   return snap;
 }

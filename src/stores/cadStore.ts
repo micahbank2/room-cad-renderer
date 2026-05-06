@@ -16,11 +16,13 @@ import type {
   CustomElement,
   PlacedCustomElement,
   Stair,
+  MeasureLine,
+  Annotation,
 } from "@/types/cad";
 import { DEFAULT_STAIR } from "@/types/cad";
 import { uid, resizeWall } from "@/lib/geometry";
 import { ROOM_TEMPLATES, type RoomTemplateId } from "@/data/roomTemplates";
-import { migrateSnapshot, migrateFloorMaterials, migrateV3ToV4 } from "@/lib/snapshotMigration";
+import { migrateSnapshot, migrateFloorMaterials, migrateV3ToV4, migrateV4ToV5 } from "@/lib/snapshotMigration";
 import type { PaintColor } from "@/types/paint";
 
 const MAX_HISTORY = 50;
@@ -130,6 +132,21 @@ interface CADState {
     target: [number, number, number],
   ) => void;
   clearStairSavedCameraNoHistory: (stairId: string) => void;
+
+  // Phase 62 MEASURE-01 (D-10): measure-line + annotation CRUD per room.
+  // All actions take roomId so callers (tools, drivers, context menu) scope
+  // mutations to the active room without relying on activeRoomId at call time.
+  addMeasureLine: (roomId: string, partial: Omit<MeasureLine, "id">) => string;
+  updateMeasureLine: (roomId: string, id: string, patch: Partial<MeasureLine>) => void;
+  updateMeasureLineNoHistory: (roomId: string, id: string, patch: Partial<MeasureLine>) => void;
+  removeMeasureLine: (roomId: string, id: string) => void;
+  removeMeasureLineNoHistory: (roomId: string, id: string) => void;
+  addAnnotation: (roomId: string, partial: Omit<Annotation, "id">) => string;
+  updateAnnotation: (roomId: string, id: string, patch: Partial<Annotation>) => void;
+  updateAnnotationNoHistory: (roomId: string, id: string, patch: Partial<Annotation>) => void;
+  removeAnnotation: (roomId: string, id: string) => void;
+  removeAnnotationNoHistory: (roomId: string, id: string) => void;
+
   removeProduct: (id: string) => void;
   removeSelected: (ids: string[]) => void;
   undo: () => void;
@@ -171,7 +188,7 @@ function snapshot(state: CADState): CADSnapshot {
   const root = state as any;
   const t0 = import.meta.env.DEV ? performance.now() : 0;
   const snap: CADSnapshot = {
-    version: 4,
+    version: 5,
     rooms: structuredClone(toPlain(state.rooms)),
     activeRoomId: state.activeRoomId,
     ...(root.customElements
@@ -1085,6 +1102,115 @@ export const useCADStore = create<CADState>()((set) => ({
       })
     ),
 
+  // -------------------------------------------------------------------------
+  // Phase 62 MEASURE-01 — measure-line + annotation CRUD.
+  // Mirrors Phase 60 stair pattern verbatim (room-scoped, NoHistory variants).
+  // -------------------------------------------------------------------------
+
+  addMeasureLine: (roomId, partial) => {
+    const id = `meas_${uid()}`;
+    set(
+      produce((s: CADState) => {
+        const doc = s.rooms[roomId];
+        if (!doc) return;
+        pushHistory(s);
+        if (!doc.measureLines) doc.measureLines = {};
+        doc.measureLines[id] = { id, start: partial.start, end: partial.end };
+      })
+    );
+    return id;
+  },
+
+  updateMeasureLine: (roomId, id, patch) =>
+    set(
+      produce((s: CADState) => {
+        const line = s.rooms[roomId]?.measureLines?.[id];
+        if (!line) return;
+        pushHistory(s);
+        Object.assign(line, patch);
+      })
+    ),
+
+  updateMeasureLineNoHistory: (roomId, id, patch) =>
+    set(
+      produce((s: CADState) => {
+        const line = s.rooms[roomId]?.measureLines?.[id];
+        if (!line) return;
+        Object.assign(line, patch);
+      })
+    ),
+
+  removeMeasureLine: (roomId, id) =>
+    set(
+      produce((s: CADState) => {
+        const doc = s.rooms[roomId];
+        if (!doc?.measureLines?.[id]) return;
+        pushHistory(s);
+        delete doc.measureLines[id];
+      })
+    ),
+
+  removeMeasureLineNoHistory: (roomId, id) =>
+    set(
+      produce((s: CADState) => {
+        const doc = s.rooms[roomId];
+        if (!doc?.measureLines?.[id]) return;
+        delete doc.measureLines[id];
+      })
+    ),
+
+  addAnnotation: (roomId, partial) => {
+    const id = `anno_${uid()}`;
+    set(
+      produce((s: CADState) => {
+        const doc = s.rooms[roomId];
+        if (!doc) return;
+        pushHistory(s);
+        if (!doc.annotations) doc.annotations = {};
+        doc.annotations[id] = { id, position: partial.position, text: partial.text };
+      })
+    );
+    return id;
+  },
+
+  updateAnnotation: (roomId, id, patch) =>
+    set(
+      produce((s: CADState) => {
+        const ann = s.rooms[roomId]?.annotations?.[id];
+        if (!ann) return;
+        pushHistory(s);
+        Object.assign(ann, patch);
+      })
+    ),
+
+  updateAnnotationNoHistory: (roomId, id, patch) =>
+    set(
+      produce((s: CADState) => {
+        const ann = s.rooms[roomId]?.annotations?.[id];
+        if (!ann) return;
+        Object.assign(ann, patch);
+      })
+    ),
+
+  removeAnnotation: (roomId, id) =>
+    set(
+      produce((s: CADState) => {
+        const doc = s.rooms[roomId];
+        if (!doc?.annotations?.[id]) return;
+        pushHistory(s);
+        delete doc.annotations[id];
+      })
+    ),
+
+  removeAnnotationNoHistory: (roomId, id) =>
+    set(
+      produce((s: CADState) => {
+        const doc = s.rooms[roomId];
+        if (!doc?.annotations?.[id]) return;
+        delete doc.annotations[id];
+      })
+    ),
+
   removeProduct: (id) =>
     set(
       produce((s: CADState) => {
@@ -1143,9 +1269,10 @@ export const useCADStore = create<CADState>()((set) => ({
 
   loadSnapshot: async (raw: unknown): Promise<void> => {
     // Phase 51 Pattern A: async pre-pass runs BEFORE produce() (Immer constraint)
-    const shaped = migrateSnapshot(raw);             // sync: v1→v2 (or v3/v4 passthrough)
+    const shaped = migrateSnapshot(raw);             // sync: v1→v2 (or v3/v4/v5 passthrough)
     const migratedV3 = await migrateFloorMaterials(shaped); // async: v2→v3 IDB migration
-    const migrated = migrateV3ToV4(migratedV3);      // sync: v3→v4 stair seed (Phase 60)
+    const migratedV4 = migrateV3ToV4(migratedV3);    // sync: v3→v4 stair seed (Phase 60)
+    const migrated = migrateV4ToV5(migratedV4);      // sync: v4→v5 measure/annotation seed (Phase 62)
     set(
       produce((s: CADState) => {
         s.rooms = migrated.rooms;

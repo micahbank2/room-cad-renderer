@@ -261,10 +261,40 @@ export interface RoomDoc {
    *  load with empty `{}` via v3→v4 migration. Consumers MUST use `?? {}`
    *  defensive fallback (research Pitfall 2). */
   stairs?: Record<string, Stair>;
+  /** Phase 62 MEASURE-01: per-room dimension lines (decorative annotations).
+   *  Optional — older snapshots load with empty `{}` via v4→v5 migration. */
+  measureLines?: Record<string, MeasureLine>;
+  /** Phase 62 MEASURE-01: per-room free-form text annotations.
+   *  Optional — older snapshots load with empty `{}` via v4→v5 migration. */
+  annotations?: Record<string, Annotation>;
+}
+
+/**
+ * Phase 62 MEASURE-01 (D-01): dimension line between two points in feet.
+ * Decorative — does not contribute to snap geometry (D-09).
+ */
+export interface MeasureLine {
+  /** Format: `meas_<uid>`. */
+  id: string;
+  start: Point;
+  end: Point;
+}
+
+/**
+ * Phase 62 MEASURE-01 (D-01): free-form text annotation placed at a point in feet.
+ * Decorative — empty text means the annotation is mid-edit (DOM overlay shows instead).
+ */
+export interface Annotation {
+  /** Format: `anno_<uid>`. */
+  id: string;
+  position: Point;
+  text: string;
 }
 
 export interface CADSnapshot {
-  version: 4;
+  /** Phase 62 MEASURE-01 (D-02): bumped from 4 to 5 — new RoomDoc fields
+   *  measureLines + annotations. v4 snapshots migrate via migrateV4ToV5. */
+  version: 5;
   rooms: Record<string, RoomDoc>;
   activeRoomId: string | null;
   /** Per-project catalog of custom elements (reusable across rooms). */
@@ -294,7 +324,10 @@ export type ToolType =
   // Phase 61 OPEN-01: three new wall-cutout placement tools.
   | "archway"
   | "passthrough"
-  | "niche";
+  | "niche"
+  // Phase 62 MEASURE-01: dimension-line + text-label placement tools.
+  | "measure"
+  | "label";
 
 /** Phase 61 OPEN-01: per-kind default dimensions for new openings.
  *  - door: 3ft × 6.67ft (6'-8" std), sill 0
