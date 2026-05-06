@@ -101,6 +101,14 @@ export default function WallSurfacePanel() {
     setWallpaper(wall.id, activeSide, { ...wp, scaleFt: newScale });
   };
 
+  // Phase 66 (TILE-02, #105): per-surface tile-size override. Range 0.5-10 ft.
+  // Clamps to safe range to prevent zero/negative values that break texture.repeat.
+  const setTileSize = (value: number) => {
+    if (!wp || wp.kind !== "pattern") return;
+    const clamped = Math.max(0.5, Math.min(10, value));
+    setWallpaper(wall.id, activeSide, { ...wp, scaleFt: clamped });
+  };
+
   // Phase 34 — apply a user-uploaded texture as wallpaper on the active side.
   const handleWallpaperUserTexture = (id: string, tileSizeFt: number) => {
     const material: Wallpaper = {
@@ -244,17 +252,35 @@ export default function WallSurfacePanel() {
           }}
         />
         {wp?.kind === "pattern" && (
-          <label className="flex items-center gap-2 mt-1 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={(wp.scaleFt ?? 0) > 0}
-              onChange={toggleTile}
-              className="w-3 h-3 accent-accent rounded-none"
-            />
-            <span className="font-mono text-[11px] text-text-dim tracking-wider">
-              TILE PATTERN {(wp.scaleFt ?? 0) > 0 ? `(${wp.scaleFt}ft)` : "(stretch)"}
-            </span>
-          </label>
+          <div className="mt-1 space-y-1.5">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={(wp.scaleFt ?? 0) > 0}
+                onChange={toggleTile}
+                className="w-3 h-3 accent-accent rounded-none"
+              />
+              <span className="font-mono text-[11px] text-text-dim tracking-wider">
+                TILE PATTERN {(wp.scaleFt ?? 0) > 0 ? `(${wp.scaleFt}ft)` : "(stretch)"}
+              </span>
+            </label>
+            {/* Phase 66 (TILE-02, #105): per-surface tile-size input. Visible only when tiling is on. */}
+            {(wp.scaleFt ?? 0) > 0 && (
+              <label className="block">
+                <span className="font-mono text-[9px] text-text-dim block">TILE SIZE (ft)</span>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0.5"
+                  max="10"
+                  value={wp.scaleFt}
+                  onChange={(e) => setTileSize(parseFloat(e.target.value) || 2)}
+                  data-testid="wallpaper-tile-size"
+                  className="w-full font-mono text-[10px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-2 py-1 rounded-sm"
+                />
+              </label>
+            )}
+          </div>
         )}
       </div>
 
