@@ -1,4 +1,4 @@
-import type { Point, WallSegment } from "@/types/cad";
+import type { Point, WallSegment, Ceiling } from "@/types/cad";
 
 /** Snap a value to the nearest increment */
 export function snapTo(value: number, increment: number): number {
@@ -283,6 +283,83 @@ export function polygonCentroid(walls: WallSegment[]): Point {
   }
   signedArea /= 2;
   return { x: cx / (6 * signedArea), y: cy / (6 * signedArea) };
+}
+
+/**
+ * Phase 65 CEIL-02 — axis-aligned bounding box of a polygon in feet.
+ *
+ * Returns zeros for an empty point list (caller-safe). The resulting
+ * `width` / `depth` are non-negative.
+ */
+export function polygonBbox(points: Point[]): {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+  width: number;
+  depth: number;
+} {
+  if (points.length === 0) {
+    return { minX: 0, minY: 0, maxX: 0, maxY: 0, width: 0, depth: 0 };
+  }
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const p of points) {
+    if (p.x < minX) minX = p.x;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.y > maxY) maxY = p.y;
+  }
+  return { minX, minY, maxX, maxY, width: maxX - minX, depth: maxY - minY };
+}
+
+/**
+ * Phase 65 CEIL-02 — resolve a Ceiling's polygon points after applying any
+ * width/depth/anchor overrides written by the edge-handle resize tool.
+ *
+ * Fast path: when none of the 4 override fields is set, returns the original
+ * `ceiling.points` array by referential identity (so memoizing consumers can
+ * cheaply detect "no resize").
+ *
+ * Override formula:
+ *   sx = widthFtOverride / origBboxWidth   (defaults to 1 if absent)
+ *   sy = depthFtOverride / origBboxDepth   (defaults to 1 if absent)
+ *   ax = anchorXFt ?? origBbox.minX
+ *   ay = anchorYFt ?? origBbox.minY
+ *   newP = (ax + (p.x - ax) * sx, ay + (p.y - ay) * sy)
+ *
+ * Anchor semantics:
+ *   - East-edge drag: width grows; ax defaults to bbox.minX → west edge fixed.
+ *   - West-edge drag: width grows; ax = bbox.maxX → east edge fixed.
+ *   - South / north drags: same idea on the y axis.
+ */
+export function resolveCeilingPoints(ceiling: Ceiling): Point[] {
+  const { widthFtOverride, depthFtOverride, anchorXFt, anchorYFt } = ceiling;
+  if (
+    widthFtOverride === undefined &&
+    depthFtOverride === undefined &&
+    anchorXFt === undefined &&
+    anchorYFt === undefined
+  ) {
+    return ceiling.points;
+  }
+  const bbox = polygonBbox(ceiling.points);
+  const sx =
+    widthFtOverride !== undefined && bbox.width > 0
+      ? widthFtOverride / bbox.width
+      : 1;
+  const sy =
+    depthFtOverride !== undefined && bbox.depth > 0
+      ? depthFtOverride / bbox.depth
+      : 1;
+  const ax = anchorXFt ?? bbox.minX;
+  const ay = anchorYFt ?? bbox.minY;
+  return ceiling.points.map((p) => ({
+    x: ax + (p.x - ax) * sx,
+    y: ay + (p.y - ay) * sy,
+  }));
 }
 
 /**
