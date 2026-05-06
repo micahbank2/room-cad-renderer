@@ -19,7 +19,7 @@
 - ✅ **v1.13 UX Polish Bundle** — shipped 2026-04-28
 - ✅ **v1.14 Real 3D Models** — Phases 55–58 (shipped 2026-05-05)
 - ✅ **v1.15 Architectural Toolbar Expansion** — Phases 59–62 (shipped 2026-05-06)
-- 🚧 **v1.16 Maintenance Pass** — Phases 63–66 (in progress)
+- ✅ **v1.16 Maintenance Pass** — Phases 63–66 (shipped 2026-05-06)
 
 ---
 
@@ -134,70 +134,9 @@
 
 ---
 
-## v1.16 Maintenance Pass
+## v1.16 Maintenance Pass (shipped 2026-05-06)
 
-**Goal:** After two big feature milestones back-to-back (v1.14 + v1.15 = 8 phases in 10 days), v1.16 clears accumulated tech debt and parked backlog items before the next big feature push. Mirrors the v1.12 maintenance-pass pattern. Source: [#146](https://github.com/micahbank2/room-cad-renderer/issues/146), [#141](https://github.com/micahbank2/room-cad-renderer/issues/141), [#70](https://github.com/micahbank2/room-cad-renderer/issues/70), [#105](https://github.com/micahbank2/room-cad-renderer/issues/105).
-
-**Sequencing rationale:** DEBT-06 first because it unblocks clean v1.16 milestone audits. BUG-04 second because it's a small fix that closes a recurring CI flake. CEIL-02 third — biggest work item, clean reuse of Phase 31 patterns. TILE-02 last — extends Phase 42's data model with the missing UI.
-
-**Forward signal:** Clears CI hygiene + completes two long-parked backlog items before v1.17 picks up the next big feature direction (likely Materials overhaul or Jessica-feedback-driven scope, depending on what surfaces).
-
-### Phase Details
-
-#### Phase 63: Vitest pollution fix (DEBT-06)
-
-**Goal:** Fix the `pickerMyTexturesIntegration.test.tsx` parallel-execution pollution that cascades 281 React errors and inflates the failure count from 4 → 10 in CI/audit reports.
-**Depends on:** None (CI-only)
-**Requirements:** [DEBT-06](https://github.com/micahbank2/room-cad-renderer/issues/146)
-**Success Criteria** (what must be TRUE):
-  1. `npx vitest run` reports `4 failed / N passed` (only the pre-existing 4 baseline failures); 0 cascade errors
-  2. `npx vitest run tests/pickerMyTexturesIntegration.test.tsx` continues to pass in isolation
-  3. Full-suite report no longer shows phantom failures in unrelated test files
-  4. Audit reports stable across runs (deterministic baseline)
-**Plans:** 0/1 plans complete
-**UI hint:** no
-
-#### Phase 64: Wall-texture flake fix (BUG-04)
-
-**Goal:** Fix the wall-user-texture-first-apply flaky e2e on chromium-dev (`__getWallMeshMapResolved` timeout after 2D→3D→2D→3D toggle).
-**Depends on:** Phase 49 (BUG-02 wall texture pipeline), Phase 63 (clean baseline before validating fix)
-**Requirements:** [BUG-04](https://github.com/micahbank2/room-cad-renderer/issues/141)
-**Success Criteria** (what must be TRUE):
-  1. `npx playwright test e2e/wall-user-texture-first-apply.spec.ts --project=chromium-dev --repeat-each=5` passes 5/5
-  2. Phase 49/50 e2e specs continue to pass
-  3. Root-cause documented in commit / VERIFICATION.md (which of the 3 hypothesized causes was correct)
-**Plans:** 0/1 plans complete
-**UI hint:** no
-
-#### Phase 65: Ceiling resize handles (CEIL-02)
-
-**Goal:** Add edge-handle resize for ceilings. Currently users can only delete + redraw a ceiling. Mirror the Phase 31 product-resize pattern.
-**Depends on:** Phase 31 (size-override resolver pattern), Phase 30 (smart-snap), Phase 42 (Ceiling.scaleFt field), Phase 53 (right-click reset action)
-**Requirements:** [CEIL-02](https://github.com/micahbank2/room-cad-renderer/issues/70)
-**Success Criteria** (what must be TRUE):
-  1. Select a ceiling in 2D → 4 edge handles appear (rectangular ceilings only in v1.16)
-  2. Drag edge → ceiling resizes; PropertiesPanel dimensions update live; 3D ceiling re-extrudes
-  3. Single Ctrl+Z undoes the entire drag
-  4. Phase 30 smart-snap engages (snap to wall edges); Alt disables
-  5. Phase 53 right-click "Reset size" clears overrides
-  6. Snapshot serialization preserves new override fields
-**Plans:** 1/1 plans complete
-**UI hint:** yes
-
-#### Phase 66: Per-surface tile-size UI (TILE-02)
-
-**Goal:** Per-surface tile-size override UI completion. Phase 42 added the data fields (`Wallpaper.scaleFt`, `FloorMaterial.scaleFt`, `Ceiling.scaleFt`); v1.16 finishes the PropertiesPanel UI so end-users can adjust each surface independently.
-**Depends on:** Phase 42 (per-surface scaleFt field), Phase 31 (single-undo drag pattern)
-**Requirements:** [TILE-02](https://github.com/micahbank2/room-cad-renderer/issues/105)
-**Success Criteria** (what must be TRUE):
-  1. Select a wall with wallpaper → PropertiesPanel shows tile-size input (slider OR feet+inches — research picks)
-  2. Same for floor surface and ceiling
-  3. Adjust → wallpaper / floor / ceiling repeat updates live in 2D and 3D
-  4. Per-surface override persists in snapshot
-  5. Reset button reverts to catalog default
-  6. No regression on Phase 17 wallpaper / Phase 11 floor / Phase 13 ceiling rendering
-**Plans:** 0/1 plans complete
-**UI hint:** yes
+4 phases (63-66), 4 plans, 4/4 requirements (DEBT-06, BUG-04, CEIL-02, TILE-02). Mirrored the v1.12 maintenance-pass pattern after two big feature milestones (v1.14 + v1.15 = 8 phases in 10 days). **Two long-parked Phase 999.x backlog items dating back to v1.9 finally cleared:** 999.1 ceiling resize handles (re-deferred twice) and 999.3 per-surface tile-size override (re-deferred once). Phase 63: investigated #146 vitest cascade — could not reproduce; shipped hygiene cleanup (top-level `global.URL` mutation → `vi.spyOn` + `restoreAllMocks`) as preventative. Phase 64: real bug found — WallMesh useEffect cleanup missing (StrictMode double-mount class, mirrors Phase 58 pattern); fix + 3000ms→8000ms timeout bump → `--repeat-each=5` 10/10 green. Phase 65: ceiling resize handles via override-anchor model (4 fields: widthFtOverride/depthFtOverride/anchorXFt/anchorYFt) with `resolveCeilingPoints` resolver — east/south drags use default anchors; west/north explicitly set opposite-edge anchor so dragged edge moves with cursor. Formal VERIFICATION 13/13 PASS. Phase 66: investigation revealed Phase 42 had already shipped data fields + actions + renderers + serialization; Phase 66 was just the missing UI tier (two `<input>` fields, no schema changes, no version bump). 32 files modified, +3,713 LOC, 4 PRs ([#147](https://github.com/micahbank2/room-cad-renderer/pull/147), [#148](https://github.com/micahbank2/room-cad-renderer/pull/148), [#149](https://github.com/micahbank2/room-cad-renderer/pull/149), [#150](https://github.com/micahbank2/room-cad-renderer/pull/150)). 3 of 4 phases used `/gsd:quick`; CEIL-02 used full pipeline. **Total wall-clock: ~55 minutes** — fastest milestone in project history. Audit `passed-with-notes` (DEBT-06 cascade observed once during audit re-run; monitor for v1.17). CLAUDE.md Pattern #7 (StrictMode useEffect cleanup) added between Phase 64 and 65, applied 3 times total in this milestone. See [milestones/v1.16-ROADMAP.md](milestones/v1.16-ROADMAP.md).
 
 
 ## Progress
@@ -235,10 +174,10 @@
 | 60. Stairs | 1/1 | Complete    | 2026-05-06 |
 | 61. Openings — Archway/Passthrough/Niche | 1/1 | Complete    | 2026-05-06 |
 | 62. Measurement + Annotation Tools | 1/1 | Complete    | 2026-05-06 |
-| 63. Vitest Pollution Fix | 1/1 | Complete    | 2026-05-04 |
-| 64. Wall-Texture Flake Fix | 1/1 | Complete    | 2026-05-04 |
+| 63. Vitest Pollution Fix | 1/1 | Complete    | 2026-05-06 |
+| 64. Wall-Texture Flake Fix | 1/1 | Complete    | 2026-05-06 |
 | 65. Ceiling Resize Handles | 1/1 | Complete    | 2026-05-06 |
-| 66. Per-Surface Tile-Size UI | 0/1 | Pending    |   |
+| 66. Per-Surface Tile-Size UI | 1/1 | Complete    | 2026-05-06 |
 
 ## Backlog
 
