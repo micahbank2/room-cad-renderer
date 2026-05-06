@@ -1,65 +1,74 @@
-# Requirements — v1.16 Maintenance Pass
+# Requirements — v1.17 Library + Material Engine
 
-After two big feature milestones back-to-back (v1.14 GLTF, v1.15 architectural toolbar) shipping 8 phases in 10 days, v1.16 clears accumulated tech debt and parked backlog items before the next big feature push. Mirrors the v1.12 maintenance-pass pattern. Continues phase numbering from 62 → starts at 63.
+First milestone since v1.2 to introduce a new core data system. Materials become a first-class entity — Jessica uploads marble, fabric, tile, flooring with real-world metadata (brand, SKU, cost, lead time), then applies them to any surface (walls, floors, ceilings, custom-element faces) and any product (as a finish slot). The library sidebar gets the proper Materials / Assemblies / Products top-level structure.
+
+Continues phase numbering from 66 → starts at **67**. Multi-day milestone (not a maintenance-pass sprint). Each phase replaces an existing subsystem; migration work + snapshot version bump expected at every boundary.
 
 ## Active Requirements
 
-### Tech Debt + Bug Fixes
+### Material Engine (Foundation)
 
-- [ ] **DEBT-06** — Fix the parallel-vitest pollution from `pickerMyTexturesIntegration.test.tsx` that cascades 281 React errors when the suite runs in parallel pool mode, inflating the failure count from 4 (real pre-existing) → 10 (phantom). Source: [#146](https://github.com/micahbank2/room-cad-renderer/issues/146).
-  - **Verifiable:** `npx vitest run` reports `4 failed / N passed` (only the pre-existing 4 baseline failures); 0 cascade errors. `npx vitest run tests/pickerMyTexturesIntegration.test.tsx` continues to pass in isolation. Full-suite report no longer shows phantom failures in unrelated test files.
-  - **Acceptance:** Either (a) explicit `beforeEach`/`afterEach` resets in `pickerMyTexturesIntegration.test.tsx` to clear module-level singletons, OR (b) `vitest.config.ts` `pool: "forks"` switch (slower but fully isolates each test file), OR (c) mark the offending file `test.sequential` and keep parallel for the rest. Research picks the lowest-disruption fix.
-  - **Hypothesis to test:** Test file mounts something with module-level state (texture cache, Zustand store, productImageCache) that doesn't reset between parallel-pool workers. Confirm via reproduction + isolation test in research.
+- [ ] **MAT-ENGINE-01** — User can upload a Material with texture maps (color / roughness / reflection) plus real-world metadata (brand, SKU, cost, lead time, name, real-world tile size in feet) and have it persist in the local library across all projects. Source: [#25](https://github.com/micahbank2/room-cad-renderer/issues/25). **Phase 67.**
+  - **Verifiable:** Open the library → click "Upload Material" → drag a JPEG/PNG color map (and optionally roughness/reflection maps) → fill metadata fields (name, brand, SKU, cost, lead time, tile size in feet+inches) → Save. Material appears in the library, persists across reload, deduplicates if the same color-map file is uploaded again, and shows the metadata in a hover/inspect view.
+  - **Acceptance:** New `Material` entity in a `materialStore` (Zustand + IndexedDB), schema mirroring Phase 32 user-texture pattern: `{ id, name, brand?, sku?, cost?, leadTimeDays?, tileSizeFt, colorMapId, roughnessMapId?, reflectionMapId?, createdAt }`. Texture maps reuse the existing user-texture IDB layer (SHA-256 dedup, 2048px longest-edge downscale, 25MB cap per map). Upload form mirrors AddProductModal layout. New `useMaterials()` hook exposes the library. Snapshot serialization NOT required at this phase — materials live in their own store, not in `cadStore`.
+  - **Hypothesis to test:** Phase 32's user-texture pipeline is the architectural template. Materials wrap one-or-more user-texture references with metadata. Confirm at plan-phase research whether "Material as wrapper around user-textures" is cleaner than "Material as new texture root."
 
-- [ ] **BUG-04** — Fix the wall-user-texture-first-apply flaky e2e on chromium-dev (`__getWallMeshMapResolved` timeout after 2D→3D→2D→3D toggle). Pre-existing from v1.14; surfaces on every PR's chromium-dev shard. Source: [#141](https://github.com/micahbank2/room-cad-renderer/issues/141).
-  - **Verifiable:** `npx playwright test e2e/wall-user-texture-first-apply.spec.ts --project=chromium-dev --repeat-each=5` passes 5/5 (currently flakes ~50% on CI). All other Phase 49/50 e2e specs continue to pass.
-  - **Acceptance:** Either (a) bump the 3000ms `__getWallMeshMapResolved` timeout to 8000ms (matches other dev-server e2e timeouts), OR (b) add an explicit "WallMesh remount complete" event signal the test can wait on (more correct), OR (c) investigate StrictMode double-mount discarding the registry entry (similar pattern to the Phase 58 thumbnail callback bug fixed in `f5f6c46`). Research picks the right fix.
-  - **Hypothesis to test:** React StrictMode (active in Vite dev) double-mounts WallMesh; the `__wallMeshMaterials` registry entry from the first mount gets discarded but the test waits on it. Confirm via console logs in the failing test.
+### Material Application (Use)
 
-### User-Facing Polish (promoted from backlog)
+- [ ] **MAT-APPLY-01** — User can apply any Material from the library to any surface (wall side, floor, ceiling, or custom-element face) through one unified picker, replacing today's split paint / wallpaper / floor-material flows. Source: [#27](https://github.com/micahbank2/room-cad-renderer/issues/27). **Phase 68.**
+  - **Verifiable:** Select a wall side → PropertiesPanel shows a unified "Material" picker → click → library opens filtered to materials applicable to walls → pick "Carrara Marble" → wall surface renders with that material's color map + roughness in 2D preview and 3D viewport. Same flow works for floor, ceiling, and custom-element faces. Existing paint colors still work (paints become a category of Material). Existing wallpaper/floor-material assignments migrate cleanly to the unified model.
+  - **Acceptance:** New `surface.materialId?: string` field on Wallpaper / FloorMaterial / Ceiling / CustomElement / WallSide. Resolver function `resolveSurfaceMaterial(surface)` returns the Material entity or null. 2D fabric texture-fill consumes the resolver; 3D mesh material does the same. Existing paint/wallpaper/floor-material types either become aliases over Material OR migrate to it via snapshot version bump. Single-undo per apply (history snapshot pattern). PropertiesPanel "Material" section replaces existing per-type sections (paint picker, wallpaper picker, floor-material picker) — but legacy entries continue to render correctly.
+  - **Hypothesis to test:** Existing paint/wallpaper/floor-material systems can be unified via either (a) full migration of legacy entries to Materials at snapshot-load time, or (b) keep legacy types and have the picker write to whichever field matches the surface. Plan-phase research picks. The migration approach is cleaner long-term but riskier; the alias approach is incremental.
 
-- [x] **CEIL-02** — Add edge-handle resize for ceilings (currently users can only delete + redraw). Mirror the Phase 31 product-resize pattern. Promoted from Phase 999.1 backlog (re-deferred from v1.9 twice). Source: [#70](https://github.com/micahbank2/room-cad-renderer/issues/70). **Shipped:** Phase 65 plan 01 (2026-05-04).
-  - **Verifiable:** Select a ceiling in 2D. Edge handles appear on the ceiling polygon (4 sides minimum for a rectangular ceiling). Drag an edge → ceiling resizes; PropertiesPanel dimensions update live; 3D ceiling mesh re-extrudes. Single Ctrl+Z undoes the entire drag. Phase 30 smart-snap engages (snap to wall edges). Hold Alt to disable smart-snap.
-  - **Acceptance:** New `widthFtOverride?: number` and `depthFtOverride?: number` fields on `Ceiling` type (mirrors `PlacedProduct` pattern). New cadStore actions `resizeCeilingAxis` + `resizeCeilingAxisNoHistory`. fabricSync.ts renders 4 edge handles per selected ceiling (mirrors product edge-handle code path). Phase 53 right-click "Reset size" action clears the overrides. RESET_SIZE affordance in PropertiesPanel.
-  - **Hypothesis to test:** Ceiling polygons are not always rectangles (Phase 12+ allows arbitrary polygon vertices). v1.16 first-pass: handles only on rectangular ceilings; non-rectangular ceilings get a "convert to rectangle to resize" tooltip OR continue to delete-and-redraw. Confirm during research.
+### Product–Material Linking (Finish Slots)
 
-- [ ] **TILE-02** — Per-surface tile-size override UI completion. Phase 42 added the data fields (`Wallpaper.scaleFt`, `FloorMaterial.scaleFt`, `Ceiling.scaleFt`); v1.16 finishes the PropertiesPanel UI so end-users can adjust each surface independently. Promoted from Phase 999.3 backlog (re-deferred from v1.9). Source: [#105](https://github.com/micahbank2/room-cad-renderer/issues/105).
-  - **Verifiable:** Select a wall with wallpaper → PropertiesPanel shows a "Tile size: X ft" slider. Slide → wallpaper repeat updates live in 2D and 3D. Same for floor surface (FloorMaterial) and ceiling. Per-surface override persists in snapshot. Reset button reverts to the catalog default. No regression on Phase 17 wallpaper / Phase 11 floor / Phase 13 ceiling rendering.
-  - **Acceptance:** New PropertiesPanel input rows (slider OR feet+inches input — research picks). Single-undo per drag (Phase 31 pattern: `update*(id, {})` + `*NoHistory` mid-drag). Slider range 0.5ft–10ft. Reset button clears the override → falls back to catalog. Snapshot serialization preserves the field (already in v3+ schema from Phase 42). 2D fabric texture scale + 3D `texture.repeat.set()` both honor the override.
-  - **Hypothesis to test:** Phase 42's data fields exist on the types but may not have UI consumers yet. Research confirms which surfaces have the field plumbed end-to-end vs. which need additional wiring.
+- [ ] **MAT-LINK-01** — User can swap the finish material on a placed product without re-placing the object. Products carry a "finish slot" referencing a Material. Source: [#26](https://github.com/micahbank2/room-cad-renderer/issues/26). **Phase 69.**
+  - **Verifiable:** Place a couch in a room → select it → PropertiesPanel shows a "Finish" picker → pick a fabric Material from the library → couch's 3D rendering changes to that fabric (color + roughness). Original couch placement, position, scale, rotation all preserved. Single Ctrl+Z undoes the finish change. Material change persists across save/load. Couches placed without an explicit finish use the catalog default (today's behavior).
+  - **Acceptance:** New `PlacedProduct.finishMaterialId?: string` field (placement-instance state per Phase 31 D-02 separation pattern). 3D ProductMesh applies the finish material to the appropriate mesh slot — for textured-box placeholders, override the box texture; for GLTF products with embedded PBR, paint a slot-aware override (which slots get overridden is left for plan-phase research; default is "all surfaces" or "primary slot"). Single-undo per swap (push history at picker open, NoHistory mid-pick, commit at confirm). Snapshot serialization adds the field; snapshot version bump if needed.
+  - **Hypothesis to test:** GLTF products have multiple PBR material slots (e.g., couch frame + fabric + cushions are separate materials). Finish-slot may need to map to one specific slot or all slots. Plan-phase research picks the default behavior. Textured-box products are simpler — single slot.
+
+### Library Restructure (UI Surface)
+
+- [ ] **LIB-REBUILD-01** — Sidebar library has a top-level Materials / Assemblies / Products toggle, each with its own category tabs (Materials: Flooring, Wall coverings, Countertops, Paint; Products: Furniture, Plumbing fixtures, Appliances, Lighting, Curtains & blinds, Decor; Assemblies: empty for v1.17, placeholder for future). Source: [#24](https://github.com/micahbank2/room-cad-renderer/issues/24). **Phase 70.**
+  - **Verifiable:** Open the sidebar library → see 3-tab top toggle (Materials / Assemblies / Products) → each tab shows the correct category sub-tabs → switching tabs filters the visible items → upload + place flows still work from the new structure. Existing products migrate to the right Products category (or "Uncategorized" if metadata missing). Existing materials (from Phase 67) appear under Materials tab in the right category. Assemblies tab shows empty state with placeholder copy ("Coming soon — pre-built combos like kitchen cabinetry").
+  - **Acceptance:** ProductLibrary.tsx refactored to top-level `LibraryRoot` with three child views: `MaterialsLibrary`, `AssembliesLibrary` (stub), `ProductsLibrary`. Category metadata extends Product (`category: "furniture" | "plumbing" | ... `) and Material (`category: "flooring" | "wallCovering" | ...`). UI uses existing CategoryTabs primitive (Phase 33 design system). Upload buttons context-aware: in Materials tab → "Upload Material"; in Products tab → "Add Product." Empty Assemblies tab shows clear placeholder, not broken UI.
+  - **Hypothesis to test:** Existing products may not all have a `category` field (added recently or not at all). Migration sets undefined → "Uncategorized". Plan-phase research confirms current Product schema and migration scope.
 
 ## Out of Scope (this milestone)
 
 | Item | Reason |
 |------|--------|
-| **CAM-05** ([#127](https://github.com/micahbank2/room-cad-renderer/issues/127)) EXPLODE saved-camera offset | Narrow trigger; Jessica unlikely to hit it day-to-day. Re-deferred again. |
-| L-shape concave-room normal heuristic | v1.15 Phase 60/61 limitation; severe non-convex rooms only. Defer to v1.17+. |
-| Per-opening saved-camera bookmarks | v1.15 Phase 61 deferral. Wall's saved-camera works as fallback. |
-| 3D dimension billboards | v1.15 Phase 62 D-03 deferral; 2D-only is sufficient for contractor handoff. |
-| Tree integration for measurements + annotations | v1.15 Phase 62 D-12 deferral; visual entities don't need tree groups. |
-| Columns + levels/platforms ([#19](https://github.com/micahbank2/room-cad-renderer/issues/19) partial) | v1.15 partial-ship; deferred for evidence of need. |
-| Window presets ([#20](https://github.com/micahbank2/room-cad-renderer/issues/20)) | Cosmetic variants; current generic window places fine. |
-| OBJ format support (v1.14 carry-over) | Demand-driven; defer until requested. |
-| GLTF animations (v1.14 carry-over) | Furniture rarely animated. |
-| Custom material overrides on GLTF (v1.14 carry-over) | Embedded PBR sufficient. |
-| LOD / progressive loading (v1.14 carry-over) | 25MB cap keeps load times fine. |
-| R3F v9 / React 19 upgrade ([#56](https://github.com/micahbank2/room-cad-renderer/issues/56)) | Still gated on R3F v9 stability. |
-| Materials overhaul ([#24](https://github.com/micahbank2/room-cad-renderer/issues/24)–[#28](https://github.com/micahbank2/room-cad-renderer/issues/28), [#81](https://github.com/micahbank2/room-cad-renderer/issues/81)) | Big rework — needs Jessica feedback before committing 4-6 phases. |
-| Plain English documentation ([#31](https://github.com/micahbank2/room-cad-renderer/issues/31), [#32](https://github.com/micahbank2/room-cad-renderer/issues/32), [#33](https://github.com/micahbank2/room-cad-renderer/issues/33)) | Could fold into a v1.17 doc-only mini-milestone. |
+| **PBR maps extension** ([#81](https://github.com/micahbank2/room-cad-renderer/issues/81) — AO + displacement + emissive) | v1.18 candidate. Phase 32 pipeline (albedo/normal/roughness) is sufficient for v1.17. |
+| **CAM-05** ([#127](https://github.com/micahbank2/room-cad-renderer/issues/127) EXPLODE saved-camera offset) | Narrow trigger; Jessica unlikely to hit it. Re-deferred. |
+| **Cloud sync** ([#30](https://github.com/micahbank2/room-cad-renderer/issues/30)) | Local-first decision still locked. Indefinite defer. |
+| **Parametric object controls** ([#28](https://github.com/micahbank2/room-cad-renderer/issues/28)) | v1.18+ candidate. Materials must land first. |
+| **Window presets** ([#20](https://github.com/micahbank2/room-cad-renderer/issues/20)) | Cosmetic; generic window places fine. v1.18+. |
+| **Columns + levels/platforms** ([#19](https://github.com/micahbank2/room-cad-renderer/issues/19) partial) | Stairs + openings shipped in v1.15. Remaining toolbar items defer to v1.18+. |
+| **R3F v9 / React 19 upgrade** ([#56](https://github.com/micahbank2/room-cad-renderer/issues/56)) | Still gated on R3F v9 stability. |
+| **Plain English documentation** ([#31](https://github.com/micahbank2/room-cad-renderer/issues/31), [#32](https://github.com/micahbank2/room-cad-renderer/issues/32), [#33](https://github.com/micahbank2/room-cad-renderer/issues/33)) | Defer to a docs-only mini-milestone. |
+| **Real Assemblies (kitchen cabinetry, vanities, built-ins)** | v1.17 ships only the empty Assemblies tab + placeholder. Real assembly authoring tool defers to v1.19+. |
+| **Material editor / fine-tune sliders** | v1.17 imports materials as-is. Editing roughness/scale per-instance is per-surface tile-size (Phase 66 already shipped); finer controls defer. |
+| **L-shape concave-room normal heuristic** | v1.15 carry-over; non-convex rooms only. |
+| **Per-opening saved-camera bookmarks** | v1.15 Phase 61 carry-over. |
+| **3D dimension billboards** | v1.15 Phase 62 carry-over. |
+| **Tree integration for measurements + annotations** | v1.15 Phase 62 carry-over. |
+| **OBJ format support** | v1.14 carry-over; demand-driven. |
+| **GLTF animations** | v1.14 carry-over. |
+| **LOD / progressive loading** | v1.14 carry-over. |
 
 ## Validated Requirements (Earlier Milestones)
 
-See `.planning/milestones/v1.0-REQUIREMENTS.md` through `.planning/milestones/v1.15-REQUIREMENTS.md`. All v1.0–v1.15 requirements shipped or formally deferred.
+See `.planning/milestones/v1.0-REQUIREMENTS.md` through `.planning/milestones/v1.16-REQUIREMENTS.md`. All v1.0–v1.16 requirements shipped or formally deferred.
 
 ## Traceability
 
 | Requirement | Phase | Plans |
 |-------------|-------|-------|
-| DEBT-06 | Phase 63 | TBD |
-| BUG-04 | Phase 64 | TBD |
-| CEIL-02 | Phase 65 | 65-01-SUMMARY.md (2026-05-04) |
-| TILE-02 | Phase 66 | TBD |
+| MAT-ENGINE-01 | Phase 67 | TBD |
+| MAT-APPLY-01 | Phase 68 | TBD |
+| MAT-LINK-01 | Phase 69 | TBD |
+| LIB-REBUILD-01 | Phase 70 | TBD |
 
 ---
 
-*Last updated: 2026-05-06*
+*Last updated: 2026-05-06 — v1.17 milestone start*
