@@ -10,20 +10,20 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 **Jessica can see her future room with her actual furniture before spending money.** The magic moment: she uploads a photo of a couch she found, places it in a room with real dimensions, switches to walk mode, and feels whether it works.
 
-## Next Milestone Goals — v1.16 Maintenance Pass
+## Next Milestone Goals — v1.17 Library + Material Engine
 
-After two big feature milestones back-to-back (v1.14 GLTF, v1.15 architectural toolbar) shipping 8 phases in 10 days, v1.16 clears accumulated tech debt and parked backlog items before the next big feature push. **Mirrors the v1.12 pattern** — the audit called v1.12 "the cleanest milestone closeout in project history."
+After v1.16 cleared parked tech debt and the long-deferred 999.x backlog, v1.17 is the **first milestone since v1.2 to introduce a new core data system.** Materials become a first-class entity — Jessica uploads marble, fabric, tile, flooring with real-world metadata (brand, SKU, cost, lead time), then applies them to any surface. The library sidebar gets the proper Materials / Assemblies / Products structure issue [#24](https://github.com/micahbank2/room-cad-renderer/issues/24) has tracked since early backlog.
 
-**Four items in v1.16:**
+**Four phases in v1.17:**
 
-1. **DEBT-06 (Phase 63)** — Fix the parallel-vitest pollution from `pickerMyTexturesIntegration.test.tsx` that cascades 281 React errors when the suite runs in parallel pool mode. Issue [#146](https://github.com/micahbank2/room-cad-renderer/issues/146). Filed during v1.15 milestone audit.
-2. **BUG-04 (Phase 64)** — Fix the wall-user-texture-first-apply chromium-dev flake (2D→3D→2D→3D toggle). Pre-existing from v1.14; bites every PR. Issue [#141](https://github.com/micahbank2/room-cad-renderer/issues/141).
-3. **CEIL-02 (Phase 65)** — Add ceiling resize handles. Currently you can only delete + redraw a ceiling. Mirror Phase 31 product-resize edge-handle pattern. Promoted from Phase 999.1 backlog (re-deferred from v1.9 twice). Issue [#70](https://github.com/micahbank2/room-cad-renderer/issues/70).
-4. **TILE-02 (Phase 66)** — Per-surface tile-size override UI completion. Phase 42 added the data fields (`Wallpaper.scaleFt`, `FloorMaterial.scaleFt`, `Ceiling.scaleFt`); v1.16 finishes the PropertiesPanel UI for end-users to adjust each surface independently. Promoted from Phase 999.3 backlog. Issue [#105](https://github.com/micahbank2/room-cad-renderer/issues/105).
+1. **MAT-ENGINE-01 (Phase 67)** — Material engine foundation. Texture-map upload (color / roughness / reflection), real-world tile size, brand/SKU/cost/lead-time metadata, IndexedDB persistence mirroring the user-texture pipeline. Issue [#25](https://github.com/micahbank2/room-cad-renderer/issues/25).
+2. **MAT-APPLY-01 (Phase 68)** — Material application system. Apply any material to walls / floors / ceilings / custom-element faces. Replaces today's split paint / wallpaper / floor-material patchwork with a unified surface-material model. Issue [#27](https://github.com/micahbank2/room-cad-renderer/issues/27).
+3. **MAT-LINK-01 (Phase 69)** — Product-to-material linking. Products carry a "finish slot" so fabric can swap without re-placing the object. Separates object-shape from material. Issue [#26](https://github.com/micahbank2/room-cad-renderer/issues/26).
+4. **LIB-REBUILD-01 (Phase 70)** — Library rebuild. Top-level Materials / Assemblies / Products toggle in sidebar with category tabs (Flooring, Wall coverings, Furniture, Lighting, etc.). Issue [#24](https://github.com/micahbank2/room-cad-renderer/issues/24).
 
-**Sequencing rationale:** DEBT-06 first because it unblocks clean v1.16 audits. BUG-04 second because it's a one-line tweak (likely a 3000ms→8000ms timeout bump or remount-complete-signal wait). CEIL-02 third — biggest work item, clean reuse of Phase 31 patterns. TILE-02 last — extends Phase 42's data model with UI.
+**Sequencing rationale:** Phase 67 lays the data foundation. Phase 68 makes it usable on real surfaces. Phase 69 unlocks finish-swapping on placed objects. Phase 70 surfaces it all in the new sidebar UI. Each phase replaces an existing subsystem — migration work + snapshot version bump expected.
 
-**Deferred to v1.17+:** CAM-05 (#127 EXPLODE saved-camera offset) — narrow trigger, Jessica unlikely to hit it; L-shape concave-room normal heuristic; per-opening saved-camera bookmarks; 3D dimension billboards; Phase 33 doc cleanup; columns + levels/platforms (#19 partial); window presets (#20).
+**Deferred to v1.18+:** PBR maps extension (#81 — AO + displacement + emissive); CAM-05 (#127 EXPLODE saved-camera offset); columns + levels/platforms (#19 partial — stairs + openings already shipped); window presets (#20); parametric object controls (#28); R3F v9 / React 19 upgrade (#56).
 
 ---
 
@@ -92,32 +92,38 @@ See `.planning/ROADMAP.md` for links to each milestone archive.
 </details>
 
 
-## Current Milestone: v1.14 Real 3D Models
+## Current Milestone: v1.17 Library + Material Engine
 
-**Goal:** Jessica uploads actual furniture from real GLTF files and sees them in 3D — not textured boxes. The biggest single user-visible win the platform has ever shipped. Validates everything from v1.0–v1.13: textures, materials, multi-room, presets, tree, displayMode, saved cameras, click-to-select, context menus all become more meaningful when products are real.
+**Goal:** Jessica picks real materials (marble, fabric, tile, paint, flooring) with real-world metadata (brand, SKU, cost, lead time) and applies them to walls, floors, ceilings, and objects. Her library finally feels organized — Materials, Assemblies, and Products as separate top-level sections.
 
-**Target requirements (4 issues, 4 phases):**
-- **Phase 55 / GLTF-UPLOAD-01 / [#29](https://github.com/micahbank2/room-cad-renderer/issues/29)** — GLTF/GLB upload + IDB storage with SHA-256 dedup; 25MB cap; new optional `gltfId` field on Product
-- **Phase 56 / GLTF-RENDER-3D-01** — ProductMesh branches on `gltfId`; renders via drei's `useGLTF` hook; loading spinner; bbox fallback on failure
-- **Phase 57 / GLTF-RENDER-2D-01** — Top-down silhouette computed from GLTF geometry; cached per gltfId; rendered as Fabric polygon path; bbox-rectangle fallback
-- **Phase 58 / GLTF-INTEGRATION-01** — Polish + verify Phase 31 size-override, Phase 48 saved-camera, Phase 53 right-click menus, Phase 54 click-to-select all work on GLTF products; library UI indicator
+**Target features (4 issues → 4 phases):**
+- **Phase 67 / MAT-ENGINE-01 / [#25](https://github.com/micahbank2/room-cad-renderer/issues/25)** — Material engine foundation: texture maps (color / roughness / reflection), real-world tile size, brand / SKU / cost / lead-time metadata, IndexedDB persistence
+- **Phase 68 / MAT-APPLY-01 / [#27](https://github.com/micahbank2/room-cad-renderer/issues/27)** — Material application system: apply any material to walls / floors / ceilings / custom-element faces; replaces split paint+wallpaper+floor-material patchwork
+- **Phase 69 / MAT-LINK-01 / [#26](https://github.com/micahbank2/room-cad-renderer/issues/26)** — Product-to-material linking: products carry a finish slot; fabric swaps without re-placing the object
+- **Phase 70 / LIB-REBUILD-01 / [#24](https://github.com/micahbank2/room-cad-renderer/issues/24)** — Library rebuild: top-level Materials / Assemblies / Products toggle in sidebar with proper category tabs
 
-**Sequencing intent:** Upload before render (Phase 55 → 56). 3D render before 2D silhouette (3D is the magic moment; 2D is enhancement). Integration verification last (builds on complete pipeline). Each phase ships independently — even Phase 55 alone has user value (uploaded models stored, ready for render in 56).
+**Sequencing intent:** Data foundation (67) before usability (68) before linking (69) before UI surface (70). Each phase ships independently — Phase 67 alone has value (materials stored + ready for apply in 68); Phase 68 alone unifies surface application; Phase 69 alone separates finish from object; Phase 70 alone reorganizes existing library. Migration work expected at every phase boundary because each replaces an existing subsystem.
 
-**Out of v1.14:** OBJ format (older, separate codepath; defer to v1.15+ if demand surfaces). Animations (furniture rarely needs them). Custom material overrides on GLTF (use embedded materials). Walls/ceilings/custom-elements as GLTF (parametric, don't need it). LOD / progressive loading (premature). Cloud-hosted GLTF library (storage scope).
+**Out of v1.17:**
+- PBR maps extension (#81 — AO / displacement / emissive) → v1.18
+- Cloud sync (#30) → deferred indefinitely
+- Parametric object controls (#28) → v1.18+
+- Window presets (#20) + columns/levels (#19) → v1.18+
+- R3F v9 / React 19 upgrade (#56) → wait for R3F v9 stable
+- Plain-English user guides (#31, #32, #33) → docs milestone
 
 **Format / scope locks:**
-- GLTF + GLB only
-- Static rendering (no animations)
-- GLTF embedded PBR materials used as-is
-- 25MB hard cap per file (validation on upload)
-- IDB storage mirroring user-texture pipeline (Phase 32 LIB-08 reference)
-- drei `useGLTF` for caching
-- Top-down silhouette in 2D (computed once, cached)
+- Material schema: texture-map slots (albedo / roughness / reflection) — keep aligned with existing PBR pipeline
+- Real-world tile size in feet (matches Phase 32 user-texture convention)
+- Metadata fields: brand, SKU, cost, lead time (text + number; no validation against external systems)
+- IndexedDB persistence mirroring user-texture pipeline + SHA-256 dedup
+- Snapshot version bump per phase as needed (current is v5)
+- Defer 3D-asset materials (PBR maps) to v1.18
 
 **Tech debt acknowledged + accepted:**
 - 6 pre-existing vitest failures permanently accepted (Phase 37 D-02); CI vitest stays disabled
 - AUDIT-01 substitute-evidence policy formalized in v1.10 audit. SUMMARY.md is canonical evidence.
+- DEBT-06 vitest cascade observed once during v1.16 audit re-run; monitor; do not block v1.17 phases on it.
 
 ## Target User
 
@@ -237,7 +243,12 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 
 ### Active
 
-v1.7 not yet scoped. Run `/gsd:new-milestone` to define next milestone requirements.
+**v1.17 Library + Material Engine — 4 requirements scoped:**
+
+- ⏳ **MAT-ENGINE-01** (Phase 67) — User can upload a material with texture maps (color / roughness / reflection) + real-world tile size + brand/SKU/cost/lead-time metadata; persisted to IndexedDB with SHA-256 dedup. Closes [#25](https://github.com/micahbank2/room-cad-renderer/issues/25).
+- ⏳ **MAT-APPLY-01** (Phase 68) — User can apply any material from the library to any surface (walls, floors, ceilings, custom-element faces) through one unified picker, replacing today's split paint/wallpaper/floor-material flows. Closes [#27](https://github.com/micahbank2/room-cad-renderer/issues/27).
+- ⏳ **MAT-LINK-01** (Phase 69) — User can swap a placed product's finish material without re-placing the object (product carries a finish slot referencing a material). Closes [#26](https://github.com/micahbank2/room-cad-renderer/issues/26).
+- ⏳ **LIB-REBUILD-01** (Phase 70) — Sidebar library has top-level Materials / Assemblies / Products toggle with proper category tabs (Flooring, Wall coverings, Furniture, Lighting, etc.). Closes [#24](https://github.com/micahbank2/room-cad-renderer/issues/24).
 
 ### Out of Scope
 
@@ -247,7 +258,7 @@ v1.7 not yet scoped. Run `/gsd:new-milestone` to define next milestone requireme
 - Mobile / iPad support — desktop only for now, iPad on v2 wishlist
 - Professional drafting features (layers, annotations, blueprints)
 - Backend / server / auth — stays local-first (IndexedDB)
-- GLTF/OBJ 3D model upload — too complex for Jessica's workflow, stick with images
+- ~~GLTF/OBJ 3D model upload~~ — superseded: GLTF shipped in v1.14 (GLTF-UPLOAD-01..GLTF-INTEGRATION-01)
 
 ## Key Decisions
 
@@ -318,4 +329,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-21 — v1.7 3D Realism scoped (PBR materials + user-uploaded textures + camera presets + tech-debt sweep)*
+*Last updated: 2026-05-06 — v1.17 Library + Material Engine scoped (Phases 67–70: material engine, application, product linking, library rebuild)*
