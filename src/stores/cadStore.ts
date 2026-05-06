@@ -42,6 +42,8 @@ interface CADState {
   resizeWallByLabel: (id: string, newLengthFt: number) => void;
   removeWall: (id: string) => void;
   addOpening: (wallId: string, opening: Omit<Opening, "id">) => void;
+  /** Phase 61 OPEN-01 (D-11'): remove an opening by id. Used by context-menu Delete. */
+  removeOpening: (wallId: string, openingId: string) => void;
   placeProduct: (productId: string, position: Point) => string;
   moveProduct: (id: string, position: Point) => void;
   rotateProduct: (id: string, angle: number) => void;
@@ -362,6 +364,20 @@ export const useCADStore = create<CADState>()((set) => ({
         if (!doc.walls[wallId]) return;
         pushHistory(s);
         doc.walls[wallId].openings.push({ ...opening, id: `op_${uid()}` });
+      })
+    ),
+
+  removeOpening: (wallId, openingId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const wall = doc.walls[wallId];
+        if (!wall) return;
+        const idx = wall.openings.findIndex((o) => o.id === openingId);
+        if (idx < 0) return;
+        pushHistory(s);
+        wall.openings.splice(idx, 1);
       })
     ),
 

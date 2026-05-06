@@ -30,6 +30,10 @@ import { activateDoorTool } from "./tools/doorTool";
 import { activateWindowTool } from "./tools/windowTool";
 import { activateCeilingTool } from "./tools/ceilingTool";
 import { activateStairTool, setStairToolLibrary } from "./tools/stairTool";
+// Phase 61 OPEN-01 (D-09): three new wall-cutout placement tools.
+import { activateArchwayTool } from "./tools/archwayTool";
+import { activatePassthroughTool } from "./tools/passthroughTool";
+import { activateNicheTool } from "./tools/nicheTool";
 import { attachDragDropHandlers } from "./dragDrop";
 import { computeLabelPx, hitTestDimLabel, validateInput } from "./dimensionEditor";
 import { closestPointOnWall, distance, formatFeet } from "@/lib/geometry";
@@ -474,13 +478,20 @@ export default function FabricCanvas({ productLibrary }: Props) {
       // Convert to Fabric viewport coordinates for containsPoint()
       const pointer = fc.getViewportPoint(e);
 
-      let hit: { kind: import("@/stores/uiStore").ContextMenuKind; nodeId: string } | null = null;
+      let hit: { kind: import("@/stores/uiStore").ContextMenuKind; nodeId: string; parentId?: string } | null = null;
 
       for (const obj of fc.getObjects()) {
         const d = (obj as unknown as { data?: Record<string, unknown> }).data;
         if (!d) continue;
 
-        if ((d.type === "wall" || d.type === "wall-side" || d.type === "wall-limewash") && d.wallId) {
+        // Phase 61 OPEN-01 (D-11'): match openings BEFORE wall — opening
+        // polygons render on top of walls and should win the hit-test.
+        if (d.type === "opening" && d.openingId && d.wallId) {
+          if ((obj as fabric.FabricObject).containsPoint(pointer)) {
+            hit = { kind: "opening", nodeId: d.openingId as string, parentId: d.wallId as string };
+            break;
+          }
+        } else if ((d.type === "wall" || d.type === "wall-side" || d.type === "wall-limewash") && d.wallId) {
           if ((obj as fabric.FabricObject).containsPoint(pointer)) {
             hit = { kind: "wall", nodeId: d.wallId as string };
             break;
@@ -513,15 +524,16 @@ export default function FabricCanvas({ productLibrary }: Props) {
             break;
           }
         }
-        // Skip: rotation-handle, resize-handle, opening, grid, dimension labels,
+        // Skip: rotation-handle, resize-handle, grid, dimension labels,
         //       stair-preview (evented:false anyway).
+        //       Phase 61 D-11': openings ARE now hit-tested (no longer in skip list).
       }
 
       if (hit) {
         useUIStore.getState().openContextMenu(hit.kind, hit.nodeId, {
           x: e.clientX,
           y: e.clientY,
-        });
+        }, hit.parentId);
       } else {
         // Empty canvas — preventDefault already called above
         useUIStore.getState().openContextMenu("empty", null, {
@@ -554,7 +566,8 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const cursorClass =
     activeTool === "wall" || activeTool === "product" ||
     activeTool === "door" || activeTool === "window" ||
-    activeTool === "stair"
+    activeTool === "stair" ||
+    activeTool === "archway" || activeTool === "passthrough" || activeTool === "niche"
       ? "cursor-crosshair"
       : "";
 
@@ -672,7 +685,11 @@ function activateCurrentTool(
     case "door":    return activateDoorTool(fc, scale, origin);
     case "window":  return activateWindowTool(fc, scale, origin);
     case "ceiling": return activateCeilingTool(fc, scale, origin);
-    case "stair":   return activateStairTool(fc, scale, origin);
+    case "stair":       return activateStairTool(fc, scale, origin);
+    // Phase 61 OPEN-01 (D-09)
+    case "archway":     return activateArchwayTool(fc, scale, origin);
+    case "passthrough": return activatePassthroughTool(fc, scale, origin);
+    case "niche":       return activateNicheTool(fc, scale, origin);
     default:        return null;
   }
 }

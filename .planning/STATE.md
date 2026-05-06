@@ -3,38 +3,38 @@ gsd_state_version: 1.0
 milestone: v1.15
 milestone_name: Architectural Toolbar Expansion
 status: verifying
-last_updated: "2026-05-05T20:05:32.910Z"
+last_updated: "2026-05-06T00:00:00.000Z"
 progress:
   total_phases: 8
-  completed_phases: 2
-  total_plans: 2
-  completed_plans: 2
+  completed_phases: 3
+  total_plans: 3
+  completed_plans: 3
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-05 — v1.14 archived; v1.15 Architectural Toolbar Expansion queued next)
+See: .planning/PROJECT.md (updated 2026-05-05 — v1.14 archived; v1.15 Architectural Toolbar Expansion in progress)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
 **Current focus:** v1.15 Architectural Toolbar Expansion — make the *room* as rich as the furniture is
 
 ## Current Position
 
-Phase: 999.1
+Phase: 62 (next to plan)
 Milestone: v1.15 Architectural Toolbar Expansion
-Phases: 4 (59, 60, 61, 62) — Phase 59 has 1 plan shipped
+Phases: 4 (59, 60, 61, 62) — Phases 59, 60, 61 shipped
 Plan: Not started
-Status: Ready for `/gsd:verify-phase 59` or to plan Phase 60 STAIRS-01
+Status: Ready for `/gsd:discuss-phase 62`
 
 ## v1.15 Roadmap
 
 | Phase | Requirement | Goal | Status |
 |-------|-------------|------|--------|
-| 59 | CUTAWAY-01 | Wall cutaway mode in 3D — ghost the nearest blocking wall | Plan 01 complete (2026-05-04) |
-| 60 | STAIRS-01 | New architectural primitive: stairs with rise/run/width config | Pending |
-| 61 | OPEN-01 | Archway / passthrough / niche wall openings (extends doors/windows) | Pending |
+| 59 | CUTAWAY-01 | Wall cutaway mode in 3D — ghost the nearest blocking wall | Shipped 2026-05-05 |
+| 60 | STAIRS-01 | New architectural primitive: stairs with rise/run/width config | Shipped 2026-05-06 (PR #143 conflict-resolved) |
+| 61 | OPEN-01 | Archway / passthrough / niche wall openings (extends doors/windows) | Shipped 2026-05-06 |
 | 62 | MEASURE-01 | Dimension lines, labels, auto room-area calculation | Pending |
 
 ## Recent Milestones
@@ -46,9 +46,4 @@ Status: Ready for `/gsd:verify-phase 59` or to plan Phase 60 STAIRS-01
 
 ## Next Step
 
-Run `/gsd:discuss-phase 59` to scope Phase 59 (Wall Cutaway Mode). Decisions to lock during discuss:
-
-- Auto-mode raycast frequency (every frame vs. every camera-move)
-- Ghost opacity value + transparency style
-- How cutaway interacts with Phase 47 SOLO/EXPLODE modes
-- Toolbar UI: dropdown vs. cycling button
+Run `/gsd:discuss-phase 62` to scope the final v1.15 phase (Measurement + annotation tools).

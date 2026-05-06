@@ -5,11 +5,13 @@ import { useMemo } from "react";
 import type { RoomDoc } from "@/types/cad";
 import type { Product } from "@/types/product";
 import WallMesh from "./WallMesh";
+import NicheMesh from "./NicheMesh";
 import ProductMesh from "./ProductMesh";
 import CeilingMesh from "./CeilingMesh";
 import FloorMesh from "./FloorMesh";
 import CustomElementMesh from "./CustomElementMesh";
 import StairMesh from "./StairMesh";
+import { computeRoomBboxCenter } from "./cutawayDetection";
 import { getFloorTexture } from "./floorTexture";
 
 type DisplayMode = "normal" | "solo" | "explode";
@@ -105,6 +107,12 @@ export function RoomGroup({
   const halfL = room.length / 2;
   const floorTexture = getFloorTexture(room.width, room.length);
 
+  // Phase 61 OPEN-01 (D-06, research Q3): per-room bbox center for niche
+  // interior-face detection. Computed once per render — same shape used by
+  // Phase 59 cutaway detection.
+  const wallList = useMemo(() => Object.values(walls ?? {}), [walls]);
+  const roomCenter = useMemo(() => computeRoomBboxCenter(wallList), [wallList]);
+
   return (
     <group position={[offsetX, 0, 0]}>
       <FloorMesh
@@ -125,6 +133,18 @@ export function RoomGroup({
             roomId={roomId}
           />
         ))}
+      {/* Phase 61 OPEN-01 (D-06, D-07): per-niche separate inset mesh on the
+          interior face. Wall body remains solid (WallMesh skips niches in
+          its holes loop), so the recess never breaks through. */}
+      {Object.values(walls ?? {})
+        .filter((w) => !effectivelyHidden.has(w.id))
+        .flatMap((w) =>
+          (w.openings ?? [])
+            .filter((o) => o.type === "niche")
+            .map((o) => (
+              <NicheMesh key={o.id} wall={w} opening={o} roomCenter={roomCenter} />
+            )),
+        )}
       {Object.values(placedProducts ?? {})
         .filter((pp) => !effectivelyHidden.has(pp.id))
         .map((pp) => {

@@ -21,6 +21,7 @@ import WallSurfacePanel from "./WallSurfacePanel";
 import CeilingPaintSection from "./CeilingPaintSection";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { Camera, CameraOff } from "lucide-react";
+import { OpeningsSection } from "@/components/PropertiesPanel.OpeningSection";
 
 interface Props {
   productLibrary: Product[];
@@ -358,9 +359,8 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
               />
             </div>
           </CollapsibleSection>
-          <div className="font-mono text-[11px] text-text-ghost">
-            {wall.openings.length} OPENING(S)
-          </div>
+          {/* Phase 61 OPEN-01 (D-10): per-opening editor section. */}
+          <OpeningsSection wall={wall} />
           <WallSurfacePanel />
           <SavedCameraButtons
             kind="wall"

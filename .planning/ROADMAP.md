@@ -177,7 +177,7 @@
   3. 3D renders correct cutout shape: archway has rounded top via `THREE.Shape` bezier curve; passthrough is full-height rectangle; niche is a recessed face mesh (NOT a through-hole)
   4. PropertiesPanel exposes kind-specific dimensions (width / height / depth-for-niche / arch-radius-for-archway)
   5. Snapshot back-compat: existing snapshots with `kind: "door" | "window"` load unchanged
-**Plans:** 0/1 plans complete
+**Plans:** 1/1 plans complete
 **UI hint:** yes
 
 #### Phase 62: Measurement + Annotation Tools (MEASURE-01)
@@ -228,8 +228,8 @@
 | 57. GLTF Top-Down Silhouette in 2D | 1/1 | Complete    | 2026-05-05 |
 | 58. GLTF Integration Verification | 1/1 | Complete    | 2026-05-05 |
 | 59. Wall Cutaway Mode | 1/1 | Complete    | 2026-05-05 |
-| 60. Stairs | 0/1 | Complete    | 2026-05-05 |
-| 61. Openings — Archway/Passthrough/Niche | 0/1 | Pending    |   |
+| 60. Stairs | 1/1 | Complete    | 2026-05-06 |
+| 61. Openings — Archway/Passthrough/Niche | 1/1 | Complete    | 2026-05-06 |
 | 62. Measurement + Annotation Tools | 0/1 | Pending    |   |
 
 ## Backlog
