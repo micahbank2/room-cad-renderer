@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.16
 milestone_name: Maintenance Pass
 status: ready-to-plan
-stopped_at: Milestone scoped — ready for /gsd:discuss-phase 63
-last_updated: "2026-05-06T18:00:00.000Z"
+stopped_at: Phase 65 (CEIL-02) plan 01 shipped — ready for /gsd:discuss-phase 66
+last_updated: "2026-05-04T15:46:30.000Z"
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 3
   total_plans: 4
-  completed_plans: 0
+  completed_plans: 3
 ---
 
 # Project State
@@ -23,19 +23,19 @@ See: .planning/PROJECT.md (updated 2026-05-06 — v1.15 archived; v1.16 Maintena
 
 ## Current Position
 
-Phase: 63 (next to plan)
+Phase: 66 (next to plan; 63, 64, 65 complete)
 Milestone: v1.16 Maintenance Pass
-Phases: 4 (63, 64, 65, 66) — none planned yet
-Plan: Not started
-Status: Ready for `/gsd:discuss-phase 63`
+Phases: 4 (63, 64, 65, 66) — 3 complete
+Plan: Phase 65 plan 01 complete (2026-05-04)
+Status: Ready for `/gsd:discuss-phase 66`
 
 ## v1.16 Roadmap
 
 | Phase | Requirement | Goal | Status |
 |-------|-------------|------|--------|
-| 63 | DEBT-06 | Fix vitest pollution from `pickerMyTexturesIntegration.test.tsx` (#146) | Pending |
-| 64 | BUG-04  | Fix wall-user-texture-first-apply chromium-dev flake (#141) | Pending |
-| 65 | CEIL-02 | Ceiling resize handles — promote 999.1 (#70) | Pending |
+| 63 | DEBT-06 | Fix vitest pollution from `pickerMyTexturesIntegration.test.tsx` (#146) | Complete |
+| 64 | BUG-04  | Fix wall-user-texture-first-apply chromium-dev flake (#141) | Complete |
+| 65 | CEIL-02 | Ceiling resize handles — promote 999.1 (#70) | Complete (2026-05-04) |
 | 66 | TILE-02 | Per-surface tile-size UI completion — promote 999.3 (#105) | Pending |
 
 ## Recent Milestones
@@ -47,4 +47,4 @@ Status: Ready for `/gsd:discuss-phase 63`
 
 ## Next Step
 
-Run `/gsd:discuss-phase 63` to scope Phase 63 (DEBT-06 vitest pollution fix).
+Run `/gsd:discuss-phase 66` to scope Phase 66 (TILE-02 per-surface tile-size UI completion).
