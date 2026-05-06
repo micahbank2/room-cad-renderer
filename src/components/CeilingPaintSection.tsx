@@ -34,6 +34,15 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
     updateCeiling(ceilingId, { limeWash: checked });
   };
 
+  // Phase 66 (TILE-02, #105): per-ceiling tile-size override. Range 0.5-10 ft.
+  // Visible only when a user-uploaded texture is applied (catalog presets manage
+  // their own scale). Clamps to safe range to prevent zero/negative texture.repeat.
+  const handleSetTileSize = (value: number) => {
+    if (!ceiling.userTextureId) return;
+    const clamped = Math.max(0.5, Math.min(10, value));
+    updateCeiling(ceilingId, { scaleFt: clamped });
+  };
+
   const hasMaterial = Boolean(ceiling.surfaceMaterialId);
 
   return (
@@ -55,6 +64,24 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
         onSelectUserTexture={handleCeilingUserTexture}
         selectedUserTextureId={ceiling.userTextureId}
       />
+
+      {/* Phase 66 (TILE-02, #105): per-ceiling tile-size input.
+          Visible only when a user-uploaded texture is applied. */}
+      {ceiling.userTextureId && ceiling.scaleFt !== undefined && (
+        <label className="block">
+          <span className="font-mono text-[9px] text-text-dim block">TILE SIZE (ft)</span>
+          <input
+            type="number"
+            step="0.5"
+            min="0.5"
+            max="10"
+            value={ceiling.scaleFt}
+            onChange={(e) => handleSetTileSize(parseFloat(e.target.value) || 2)}
+            data-testid="ceiling-tile-size"
+            className="w-full font-mono text-[10px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-2 py-1 rounded-sm"
+          />
+        </label>
+      )}
 
       {hasMaterial && (
         <div className="flex items-center justify-between">
