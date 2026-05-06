@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { useUIStore } from "@/stores/uiStore";
 import { useCADStore } from "@/stores/cadStore";
 import { useProjectStore } from "@/stores/projectStore";
@@ -7,6 +8,7 @@ import type { ToolType } from "@/types/cad";
 import Tooltip from "@/components/Tooltip";
 import { InlineEditableText } from "@/components/ui/InlineEditableText";
 import { PRESETS, type PresetId } from "@/three/cameraPresets";
+import { WallCutoutsDropdown } from "@/components/Toolbar.WallCutoutsDropdown";
 import {
   PersonStanding,
   Map as MapIcon,
@@ -16,6 +18,7 @@ import {
   Square,
   Move3d,
   EyeOff,
+  ChevronDown,
   type LucideIcon,
 } from "lucide-react";
 
@@ -331,6 +334,12 @@ const TOOL_SHORTCUTS: Record<ToolType, string> = {
   window: "N",
   ceiling: "C",
   product: "",
+  // Phase 61 OPEN-01 (D-03): no keyboard shortcuts for the 3 dropdown tools
+  // (toolbar dropdown is the canonical entry; mirror the pattern of `product`
+  // which has no shortcut).
+  archway: "",
+  passthrough: "",
+  niche: "",
 };
 
 /** Prominent save indicator in the top toolbar (SAVE-04) */
@@ -397,6 +406,10 @@ export function ToolPalette() {
   const userZoom = useUIStore((s) => s.userZoom);
   const setUserZoom = useUIStore((s) => s.setUserZoom);
   const resetView = useUIStore((s) => s.resetView);
+  // Phase 61 OPEN-01 (D-03): Wall Cutouts dropdown trigger state.
+  const wallCutoutsTriggerRef = useRef<HTMLButtonElement>(null);
+  const [showWallCutouts, setShowWallCutouts] = useState(false);
+  const isCutoutTool = activeTool === "archway" || activeTool === "passthrough" || activeTool === "niche";
 
   return (
     <div className="absolute left-3 top-3 z-10 flex flex-col gap-1 glass-panel p-1.5 rounded-sm">
@@ -420,6 +433,33 @@ export function ToolPalette() {
           </button>
         </Tooltip>
       ))}
+      {/* Phase 61 OPEN-01 (D-03): Wall Cutouts dropdown trigger — opens
+          archway / passthrough / niche picker. Active when one of those
+          tools is currently selected. */}
+      <Tooltip content="Wall cutouts (archway / passthrough / niche)" placement="right">
+        <button
+          ref={wallCutoutsTriggerRef}
+          data-testid="wall-cutouts-trigger"
+          onClick={() => setShowWallCutouts((v) => !v)}
+          className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-150 ${
+            isCutoutTool
+              ? "bg-accent text-white shadow-[0_0_15px_rgba(124,91,240,0.3)]"
+              : "text-text-dim hover:text-text-primary hover:bg-obsidian-high"
+          }`}
+        >
+          <ChevronDown size={16} />
+        </button>
+      </Tooltip>
+      {showWallCutouts && (
+        <WallCutoutsDropdown
+          anchorRef={wallCutoutsTriggerRef}
+          onClose={() => setShowWallCutouts(false)}
+          onPick={(kind) => {
+            setTool(kind);
+            setShowWallCutouts(false);
+          }}
+        />
+      )}
       <div className="w-full h-px bg-outline-variant/20 my-0.5" />
       <Tooltip content="Toggle grid" placement="right">
         <button

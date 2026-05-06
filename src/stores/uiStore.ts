@@ -151,14 +151,19 @@ interface UIState {
    * null = menu closed. Opened by openContextMenu(), closed by closeContextMenu().
    */
   contextMenu: {
-    kind: "wall" | "product" | "ceiling" | "custom" | "empty";
+    /** Phase 61 OPEN-01 (D-11'): adds 'opening' kind for archway / passthrough /
+     *  niche / door / window. parentId = wallId for opening kind. */
+    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "opening";
     nodeId: string | null;
     position: { x: number; y: number };
+    /** Phase 61 OPEN-01: when kind === 'opening', the parent wall id. */
+    parentId?: string;
   } | null;
   openContextMenu: (
-    kind: "wall" | "product" | "ceiling" | "custom" | "empty",
+    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "opening",
     nodeId: string | null,
     position: { x: number; y: number },
+    parentId?: string,
   ) => void;
   closeContextMenu: () => void;
 
@@ -347,10 +352,10 @@ export const useUIStore = create<UIState>()((set) => ({
     }
   },
 
-  // Phase 53 CTXMENU-01
+  // Phase 53 CTXMENU-01 + Phase 61 OPEN-01 D-11' (parentId for openings)
   contextMenu: null,
-  openContextMenu: (kind, nodeId, position) =>
-    set({ contextMenu: { kind, nodeId, position } }),
+  openContextMenu: (kind, nodeId, position, parentId) =>
+    set({ contextMenu: { kind, nodeId, position, parentId } }),
   closeContextMenu: () => set({ contextMenu: null }),
   pendingLabelFocus: null,
   setPendingLabelFocus: (pceId) => set({ pendingLabelFocus: pceId }),

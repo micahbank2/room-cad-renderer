@@ -14,6 +14,11 @@ import { drawWallDimension } from "./dimensions";
 import { getCachedImage } from "./productImageCache";
 import { getCachedSilhouette } from "@/lib/gltfSilhouette";
 import { getHandleWorldPos } from "./rotationHandle";
+import {
+  buildArchwaySymbol,
+  buildPassthroughSymbol,
+  buildNicheSymbol,
+} from "./openingSymbols";
 import { getResizeHandles, getEdgeHandles } from "./resizeHandles";
 import { getWallEndpointHandles, getWallThicknessHandle } from "./wallEditHandles";
 import { getOpeningHandles } from "./openingEditHandles";
@@ -415,16 +420,35 @@ export function renderWalls(
         { x: origin.x + (oEnd.x - pdx) * scale, y: origin.y + (oEnd.y - pdy) * scale },
       ];
 
-      fc.add(
-        new fabric.Polygon(openingPoints, {
-          fill: opening.type === "door" ? "rgba(255,184,117,0.15)" : "rgba(124,91,240,0.15)",
-          stroke: "#484554",
-          strokeWidth: 0.5,
-          selectable: false,
-          evented: false,
-          data: { type: "opening", openingId: opening.id, wallId: wall.id },
-        })
-      );
+      // Phase 61 OPEN-01 (D-08): kind-discriminated 2D symbol dispatch.
+      // door / window: existing rectangle polygon (selectable+evented now true so
+      // Phase 54 click-to-select fires; Phase 53 right-click handled by
+      // FabricCanvas hit-test branch).
+      // archway / passthrough / niche: kind-specific symbols from openingSymbols.ts.
+      if (opening.type === "door" || opening.type === "window") {
+        fc.add(
+          new fabric.Polygon(openingPoints, {
+            fill: opening.type === "door" ? "rgba(255,184,117,0.15)" : "rgba(124,91,240,0.15)",
+            stroke: "#484554",
+            strokeWidth: 0.5,
+            selectable: true,
+            evented: true,
+            data: { type: "opening", openingId: opening.id, wallId: wall.id, openingType: opening.type },
+          })
+        );
+      } else {
+        const ctx = { openingId: opening.id, wallId: wall.id, openingType: opening.type };
+        let symbol: fabric.Group;
+        if (opening.type === "archway") {
+          symbol = buildArchwaySymbol(openingPoints, ctx);
+        } else if (opening.type === "passthrough") {
+          symbol = buildPassthroughSymbol(openingPoints, ctx);
+        } else {
+          // niche
+          symbol = buildNicheSymbol(openingPoints, ctx);
+        }
+        fc.add(symbol);
+      }
     }
 
     // Dimension label

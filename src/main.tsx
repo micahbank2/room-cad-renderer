@@ -9,6 +9,7 @@ import { installSavedCameraDrivers } from "./test-utils/savedCameraDrivers";
 import { installUserTextureDrivers } from "./test-utils/userTextureDrivers";
 import { installGltfDrivers } from "./test-utils/gltfDrivers";
 import { installCutawayDrivers } from "./test-utils/cutawayDrivers";
+import { installOpeningDrivers } from "./test-utils/openingDrivers";
 
 // Phase 46: install tree test drivers (gated by MODE==="test", production no-op)
 installTreeDrivers();
@@ -22,6 +23,8 @@ installUserTextureDrivers();
 installGltfDrivers();
 // Phase 59: install cutaway test drivers (gated by MODE==="test", production no-op)
 installCutawayDrivers();
+// Phase 61: install opening placement test drivers (gated by MODE==="test", production no-op)
+installOpeningDrivers();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
