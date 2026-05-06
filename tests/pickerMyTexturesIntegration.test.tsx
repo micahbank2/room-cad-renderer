@@ -105,14 +105,19 @@ vi.mock("@/components/PaintSection", () => ({
 }));
 
 // ---- URL shims -----------------------------------------------------------
-if (!global.URL.createObjectURL) {
-  // @ts-expect-error
-  global.URL.createObjectURL = () => "blob:mock/url";
-}
-if (!global.URL.revokeObjectURL) {
-  // @ts-expect-error
-  global.URL.revokeObjectURL = () => {};
-}
+// Phase 63 (DEBT-06, #146): use vi.spyOn + restoreAllMocks instead of
+// top-level global.URL mutation. Top-level mutation persisted across the
+// vitest worker pool (isolate:true only resets module registry, NOT
+// globalThis), causing 281-error cascade pollution into unrelated test
+// files. Pattern mirrors userTextureCache.test.tsx:42-56.
+import { beforeAll, afterAll } from "vitest";
+beforeAll(() => {
+  vi.spyOn(URL, "createObjectURL").mockImplementation(() => "blob:mock/url");
+  vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+});
+afterAll(() => {
+  vi.restoreAllMocks();
+});
 
 import FloorMaterialPicker from "@/components/FloorMaterialPicker";
 import SurfaceMaterialPicker from "@/components/SurfaceMaterialPicker";
