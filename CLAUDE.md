@@ -109,6 +109,27 @@ Zustand store keeps `past[]` and `future[]` arrays of `CADSnapshot` objects (roo
 
 6. **View modes**: App supports "2d", "3d", "split". Split uses `w-1/2` containers. FabricCanvas uses ResizeObserver to handle layout changes.
 
+7. **StrictMode-safe useEffect cleanup for module-level registries**: When a `useEffect` writes to a module-level registry, global, or shared callback collection, it MUST return a cleanup function that clears the entry on unmount. React StrictMode (active in dev via `src/main.tsx`) double-mounts components — first mount runs the effect, then unmounts immediately, then remounts. Without cleanup, the registry retains a stale ref to the discarded first-mount instance, and downstream consumers (test drivers, async callbacks, render-tick hooks) read garbage.
+
+   **We've hit this trap twice:**
+   - **Phase 58** (`f5f6c46`): `gltfThumbnailGenerator` stored a single `onReady` callback per gltfId; first mount registered, StrictMode unmount discarded it, second mount saw `computing.has(gltfId)` and skipped its own registration. Fix: `Set<() => void>` per gltfId, fire all callbacks on resolve.
+   - **Phase 64** (commit `acfb9c2`): `WallMesh` wrote `matRefA.current` to the test-mode `__wallMeshMaterials` registry on mount with no cleanup. After 2D→3D toggle the registry pointed at a discarded material; e2e flake on chromium-dev. Fix: cleanup function with identity check `if (reg[id] === matRefA.current) reg[id] = null`.
+
+   **Required pattern when writing to a module-level registry from an effect:**
+   ```ts
+   useEffect(() => {
+     const reg = (window as ...).__someRegistry;
+     if (!reg) return;
+     reg[id] = currentValue;
+     return () => {
+       // Identity check prevents clobbering a registration from a remount that already happened
+       if (reg[id] === currentValue) reg[id] = null;
+     };
+   }, [id, ...]);
+   ```
+
+   Applies to: test-mode registries (`__wallMeshMaterials`, `__driver*`), shared callback Sets (FIX-01 onReady pattern), bridge functions installed by Scene/Canvas mount (e.g., Phase 48 `installCameraCapture`), and any other module-level state a useEffect mutates.
+
 ---
 
 ## Keyboard Shortcuts
