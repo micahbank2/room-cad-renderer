@@ -1,17 +1,18 @@
 import type { HelpSectionId } from "@/stores/uiStore";
 import { SHORTCUT_DISPLAY_LIST, type ShortcutDisplay } from "@/lib/shortcuts";
+import { Flag, Keyboard, LayoutGrid, Cuboid, type LucideIcon } from "lucide-react";
 
 export interface HelpSectionMeta {
   id: HelpSectionId;
   label: string;
-  icon: string;
+  icon: LucideIcon; // D-15: was material-symbols string
 }
 
 export const HELP_SECTIONS: HelpSectionMeta[] = [
-  { id: "getting-started", label: "GETTING STARTED", icon: "flag" },
-  { id: "shortcuts", label: "SHORTCUTS", icon: "keyboard" },
-  { id: "library", label: "LIBRARY & 2D", icon: "grid_view" },
-  { id: "3d", label: "3D & WALK & ROOMS", icon: "view_in_ar" },
+  { id: "getting-started", label: "GETTING STARTED", icon: Flag },
+  { id: "shortcuts",       label: "SHORTCUTS",       icon: Keyboard },
+  { id: "library",         label: "LIBRARY & 2D",    icon: LayoutGrid },
+  { id: "3d",              label: "3D & WALK & ROOMS", icon: Cuboid }, // D-15: substitute for material-symbols 'view_in_ar'
 ];
 
 // Phase 52 (HOTKEY-01): SHORTCUTS is an alias for the registry's display list.

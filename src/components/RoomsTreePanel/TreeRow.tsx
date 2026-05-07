@@ -2,7 +2,7 @@
 // Phase 46: Single tree row matching UI-SPEC § Per-Row Anatomy verbatim.
 
 import React from "react";
-import { ChevronRight, ChevronDown, Eye, EyeOff, Camera } from "lucide-react";
+import { ChevronRight, ChevronDown, Eye, EyeOff, Camera, Footprints } from "lucide-react";
 import type { TreeNode } from "@/lib/buildRoomTree";
 import { isHiddenInTree } from "@/lib/isHiddenInTree";
 
@@ -160,19 +160,15 @@ export function TreeRow(props: TreeRowProps) {
         {/* 4px gap between chevron/spacer and label */}
         <span className="w-1" aria-hidden="true" />
 
-        {/* Phase 60 STAIRS-01: per-kind icon for stair leaf nodes.
-            Phase 33 D-33 exception — CAD-domain glyph; lucide-react has
-            no Stairs export. CLAUDE.md Material Symbols allowlist updated
-            to include this file. */}
+        {/* Phase 71 D-15: stair leaf icon — Footprints substitute for material-symbols 'stairs' */}
         {node.kind === "stair" && (
-          <span
-            className="material-symbols-outlined text-muted-foreground/80 mr-1"
-            style={{ fontSize: 14 }}
+          <Footprints
+            size={14}
+            className="text-muted-foreground/80 mr-1"
             aria-hidden="true"
             data-stair-icon
-          >
-            stairs
-          </span>
+          />
+          // D-15: substitute for material-symbols 'stairs'
         )}
 
         {/* Label button — data-tree-row for test driver targeting */}

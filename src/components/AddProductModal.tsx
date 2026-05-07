@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { X } from "lucide-react";
+import { X, Upload } from "lucide-react";
 import { uid } from "@/lib/geometry";
 import type { Product } from "@/types/product";
 import { PRODUCT_CATEGORIES } from "@/types/product";
@@ -91,7 +91,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
             onClick={onClose}
             className="text-muted-foreground/60 hover:text-foreground transition-colors"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <X size={18} />
           </button>
         </div>
 
@@ -118,9 +118,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                   />
                 ) : (
                   <>
-                    <span className="material-symbols-outlined text-2xl text-muted-foreground/60 mb-2">
-                      cloud_upload
-                    </span>
+                    <Upload size={24} className="text-muted-foreground/60 mb-2" />
                     <span className="font-sans text-[8px] text-muted-foreground/60 tracking-wider text-center px-3">
                       DRAG ASSETS HERE
                     </span>

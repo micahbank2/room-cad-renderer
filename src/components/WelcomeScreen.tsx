@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { Plus, Upload, FolderOpen, ArrowRight } from "lucide-react";
 import { useCADStore } from "@/stores/cadStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { defaultSnapshot } from "@/lib/snapshotMigration";
@@ -77,9 +78,7 @@ export default function WelcomeScreen({ onStart }: Props) {
               onClick={() => setShowTemplates(true)}
               className="w-72 bg-card border border-border/10 hover:border-accent/40 rounded-smooth-md p-6 text-left transition-all group"
             >
-              <span className="material-symbols-outlined text-[28px] text-foreground mb-3 block">
-                add_box
-              </span>
+              <Plus size={28} className="text-foreground mb-3 block" />
               <h3 className="font-sans text-xs text-foreground tracking-widest mb-2 group-hover:text-foreground transition-colors">
                 CREATE FLOOR PLAN
               </h3>
@@ -93,9 +92,7 @@ export default function WelcomeScreen({ onStart }: Props) {
               onClick={handleUploadClick}
               className="w-72 bg-card border border-border/10 hover:border-accent/40 rounded-smooth-md p-6 text-left transition-all group"
             >
-              <span className="material-symbols-outlined text-[28px] text-foreground mb-3 block">
-                upload_file
-              </span>
+              <Upload size={28} className="text-foreground mb-3 block" />
               <h3 className="font-sans text-xs text-foreground tracking-widest mb-2 group-hover:text-foreground transition-colors">
                 UPLOAD FLOOR PLAN
               </h3>
@@ -110,9 +107,7 @@ export default function WelcomeScreen({ onStart }: Props) {
                 onClick={() => setShowProjects((v) => !v)}
                 className="w-72 bg-card border border-border/10 hover:border-accent/40 rounded-smooth-md p-6 text-left transition-all group"
               >
-                <span className="material-symbols-outlined text-[28px] text-foreground mb-3 block">
-                  folder_open
-                </span>
+                <FolderOpen size={28} className="text-foreground mb-3 block" />
                 <h3 className="font-sans text-xs text-foreground tracking-widest mb-2 group-hover:text-foreground transition-colors">
                   OPEN PROJECT
                 </h3>
@@ -144,9 +139,7 @@ export default function WelcomeScreen({ onStart }: Props) {
                         {new Date(p.updatedAt).toLocaleDateString()}
                       </div>
                     </div>
-                    <span className="material-symbols-outlined text-[18px] text-muted-foreground/60 group-hover:text-accent transition-colors ml-3">
-                      arrow_forward
-                    </span>
+                    <ArrowRight size={18} className="text-muted-foreground/60 group-hover:text-accent transition-colors ml-3" />
                   </button>
                 ))}
               </div>

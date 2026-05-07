@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { X, RotateCcw } from "lucide-react";
 import { useUIStore } from "@/stores/uiStore";
 import type { HelpSectionId } from "@/stores/uiStore";
 import {
@@ -73,7 +74,7 @@ export default function HelpModal() {
             title="Close (Esc)"
             className="text-muted-foreground/60 hover:text-foreground transition-colors"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <X size={18} />
           </button>
         </div>
 
@@ -127,7 +128,7 @@ export default function HelpModal() {
                 }}
                 className="font-sans text-[10px] tracking-widest text-muted-foreground/80 hover:text-foreground transition-colors flex items-center gap-1"
               >
-                <span className="material-symbols-outlined text-[14px]">replay</span>
+                <RotateCcw size={14} /> {/* D-15: substitute for material-symbols 'replay' */}
                 REPLAY TOUR
               </button>
               <span className="font-sans text-[9px] text-muted-foreground/60 tracking-widest">
@@ -143,13 +144,13 @@ export default function HelpModal() {
 
 function HelpNavButton({
   label,
-  icon,
+  icon: Icon,
   active,
   onClick,
 }: {
   section: HelpSectionId;
   label: string;
-  icon: string;
+  icon: React.ComponentType<{ size?: number }>;
   active: boolean;
   onClick: () => void;
 }) {
@@ -162,7 +163,7 @@ function HelpNavButton({
           : "text-muted-foreground/80 border-transparent hover:text-foreground hover:bg-accent"
       }`}
     >
-      <span className="material-symbols-outlined text-[14px]">{icon}</span>
+      <Icon size={14} />
       <span>{label}</span>
     </button>
   );

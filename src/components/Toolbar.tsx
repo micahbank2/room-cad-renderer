@@ -21,6 +21,24 @@ import {
   ChevronDown,
   Ruler,
   Type,
+  Footprints,
+  Undo2,
+  Redo2,
+  HelpCircle,
+  Settings,
+  User,
+  MousePointer,
+  Minus,
+  DoorOpen,
+  RectangleVertical,
+  Triangle,
+  Grid2x2,
+  ZoomIn,
+  ZoomOut,
+  Maximize,
+  AlertCircle,
+  Loader2,
+  CloudCheck,
   type LucideIcon,
 } from "lucide-react";
 import { setPendingStair } from "@/canvas/tools/stairTool";
@@ -40,15 +58,14 @@ const DISPLAY_MODES = [
   { id: "explode" as const, label: "EXPLODE", Icon: Move3d,     tooltip: "Rooms separated along X-axis" },
 ];
 
-const tools: { id: ToolType; label: string; icon: string }[] = [
-  { id: "select", label: "SELECT", icon: "arrow_selector_tool" },
-  { id: "wall", label: "WALL", icon: "horizontal_rule" },
-  { id: "door", label: "DOOR", icon: "door_front" },
-  { id: "window", label: "WINDOW", icon: "window" },
-  { id: "ceiling", label: "CEILING", icon: "roofing" },
-  // Phase 60 STAIRS-01 (research Q1): Material Symbols `stairs` glyph;
-  // lucide-react has no Stairs export (Toolbar.tsx is on the D-33 allowlist).
-  { id: "stair", label: "STAIRS", icon: "stairs" },
+// D-15: lucide-react icon map for tool palette (Material Symbols replaced)
+const tools: { id: ToolType; label: string; Icon: LucideIcon }[] = [
+  { id: "select", label: "SELECT", Icon: MousePointer },
+  { id: "wall",   label: "WALL",   Icon: Minus },
+  { id: "door",   label: "DOOR",   Icon: DoorOpen },
+  { id: "window", label: "WINDOW", Icon: RectangleVertical }, // D-15: substitute for material-symbols 'window'
+  { id: "ceiling", label: "CEILING", Icon: Triangle },        // D-15: substitute for material-symbols 'roofing'
+  { id: "stair", label: "STAIRS", Icon: Footprints },         // D-15: substitute for material-symbols 'stairs'
 ];
 
 interface Props {
@@ -106,7 +123,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
               onClick={onFloorPlanClick}
               className="flex items-center gap-1.5 font-sans text-sm font-normal px-2 py-1 text-muted-foreground/80 hover:text-foreground transition-colors duration-150"
             >
-              <span className="material-symbols-outlined text-[14px]">grid_view</span>
+              <LayoutGrid size={14} />
               Floor plan
             </button>
           </Tooltip>
@@ -144,7 +161,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
                 : "text-muted-foreground/80 hover:text-foreground"
             }`}
           >
-            <span className="material-symbols-outlined text-[14px]">directions_walk</span>
+            <Footprints size={14} /> {/* D-15: substitute for material-symbols 'directions_walk' */}
             {cameraMode === "orbit" ? "Walk" : "Orbit"}
           </button>
         </Tooltip>
@@ -277,7 +294,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
             aria-label="Undo"
             className="text-muted-foreground/80 hover:text-foreground disabled:opacity-20 transition-colors"
           >
-            <span className="material-symbols-outlined text-[18px]">undo</span>
+            <Undo2 size={18} />
           </button>
         </Tooltip>
         <Tooltip content="Redo" shortcut="Ctrl+Shift+Z" placement="bottom">
@@ -287,7 +304,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
             aria-label="Redo"
             className="text-muted-foreground/80 hover:text-foreground disabled:opacity-20 transition-colors"
           >
-            <span className="material-symbols-outlined text-[18px]">redo</span>
+            <Redo2 size={18} />
           </button>
         </Tooltip>
 
@@ -317,14 +334,14 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
             className="text-muted-foreground/80 hover:text-foreground transition-colors"
             data-onboarding="help-button"
           >
-            <span className="material-symbols-outlined text-[18px]">help</span>
+            <HelpCircle size={18} />
           </button>
         </Tooltip>
         <button className="text-muted-foreground/80 hover:text-foreground transition-colors">
-          <span className="material-symbols-outlined text-[18px]">settings</span>
+          <Settings size={18} />
         </button>
         <div className="w-7 h-7 rounded-full bg-accent flex items-center justify-center">
-          <span className="material-symbols-outlined text-[14px] text-muted-foreground/80">person</span>
+          <User size={14} className="text-muted-foreground/80" />
         </div>
       </div>
     </header>
@@ -364,7 +381,7 @@ function ToolbarSaveStatus() {
   if (status === "failed") {
     return (
       <div className="flex items-center gap-1.5 min-w-[72px]" aria-label="Save status">
-        <span className="material-symbols-outlined text-[14px] text-error">error</span>
+        <AlertCircle size={14} className="text-error" />
         <span className="font-sans text-base tracking-widest text-error">
           SAVE_FAILED
         </span>
@@ -378,22 +395,17 @@ function ToolbarSaveStatus() {
     <div className="flex items-center gap-1.5 min-w-[72px]" aria-label="Save status">
       {isSaving ? (
         <>
-          <span
-            className={`material-symbols-outlined text-[14px] text-foreground ${
-              reducedMotion ? "" : "animate-spin"
-            }`}
-          >
-            progress_activity
-          </span>
+          <Loader2
+            size={14}
+            className={`text-foreground ${reducedMotion ? "" : "animate-spin"}`}
+          />
           <span className="font-sans text-base tracking-widest text-foreground">
             SAVING
           </span>
         </>
       ) : (
         <>
-          <span className="material-symbols-outlined text-[14px] text-success">
-            cloud_done
-          </span>
+          <CloudCheck size={14} className="text-success" />
           <span
             className={`font-sans text-base tracking-widest ${
               isSaved ? "text-success" : "text-muted-foreground/60"
@@ -454,7 +466,7 @@ export function ToolPalette() {
                 : "text-muted-foreground/80 hover:text-foreground hover:bg-accent"
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
+            <t.Icon size={18} />
           </button>
         </Tooltip>
       ))}
@@ -520,7 +532,7 @@ export function ToolPalette() {
             showGrid ? "text-foreground" : "text-muted-foreground/60"
           } hover:bg-accent`}
         >
-          <span className="material-symbols-outlined text-[18px]">grid_4x4</span>
+          <Grid2x2 size={18} /> {/* D-15: substitute for material-symbols 'grid_4x4' */}
         </button>
       </Tooltip>
       <div className="w-full h-px bg-border/50 my-0.5" />
@@ -529,7 +541,7 @@ export function ToolPalette() {
           onClick={() => setUserZoom(userZoom * 1.2)}
           className="w-8 h-8 flex items-center justify-center rounded-smooth-md text-muted-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
         >
-          <span className="material-symbols-outlined text-[18px]">zoom_in</span>
+          <ZoomIn size={18} />
         </button>
       </Tooltip>
       <Tooltip content="Zoom out" placement="right">
@@ -537,7 +549,7 @@ export function ToolPalette() {
           onClick={() => setUserZoom(userZoom / 1.2)}
           className="w-8 h-8 flex items-center justify-center rounded-smooth-md text-muted-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
         >
-          <span className="material-symbols-outlined text-[18px]">zoom_out</span>
+          <ZoomOut size={18} />
         </button>
       </Tooltip>
       <Tooltip content="Fit to view" shortcut="0" placement="right">
@@ -545,7 +557,7 @@ export function ToolPalette() {
           onClick={resetView}
           className="w-8 h-8 flex items-center justify-center rounded-smooth-md text-muted-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
         >
-          <span className="material-symbols-outlined text-[18px]">fit_screen</span>
+          <Maximize size={18} />
         </button>
       </Tooltip>
       <div className="w-8 h-5 flex items-center justify-center font-sans text-[9px] text-muted-foreground/60 tracking-wider">

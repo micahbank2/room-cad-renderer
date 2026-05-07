@@ -4,10 +4,10 @@
 // (mousedown click-outside, uiStore zoom/pan change, Escape), animated
 // fade-in guarded by useReducedMotion (Phase 33 D-39).
 //
-// Phase 33 D-33 allowlist exception: Material Symbols `arch` glyph is the
-// only icon for archway — lucide has no archway equivalent.
+// Phase 71 D-15: Material Symbols `arch` replaced with `Squircle` from lucide-react.
+// D-15: substitute for material-symbols 'arch'
 import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
-import { Frame, RectangleHorizontal } from "lucide-react";
+import { Frame, RectangleHorizontal, Squircle } from "lucide-react";
 import { useUIStore } from "@/stores/uiStore";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
@@ -110,7 +110,7 @@ export function WallCutoutsDropdown({ anchorRef, onClose, onPick }: Props) {
           className="w-full flex items-center gap-2 px-2 py-1 rounded-smooth-md font-sans text-[11px] text-foreground hover:bg-accent transition-colors"
         >
           {item.icon === "arch" && (
-            <span className="material-symbols-outlined text-[14px]">arch</span>
+            <Squircle size={14} /> /* D-15: substitute for material-symbols 'arch' */
           )}
           {item.icon === "lucide-rect" && <RectangleHorizontal size={14} />}
           {item.icon === "lucide-frame" && <Frame size={14} />}

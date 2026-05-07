@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Search, X } from "lucide-react";
 import { HELP_INDEX } from "@/components/help/helpIndex";
 import { searchHelp, highlightMatch } from "@/lib/helpSearch";
 import type { HelpIndexEntry } from "@/components/help/helpIndex";
@@ -17,9 +18,7 @@ export default function HelpSearch({ query, onQueryChange, onSelect }: Props) {
   return (
     <div className="px-3 mb-3">
       <div className="relative">
-        <span className="material-symbols-outlined text-[14px] text-muted-foreground/60 absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none">
-          search
-        </span>
+        <Search size={14} className="text-muted-foreground/60 absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" />
         <input
           type="text"
           value={query}
@@ -33,7 +32,7 @@ export default function HelpSearch({ query, onQueryChange, onSelect }: Props) {
             title="Clear search"
             className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground/60 hover:text-foreground"
           >
-            <span className="material-symbols-outlined text-[14px]">close</span>
+            <X size={14} />
           </button>
         )}
       </div>

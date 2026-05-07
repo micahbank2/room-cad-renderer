@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box } from "lucide-react";
+import { Box, Package } from "lucide-react";
 import type { Product } from "@/types/product";
 import { PRODUCT_CATEGORIES } from "@/types/product";
 import { useUIStore } from "@/stores/uiStore";
@@ -123,9 +123,7 @@ export function ProductLibrary({
       <div className="flex-1 overflow-y-auto px-6 pb-6">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full">
-            <span className="material-symbols-outlined text-4xl text-muted-foreground/60 mb-3">
-              inventory_2
-            </span>
+            <Package size={36} className="text-muted-foreground/60 mb-3" /> {/* D-15: substitute for material-symbols 'inventory_2' */}
             <span className="font-sans text-[10px] text-muted-foreground/60 tracking-widest">
               NO ITEMS FOUND
             </span>

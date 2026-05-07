@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { LayoutGrid, Sofa, BedDouble, ChefHat, Upload, ImageOff, X, type LucideIcon } from "lucide-react";
 import { useCADStore } from "@/stores/cadStore";
 import { defaultSnapshot } from "@/lib/snapshotMigration";
 import { ROOM_TEMPLATES, type RoomTemplateId } from "@/data/roomTemplates";
@@ -78,11 +79,11 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
     onClose();
   };
 
-  const templates: { id: RoomTemplateId; title: string; sub: string; icon: string }[] = [
-    { id: "BLANK", title: "BLANK ROOM", sub: "Draw walls from scratch", icon: "grid_view" },
-    { id: "LIVING_ROOM", title: "LIVING ROOM", sub: "16 × 20 ft perimeter", icon: "weekend" },
-    { id: "BEDROOM", title: "BEDROOM", sub: "12 × 14 ft perimeter", icon: "bed" },
-    { id: "KITCHEN", title: "KITCHEN", sub: "10 × 12 ft perimeter", icon: "kitchen" },
+  const templates: { id: RoomTemplateId; title: string; sub: string; Icon: LucideIcon }[] = [
+    { id: "BLANK",       title: "BLANK ROOM",   sub: "Draw walls from scratch",   Icon: LayoutGrid },
+    { id: "LIVING_ROOM", title: "LIVING ROOM",  sub: "16 × 20 ft perimeter",     Icon: Sofa },       // D-15: substitute for material-symbols 'weekend'
+    { id: "BEDROOM",     title: "BEDROOM",      sub: "12 × 14 ft perimeter",     Icon: BedDouble },  // D-15: substitute for material-symbols 'bed'
+    { id: "KITCHEN",     title: "KITCHEN",      sub: "10 × 12 ft perimeter",     Icon: ChefHat },    // D-15: substitute for material-symbols 'kitchen'
   ];
 
   return (
@@ -105,7 +106,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
             title="Close (Esc)"
             className="text-muted-foreground/60 hover:text-foreground transition-colors"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <X size={18} />
           </button>
         </div>
         <div className="p-5 grid grid-cols-2 gap-3">
@@ -115,9 +116,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
               onClick={() => pickTemplate(t.id)}
               className="group text-left bg-card border border-border/10 hover:border-accent/40 rounded-smooth-md p-4 transition-all"
             >
-              <span className="material-symbols-outlined text-[28px] text-foreground mb-2 block">
-                {t.icon}
-              </span>
+              <t.Icon size={28} className="text-foreground mb-2 block" />
               <h3 className="font-sans text-[11px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
                 {t.title}
               </h3>
@@ -132,9 +131,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
                 onClick={() => fileInputRef.current?.click()}
                 className="group text-left bg-card border border-border/10 hover:border-accent/40 rounded-smooth-md p-4 transition-all"
               >
-                <span className="material-symbols-outlined text-[28px] text-foreground mb-2 block">
-                  upload_file
-                </span>
+                <Upload size={28} className="text-foreground mb-2 block" />
                 <h3 className="font-sans text-[11px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
                   UPLOAD IMAGE
                 </h3>
@@ -146,9 +143,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
                 onClick={handleRemoveImage}
                 className="group text-left bg-card border border-border/10 hover:border-accent/40 rounded-smooth-md p-4 transition-all"
               >
-                <span className="material-symbols-outlined text-[28px] text-muted-foreground/60 mb-2 block">
-                  image_not_supported
-                </span>
+                <ImageOff size={28} className="text-muted-foreground/60 mb-2 block" />
                 <h3 className="font-sans text-[11px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
                   REMOVE IMAGE
                 </h3>
