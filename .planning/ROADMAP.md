@@ -192,7 +192,14 @@
   3. Click a Tab → muted-background pill active state (no neon glow, no hard accent ring)
   4. Expand any panel section → spring-animated height transition with chevron rotation; collapsed/expanded state persists per section
   5. ~30 existing button sites + ~5 tab sites + ~5 panel sites migrated to the new primitives in this phase; remaining sites continue to work with their inline styles until touched in Phases 73-76
-**Plans:** TBD
+**Plans:** 7 plans
+- [ ] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
+- [ ] 72-02-PLAN.md — Button primitive + tests
+- [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
+- [ ] 72-04-PLAN.md — Dialog primitive + tests
+- [ ] 72-05-PLAN.md — Remaining primitives (Tabs, SegmentedControl, Switch, Slider, Tooltip, Input, Popover)
+- [ ] 72-06-PLAN.md — Toolbar button migration (~20 sites)
+- [ ] 72-07-PLAN.md — PropertiesPanel CollapsibleSection migration (11 sites) + cleanup
 **UI hint:** yes
 
 #### Phase 73: Sidebar Restyle (SIDEBAR-RESTYLE)
@@ -206,7 +213,14 @@
   3. Click empty canvas → right sidebar disappears with spring exit animation; canvas fills the freed space
   4. Click a wall / product / ceiling / custom-element / opening / stair → right sidebar slides in with spring entry showing the relevant PropertiesPanel sections
   5. Re-click empty canvas → sidebar collapses again with no driver registration loss (Phase 68 lesson: drivers live in `src/test-utils/*Drivers.ts`, survive component un-mount cleanly)
-**Plans:** TBD
+**Plans:** 7 plans
+- [ ] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
+- [ ] 72-02-PLAN.md — Button primitive + tests
+- [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
+- [ ] 72-04-PLAN.md — Dialog primitive + tests
+- [ ] 72-05-PLAN.md — Remaining primitives (Tabs, SegmentedControl, Switch, Slider, Tooltip, Input, Popover)
+- [ ] 72-06-PLAN.md — Toolbar button migration (~20 sites)
+- [ ] 72-07-PLAN.md — PropertiesPanel CollapsibleSection migration (11 sites) + cleanup
 **UI hint:** yes
 
 #### Phase 74: Toolbar Rework — Floating Action Menu (TOOLBAR-REWORK)
@@ -220,7 +234,14 @@
   3. Click a building-block icon → tool activates and canvas cursor switches; existing keyboard shortcuts (V / W / D / N / etc. from `src/lib/shortcuts.ts`) all still work
   4. Active tool gets a darker fill ring; switching to a different tool runs the existing tool-cleanup pattern (`toolCleanupRef` from CLAUDE.md tool architecture) with zero leaks
   5. Display Mode (NORMAL/SOLO/EXPLODE) and View Mode (2D/3D/Split) render as SegmentedControl primitive instances in the bottom row; Save/Open project UI relocates to a top-bar or floating top-right element (decided during plan-phase research)
-**Plans:** TBD
+**Plans:** 7 plans
+- [ ] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
+- [ ] 72-02-PLAN.md — Button primitive + tests
+- [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
+- [ ] 72-04-PLAN.md — Dialog primitive + tests
+- [ ] 72-05-PLAN.md — Remaining primitives (Tabs, SegmentedControl, Switch, Slider, Tooltip, Input, Popover)
+- [ ] 72-06-PLAN.md — Toolbar button migration (~20 sites)
+- [ ] 72-07-PLAN.md — PropertiesPanel CollapsibleSection migration (11 sites) + cleanup
 **UI hint:** yes
 
 #### Phase 75: Properties + Library Restyle (PROPERTIES-LIBRARY-RESTYLE)
@@ -234,7 +255,14 @@
   3. Open the ProductLibrary → cards use Pascal's pattern with Barlow names + Geist Sans metadata; GLTF Box badge top-LEFT survives the restyle
   4. RoomSettings collapsible sections use the new PanelSection primitive (spring expand/collapse, chevron rotation); inputs use the new Input primitive
   5. Custom CSS classes `glass-panel` / `accent-glow` / `cad-grid-bg` / `ghost-border` removed from MaterialPicker / ProductLibrary / RoomSettings / PropertiesPanel / WallSurfacePanel / AddProductModal / UploadTextureModal / UploadMaterialModal / MyTexturesList / LibraryCard
-**Plans:** TBD
+**Plans:** 7 plans
+- [ ] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
+- [ ] 72-02-PLAN.md — Button primitive + tests
+- [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
+- [ ] 72-04-PLAN.md — Dialog primitive + tests
+- [ ] 72-05-PLAN.md — Remaining primitives (Tabs, SegmentedControl, Switch, Slider, Tooltip, Input, Popover)
+- [ ] 72-06-PLAN.md — Toolbar button migration (~20 sites)
+- [ ] 72-07-PLAN.md — PropertiesPanel CollapsibleSection migration (11 sites) + cleanup
 **UI hint:** yes
 
 #### Phase 76: Modals + WelcomeScreen + Final (MODALS-WELCOME-FINAL)
@@ -248,7 +276,14 @@
   3. Open HelpModal, ConfirmDialog, ErrorBoundary fallback → all use the unified Dialog primitive; existing keyboard-shortcut overlay (Phase 52) preserves its 26 shortcut entries
   4. Final grep audit returns zero matches for `obsidian-` / `text-text-` / `accent-glow` / `cad-grid-bg` / `glass-panel` / `material-symbols-outlined` across `src/`
   5. The 4 v1.17 carry-over tests verified passing on the new chrome (snapshot v6 assertion, removed wallpaper "MY TEXTURES" tab, WallMesh cutaway ghost-spread audit, contextMenuActionCounts pollution); existing 800+ test suite still green
-**Plans:** TBD
+**Plans:** 7 plans
+- [ ] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
+- [ ] 72-02-PLAN.md — Button primitive + tests
+- [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
+- [ ] 72-04-PLAN.md — Dialog primitive + tests
+- [ ] 72-05-PLAN.md — Remaining primitives (Tabs, SegmentedControl, Switch, Slider, Tooltip, Input, Popover)
+- [ ] 72-06-PLAN.md — Toolbar button migration (~20 sites)
+- [ ] 72-07-PLAN.md — PropertiesPanel CollapsibleSection migration (11 sites) + cleanup
 **UI hint:** yes
 
 ---
