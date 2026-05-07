@@ -260,7 +260,7 @@
 | 64. Wall-Texture Flake Fix | 1/1 | Complete    | 2026-05-06 |
 | 65. Ceiling Resize Handles | 1/1 | Complete    | 2026-05-06 |
 | 66. Per-Surface Tile-Size UI | 1/1 | Complete    | 2026-05-06 |
-| 67. Material Engine Foundation | 1/1 | Complete   | 2026-05-07 |
+| 67. Material Engine Foundation | 1/1 | Complete    | 2026-05-07 |
 | 68. Material Application System | 0/0 | Not started   | — |
 | 69. Product–Material Linking | 0/0 | Not started   | — |
 | 70. Library Rebuild | 0/0 | Not started   | — |
