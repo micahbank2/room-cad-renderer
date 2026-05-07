@@ -190,9 +190,9 @@
   3. Applying a material is a single undo entry (Ctrl+Z reverts the apply)
   4. Existing paint colors, wallpaper assignments, and floor-material assignments auto-migrate at load time (snapshot v5→v6, idempotent — D-01)
   5. Snapshot serialization preserves `surface.materialId` and round-trips cleanly through save/load
-**Plans:** 7 plans
-- [ ] 68-01-PLAN.md — Wave 0 RED test scaffolding (6 failing tests pin the contract)
-- [ ] 68-02-PLAN.md — Type extensions (Material.colorHex, FaceDirection, materialIdA/B, floorMaterialId, ceiling.materialId, faceMaterials, snapshot v5→v6) + resolveSurfaceMaterial / resolveSurfaceTileSize
+**Plans:** 2/7 plans executed
+- [x] 68-01-PLAN.md — Wave 0 RED test scaffolding (6 failing tests pin the contract)
+- [x] 68-02-PLAN.md — Type extensions (Material.colorHex, FaceDirection, materialIdA/B, floorMaterialId, ceiling.materialId, faceMaterials, snapshot v5→v6) + resolveSurfaceMaterial / resolveSurfaceTileSize
 - [ ] 68-03-PLAN.md — migrateV5ToV6 async pre-pass (paint→Material, wallpaper→Material, floor→Material, ceiling→Material, idempotent) + applySurfaceMaterial / *NoHistory + applySurfaceTileSize / *NoHistory store actions
 - [ ] 68-04-PLAN.md — useResolvedMaterial R3F hook + priority-1 materialId branch in WallMesh / FloorMesh / CeilingMesh / per-face material array on CustomElementMesh
 - [ ] 68-05-PLAN.md — materialPatternCache (async fabric.Pattern loader) + fabricSync wall fill materialId branch + new renderFloor 2D top-down floor render
@@ -268,7 +268,7 @@
 | 65. Ceiling Resize Handles | 1/1 | Complete    | 2026-05-06 |
 | 66. Per-Surface Tile-Size UI | 1/1 | Complete    | 2026-05-06 |
 | 67. Material Engine Foundation | 1/1 | Complete    | 2026-05-07 |
-| 68. Material Application System | 0/7 | Not started   | — |
+| 68. Material Application System | 2/7 | In Progress|  |
 | 69. Product–Material Linking | 0/0 | Not started   | — |
 | 70. Library Rebuild | 0/0 | Not started   | — |
 
