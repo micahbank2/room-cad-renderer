@@ -1,10 +1,13 @@
 import { useState } from "react";
 import type { Product } from "@/types/product";
-import { useActiveRoom, useActiveWalls, useActivePlacedProducts } from "@/stores/cadStore";
+import {
+  useActiveRoom,
+  useActiveWalls,
+  useActivePlacedProducts,
+} from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import RoomSettings from "./RoomSettings";
 import SidebarProductPicker from "./SidebarProductPicker";
-import FloorMaterialPicker from "./FloorMaterialPicker";
 import CustomElementsPanel from "./CustomElementsPanel";
 import FramedArtLibrary from "./FramedArtLibrary";
 import WainscotLibrary from "./WainscotLibrary";
@@ -108,9 +111,6 @@ export default function Sidebar({ productLibrary }: Props) {
           </div>
         </CollapsibleSection>
 
-        <CollapsibleSection label="Floor material">
-          <FloorMaterialPicker />
-        </CollapsibleSection>
 
         <CollapsibleSection label="Snap" defaultOpen={false}>
           <select
