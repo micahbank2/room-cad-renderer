@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.18
 milestone_name: Pascal Visual Parity
 status: verifying
-last_updated: "2026-05-07T21:45:54.332Z"
+last_updated: "2026-05-07T21:46:10.120Z"
 last_activity: 2026-05-07
 progress:
   total_phases: 6
-  completed_phases: 1
-  total_plans: 14
-  completed_plans: 7
+  completed_phases: 2
+  total_plans: 8
+  completed_plans: 8
 ---
 
 # Project State
@@ -52,7 +52,8 @@ Last activity: 2026-05-07
 - [Phase 71]: productStore addProduct: restored pre-load guard (LIB-03 safety — prevents writing empty library before load resolves)
 - [Phase 71]: contextMenuActionCounts: duplicate vi.mock() caused full-suite TypeErrors; removed first incomplete mock declaration
 - [Phase 72-01]: Import type Transition from motion/react (no runtime side-effects)
-- [Phase 72-primitives-shelf]: AnimatePresence initial=false prevents first-mount animation in PanelSection (Pitfall 1)
+- [Phase 72-primitives-shelf]: Tabs uses useId() for stable layoutId namespacing to prevent cross-instance pill animation leakage
+- [Phase 72-primitives-shelf]: Slider uses native accentColor CSS property instead of appearance-none custom thumb for simplicity
 
 ## Performance Metrics
 
@@ -76,7 +77,7 @@ Last activity: 2026-05-07
 | Phase 71 P05 | 11 | 2 tasks | 19 files |
 | Phase 71 P06 | 45 | 3 tasks | 16 files |
 | Phase 72-primitives-shelf P01 | 110 | 2 tasks | 6 files |
-| Phase 72-primitives-shelf P03 | 15 | 1 tasks | 3 files |
+| Phase 72-primitives-shelf P05 | 12 | 2 tasks | 9 files |
 
 ## Recent Milestones
 

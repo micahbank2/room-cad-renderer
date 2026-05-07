@@ -159,7 +159,7 @@
 ### Phases
 
 - [x] **Phase 71: Token Foundation (TOKEN-FOUNDATION)** — Replace Obsidian palette with Pascal's oklch tokens; Barlow + Geist fonts; 10px squircle radius; light + dark dual-mode (completed 2026-05-07)
-- [ ] **Phase 72: Primitives Shelf (PRIMITIVES-SHELF)** — `cva`-driven primitives (Button / Tab / PanelSection / SegmentedControl / Switch / Slider / Tooltip / Dialog / Input / Popover) with `motion/react` animations
+- [x] **Phase 72: Primitives Shelf (PRIMITIVES-SHELF)** — `cva`-driven primitives (Button / Tab / PanelSection / SegmentedControl / Switch / Slider / Tooltip / Dialog / Input / Popover) with `motion/react` animations (completed 2026-05-07)
 - [ ] **Phase 73: Sidebar Restyle (SIDEBAR-RESTYLE)** — Pascal spine-and-branches rooms tree; right sidebar becomes contextual (mounts only when something is selected)
 - [ ] **Phase 74: Toolbar Rework (TOOLBAR-REWORK)** — Floating two-row action menu at canvas-bottom-center replaces the top-left toolbar entirely
 - [ ] **Phase 75: Properties + Library Restyle (PROPERTIES-LIBRARY-RESTYLE)** — MaterialPicker / ProductLibrary / RoomSettings / PropertiesPanel / Add+UploadModals adopt new tokens, primitives, and contextual mount pattern
@@ -192,12 +192,12 @@
   3. Click a Tab → muted-background pill active state (no neon glow, no hard accent ring)
   4. Expand any panel section → spring-animated height transition with chevron rotation; collapsed/expanded state persists per section
   5. ~30 existing button sites + ~5 tab sites + ~5 panel sites migrated to the new primitives in this phase; remaining sites continue to work with their inline styles until touched in Phases 73-76
-**Plans:** 0/7 plans executed
-- [ ] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
-- [ ] 72-02-PLAN.md — Button primitive + tests
-- [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
-- [ ] 72-04-PLAN.md — Dialog primitive + tests
-- [ ] 72-05-PLAN.md — Remaining primitives (Tabs, SegmentedControl, Switch, Slider, Tooltip, Input, Popover)
+**Plans:** 5/7 plans complete
+- [x] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
+- [x] 72-02-PLAN.md — Button primitive + tests
+- [x] 72-03-PLAN.md — PanelSection primitive + test driver + tests
+- [x] 72-04-PLAN.md — Dialog primitive + tests
+- [x] 72-05-PLAN.md — Remaining primitives (Tabs, SegmentedControl, Switch, Slider, Tooltip, Input, Popover)
 - [ ] 72-06-PLAN.md — Toolbar button migration (~20 sites)
 - [ ] 72-07-PLAN.md — PropertiesPanel CollapsibleSection migration (11 sites) + cleanup
 **UI hint:** yes
@@ -417,7 +417,7 @@
 | 69. Product–Material Linking | 0/0 | Deferred to v1.19   | — |
 | 70. Library Rebuild | 0/0 | Deferred to v1.19   | — |
 | 71. Token Foundation | 7/7 | Complete   | 2026-05-07 |
-| 72. Primitives Shelf | 0/7 | Planned    |  |
+| 72. Primitives Shelf | 5/7 | In Progress   | — |
 | 73. Sidebar Restyle | 0/0 | Not started   | — |
 | 74. Toolbar Rework | 0/0 | Not started   | — |
 | 75. Properties + Library Restyle | 0/0 | Not started   | — |
