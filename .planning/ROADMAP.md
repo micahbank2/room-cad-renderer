@@ -158,7 +158,7 @@
 
 ### Phases
 
-- [ ] **Phase 71: Token Foundation (TOKEN-FOUNDATION)** — Replace Obsidian palette with Pascal's oklch tokens; Barlow + Geist fonts; 10px squircle radius; light + dark dual-mode
+- [x] **Phase 71: Token Foundation (TOKEN-FOUNDATION)** — Replace Obsidian palette with Pascal's oklch tokens; Barlow + Geist fonts; 10px squircle radius; light + dark dual-mode (completed 2026-05-07)
 - [ ] **Phase 72: Primitives Shelf (PRIMITIVES-SHELF)** — `cva`-driven primitives (Button / Tab / PanelSection / SegmentedControl / Switch / Slider / Tooltip / Dialog / Input / Popover) with `motion/react` animations
 - [ ] **Phase 73: Sidebar Restyle (SIDEBAR-RESTYLE)** — Pascal spine-and-branches rooms tree; right sidebar becomes contextual (mounts only when something is selected)
 - [ ] **Phase 74: Toolbar Rework (TOOLBAR-REWORK)** — Floating two-row action menu at canvas-bottom-center replaces the top-left toolbar entirely
@@ -178,7 +178,7 @@
   3. Toggle theme via `useTheme()` → smooth swap to light mode; every surface adapts cleanly with no `obsidian-*` artifacts
   4. UI text uses Barlow (display) and Geist Sans (body) plus Geist Mono only where monospaced data is appropriate; IBM Plex Mono is gone from the chrome
   5. Existing 800+ test suite passes after the token swap, plus the 4 v1.17 carry-over tests get their contracts updated (snapshot v6 assertion, removed wallpaper "MY TEXTURES" tab, WallMesh cutaway ghost-spread audit, contextMenuActionCounts pollution)
-**Plans:** 6/7 plans executed
+**Plans:** 7/7 plans complete
 **UI hint:** yes
 
 #### Phase 72: Primitives Shelf (PRIMITIVES-SHELF)
@@ -381,7 +381,7 @@
 | 68. Material Application System | 7/7 | Complete   | 2026-05-07 |
 | 69. Product–Material Linking | 0/0 | Deferred to v1.19   | — |
 | 70. Library Rebuild | 0/0 | Deferred to v1.19   | — |
-| 71. Token Foundation | 6/7 | In Progress|  |
+| 71. Token Foundation | 7/7 | Complete   | 2026-05-07 |
 | 72. Primitives Shelf | 0/0 | Not started   | — |
 | 73. Sidebar Restyle | 0/0 | Not started   | — |
 | 74. Toolbar Rework | 0/0 | Not started   | — |
