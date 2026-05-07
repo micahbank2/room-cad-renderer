@@ -88,22 +88,22 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
-        className="absolute inset-0 bg-obsidian-deepest/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
         onClick={onClose}
       />
       <div
-        className="relative w-[700px] max-w-[95vw] bg-obsidian-mid border border-outline-variant/30 rounded-sm shadow-2xl"
+        className="relative w-[700px] max-w-[95vw] bg-popover border border-border/60 rounded-sm shadow-2xl"
         role="dialog"
         aria-label="Choose a floor plan template"
       >
-        <div className="flex items-center justify-between px-5 py-3 border-b border-outline-variant/20">
-          <h2 className="font-mono text-sm text-text-primary tracking-widest uppercase">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-border/50">
+          <h2 className="font-mono text-sm text-foreground tracking-widest uppercase">
             Choose A Template
           </h2>
           <button
             onClick={onClose}
             title="Close (Esc)"
-            className="text-text-ghost hover:text-text-primary transition-colors"
+            className="text-muted-foreground/60 hover:text-foreground transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
@@ -113,15 +113,15 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
             <button
               key={t.id}
               onClick={() => pickTemplate(t.id)}
-              className="group text-left bg-obsidian-low border border-outline-variant/10 hover:border-accent/40 rounded-sm p-4 transition-all"
+              className="group text-left bg-card border border-border/10 hover:border-accent/40 rounded-sm p-4 transition-all"
             >
-              <span className="material-symbols-outlined text-[28px] text-accent mb-2 block">
+              <span className="material-symbols-outlined text-[28px] text-foreground mb-2 block">
                 {t.icon}
               </span>
-              <h3 className="font-mono text-[11px] text-text-primary tracking-widest mb-1 group-hover:text-accent-light transition-colors">
+              <h3 className="font-mono text-[11px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
                 {t.title}
               </h3>
-              <p className="font-mono text-[10px] text-text-ghost leading-relaxed">
+              <p className="font-mono text-[10px] text-muted-foreground/60 leading-relaxed">
                 {t.sub}
               </p>
             </button>
@@ -130,29 +130,29 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
             <>
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="group text-left bg-obsidian-low border border-outline-variant/10 hover:border-accent/40 rounded-sm p-4 transition-all"
+                className="group text-left bg-card border border-border/10 hover:border-accent/40 rounded-sm p-4 transition-all"
               >
-                <span className="material-symbols-outlined text-[28px] text-accent mb-2 block">
+                <span className="material-symbols-outlined text-[28px] text-foreground mb-2 block">
                   upload_file
                 </span>
-                <h3 className="font-mono text-[11px] text-text-primary tracking-widest mb-1 group-hover:text-accent-light transition-colors">
+                <h3 className="font-mono text-[11px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
                   UPLOAD IMAGE
                 </h3>
-                <p className="font-mono text-[10px] text-text-ghost leading-relaxed">
+                <p className="font-mono text-[10px] text-muted-foreground/60 leading-relaxed">
                   Use an existing plan as a tracing reference.
                 </p>
               </button>
               <button
                 onClick={handleRemoveImage}
-                className="group text-left bg-obsidian-low border border-outline-variant/10 hover:border-accent/40 rounded-sm p-4 transition-all"
+                className="group text-left bg-card border border-border/10 hover:border-accent/40 rounded-sm p-4 transition-all"
               >
-                <span className="material-symbols-outlined text-[28px] text-text-ghost mb-2 block">
+                <span className="material-symbols-outlined text-[28px] text-muted-foreground/60 mb-2 block">
                   image_not_supported
                 </span>
-                <h3 className="font-mono text-[11px] text-text-primary tracking-widest mb-1 group-hover:text-accent-light transition-colors">
+                <h3 className="font-mono text-[11px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
                   REMOVE IMAGE
                 </h3>
-                <p className="font-mono text-[10px] text-text-ghost leading-relaxed">
+                <p className="font-mono text-[10px] text-muted-foreground/60 leading-relaxed">
                   Clear the current tracing background.
                 </p>
               </button>
@@ -171,7 +171,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
           }}
         />
         <div className="px-5 pb-4">
-          <p className="font-mono text-[9px] text-text-ghost tracking-wider">
+          <p className="font-mono text-[9px] text-muted-foreground/60 tracking-wider">
             ESC TO CLOSE
           </p>
         </div>

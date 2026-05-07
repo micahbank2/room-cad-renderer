@@ -68,10 +68,10 @@ export function TreeRow(props: TreeRowProps) {
   const rowBase = [
     "group flex items-center h-6 pr-2 rounded-sm cursor-pointer",
     INDENT[depth],
-    "hover:bg-obsidian-high",
+    "hover:bg-accent",
     "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent",
   ];
-  if (selected) rowBase.push("bg-obsidian-highest border-l-2 border-accent");
+  if (selected) rowBase.push("bg-secondary border-l-2 border-accent");
   if (parentOnlyHidden) rowBase.push("opacity-50");
   const rowClass = rowBase.join(" ");
 
@@ -84,10 +84,10 @@ export function TreeRow(props: TreeRowProps) {
     "text-sm";
 
   const labelColor =
-    selected || isActiveRoom ? "text-accent-light" :
-    parentOnlyHidden ? "text-text-ghost italic" :
-    selfHidden ? "text-text-ghost" :
-    "text-text-primary";
+    selected || isActiveRoom ? "text-foreground" :
+    parentOnlyHidden ? "text-muted-foreground/60 italic" :
+    selfHidden ? "text-muted-foreground/60" :
+    "text-foreground";
 
   const labelClass = [
     "flex-1 text-left font-mono truncate overflow-hidden text-ellipsis whitespace-nowrap",
@@ -99,9 +99,9 @@ export function TreeRow(props: TreeRowProps) {
   // Eye icon color tokens — UI-SPEC § Color visibility-state table
   // ---------------------------------------------------------------------------
   const eyeColor =
-    parentOnlyHidden ? "text-text-ghost opacity-50" :
-    selfHidden ? "text-text-muted" :
-    "text-text-dim hover:text-accent";
+    parentOnlyHidden ? "text-muted-foreground/60 opacity-50" :
+    selfHidden ? "text-muted-foreground" :
+    "text-muted-foreground/80 hover:text-accent";
 
   // ---------------------------------------------------------------------------
   // aria-labels — VERBATIM per UI-SPEC § Copywriting Contract
@@ -141,7 +141,7 @@ export function TreeRow(props: TreeRowProps) {
             data-tree-chevron
             aria-label={chevronAria}
             aria-expanded={isOpen}
-            className="text-text-ghost hover:text-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+            className="text-muted-foreground/60 hover:text-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
             onClick={(e) => {
               e.stopPropagation();
               props.onToggleExpand(node.id);
@@ -166,7 +166,7 @@ export function TreeRow(props: TreeRowProps) {
             to include this file. */}
         {node.kind === "stair" && (
           <span
-            className="material-symbols-outlined text-text-dim mr-1"
+            className="material-symbols-outlined text-muted-foreground/80 mr-1"
             style={{ fontSize: 14 }}
             aria-hidden="true"
             data-stair-icon
@@ -196,7 +196,7 @@ export function TreeRow(props: TreeRowProps) {
           <span
             title="Has saved camera angle"
             aria-hidden="true"
-            className="text-accent-light flex items-center justify-center"
+            className="text-foreground flex items-center justify-center"
             data-saved-camera-indicator
           >
             <Camera className="w-3.5 h-3.5" />
@@ -243,9 +243,9 @@ export function TreeRow(props: TreeRowProps) {
         ))
       }
 
-      {/* Empty-state rows — UI-SPEC § Empty States VERBATIM (italic, text-text-ghost, pl-6, h-6) */}
+      {/* Empty-state rows — UI-SPEC § Empty States VERBATIM (italic, text-muted-foreground/60, pl-6, h-6) */}
       {isGroup && node.children && node.children.length === 0 && (
-        <div className="flex items-center h-6 pl-6 pr-2 italic text-text-ghost font-mono text-sm">
+        <div className="flex items-center h-6 pl-6 pr-2 italic text-muted-foreground/60 font-mono text-sm">
           {node.groupKey === "walls" && "No walls yet"}
           {node.groupKey === "products" && "No products placed"}
           {node.groupKey === "custom" && "No custom elements placed"}

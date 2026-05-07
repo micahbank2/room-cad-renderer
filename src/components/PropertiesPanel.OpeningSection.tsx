@@ -23,14 +23,14 @@ interface Props {
 export function OpeningsSection({ wall }: Props) {
   if (!wall.openings || wall.openings.length === 0) {
     return (
-      <div className="font-mono text-[11px] text-text-ghost">
+      <div className="font-mono text-[11px] text-muted-foreground/60">
         0 OPENING(S)
       </div>
     );
   }
   return (
     <div className="space-y-1">
-      <div className="font-mono text-[10px] text-text-ghost tracking-widest uppercase">
+      <div className="font-mono text-[10px] text-muted-foreground/60 tracking-widest uppercase">
         {wall.openings.length} OPENING(S)
       </div>
       {wall.openings.map((op) => (
@@ -46,17 +46,17 @@ function OpeningRow({ wall, opening }: { wall: WallSegment; opening: Opening }) 
   const offsetLabel = `${opening.offset.toFixed(1)}'`;
 
   return (
-    <div className="bg-obsidian-low ghost-border rounded-sm">
+    <div className="bg-card ghost-border rounded-sm">
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
         data-testid={`opening-row-${opening.id}`}
-        className="w-full flex items-center justify-between px-2 py-1 font-mono text-[11px] text-text-primary hover:bg-obsidian-high transition-colors"
+        className="w-full flex items-center justify-between px-2 py-1 font-mono text-[11px] text-foreground hover:bg-accent transition-colors"
       >
         <span>
           {kindLabel} @ {offsetLabel}
         </span>
-        <span className="text-text-ghost">{expanded ? "−" : "+"}</span>
+        <span className="text-muted-foreground/60">{expanded ? "−" : "+"}</span>
       </button>
       {expanded && <OpeningEditor wall={wall} opening={opening} />}
     </div>
@@ -143,7 +143,7 @@ function NumericRow({
   // (Lightweight controlled-on-blur pattern; matches Phase 31 convention.)
   return (
     <div className="flex items-center justify-between gap-2">
-      <span className="font-mono text-[10px] text-text-ghost tracking-widest uppercase">
+      <span className="font-mono text-[10px] text-muted-foreground/60 tracking-widest uppercase">
         {label}
       </span>
       <div className="flex items-center gap-1">
@@ -177,9 +177,9 @@ function NumericRow({
               (e.target as HTMLInputElement).blur();
             }
           }}
-          className="w-16 font-mono text-[11px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-1 py-0.5 rounded-sm text-right"
+          className="w-16 font-mono text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-sm text-right"
         />
-        <span className="font-mono text-[10px] text-text-ghost">{unit}</span>
+        <span className="font-mono text-[10px] text-muted-foreground/60">{unit}</span>
       </div>
     </div>
   );

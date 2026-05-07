@@ -777,7 +777,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
             if (e.key === "Escape") { e.preventDefault(); cancelEdit(); }
           }}
           style={overlayStyle}
-          className="font-mono text-[11px] bg-obsidian-high text-accent-light border border-accent px-1 outline-none"
+          className="font-mono text-[11px] bg-accent text-foreground border border-accent px-1 outline-none"
           data-testid="dimension-edit-input"
         />
       )}
@@ -812,7 +812,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
             if (e.key === "Escape") { e.preventDefault(); cancelAnnotation(); }
           }}
           style={annotationOverlayStyle}
-          className="font-mono text-[12px] bg-obsidian-low text-text-primary border border-accent px-1 outline-none rounded-sm"
+          className="font-mono text-[12px] bg-card text-foreground border border-accent px-1 outline-none rounded-sm"
           data-testid={`annotation-edit-${editingAnnotation.id}`}
         />
       )}

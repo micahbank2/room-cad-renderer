@@ -107,7 +107,7 @@ export function WallCutoutsDropdown({ anchorRef, onClose, onPick }: Props) {
           key={item.kind}
           data-testid={`wall-cutout-${item.kind}`}
           onClick={() => onPick(item.kind)}
-          className="w-full flex items-center gap-2 px-2 py-1 rounded-sm font-mono text-[11px] text-text-primary hover:bg-obsidian-high transition-colors"
+          className="w-full flex items-center gap-2 px-2 py-1 rounded-sm font-mono text-[11px] text-foreground hover:bg-accent transition-colors"
         >
           {item.icon === "arch" && (
             <span className="material-symbols-outlined text-[14px]">arch</span>

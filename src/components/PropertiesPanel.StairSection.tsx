@@ -97,11 +97,11 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
 
   return (
     <div className="space-y-2">
-      <div className="font-mono text-xs text-accent-light">
+      <div className="font-mono text-xs text-foreground">
         STAIR {stair.id.slice(-4).toUpperCase()}
       </div>
 
-      <div className="space-y-2 border-t border-outline-variant/20 pt-2">
+      <div className="space-y-2 border-t border-border/50 pt-2">
         <NumberRow
           label="WIDTH"
           ariaLabel="Width"
@@ -132,7 +132,7 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
               setWidthDraft(String(DEFAULT_STAIR_WIDTH_FT));
             }}
             data-testid="reset-stair-size"
-            className="font-mono text-sm text-accent hover:text-accent-light"
+            className="font-mono text-sm text-foreground hover:text-foreground"
           >
             Reset size
           </button>
@@ -232,7 +232,7 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
 
         <div className="flex flex-col gap-1">
           <label
-            className="font-mono text-sm text-text-ghost tracking-wider"
+            className="font-mono text-sm text-muted-foreground/60 tracking-wider"
             htmlFor={`stair-label-${stair.id}`}
           >
             LABEL
@@ -262,7 +262,7 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
                 labelOverride: v.trim() === "" ? undefined : v.slice(0, LABEL_MAX),
               });
             }}
-            className="px-2 py-1 font-mono text-sm text-text-primary bg-obsidian-deepest border border-outline-variant/30 rounded-sm"
+            className="px-2 py-1 font-mono text-sm text-foreground bg-background border border-border/60 rounded-sm"
           />
         </div>
       </div>
@@ -298,7 +298,7 @@ function NumberRow({
   return (
     <div className="flex flex-col gap-1">
       <label
-        className="font-mono text-sm text-text-ghost tracking-wider"
+        className="font-mono text-sm text-muted-foreground/60 tracking-wider"
         htmlFor={`stair-input-${ariaLabel}`}
       >
         {label}
@@ -325,10 +325,10 @@ function NumberRow({
             }
             onCommit();
           }}
-          className="flex-1 px-2 py-1 font-mono text-sm text-accent-light bg-obsidian-deepest border border-outline-variant/30 rounded-sm"
+          className="flex-1 px-2 py-1 font-mono text-sm text-foreground bg-background border border-border/60 rounded-sm"
         />
         {suffix && (
-          <span className="font-mono text-sm text-text-ghost">{suffix}</span>
+          <span className="font-mono text-sm text-muted-foreground/60">{suffix}</span>
         )}
       </div>
     </div>

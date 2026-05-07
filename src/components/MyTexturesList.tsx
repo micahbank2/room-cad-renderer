@@ -117,8 +117,8 @@ export function MyTexturesList({ selectedId, onSelect }: MyTexturesListProps): J
   }, []);
 
   const skeletonBg = reducedMotion
-    ? "bg-obsidian-highest"
-    : "bg-obsidian-highest animate-pulse";
+    ? "bg-secondary"
+    : "bg-secondary animate-pulse";
 
   // ---- Render ----------------------------------------------------------
 
@@ -138,10 +138,10 @@ export function MyTexturesList({ selectedId, onSelect }: MyTexturesListProps): J
   } else if (textures.length === 0) {
     body = (
       <div className="py-8 px-4 text-center flex flex-col items-center gap-4">
-        <h3 className="font-mono text-base font-medium uppercase tracking-widest text-text-dim">
+        <h3 className="font-mono text-base font-medium uppercase tracking-widest text-muted-foreground/80">
           NO CUSTOM TEXTURES
         </h3>
-        <p className="font-body text-base text-text-muted max-w-xs">
+        <p className="font-body text-base text-muted-foreground max-w-xs">
           Upload a photo of a surface to use it on walls, floors, and ceilings.
         </p>
         <UploadSlot onClick={handleOpenUpload} />
@@ -220,8 +220,8 @@ function TextureCard({
   const base =
     "group relative ghost-border rounded-md cursor-pointer transition-colors flex flex-col p-2";
   const state = selected
-    ? "border-accent/60 bg-accent/10 ring-2 ring-accent ring-offset-1 ring-offset-obsidian-low"
-    : "bg-obsidian-low hover:bg-obsidian-high";
+    ? "border-accent/60 bg-accent/10 ring-2 ring-accent ring-offset-1 ring-offset-card"
+    : "bg-card hover:bg-accent";
 
   return (
     <div
@@ -235,20 +235,20 @@ function TextureCard({
           type="button"
           aria-label="Texture options"
           onClick={onMenuToggle}
-          className="opacity-0 group-hover:opacity-100 transition-opacity text-text-ghost hover:text-text-primary"
+          className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground/60 hover:text-foreground"
           style={{ minHeight: 44, minWidth: 44, padding: 4 }}
         >
           <MoreHorizontal className="size-4" />
         </button>
         {menuOpen && (
-          <div className="absolute right-0 top-6 z-10 bg-obsidian-highest border border-outline-variant/20 rounded-sm shadow-lg">
+          <div className="absolute right-0 top-6 z-10 bg-secondary border border-border/50 rounded-sm shadow-lg">
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit();
               }}
-              className="block w-full text-left px-2 py-1 font-mono text-sm text-text-muted hover:bg-obsidian-high hover:text-text-primary cursor-pointer"
+              className="block w-full text-left px-2 py-1 font-mono text-sm text-muted-foreground hover:bg-accent hover:text-foreground cursor-pointer"
             ><span>Edit</span></button>
             <button
               type="button"
@@ -256,14 +256,14 @@ function TextureCard({
                 e.stopPropagation();
                 onDelete();
               }}
-              className="block w-full text-left px-2 py-1 font-mono text-sm text-error hover:bg-obsidian-high cursor-pointer"
+              className="block w-full text-left px-2 py-1 font-mono text-sm text-error hover:bg-accent cursor-pointer"
             ><span>Delete</span></button>
           </div>
         )}
       </div>
 
       {/* Thumbnail */}
-      <div className="aspect-square rounded-sm bg-obsidian-high overflow-hidden">
+      <div className="aspect-square rounded-sm bg-accent overflow-hidden">
         {thumbnailUrl ? (
           <img src={thumbnailUrl} alt={texture.name} className="w-full h-full object-cover" />
         ) : null}
@@ -271,10 +271,10 @@ function TextureCard({
 
       {/* Name + tile size */}
       <div className="mt-2 flex flex-col gap-1">
-        <span className="font-mono text-sm font-medium uppercase text-text-primary truncate">
+        <span className="font-mono text-sm font-medium uppercase text-foreground truncate">
           {texture.name.toUpperCase()}
         </span>
-        <span className="font-mono text-sm text-accent-light">
+        <span className="font-mono text-sm text-foreground">
           {formatFeet(texture.tileSizeFt)}
         </span>
       </div>
@@ -291,10 +291,10 @@ function UploadSlot({ onClick }: UploadSlotProps): JSX.Element {
     <button
       type="button"
       onClick={onClick}
-      className="aspect-square bg-obsidian-low border-2 border-dashed border-outline-variant/30 rounded-md flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-accent/50 transition-colors"
+      className="aspect-square bg-card border-2 border-dashed border-border/60 rounded-md flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-accent/50 transition-colors"
     >
-      <Plus className="size-5 text-text-ghost" />
-      <span className="font-mono text-sm text-text-ghost">UPLOAD</span>
+      <Plus className="size-5 text-muted-foreground/60" />
+      <span className="font-mono text-sm text-muted-foreground/60">UPLOAD</span>
     </button>
   );
 }

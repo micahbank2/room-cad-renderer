@@ -273,26 +273,26 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop — click = Discard */}
       <div
-        className="absolute inset-0 bg-obsidian-deepest/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Surface */}
       <div
-        className={`relative w-[520px] bg-obsidian-mid/90 backdrop-blur-xl border border-outline-variant/20 rounded-sm shadow-2xl${surfaceTransition}`}
+        className={`relative w-[520px] bg-popover/90 backdrop-blur-xl border border-border/50 rounded-sm shadow-2xl${surfaceTransition}`}
         role="dialog"
         aria-modal="true"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-4">
-          <h2 className="font-mono text-base font-medium uppercase tracking-widest text-text-primary">
+          <h2 className="font-mono text-base font-medium uppercase tracking-widest text-foreground">
             {heading}
           </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close upload dialog"
-            className="text-text-ghost hover:text-text-primary transition-colors"
+            className="text-muted-foreground/60 hover:text-foreground transition-colors"
           >
             <X className="size-4" />
           </button>
@@ -307,13 +307,13 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
                   <img
                     src={previewUrl}
                     alt="Texture preview"
-                    className="w-40 h-30 rounded-sm border border-outline-variant/20 object-cover"
+                    className="w-40 h-30 rounded-sm border border-border/50 object-cover"
                     style={{ width: 160, height: 120 }}
                   />
                   <button
                     type="button"
                     onClick={openFilePicker}
-                    className="text-accent text-[11px] font-mono text-left hover:text-accent-light"
+                    className="text-foreground text-[11px] font-mono text-left hover:text-foreground"
                   >
                     Change
                   </button>
@@ -330,13 +330,13 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
                   className={`rounded-md border-2 border-dashed p-8 flex flex-col items-center gap-2 cursor-pointer transition-colors ${
                     dragOver
                       ? "border-accent bg-accent/5"
-                      : "border-outline-variant/40 bg-obsidian-low"
+                      : "border-border/40 bg-card"
                   }`}
                 >
                   <Upload
-                    className={`size-6 ${dragOver ? "text-accent" : "text-text-dim"}`}
+                    className={`size-6 ${dragOver ? "text-foreground" : "text-muted-foreground/80"}`}
                   />
-                  <p className="font-body text-sm text-text-muted">
+                  <p className="font-body text-sm text-muted-foreground">
                     {COPY.dropInvite}
                   </p>
                 </div>
@@ -361,7 +361,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
             <label
               htmlFor="utex-name"
               className={`font-mono text-sm font-medium uppercase tracking-wide ${
-                mode === "edit" ? "text-text-primary" : "text-text-dim"
+                mode === "edit" ? "text-foreground" : "text-muted-foreground/80"
               }`}
             >
               NAME
@@ -375,7 +375,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
               placeholder="e.g. Oak Floor"
               maxLength={40}
               autoFocus={mode === "edit"}
-              className="bg-obsidian-low border border-outline-variant/20 rounded-sm px-2 py-1 text-sm font-mono text-text-primary w-full placeholder:text-text-ghost"
+              className="bg-card border border-border/50 rounded-sm px-2 py-1 text-sm font-mono text-foreground w-full placeholder:text-muted-foreground/60"
             />
           </div>
 
@@ -383,11 +383,11 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
           <div className="flex flex-col gap-1">
             <label
               htmlFor="utex-tile-size"
-              className="font-mono text-sm font-medium uppercase tracking-wide text-text-dim"
+              className="font-mono text-sm font-medium uppercase tracking-wide text-muted-foreground/80"
             >
               TILE SIZE
             </label>
-            <p className="font-body text-[11px] text-text-ghost">
+            <p className="font-body text-[11px] text-muted-foreground/60">
               {COPY.tileHelper}
             </p>
             <input
@@ -400,8 +400,8 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
               }}
               onBlur={handleTileSizeBlur}
               placeholder="2'"
-              className={`bg-obsidian-low border rounded-sm px-2 py-1 text-sm font-mono text-text-primary w-full placeholder:text-text-ghost ${
-                tileSizeError ? "border-error" : "border-outline-variant/20"
+              className={`bg-card border rounded-sm px-2 py-1 text-sm font-mono text-foreground w-full placeholder:text-muted-foreground/60 ${
+                tileSizeError ? "border-error" : "border-border/50"
               }`}
             />
             {tileSizeError && (
@@ -416,7 +416,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
             type="button"
             onClick={onClose}
             disabled={saving}
-            className="rounded-sm px-4 py-1 font-mono text-sm text-text-muted hover:text-text-primary bg-obsidian-high hover:bg-obsidian-highest border border-outline-variant/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-sm px-4 py-1 font-mono text-sm text-muted-foreground hover:text-foreground bg-accent hover:bg-secondary border border-border/50 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ minHeight: 44 }}
           >
             <span>Discard</span>
@@ -425,7 +425,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
             type="button"
             onClick={submit}
             disabled={primaryDisabled}
-            className="rounded-sm px-4 py-1 font-mono text-sm text-text-primary bg-accent hover:bg-accent/90 border-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="rounded-sm px-4 py-1 font-mono text-sm text-foreground bg-accent hover:bg-accent/90 border-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             style={{ minHeight: 44 }}
           >
             {saving || processing ? (

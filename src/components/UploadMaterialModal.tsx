@@ -347,26 +347,26 @@ export function UploadMaterialModal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop — click = Discard */}
       <div
-        className="absolute inset-0 bg-obsidian-deepest/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Surface */}
       <div
-        className={`relative w-[560px] max-h-[90vh] overflow-y-auto bg-obsidian-mid/90 backdrop-blur-xl border border-outline-variant/20 rounded-sm shadow-2xl${surfaceTransition}`}
+        className={`relative w-[560px] max-h-[90vh] overflow-y-auto bg-popover/90 backdrop-blur-xl border border-border/50 rounded-sm shadow-2xl${surfaceTransition}`}
         role="dialog"
         aria-modal="true"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-4">
-          <h2 className="font-mono text-base font-medium uppercase tracking-widest text-text-primary">
+          <h2 className="font-mono text-base font-medium uppercase tracking-widest text-foreground">
             {heading}
           </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close upload dialog"
-            className="text-text-ghost hover:text-text-primary transition-colors"
+            className="text-muted-foreground/60 hover:text-foreground transition-colors"
           >
             <X className="size-4" />
           </button>
@@ -410,7 +410,7 @@ export function UploadMaterialModal(
           <div className="flex flex-col gap-1">
             <label
               htmlFor="mat-name"
-              className="font-mono text-sm font-medium uppercase tracking-wide text-text-dim"
+              className="font-mono text-sm font-medium uppercase tracking-wide text-muted-foreground/80"
             >
               NAME
             </label>
@@ -425,7 +425,7 @@ export function UploadMaterialModal(
               }}
               placeholder="e.g. Carrara Marble"
               maxLength={40}
-              className="bg-obsidian-low border border-outline-variant/20 rounded-sm px-2 py-1 text-sm font-mono text-text-primary w-full placeholder:text-text-ghost"
+              className="bg-card border border-border/50 rounded-sm px-2 py-1 text-sm font-mono text-foreground w-full placeholder:text-muted-foreground/60"
             />
             {nameError && (
               <p className="font-mono text-sm text-error">{nameError}</p>
@@ -436,11 +436,11 @@ export function UploadMaterialModal(
           <div className="flex flex-col gap-1">
             <label
               htmlFor="mat-tile-size"
-              className="font-mono text-sm font-medium uppercase tracking-wide text-text-dim"
+              className="font-mono text-sm font-medium uppercase tracking-wide text-muted-foreground/80"
             >
               TILE_SIZE
             </label>
-            <p className="font-body text-sm text-text-ghost">{COPY.tileHelper}</p>
+            <p className="font-body text-sm text-muted-foreground/60">{COPY.tileHelper}</p>
             <input
               id="mat-tile-size"
               type="text"
@@ -451,8 +451,8 @@ export function UploadMaterialModal(
               }}
               onBlur={handleTileSizeBlur}
               placeholder="2'"
-              className={`bg-obsidian-low border rounded-sm px-2 py-1 text-sm font-mono text-text-primary w-full placeholder:text-text-ghost ${
-                tileSizeError ? "border-error" : "border-outline-variant/20"
+              className={`bg-card border rounded-sm px-2 py-1 text-sm font-mono text-foreground w-full placeholder:text-muted-foreground/60 ${
+                tileSizeError ? "border-error" : "border-border/50"
               }`}
             />
             {tileSizeError && (
@@ -497,7 +497,7 @@ export function UploadMaterialModal(
             type="button"
             onClick={onClose}
             disabled={saving}
-            className="rounded-sm px-4 py-1 font-mono text-sm text-text-muted hover:text-text-primary bg-obsidian-high hover:bg-obsidian-highest border border-outline-variant/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-sm px-4 py-1 font-mono text-sm text-muted-foreground hover:text-foreground bg-accent hover:bg-secondary border border-border/50 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ minHeight: 44 }}
           >
             <span>{COPY.ctaDiscard}</span>
@@ -506,7 +506,7 @@ export function UploadMaterialModal(
             type="button"
             onClick={submit}
             disabled={primaryDisabled}
-            className="rounded-sm px-4 py-1 font-mono text-sm text-text-primary bg-accent hover:bg-accent/90 border-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="rounded-sm px-4 py-1 font-mono text-sm text-foreground bg-accent hover:bg-accent/90 border-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             style={{ minHeight: 44 }}
           >
             {saving || processing ? (
@@ -567,12 +567,12 @@ function DropZone({
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-2">
-        <span className="font-mono text-sm font-medium uppercase tracking-wide text-text-dim">
+        <span className="font-mono text-sm font-medium uppercase tracking-wide text-muted-foreground/80">
           {label}
         </span>
         {required && <span className="text-error font-mono text-sm">*</span>}
         {optional && (
-          <span className="font-mono text-sm text-text-ghost tracking-widest">
+          <span className="font-mono text-sm text-muted-foreground/60 tracking-widest">
             OPTIONAL
           </span>
         )}
@@ -583,13 +583,13 @@ function DropZone({
           <img
             src={processed.previewUrl}
             alt={`${label} preview`}
-            className="w-16 h-16 rounded-sm border border-outline-variant/20 object-cover"
+            className="w-16 h-16 rounded-sm border border-border/50 object-cover"
             style={{ width: 64, height: 64 }}
           />
           <button
             type="button"
             onClick={openPicker}
-            className="text-accent text-sm font-mono hover:text-accent-light"
+            className="text-foreground text-sm font-mono hover:text-foreground"
           >
             Change
           </button>
@@ -606,13 +606,13 @@ function DropZone({
           className={`rounded-sm border-2 border-dashed p-4 flex flex-col items-center gap-1 cursor-pointer transition-colors ${
             dragOver
               ? "border-accent bg-accent/5"
-              : "border-outline-variant/40 bg-obsidian-low"
+              : "border-border/40 bg-card"
           }`}
         >
           <Upload
-            className={`size-4 ${dragOver ? "text-accent" : "text-text-dim"}`}
+            className={`size-4 ${dragOver ? "text-foreground" : "text-muted-foreground/80"}`}
           />
-          <p className="font-body text-sm text-text-muted">
+          <p className="font-body text-sm text-muted-foreground">
             Drag and drop a photo, or click to browse.
           </p>
         </div>
@@ -651,7 +651,7 @@ function MetaField({
     <div className="flex flex-col gap-1">
       <label
         htmlFor={id}
-        className="font-mono text-sm font-medium uppercase tracking-wide text-text-dim"
+        className="font-mono text-sm font-medium uppercase tracking-wide text-muted-foreground/80"
       >
         {label}
       </label>
@@ -661,7 +661,7 @@ function MetaField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="bg-obsidian-low border border-outline-variant/20 rounded-sm px-2 py-1 text-sm font-mono text-text-primary w-full placeholder:text-text-ghost"
+        className="bg-card border border-border/50 rounded-sm px-2 py-1 text-sm font-mono text-foreground w-full placeholder:text-muted-foreground/60"
       />
     </div>
   );

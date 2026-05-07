@@ -30,12 +30,12 @@ export default function AddRoomDialog({ open, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-obsidian-deepest/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-sm"
       data-testid="ADD_ROOM"
     >
-      <div className="bg-obsidian-mid border border-outline-variant/30 p-6 w-[480px] font-mono">
-        <h2 className="text-accent-light text-sm mb-4 tracking-widest">ADD ROOM</h2>
-        <label className="block text-text-dim text-[9px] tracking-wider mb-1">ROOM NAME</label>
+      <div className="bg-popover border border-border/60 p-6 w-[480px] font-mono">
+        <h2 className="text-foreground text-sm mb-4 tracking-widest">ADD ROOM</h2>
+        <label className="block text-muted-foreground/80 text-[9px] tracking-wider mb-1">ROOM NAME</label>
         <input
           autoFocus
           value={name}
@@ -50,10 +50,10 @@ export default function AddRoomDialog({ open, onClose }: Props) {
               handleCancel();
             }
           }}
-          className="w-full bg-obsidian-deepest text-text-primary px-2 py-1.5 border border-outline-variant/30 mb-4 font-mono text-xs outline-none focus:border-accent"
+          className="w-full bg-background text-foreground px-2 py-1.5 border border-border/60 mb-4 font-mono text-xs outline-none focus:border-accent"
           placeholder="ROOM NAME"
         />
-        <label className="block text-text-dim text-[9px] tracking-wider mb-2">TEMPLATE</label>
+        <label className="block text-muted-foreground/80 text-[9px] tracking-wider mb-2">TEMPLATE</label>
         <div className="grid grid-cols-2 gap-2 mb-4">
           {TEMPLATE_IDS.map((id) => (
             <button
@@ -62,8 +62,8 @@ export default function AddRoomDialog({ open, onClose }: Props) {
               onClick={() => setTpl(id)}
               className={`p-3 text-[10px] text-left border transition-colors ${
                 tpl === id
-                  ? "border-accent text-accent-light bg-accent/10"
-                  : "border-outline-variant/30 text-text-muted hover:border-accent/50"
+                  ? "border-accent text-foreground bg-accent/10"
+                  : "border-border/60 text-muted-foreground hover:border-accent/50"
               }`}
             >
               {ROOM_TEMPLATES[id].label}
@@ -74,7 +74,7 @@ export default function AddRoomDialog({ open, onClose }: Props) {
           <button
             type="button"
             onClick={handleCancel}
-            className="px-3 py-1.5 text-[10px] tracking-widest text-text-dim hover:text-text-muted"
+            className="px-3 py-1.5 text-[10px] tracking-widest text-muted-foreground/80 hover:text-muted-foreground"
           >
             CANCEL
           </button>
@@ -82,7 +82,7 @@ export default function AddRoomDialog({ open, onClose }: Props) {
             type="button"
             onClick={handleCreate}
             disabled={!name.trim()}
-            className="px-3 py-1.5 text-[10px] tracking-widest bg-accent text-obsidian-deepest disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
+            className="px-3 py-1.5 text-[10px] tracking-widest bg-accent text-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
           >
             CREATE
           </button>

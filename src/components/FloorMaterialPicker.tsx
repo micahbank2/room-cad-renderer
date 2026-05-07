@@ -84,7 +84,7 @@ export default function FloorMaterialPicker() {
 
   return (
     <div>
-      <h3 className="font-mono text-[10px] text-text-ghost tracking-widest uppercase mb-2">
+      <h3 className="font-mono text-[10px] text-muted-foreground/60 tracking-widest uppercase mb-2">
         FLOOR MATERIAL
       </h3>
 
@@ -107,7 +107,7 @@ export default function FloorMaterialPicker() {
           {/* Upload button */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full font-mono text-[10px] text-text-ghost hover:text-text-primary tracking-widest uppercase py-1 border border-outline-variant/20 rounded-sm mt-2"
+            className="w-full font-mono text-[10px] text-muted-foreground/60 hover:text-foreground tracking-widest uppercase py-1 border border-border/50 rounded-sm mt-2"
           >
             {isCustom ? "CUSTOM IMAGE" : "UPLOAD IMAGE..."}
           </button>
@@ -116,10 +116,10 @@ export default function FloorMaterialPicker() {
           {!isCustom && !isUserTexture && currentPresetId !== "DEFAULT" && (
             <div className="flex items-center gap-2 mb-2 mt-2">
               <div
-                className="w-4 h-4 rounded-sm border border-outline-variant/30"
+                className="w-4 h-4 rounded-sm border border-border/60"
                 style={{ backgroundColor: FLOOR_PRESETS[currentPresetId as FloorPresetId].color }}
               />
-              <span className="font-mono text-[9px] text-text-dim">
+              <span className="font-mono text-[9px] text-muted-foreground/80">
                 {FLOOR_PRESETS[currentPresetId as FloorPresetId].color}
               </span>
             </div>
@@ -141,29 +141,29 @@ export default function FloorMaterialPicker() {
           {current && (
             <div className="space-y-1.5 mt-2">
               <label className="block">
-                <span className="font-mono text-[9px] text-text-dim block">SCALE (ft)</span>
+                <span className="font-mono text-[9px] text-muted-foreground/80 block">SCALE (ft)</span>
                 <input
                   type="number"
                   step="0.5"
                   min="0.1"
                   value={current.scaleFt}
                   onChange={(e) => handleScaleChange(parseFloat(e.target.value) || 1)}
-                  className="w-full font-mono text-[10px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-2 py-1 rounded-sm"
+                  className="w-full font-mono text-[10px] bg-accent text-foreground border border-border/60 px-2 py-1 rounded-sm"
                 />
               </label>
               <label className="block">
-                <span className="font-mono text-[9px] text-text-dim block">ROTATION (°)</span>
+                <span className="font-mono text-[9px] text-muted-foreground/80 block">ROTATION (°)</span>
                 <input
                   type="number"
                   step="15"
                   value={current.rotationDeg}
                   onChange={(e) => handleRotationChange(parseFloat(e.target.value) || 0)}
-                  className="w-full font-mono text-[10px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-2 py-1 rounded-sm"
+                  className="w-full font-mono text-[10px] bg-accent text-foreground border border-border/60 px-2 py-1 rounded-sm"
                 />
               </label>
               <button
                 onClick={() => setFloorMaterial(undefined)}
-                className="w-full font-mono text-[9px] text-text-ghost hover:text-text-primary tracking-widest uppercase py-1 mt-1"
+                className="w-full font-mono text-[9px] text-muted-foreground/60 hover:text-foreground tracking-widest uppercase py-1 mt-1"
               >
                 RESET TO DEFAULT
               </button>

@@ -12,14 +12,14 @@ import type { MeasureLine, Annotation, WallSegment, Point } from "@/types/cad";
  * Typography mirrors src/canvas/dimensions.ts conventions.
  */
 
-const TEXT_DIM = "#938ea0"; // text-text-dim
-const TEXT_PRIMARY = "#e3e0f1"; // text-text-primary
+const TEXT_DIM = "#938ea0"; // text-muted-foreground/80
+const TEXT_PRIMARY = "#e3e0f1"; // text-foreground
 const PILL_BG_LIGHT = "#ffffff"; // white pill for measure-line label
-const PILL_BG_DARK = "#1b1a26"; // bg-obsidian-low for annotation
+const PILL_BG_DARK = "#1b1a26"; // bg-card for annotation
 const FONT_MONO = "IBM Plex Mono, ui-monospace, monospace";
 
 /**
- * D-06 dimension line visual: 1px stroke text-text-dim line, 4px perpendicular
+ * D-06 dimension line visual: 1px stroke text-muted-foreground/80 line, 4px perpendicular
  * ticks at each endpoint, formatFeet text label centered on midpoint with
  * white-pill background. No arrows, no extension lines.
  *
@@ -110,7 +110,7 @@ export function buildMeasureLineGroup(
 }
 
 /**
- * D-08 annotation visual: IBM Plex Mono 12px text-text-primary on bg-obsidian-low
+ * D-08 annotation visual: IBM Plex Mono 12px text-foreground on bg-card
  * rounded-sm pill. Auto-fit text width with 6px horizontal padding.
  *
  * Wrapped in fabric.Group with `data: { type: "annotation", annotationId }`.
@@ -166,7 +166,7 @@ export function buildAnnotationGroup(
 
 /**
  * D-04 canvas overlay: subtle "{XX} SQ FT" label rendered at the polygon
- * centroid in IBM Plex Mono 11px text-text-dim. Decorative — not selectable,
+ * centroid in IBM Plex Mono 11px text-muted-foreground/80. Decorative — not selectable,
  * not evented. Returns null if the wall loop is non-closed (polygonArea === 0).
  */
 export function buildRoomAreaOverlay(

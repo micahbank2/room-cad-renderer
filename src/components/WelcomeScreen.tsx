@@ -51,10 +51,10 @@ export default function WelcomeScreen({ onStart }: Props) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-obsidian-base">
+    <div className="h-full flex flex-col bg-background">
       {/* Minimal top bar — just the brand */}
-      <header className="h-14 bg-obsidian-deepest flex items-center px-6 ghost-border border-0 border-b">
-        <span className="font-display font-bold text-accent text-sm tracking-[0.1em]">
+      <header className="h-14 bg-background flex items-center px-6 ghost-border border-0 border-b">
+        <span className="font-display font-bold text-foreground text-sm tracking-[0.1em]">
           OBSIDIAN CAD
         </span>
       </header>
@@ -62,10 +62,10 @@ export default function WelcomeScreen({ onStart }: Props) {
       {/* Centered hero with 2 CTAs */}
       <div className="flex-1 flex flex-col items-center justify-center px-8">
         <div className="max-w-2xl text-center">
-          <h1 className="font-display font-bold text-5xl text-text-primary tracking-tight mb-4 leading-tight">
+          <h1 className="font-display font-bold text-5xl text-foreground tracking-tight mb-4 leading-tight">
             DESIGN YOUR SPACE
           </h1>
-          <p className="text-text-dim text-sm leading-relaxed max-w-lg mx-auto mb-10">
+          <p className="text-muted-foreground/80 text-sm leading-relaxed max-w-lg mx-auto mb-10">
             Start by creating a new floor plan from a template, or upload a reference
             image of an existing plan to trace walls on top of.
           </p>
@@ -75,15 +75,15 @@ export default function WelcomeScreen({ onStart }: Props) {
             {/* Create floor plan */}
             <button
               onClick={() => setShowTemplates(true)}
-              className="w-72 bg-obsidian-low border border-outline-variant/10 hover:border-accent/40 rounded-sm p-6 text-left transition-all group"
+              className="w-72 bg-card border border-border/10 hover:border-accent/40 rounded-sm p-6 text-left transition-all group"
             >
-              <span className="material-symbols-outlined text-[28px] text-accent mb-3 block">
+              <span className="material-symbols-outlined text-[28px] text-foreground mb-3 block">
                 add_box
               </span>
-              <h3 className="font-mono text-xs text-text-primary tracking-widest mb-2 group-hover:text-accent-light transition-colors">
+              <h3 className="font-mono text-xs text-foreground tracking-widest mb-2 group-hover:text-foreground transition-colors">
                 CREATE FLOOR PLAN
               </h3>
-              <p className="text-[11px] text-text-ghost leading-relaxed">
+              <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
                 Start with a blank room or one of four pre-drawn templates.
               </p>
             </button>
@@ -91,15 +91,15 @@ export default function WelcomeScreen({ onStart }: Props) {
             {/* Upload floor plan */}
             <button
               onClick={handleUploadClick}
-              className="w-72 bg-obsidian-low border border-outline-variant/10 hover:border-accent/40 rounded-sm p-6 text-left transition-all group"
+              className="w-72 bg-card border border-border/10 hover:border-accent/40 rounded-sm p-6 text-left transition-all group"
             >
-              <span className="material-symbols-outlined text-[28px] text-accent mb-3 block">
+              <span className="material-symbols-outlined text-[28px] text-foreground mb-3 block">
                 upload_file
               </span>
-              <h3 className="font-mono text-xs text-text-primary tracking-widest mb-2 group-hover:text-accent-light transition-colors">
+              <h3 className="font-mono text-xs text-foreground tracking-widest mb-2 group-hover:text-foreground transition-colors">
                 UPLOAD FLOOR PLAN
               </h3>
-              <p className="text-[11px] text-text-ghost leading-relaxed">
+              <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
                 Drop an image of an existing plan and trace walls on top of it.
               </p>
             </button>
@@ -108,15 +108,15 @@ export default function WelcomeScreen({ onStart }: Props) {
             {projects.length > 0 && (
               <button
                 onClick={() => setShowProjects((v) => !v)}
-                className="w-72 bg-obsidian-low border border-outline-variant/10 hover:border-accent/40 rounded-sm p-6 text-left transition-all group"
+                className="w-72 bg-card border border-border/10 hover:border-accent/40 rounded-sm p-6 text-left transition-all group"
               >
-                <span className="material-symbols-outlined text-[28px] text-accent mb-3 block">
+                <span className="material-symbols-outlined text-[28px] text-foreground mb-3 block">
                   folder_open
                 </span>
-                <h3 className="font-mono text-xs text-text-primary tracking-widest mb-2 group-hover:text-accent-light transition-colors">
+                <h3 className="font-mono text-xs text-foreground tracking-widest mb-2 group-hover:text-foreground transition-colors">
                   OPEN PROJECT
                 </h3>
-                <p className="text-[11px] text-text-ghost leading-relaxed">
+                <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
                   Resume a previously saved project from your library.
                 </p>
               </button>
@@ -126,25 +126,25 @@ export default function WelcomeScreen({ onStart }: Props) {
           {/* Saved project list */}
           {showProjects && projects.length > 0 && (
             <div className="mt-6 w-full max-w-2xl">
-              <div className="bg-obsidian-low border border-outline-variant/10 rounded-sm p-4 space-y-2">
-                <h4 className="font-mono text-[9px] text-text-ghost tracking-widest mb-3">
+              <div className="bg-card border border-border/10 rounded-sm p-4 space-y-2">
+                <h4 className="font-mono text-[9px] text-muted-foreground/60 tracking-widest mb-3">
                   SAVED PROJECTS
                 </h4>
                 {projects.map((p) => (
                   <button
                     key={p.id}
                     onClick={() => handleOpenProject(p)}
-                    className="w-full flex items-center justify-between p-3 rounded-sm border border-outline-variant/10 hover:border-accent/40 bg-obsidian-base transition-all group text-left"
+                    className="w-full flex items-center justify-between p-3 rounded-sm border border-border/10 hover:border-accent/40 bg-background transition-all group text-left"
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="font-mono text-xs text-text-primary tracking-wide group-hover:text-accent-light transition-colors truncate">
+                      <div className="font-mono text-xs text-foreground tracking-wide group-hover:text-foreground transition-colors truncate">
                         {p.name.toUpperCase().replace(/\s/g, "_")}
                       </div>
-                      <div className="font-mono text-[10px] text-text-ghost mt-0.5">
+                      <div className="font-mono text-[10px] text-muted-foreground/60 mt-0.5">
                         {new Date(p.updatedAt).toLocaleDateString()}
                       </div>
                     </div>
-                    <span className="material-symbols-outlined text-[18px] text-text-ghost group-hover:text-accent transition-colors ml-3">
+                    <span className="material-symbols-outlined text-[18px] text-muted-foreground/60 group-hover:text-accent transition-colors ml-3">
                       arrow_forward
                     </span>
                   </button>
@@ -167,10 +167,10 @@ export default function WelcomeScreen({ onStart }: Props) {
       </div>
 
       {/* Simple status bar */}
-      <div className="h-8 bg-obsidian-deepest flex items-center px-4 ghost-border border-0 border-t">
+      <div className="h-8 bg-background flex items-center px-4 ghost-border border-0 border-t">
         <div className="flex items-center gap-1.5">
           <div className="w-1.5 h-1.5 rounded-full bg-success" />
-          <span className="font-mono text-[9px] text-text-ghost tracking-widest">
+          <span className="font-mono text-[9px] text-muted-foreground/60 tracking-widest">
             SYSTEM STATUS: READY
           </span>
         </div>

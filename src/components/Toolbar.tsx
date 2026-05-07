@@ -88,11 +88,11 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
   const displayValue = draftName ?? activeName;
 
   return (
-    <header className="h-14 bg-obsidian-deepest flex items-center px-4 shrink-0 ghost-border border-0 border-b">
+    <header className="h-14 bg-background flex items-center px-4 shrink-0 ghost-border border-0 border-b">
       {/* Brand — click to go home */}
       <button
         onClick={onHome}
-        className="font-display font-bold text-accent text-sm tracking-[0.1em] mr-6 hover:text-accent-light transition-colors"
+        className="font-display font-bold text-foreground text-sm tracking-[0.1em] mr-6 hover:text-foreground transition-colors"
         title="Back to home"
       >
         OBSIDIAN CAD
@@ -104,7 +104,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
           <Tooltip content="Change floor plan / upload reference image" placement="bottom">
             <button
               onClick={onFloorPlanClick}
-              className="flex items-center gap-1.5 font-mono text-sm font-normal px-2 py-1 text-text-dim hover:text-accent-light transition-colors duration-150"
+              className="flex items-center gap-1.5 font-mono text-sm font-normal px-2 py-1 text-muted-foreground/80 hover:text-foreground transition-colors duration-150"
             >
               <span className="material-symbols-outlined text-[14px]">grid_view</span>
               Floor plan
@@ -120,8 +120,8 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
               onClick={() => onViewChange(mode)}
               className={`font-mono text-sm font-normal px-2 py-1 transition-colors duration-150 ${
                 viewMode === mode
-                  ? "text-accent-light border-b-2 border-accent"
-                  : "text-text-dim hover:text-accent-light"
+                  ? "text-foreground border-b-2 border-accent"
+                  : "text-muted-foreground/80 hover:text-foreground"
               }`}
             >
               {labels[mode]}
@@ -140,8 +140,8 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
             onClick={toggleCameraMode}
             className={`flex items-center gap-1.5 font-mono text-sm font-normal px-2 py-1 transition-colors duration-150 mr-6 ${
               cameraMode === "walk"
-                ? "text-accent-light border-b-2 border-accent"
-                : "text-text-dim hover:text-accent-light"
+                ? "text-foreground border-b-2 border-accent"
+                : "text-muted-foreground/80 hover:text-foreground"
             }`}
           >
             <span className="material-symbols-outlined text-[14px]">directions_walk</span>
@@ -180,8 +180,8 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
                   aria-pressed={isActive}
                   className={`flex items-center justify-center p-1 rounded-sm transition-colors duration-150 ${
                     isActive
-                      ? "bg-accent/20 text-accent-light border border-accent/30"
-                      : "text-text-dim hover:text-accent-light border border-transparent"
+                      ? "bg-accent/20 text-foreground border border-ring"
+                      : "text-muted-foreground/80 hover:text-foreground border border-transparent"
                   } ${isWalkMode ? "opacity-40 cursor-not-allowed" : ""}`}
                 >
                   <Icon size={16} strokeWidth={1.5} />
@@ -211,8 +211,8 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
                   title={tooltip}
                   className={`flex items-center justify-center gap-1 px-2 py-1 rounded-sm font-mono text-sm transition-colors duration-150 border ${
                     isActive
-                      ? "bg-accent/10 text-accent border-accent/30"
-                      : "text-text-dim hover:text-accent-light border-transparent"
+                      ? "bg-accent/10 text-foreground border-ring"
+                      : "text-muted-foreground/80 hover:text-foreground border-transparent"
                   }`}
                 >
                   <Icon size={14} strokeWidth={1.5} />
@@ -240,8 +240,8 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
             title={`CUTAWAY: ${cutawayMode === "auto" ? "AUTO" : "OFF"}`}
             className={`flex items-center justify-center gap-1 px-2 py-1 rounded-sm font-mono text-sm transition-colors duration-150 border mr-6 ${
               cutawayMode === "auto"
-                ? "bg-accent/10 text-accent border-accent/30 accent-glow"
-                : "text-text-dim hover:text-accent-light border-transparent"
+                ? "bg-accent/10 text-foreground border-ring accent-glow"
+                : "text-muted-foreground/80 hover:text-foreground border-transparent"
             }`}
           >
             <EyeOff size={14} strokeWidth={1.5} />
@@ -264,7 +264,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
           maxLength={60}
           data-testid="inline-doc-title"
           placeholder="Untitled Room"
-          className="font-mono text-sm text-text-primary text-center min-w-0 max-w-[320px] truncate"
+          className="font-mono text-sm text-foreground text-center min-w-0 max-w-[320px] truncate"
         />
       </div>
 
@@ -275,7 +275,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
             onClick={undo}
             disabled={pastLen === 0}
             aria-label="Undo"
-            className="text-text-dim hover:text-text-primary disabled:opacity-20 transition-colors"
+            className="text-muted-foreground/80 hover:text-foreground disabled:opacity-20 transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">undo</span>
           </button>
@@ -285,13 +285,13 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
             onClick={redo}
             disabled={futureLen === 0}
             aria-label="Redo"
-            className="text-text-dim hover:text-text-primary disabled:opacity-20 transition-colors"
+            className="text-muted-foreground/80 hover:text-foreground disabled:opacity-20 transition-colors"
           >
             <span className="material-symbols-outlined text-[18px]">redo</span>
           </button>
         </Tooltip>
 
-        <div className="w-px h-5 bg-outline-variant/20 mx-1" />
+        <div className="w-px h-5 bg-border/50 mx-1" />
 
         <ToolbarSaveStatus />
 
@@ -304,7 +304,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
               }
               exportRenderedImage();
             }}
-            className="font-mono text-sm font-normal px-4 py-1 border border-accent text-accent hover:bg-accent/10 transition-colors rounded-sm"
+            className="font-mono text-sm font-normal px-4 py-1 border border-accent text-foreground hover:bg-accent/10 transition-colors rounded-sm"
             aria-label="Export"
           >
             Export
@@ -314,17 +314,17 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
         <Tooltip content="Help &amp; shortcuts" shortcut="?" placement="bottom">
           <button
             onClick={() => openHelp()}
-            className="text-text-dim hover:text-text-primary transition-colors"
+            className="text-muted-foreground/80 hover:text-foreground transition-colors"
             data-onboarding="help-button"
           >
             <span className="material-symbols-outlined text-[18px]">help</span>
           </button>
         </Tooltip>
-        <button className="text-text-dim hover:text-text-primary transition-colors">
+        <button className="text-muted-foreground/80 hover:text-foreground transition-colors">
           <span className="material-symbols-outlined text-[18px]">settings</span>
         </button>
-        <div className="w-7 h-7 rounded-full bg-obsidian-high flex items-center justify-center">
-          <span className="material-symbols-outlined text-[14px] text-text-dim">person</span>
+        <div className="w-7 h-7 rounded-full bg-accent flex items-center justify-center">
+          <span className="material-symbols-outlined text-[14px] text-muted-foreground/80">person</span>
         </div>
       </div>
     </header>
@@ -379,13 +379,13 @@ function ToolbarSaveStatus() {
       {isSaving ? (
         <>
           <span
-            className={`material-symbols-outlined text-[14px] text-accent-light ${
+            className={`material-symbols-outlined text-[14px] text-foreground ${
               reducedMotion ? "" : "animate-spin"
             }`}
           >
             progress_activity
           </span>
-          <span className="font-mono text-base tracking-widest text-accent-light">
+          <span className="font-mono text-base tracking-widest text-foreground">
             SAVING
           </span>
         </>
@@ -396,7 +396,7 @@ function ToolbarSaveStatus() {
           </span>
           <span
             className={`font-mono text-base tracking-widest ${
-              isSaved ? "text-success" : "text-text-ghost"
+              isSaved ? "text-success" : "text-muted-foreground/60"
             }`}
           >
             SAVED
@@ -450,8 +450,8 @@ export function ToolPalette() {
             data-testid={`tool-${t.id}`}
             className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-150 ${
               activeTool === t.id
-                ? "bg-accent text-white shadow-[0_0_15px_rgba(124,91,240,0.3)]"
-                : "text-text-dim hover:text-text-primary hover:bg-obsidian-high"
+                ? "bg-primary text-primary-foreground shadow-[0_0_15px_rgba(124,91,240,0.3)]"
+                : "text-muted-foreground/80 hover:text-foreground hover:bg-accent"
             }`}
           >
             <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
@@ -468,8 +468,8 @@ export function ToolPalette() {
           onClick={() => setShowWallCutouts((v) => !v)}
           className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-150 ${
             isCutoutTool
-              ? "bg-accent text-white shadow-[0_0_15px_rgba(124,91,240,0.3)]"
-              : "text-text-dim hover:text-text-primary hover:bg-obsidian-high"
+              ? "bg-primary text-primary-foreground shadow-[0_0_15px_rgba(124,91,240,0.3)]"
+              : "text-muted-foreground/80 hover:text-foreground hover:bg-accent"
           }`}
         >
           <ChevronDown size={16} />
@@ -492,8 +492,8 @@ export function ToolPalette() {
           data-testid="tool-measure"
           className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-150 ${
             activeTool === "measure"
-              ? "bg-accent text-white shadow-[0_0_15px_rgba(124,91,240,0.3)]"
-              : "text-text-dim hover:text-text-primary hover:bg-obsidian-high"
+              ? "bg-primary text-primary-foreground shadow-[0_0_15px_rgba(124,91,240,0.3)]"
+              : "text-muted-foreground/80 hover:text-foreground hover:bg-accent"
           }`}
         >
           <Ruler size={18} />
@@ -505,29 +505,29 @@ export function ToolPalette() {
           data-testid="tool-label"
           className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-150 ${
             activeTool === "label"
-              ? "bg-accent text-white shadow-[0_0_15px_rgba(124,91,240,0.3)]"
-              : "text-text-dim hover:text-text-primary hover:bg-obsidian-high"
+              ? "bg-primary text-primary-foreground shadow-[0_0_15px_rgba(124,91,240,0.3)]"
+              : "text-muted-foreground/80 hover:text-foreground hover:bg-accent"
           }`}
         >
           <Type size={18} />
         </button>
       </Tooltip>
-      <div className="w-full h-px bg-outline-variant/20 my-0.5" />
+      <div className="w-full h-px bg-border/50 my-0.5" />
       <Tooltip content="Toggle grid" placement="right">
         <button
           onClick={toggleGrid}
           className={`w-8 h-8 flex items-center justify-center rounded-sm transition-colors ${
-            showGrid ? "text-accent" : "text-text-ghost"
-          } hover:bg-obsidian-high`}
+            showGrid ? "text-foreground" : "text-muted-foreground/60"
+          } hover:bg-accent`}
         >
           <span className="material-symbols-outlined text-[18px]">grid_4x4</span>
         </button>
       </Tooltip>
-      <div className="w-full h-px bg-outline-variant/20 my-0.5" />
+      <div className="w-full h-px bg-border/50 my-0.5" />
       <Tooltip content="Zoom in" placement="right">
         <button
           onClick={() => setUserZoom(userZoom * 1.2)}
-          className="w-8 h-8 flex items-center justify-center rounded-sm text-text-dim hover:text-text-primary hover:bg-obsidian-high transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-sm text-muted-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
         >
           <span className="material-symbols-outlined text-[18px]">zoom_in</span>
         </button>
@@ -535,7 +535,7 @@ export function ToolPalette() {
       <Tooltip content="Zoom out" placement="right">
         <button
           onClick={() => setUserZoom(userZoom / 1.2)}
-          className="w-8 h-8 flex items-center justify-center rounded-sm text-text-dim hover:text-text-primary hover:bg-obsidian-high transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-sm text-muted-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
         >
           <span className="material-symbols-outlined text-[18px]">zoom_out</span>
         </button>
@@ -543,12 +543,12 @@ export function ToolPalette() {
       <Tooltip content="Fit to view" shortcut="0" placement="right">
         <button
           onClick={resetView}
-          className="w-8 h-8 flex items-center justify-center rounded-sm text-text-dim hover:text-text-primary hover:bg-obsidian-high transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-sm text-muted-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
         >
           <span className="material-symbols-outlined text-[18px]">fit_screen</span>
         </button>
       </Tooltip>
-      <div className="w-8 h-5 flex items-center justify-center font-mono text-[9px] text-text-ghost tracking-wider">
+      <div className="w-8 h-5 flex items-center justify-center font-mono text-[9px] text-muted-foreground/60 tracking-wider">
         {Math.round(userZoom * 100)}%
       </div>
     </div>

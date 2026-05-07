@@ -95,19 +95,19 @@ export function DeleteTextureDialog(props: DeleteTextureDialogProps): JSX.Elemen
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-obsidian-deepest/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
         onClick={deleting ? undefined : onClose}
       />
 
       {/* Surface */}
       <div
-        className="relative w-[400px] bg-obsidian-mid/90 backdrop-blur-xl border border-outline-variant/20 rounded-sm shadow-2xl"
+        className="relative w-[400px] bg-popover/90 backdrop-blur-xl border border-border/50 rounded-sm shadow-2xl"
         role="dialog"
         aria-modal="true"
       >
         {/* Header */}
         <div className="p-6 pb-4">
-          <h2 className="font-mono text-base font-medium uppercase tracking-widest text-text-primary">
+          <h2 className="font-mono text-base font-medium uppercase tracking-widest text-foreground">
             DELETE TEXTURE
           </h2>
         </div>
@@ -115,15 +115,15 @@ export function DeleteTextureDialog(props: DeleteTextureDialogProps): JSX.Elemen
         {/* Body — locked D-07 copy */}
         <div className="px-6 pb-4">
           {count === 0 ? (
-            <p className="font-body text-base text-text-muted">
+            <p className="font-body text-base text-muted-foreground">
               Delete{" "}
-              <span className="text-text-primary uppercase">{nameUpper}</span>
+              <span className="text-foreground uppercase">{nameUpper}</span>
               ? This texture isn't used by any surface.
             </p>
           ) : (
-            <p className="font-body text-base text-text-muted">
+            <p className="font-body text-base text-muted-foreground">
               Delete{" "}
-              <span className="text-text-primary uppercase">{nameUpper}</span>?{" "}
+              <span className="text-foreground uppercase">{nameUpper}</span>?{" "}
               {count} surface{count === 1 ? "" : "s"} in this project use it.
               They'll fall back to their base color.
             </p>
@@ -136,14 +136,14 @@ export function DeleteTextureDialog(props: DeleteTextureDialogProps): JSX.Elemen
             type="button"
             onClick={onClose}
             disabled={deleting}
-            className="rounded-sm px-4 py-1 font-mono text-sm text-text-muted hover:text-text-primary bg-obsidian-high hover:bg-obsidian-highest border border-outline-variant/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-sm px-4 py-1 font-mono text-sm text-muted-foreground hover:text-foreground bg-accent hover:bg-secondary border border-border/50 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ minHeight: 44 }}
           ><span>Discard</span></button>
           <button
             type="button"
             onClick={handleDelete}
             disabled={deleting}
-            className="rounded-sm px-4 py-1 font-mono text-sm text-error bg-obsidian-high hover:bg-error/10 border border-error/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="rounded-sm px-4 py-1 font-mono text-sm text-error bg-accent hover:bg-error/10 border border-error/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             style={{ minHeight: 44 }}
           >
             {deleting ? (

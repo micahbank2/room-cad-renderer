@@ -177,7 +177,7 @@ export default function App() {
   const isCanvas = viewMode === "2d" || viewMode === "3d" || viewMode === "split";
 
   return (
-    <div className="h-full flex flex-col bg-obsidian-base">
+    <div className="h-full flex flex-col bg-background">
       <Toolbar
         viewMode={viewMode}
         onViewChange={setViewMode}
@@ -195,10 +195,10 @@ export default function App() {
         {isCanvas && !showSidebar && (
           <button
             onClick={toggleSidebar}
-            className="absolute left-2 top-2 z-20 w-8 h-8 bg-obsidian-low rounded-sm border border-outline-variant/30 flex items-center justify-center hover:bg-obsidian-mid"
+            className="absolute left-2 top-2 z-20 w-8 h-8 bg-card rounded-sm border border-border/60 flex items-center justify-center hover:bg-popover"
             title="SHOW SIDEBAR"
           >
-            <span className="font-mono text-[10px] text-text-dim">&#9776;</span>
+            <span className="font-mono text-[10px] text-muted-foreground/80">&#9776;</span>
           </button>
         )}
 
@@ -206,31 +206,31 @@ export default function App() {
         {viewMode === "library" && (
           <div className="flex flex-1 overflow-hidden">
             {/* Library sidebar filters */}
-            <aside className="w-48 shrink-0 bg-obsidian-low p-4 space-y-4 overflow-y-auto">
+            <aside className="w-48 shrink-0 bg-card p-4 space-y-4 overflow-y-auto">
               <div>
-                <h4 className="font-mono text-[9px] text-text-ghost tracking-widest mb-2">
+                <h4 className="font-mono text-[9px] text-muted-foreground/60 tracking-widest mb-2">
                   CATEGORIES
                 </h4>
                 {["SEATING", "STORAGE", "LIGHTING", "TABLES", "DECOR"].map((cat) => (
                   <label key={cat} className="flex items-center gap-2 py-0.5 cursor-pointer">
                     <input type="checkbox" className="w-3 h-3 accent-accent rounded-none" />
-                    <span className="font-mono text-[10px] text-text-dim">{cat}</span>
+                    <span className="font-mono text-[10px] text-muted-foreground/80">{cat}</span>
                   </label>
                 ))}
               </div>
               <div>
-                <h4 className="font-mono text-[9px] text-text-ghost tracking-widest mb-2">
+                <h4 className="font-mono text-[9px] text-muted-foreground/60 tracking-widest mb-2">
                   MATERIALS
                 </h4>
                 {["NATURAL OAK", "BRUSHED STEEL", "CONCRETE", "FABRIC"].map((mat) => (
                   <label key={mat} className="flex items-center gap-2 py-0.5 cursor-pointer">
                     <input type="checkbox" className="w-3 h-3 accent-accent rounded-none" />
-                    <span className="font-mono text-[10px] text-text-dim">{mat}</span>
+                    <span className="font-mono text-[10px] text-muted-foreground/80">{mat}</span>
                   </label>
                 ))}
               </div>
               <div className="pt-2">
-                <span className="font-mono text-[9px] text-text-ghost tracking-widest">
+                <span className="font-mono text-[9px] text-muted-foreground/60 tracking-widest">
                   RECENT IMPORTS
                 </span>
               </div>
@@ -265,8 +265,8 @@ export default function App() {
               <div className={`${viewMode === "split" ? "w-1/2" : "flex-1"} h-full relative`}>
                 <Suspense
                   fallback={
-                    <div className="w-full h-full bg-obsidian-deepest flex items-center justify-center">
-                      <span className="font-mono text-[10px] text-text-ghost tracking-widest animate-pulse">
+                    <div className="w-full h-full bg-background flex items-center justify-center">
+                      <span className="font-mono text-[10px] text-muted-foreground/60 tracking-widest animate-pulse">
                         BUILDING SCENE...
                       </span>
                     </div>

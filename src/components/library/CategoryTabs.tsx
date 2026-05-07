@@ -18,13 +18,13 @@ export interface CategoryTabsProps {
  */
 export function CategoryTabs({ tabs, activeId, onChange }: CategoryTabsProps) {
   return (
-    <div className="flex items-end gap-4 border-b border-outline-variant/20">
+    <div className="flex items-end gap-4 border-b border-border/50">
       {tabs.map((tab) => {
         const isActive = tab.id === activeId;
         const baseClasses = "pb-1 font-mono text-sm transition-colors";
         const stateClasses = isActive
-          ? "text-text-primary font-medium border-b border-accent -mb-px"
-          : "text-text-dim hover:text-text-muted";
+          ? "text-foreground font-medium border-b border-accent -mb-px"
+          : "text-muted-foreground/80 hover:text-muted-foreground";
         return (
           <button
             key={tab.id}
@@ -34,7 +34,7 @@ export function CategoryTabs({ tabs, activeId, onChange }: CategoryTabsProps) {
           >
             {tab.label}
             {typeof tab.count === "number" ? (
-              <span className="ml-1 text-text-ghost font-mono text-sm">
+              <span className="ml-1 text-muted-foreground/60 font-mono text-sm">
                 ({tab.count})
               </span>
             ) : null}
