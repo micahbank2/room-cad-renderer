@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.18
 milestone_name: Pascal Visual Parity
 status: executing
-last_updated: "2026-05-07T19:16:00.827Z"
+last_updated: "2026-05-07T19:26:39.333Z"
 last_activity: 2026-05-07
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 7
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-07 — v1.17 partial-shipped 67+68; v
 Phase: 71 (Token Foundation) — EXECUTING
 Milestone: v1.18 Pascal Visual Parity
 Phases: 6 (71, 72, 73, 74, 75, 76) — 0 complete
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-05-07
 
@@ -43,6 +43,8 @@ Last activity: 2026-05-07
 - **D-A9 (carry-over):** 4 legacy tests need contract updates from Phase 68 — fold into v1.18 Phase 71: `tests/snapshotMigration.test.ts:32` (asserts version 5, bump to 6), `tests/pickerMyTexturesIntegration.test.tsx` (tests removed wallpaper "MY TEXTURES" tab), `tests/WallMesh.cutaway.test.tsx` (Phase 59 ghost-spread audit on new material sites — open question whether ghost cutaway should propagate through resolved Materials), `tests/lib/contextMenuActionCounts.test.ts` (test pollution).
 - [Phase 71]: Wave 0 test scaffold (Plan 00): RED tests lock useTheme + __driveTheme contract before implementation; Plan 71-01 turns GREEN
 - [Phase 71]: geist npm package is Next.js-only; loaded Geist fonts via Google Fonts in index.html instead for Vite compatibility
+- [Phase 71]: bg-obsidian-high (hover states) → bg-accent; bg-accent text-white (brand buttons) → bg-primary text-primary-foreground; hover:text-accent preserved as neutral hover
+- [Phase 71]: snapGuides.ts #7c5bf0 preserved as canvas data per D-06a; Lighting.tsx photographic hex colors preserved
 
 ## Performance Metrics
 
@@ -60,6 +62,7 @@ Last activity: 2026-05-07
 | 76 | MODALS-WELCOME-FINAL | Modal primitives + light-mode Welcome/ProjectManager + carry-over test cleanup | Pending |
 | Phase 71 P00 | 6 | 2 tasks | 2 files |
 | Phase 71 P01 | 218 | 3 tasks | 6 files |
+| Phase 71 P02 | 461 | 1 tasks | 55 files |
 
 ## Recent Milestones
 
