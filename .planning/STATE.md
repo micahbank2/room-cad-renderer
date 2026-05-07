@@ -1,86 +1,79 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.17
-milestone_name: Library + Material Engine
-status: executing
-last_updated: "2026-05-07T11:41:03.941Z"
+milestone: v1.18
+milestone_name: Pascal Visual Parity
+status: planning
+last_updated: "2026-05-07T17:30:00.000Z"
 last_activity: 2026-05-07
 progress:
-  total_phases: 9
-  completed_phases: 2
-  total_plans: 8
-  completed_plans: 8
+  total_phases: 6
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-06 — v1.16 archived; v1.17 Library + Material Engine roadmap finalized)
+See: .planning/PROJECT.md (updated 2026-05-07 — v1.17 partial-shipped 67+68; v1.18 Pascal Visual Parity opened; Phases 69+70 deferred to v1.19)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 68 — material-application-system-mat-apply-01
+**Current focus:** Milestone v1.18 — chrome-only rewrite to emulate Pascal Editor
 
 ## Current Position
 
-Phase: 68 (material-application-system-mat-apply-01) — EXECUTING
-Milestone: v1.17 Library + Material Engine
-Phases: 4 (67, 68, 69, 70) — 1 complete
-Plan: 7 of 7
-Status: Ready to execute
+Phase: TBD (next: Phase 71 TOKEN-FOUNDATION after roadmap approval)
+Milestone: v1.18 Pascal Visual Parity
+Phases: 6 (71, 72, 73, 74, 75, 76) — 0 complete
+Plan: Not started
+Status: Roadmap pending approval
 Last activity: 2026-05-07
 
 ## Decisions
 
-- **D-09 RESOLVED (Phase 67):** wrapper architecture confirmed. Material stores `utex_`-prefixed colorMapId references into the existing userTextureStore (Phase 34 pipeline) rather than owning blobs directly. Phase 68 surface renderers consume Material via the existing pbrTextureCache plumbing — zero new texture-cache code needed for apply.
-- [Phase 68-material-application-system-mat-apply-01]: Plan 05: Convex-only floor footprint for v1.17 (walk wall.start points); non-convex rooms degrade gracefully without crash. True wall-graph traversal deferred to Phase 70+.
-- [Phase 68-material-application-system-mat-apply-01]: Plan 05: Ceiling 2D fabric fill intentionally deferred — ceilings remain outlines in top-down view per RESEARCH Q5.
-- [Phase 68-material-application-system-mat-apply-01]: FACE_ORDER physically-correct mapping ([+X=east, -X=west, +Y=top, -Y=bottom, +Z=north, -Z=south]) over material.ts JSDoc that had +Z=top — material.ts comment cleanup deferred
-- [Phase 68-material-application-system-mat-apply-01]: FloorMesh receives floorMaterialId/floorScaleFt as new props from RoomGroup; keeps FloorMesh deterministic vs reading from cadStore
-- [Phase 68-material-application-system-mat-apply-01]: Plan 06: Mid-pick preview NOT enabled in v1.17 — single click applies, single Ctrl+Z reverts. Documented in MaterialPicker file header for v1.18 reconsideration.
-- [Phase 68-material-application-system-mat-apply-01]: Plan 06: Floor MaterialPicker relocated from Sidebar.tsx into RoomSettings.tsx to honor plan acceptance criteria AND group floor material with room dimensions.
-- [Phase 68]: Spec relocation tests/e2e/material-apply.spec.ts → tests/e2e/specs/material-apply.spec.ts (testMatch glob fix)
-- [Phase 68]: Synthetic paint Material seed via __driveSeedPaintMaterial (saveMaterialDirect wrapper) — no JPEG fixture needed for e2e
-- [Phase 68]: Defensive store-action fallback after Ctrl+Z keyboard route — robust against headless Chromium focus-bubble fragility
+- **D-A1 (audit-locked):** Adopt shadcn/ui v4 oklch token system as defined in pascal-visual-audit.md — 16 semantic tokens, no custom palette extensions in chrome (chart colors only for non-chrome viz). No accent purple in chrome.
+- **D-A2 (audit-locked):** 10px base radius (`--radius: 0.625rem`) with sm/md/lg/xl computed; opt-in `corner-shape: squircle` as progressive enhancement (Safari/WebKit-only at writing).
+- **D-A3 (audit-locked):** Font stack swap to Barlow + Geist Sans + Geist Mono. Drop IBM Plex Mono UI chrome; drop Space Grotesk display tier; UPPERCASE_SNAKE labels become mixed case throughout.
+- **D-A4 (audit-locked):** Light + dark dual-mode first-class. Editor surfaces stay dark; WelcomeScreen + ProjectManager + scene-list adopt light mode (Pascal pattern).
+- **D-A5 (user-confirmed):** Lucide-react icons only — drop the 10-file Material Symbols allowlist (D-33 policy stricter). Action menu's chunky top row uses lucide at 1.5x size as fallback; commission isometric PNG icon set later only if look is flat.
+- **D-A6 (user-confirmed):** Floating two-row action menu **replaces** the top-left toolbar entirely — half-measures look incoherent.
+- **D-A7 (user-confirmed):** Right sidebar becomes **contextual** — appears only when something is selected. PropertiesPanel un-mounts on empty selection.
+- **D-A8 (sequencing):** v1.17 closed early at "shipped 67 + 68". Phases 69 (MAT-LINK-01) + 70 (LIB-REBUILD-01) deferred to v1.19 to ship in v1.18 chrome rather than be designed twice.
+- **D-A9 (carry-over):** 4 legacy tests need contract updates from Phase 68 — fold into v1.18 Phase 71: `tests/snapshotMigration.test.ts:32` (asserts version 5, bump to 6), `tests/pickerMyTexturesIntegration.test.tsx` (tests removed wallpaper "MY TEXTURES" tab), `tests/WallMesh.cutaway.test.tsx` (Phase 59 ghost-spread audit on new material sites — open question whether ghost cutaway should propagate through resolved Materials), `tests/lib/contextMenuActionCounts.test.ts` (test pollution).
 
 ## Performance Metrics
 
-| Phase-Plan | Duration | Tasks | Files | Date |
-|---|---|---|---|---|
-| 67-01 | ~25min | 3 | 13 (6 src + 6 tests + 1 mod) | 2026-05-07 |
-| Phase 68 P01 | 6m | 2 tasks | 6 files |
-| Phase 68-material-application-system-mat-apply-01 P03 | 10m | 2 tasks | 4 files |
-| Phase 68-material-application-system-mat-apply-01 P05 | 358s | 2 tasks | 4 files |
-| Phase 68-material-application-system-mat-apply-01 P04 | 25min | 3 tasks | 9 files |
-| Phase 68-material-application-system-mat-apply-01 P06 | 14min | 2 tasks | 6 files |
-| Phase 68 P07 | 22min | 4 tasks | 3 files |
+(v1.18 — pending first phase execution)
 
-## v1.17 Roadmap
+## v1.18 Roadmap
 
 | Phase | Requirement | Goal | Status |
 |-------|-------------|------|--------|
-| 67 | MAT-ENGINE-01 | Material engine foundation — texture maps + metadata + IDB persistence (#25) | Complete |
-| 68 | MAT-APPLY-01 | Material application system — unified surface picker (#27) | Pending |
-| 69 | MAT-LINK-01 | Product-to-material linking — finish slot on placed products (#26) | Pending |
-| 70 | LIB-REBUILD-01 | Library rebuild — Materials / Assemblies / Products top-level toggle (#24) | Pending |
+| 71 | TOKEN-FOUNDATION | Replace Obsidian palette with Pascal oklch tokens; new fonts; light+dark | Pending |
+| 72 | PRIMITIVES-SHELF | Button/Tab/PanelSection/Segmented/Switch/Slider via cva + motion/react | Pending |
+| 73 | SIDEBAR-RESTYLE | Tree spine geometry; contextual right sidebar | Pending |
+| 74 | TOOLBAR-REWORK | Floating two-row action menu replaces top-left toolbar | Pending |
+| 75 | PROPERTIES-LIBRARY-RESTYLE | MaterialPicker / ProductLibrary / RoomSettings restyle | Pending |
+| 76 | MODALS-WELCOME-FINAL | Modal primitives + light-mode Welcome/ProjectManager + carry-over test cleanup | Pending |
 
 ## Recent Milestones
 
+- **v1.17 Library + Material Engine** — partial-shipped 2026-05-07 (2/4 phases — 67 MAT-ENGINE-01 + 68 MAT-APPLY-01; 69+70 deferred to v1.19)
 - **v1.16 Maintenance Pass** — shipped 2026-05-06 (4 phases, audit `passed-with-notes`)
 - **v1.15 Architectural Toolbar Expansion** — shipped 2026-05-06 (4 phases, audit `passed`)
 - **v1.14 Real 3D Models** — shipped 2026-05-05 (4 phases, audit `passed`)
-- **v1.13 UX Polish Bundle** — shipped 2026-04-28 (2 phases)
 
 ## Accumulated Context
 
-- v1.16 carry-over notes: monitor DEBT-06 vitest cascade pattern; observed once during audit re-run, not blocking. Captured as potential Phase 999.5 (DEBT-07) if it reappears in v1.17 PR audits.
-- StrictMode useEffect cleanup pattern (CLAUDE.md #7) applies to any new module-level registry writes — relevant if Phase 67/68 introduces material-registry bridges.
-- Phase 32 user-texture pipeline is the architectural template for Phase 67 (SHA-256 dedup, IDB store, real-world tile size convention, 25MB cap, 2048px longest-edge downscale).
-- Snapshot version chain: currently v5 (Phase 62 MEASURE-01). Phases 68 + 69 likely each need a version bump + migration; Phase 67 isolates new entity to its own store and skips snapshot impact.
-- Phase 31 D-02 placement-instance separation pattern (override fields on PlacedProduct, not Product) is the template for Phase 69's `finishMaterialId` slot.
-- Phase 33 CategoryTabs primitive is reused by Phase 70 library tabs.
-- v1.17 sequencing locked: Foundation (67) → Apply (68) → Link (69) → UI Surface (70). Each phase ships independently; Phase 67 alone has user value (uploaded materials persist, ready for Phase 68 apply).
+- **Audit doc is the research source for v1.18.** `.planning/competitive/pascal-visual-audit.md` contains the full token map, component patterns, screenshots, and migration cost matrix. No separate `research/` pass needed for this milestone.
+- **Pascal repo cloned at `/tmp/pascal-editor`** (shallow, gitignored). Bun-installed; can be rebooted with `cd /tmp/pascal-editor && bun dev` for live reference. Port 3002.
+- **Tailwind v4 alignment is the lucky coincidence** — both stacks use `@theme {}` blocks. Token swap is mechanical, not a rewrite.
+- **800+ existing tests catch behavior regressions.** v1.18 is chrome-only; any failed Playwright/vitest in Phase 71+ flags real (non-chrome) breakage.
+- **StrictMode-safe useEffect cleanup pattern (CLAUDE.md #7)** still applies. v1.18 will introduce new motion/react `<motion.div layout>` instances — verify no module-level registry writes inside their effects.
+- **Pattern from Phase 68 carry-over fix:** when extracting test drivers, put them in `src/test-utils/*Drivers.ts` with `installXDrivers()` exports + import from `main.tsx`. Decouples driver registration from UI mount paths.
+- **Phase 33 D-33 / D-34 / D-03 / D-39 design tokens** were the v1.7.5 baseline — v1.18 supersedes D-33 (Material Symbols dropped) and D-34 (new spacing scale) but D-39 (reduced motion) stays compatible.
 
 ## Next Step
 
-Run `/gsd:verify-work` to gate Phase 67 — confirm all 5 success criteria, run e2e Playwright suite (`npx playwright test tests/e2e/specs/material-upload.spec.ts`), and validate Pattern #7 / D-09 wrapper architecture before promoting to Phase 68.
+Run `/gsd:plan-phase 71` to plan TOKEN-FOUNDATION. Audit doc + the ROADMAP.md detail for Phase 71 are the research input — no separate research pass needed.

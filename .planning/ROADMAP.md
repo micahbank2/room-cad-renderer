@@ -20,7 +20,8 @@
 - ✅ **v1.14 Real 3D Models** — Phases 55–58 (shipped 2026-05-05)
 - ✅ **v1.15 Architectural Toolbar Expansion** — Phases 59–62 (shipped 2026-05-06)
 - ✅ **v1.16 Maintenance Pass** — Phases 63–66 (shipped 2026-05-06)
-- 🚧 **v1.17 Library + Material Engine** — Phases 67–70 (in progress)
+- ✅ **v1.17 Library + Material Engine** — Phases 67–68 (partial-shipped 2026-05-07; Phases 69 MAT-LINK-01 + 70 LIB-REBUILD-01 deferred to v1.19)
+- 🚧 **v1.18 Pascal Visual Parity** — Phases 71–76 (in progress) — chrome-only rewrite to emulate pascalorg/editor
 
 ---
 
@@ -147,7 +148,21 @@
 
 ---
 
-## v1.17 Library + Material Engine (active)
+## v1.18 Pascal Visual Parity (active)
+
+**Goal:** Make Room CAD Renderer look extremely similar to Pascal Editor. Adopt Pascal's design tokens (oklch shadcn/ui v4 palette), font stack (Barlow + Geist Sans + Geist Mono), 10px squircle radius, layout patterns (contextual right sidebar, floating two-row action menu), and light + dark dual-mode. Every existing behavior, store, snapshot v6, hotkey, and test driver continues to work — chrome-only rewrite. Audit reference: `.planning/competitive/pascal-visual-audit.md`.
+
+**Sequencing rationale (locked):** Tokens → Primitives → Sidebar → Toolbar → Properties → Final. Phase 71 establishes the new design language at the variable level (every Tailwind class downstream picks up the new look). Phase 72 builds the primitive library so subsequent phases assemble UIs from one consistent vocabulary. Phase 73 reshapes the rooms tree + makes the right sidebar contextual — biggest layout change before the toolbar rework. Phase 74 swaps the top-left toolbar for the floating action menu — single most "Pascal-feeling" leap. Phase 75 polishes the properties + library surfaces with the new vocabulary. Phase 76 finishes with light-mode marketing surfaces + carry-over test cleanup + audit.
+
+**Forward signal:** Roadmap will be filled in by gsd-roadmapper. 6 phases, ~5–7 days. Functionality regression-tested by existing 800+ test suite. Lucide-icon fallback first for the action menu's chunky top row; commission isometric PNG icons later if look is flat.
+
+### Phases
+
+(Roadmapper will populate phase list with goals, dependencies, success criteria, plans.)
+
+---
+
+## v1.17 Library + Material Engine (closed early — partial-shipped)
 
 **Goal:** Jessica picks real materials (marble, fabric, tile, paint, flooring) with real-world metadata (brand, SKU, cost, lead time) and applies them to walls, floors, ceilings, and objects. Her library finally feels organized — Materials, Assemblies, and Products as separate top-level sections. **First milestone since v1.2 to introduce a new core data system.** Source: [#24](https://github.com/micahbank2/room-cad-renderer/issues/24), [#25](https://github.com/micahbank2/room-cad-renderer/issues/25), [#26](https://github.com/micahbank2/room-cad-renderer/issues/26), [#27](https://github.com/micahbank2/room-cad-renderer/issues/27).
 

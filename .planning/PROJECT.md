@@ -10,24 +10,40 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 **Jessica can see her future room with her actual furniture before spending money.** The magic moment: she uploads a photo of a couch she found, places it in a room with real dimensions, switches to walk mode, and feels whether it works.
 
-## Current Milestone Goals — v1.17 Library + Material Engine
+## Current Milestone Goals — v1.18 Pascal Visual Parity
 
-After v1.16 cleared parked tech debt and the long-deferred 999.x backlog, v1.17 is the **first milestone since v1.2 to introduce a new core data system.** Materials become a first-class entity — Jessica uploads marble, fabric, tile, flooring with real-world metadata (brand, SKU, cost, lead time), then applies them to any surface. The library sidebar gets the proper Materials / Assemblies / Products structure issue [#24](https://github.com/micahbank2/room-cad-renderer/issues/24) has tracked since early backlog.
+After v1.17 shipped the unified Material engine (Phases 67-68), v1.18 turns to the visual layer. Goal: make Room CAD Renderer **look extremely similar to Pascal Editor** while keeping every existing behavior, store, snapshot version, hotkey, and test driver functioning unchanged. The Obsidian CAD theme — dark blue cyberpunk, monospace UI chrome, sharp 2px corners, saturated purple accent — gets retired in favor of Pascal's neutral grays, soft 10px squircle radius, Barlow + Geist Sans, and floating action menu.
 
-**Four phases in v1.17:**
+**Approach:** chrome-only rewrite. Every Zustand store, snapshot v6, Three.js mesh, Fabric.js renderer, and `__drive*` test driver continues to work. The 800+ existing test suite catches regressions. This is `src/index.css` token swap + per-component className/markup migration.
 
-1. **MAT-ENGINE-01 (Phase 67)** — Material engine foundation. Texture-map upload (color / roughness / reflection), real-world tile size, brand/SKU/cost/lead-time metadata, IndexedDB persistence mirroring the user-texture pipeline. Issue [#25](https://github.com/micahbank2/room-cad-renderer/issues/25).
-2. **MAT-APPLY-01 (Phase 68)** — Material application system. Apply any material to walls / floors / ceilings / custom-element faces. Replaces today's split paint / wallpaper / floor-material patchwork with a unified surface-material model. Issue [#27](https://github.com/micahbank2/room-cad-renderer/issues/27).
-3. **MAT-LINK-01 (Phase 69)** — Product-to-material linking. Products carry a "finish slot" so fabric can swap without re-placing the object. Separates object-shape from material. Issue [#26](https://github.com/micahbank2/room-cad-renderer/issues/26).
-4. **LIB-REBUILD-01 (Phase 70)** — Library rebuild. Top-level Materials / Assemblies / Products toggle in sidebar with category tabs (Flooring, Wall coverings, Furniture, Lighting, etc.). Issue [#24](https://github.com/micahbank2/room-cad-renderer/issues/24).
+**Six phases in v1.18 (Phases 71-76):**
 
-**Sequencing rationale:** Phase 67 lays the data foundation. Phase 68 makes it usable on real surfaces. Phase 69 unlocks finish-swapping on placed objects. Phase 70 surfaces it all in the new sidebar UI. Each phase replaces an existing subsystem — migration work + snapshot version bump expected.
+1. **TOKEN-FOUNDATION (Phase 71)** — Replace Obsidian palette with Pascal's oklch token system (16 semantic tokens — background/foreground/card/primary/secondary/muted/accent/destructive/border/input/ring/sidebar*/chart*); 10px base radius scale with optional `corner-shape: squircle`; Barlow + Geist Sans + Geist Mono fonts (drop IBM Plex Mono UI chrome); **light + dark dual-mode** support throughout.
+2. **PRIMITIVES-SHELF (Phase 72)** — Build component primitives via `cva`: Button, Tab, PanelSection (collapsible accordion with spring animation), SegmentedControl, Switch, Slider, Tooltip, Dialog. Adopt `motion/react` (framer-motion v12) for layout/spring transitions.
+3. **SIDEBAR-RESTYLE (Phase 73)** — Restyle Phase 46 rooms tree with Pascal's spine-and-branches geometry (1px gray line at left:21px, horizontal branches at 21px-32px); convert right sidebar to **contextual** (appears only when something is selected, not always-mounted).
+4. **TOOLBAR-REWORK (Phase 74)** — **Floating two-row action menu replaces top-left toolbar entirely.** Top row: chunky tool icons (lucide-react at 1.5x size as fallback; commission isometric PNG icon set later if the look doesn't land). Bottom row: flat tool icons. Floating glass pill at canvas-bottom-center with `rounded-2xl border border-border bg-background/90 shadow-2xl backdrop-blur-md`.
+5. **PROPERTIES-LIBRARY-RESTYLE (Phase 75)** — MaterialPicker (just shipped Phase 68), ProductLibrary, RoomSettings, PropertiesPanel adopt new tokens, primitives, and contextual mount pattern.
+6. **MODALS-WELCOME-FINAL (Phase 76)** — Modal/Dialog primitives, WelcomeScreen and ProjectManager adopt **light mode** (Pascal's marketing/empty pages are light; editor is dark). Final QA pass, audit checklist, milestone close.
 
-**Deferred to v1.18+:** PBR maps extension (#81 — AO + displacement + emissive); CAM-05 (#127 EXPLODE saved-camera offset); columns + levels/platforms (#19 partial — stairs + openings already shipped); window presets (#20); parametric object controls (#28); R3F v9 / React 19 upgrade (#56).
+**Open decisions resolved during planning:**
+- Lucide-icon fallback for the action menu's top row (no commissioned icons yet — defers cost; revisit if look is flat)
+- Light mode in scope for v1.18 (Pascal's chrome is theme-aware; doing dark-only first then adding light is double work)
+- Floating action menu **replaces** the top-left toolbar (half-measures look incoherent)
+- Right sidebar **contextual** (more canvas room when nothing selected)
+
+**Audit reference:** [.planning/competitive/pascal-visual-audit.md](competitive/pascal-visual-audit.md) — full token map, component patterns, and screenshots from `localhost:3002` Pascal boot.
+
+**Deferred to v1.19 (carried over from v1.17):**
+- **MAT-LINK-01** (Phase 69 → renumbered) — Product-to-material linking, finish slots. Issue [#26](https://github.com/micahbank2/room-cad-renderer/issues/26). Reason: redesigning the product library + material picker chrome in v1.18 means Phase 69's UI surfaces would have to be designed twice. Better to ship the new visual language first, then add finish-slot UI in the new style.
+- **LIB-REBUILD-01** (Phase 70 → renumbered) — Library rebuild with top-level Materials / Assemblies / Products toggle. Issue [#24](https://github.com/micahbank2/room-cad-renderer/issues/24). Same reason — wait for v1.18 chrome.
+
+**Deferred to v1.19+:** PBR maps extension (#81); CAM-05 (#127 EXPLODE saved-camera offset); parametric object controls (#28); window presets (#20); columns + levels/platforms (#19); R3F v9 / React 19 upgrade (#56).
 
 ---
 
 ## Current State
+
+**v1.17 Library + Material Engine partial-ship 2026-05-07** (1-day milestone, ~7 hours wall-clock for the two phases that landed). 2 of 4 planned phases shipped; remaining 2 deferred to v1.19. PRs [#151](https://github.com/micahbank2/room-cad-renderer/pull/151) (Phase 67 — MAT-ENGINE-01) and [#152](https://github.com/micahbank2/room-cad-renderer/pull/152) (Phase 68 — MAT-APPLY-01). Phase 67: Material as first-class entity wrapping existing UserTexture references (D-09 wrapper architecture) — `src/types/material.ts` with `colorMapId`/`roughnessMapId`/`reflectionMapId` slots, real-world `tileSizeFt`, brand/SKU/cost/lead-time metadata, IndexedDB store mirroring Phase 32 user-texture pattern with SHA-256 dedup, 5-card library section (Modal + Card + Section + useMaterials hook + materialStore). Phase 68: unified surface-material model — snapshot v5→v6 migration auto-converts paint/wallpaper/floor/ceiling assignments to Material entries (idempotent async pre-pass), priority-1 `materialId` branches in WallMesh/FloorMesh/CeilingMesh/CustomElementMesh (per-face) + 2D Fabric.js `materialPatternCache`, unified `MaterialPicker` component mounted in PropertiesPanel/WallSurfacePanel/RoomSettings replacing per-surface paint/wallpaper/floor pickers, `applySurfaceMaterial` + `*NoHistory` action pair for single-undo apply, full Wave 0 → Wave 5 RED-to-GREEN flow with Playwright e2e GREEN on chromium-dev + chromium-preview. **Closed early:** Phase 69 (MAT-LINK-01) + Phase 70 (LIB-REBUILD-01) deferred to v1.19 to ship in v1.18 Pascal Visual Parity chrome instead of being designed twice. **Carry-over:** 4 legacy tests need contract updates (snapshot v5→v6 assertion, removed wallpaper "MY TEXTURES" tab, WallMesh cutaway ghost-spread audit on new material sites, contextMenuActionCounts test pollution) — fold into v1.18 Phase 71 cleanup. Audit `passed-with-carry-over` (5/5 must-haves verified). Pattern #7 (StrictMode-safe useEffect cleanup) applied in driver registration. ~10K LOC, 25 commits, 7/7 plans across 5 waves. **Lessons learned:** Wave 0 RED tests pinned the contract before any implementation — saved at least one round of re-do; module-eval driver install survives only when something always imports the module — moving driver registrations to dedicated `src/test-utils/*Drivers.ts` files (and importing from main.tsx) decouples them from UI mount paths; passing 7 plans through 4 parallel + 3 sequential agents in ~3.5 hours total wall clock validates the wave-based execute pattern at scale. Forward commitment: **v1.18 Pascal Visual Parity** — chrome rewrite to emulate pascalorg/editor, then v1.19 picks up Phase 69+70 in the new style.
 
 **v1.16 Maintenance Pass shipped 2026-05-06** (single-day milestone, ~55 minutes wall-clock — fastest milestone in project history). 4 phases (63-66), 4 plans, 4 PRs ([#147](https://github.com/micahbank2/room-cad-renderer/pull/147), [#148](https://github.com/micahbank2/room-cad-renderer/pull/148), [#149](https://github.com/micahbank2/room-cad-renderer/pull/149), [#150](https://github.com/micahbank2/room-cad-renderer/pull/150)), 4/4 requirements (DEBT-06, BUG-04, CEIL-02, TILE-02). Mirrored the v1.12 maintenance-pass pattern after two big feature milestones back-to-back. **Two long-parked Phase 999.x backlog items dating back to v1.9 finally cleared:** 999.1 ceiling resize handles (re-deferred twice) and 999.3 per-surface tile-size override (re-deferred once). Phase 63 (DEBT-06): investigated [#146](https://github.com/micahbank2/room-cad-renderer/issues/146) cascade — could not reproduce in 3 deterministic local runs; the verifier's "10 failed" was likely transient flake or stderr-noise confusion. Hygiene cleanup shipped anyway: top-level `global.URL.createObjectURL` mutation in `pickerMyTexturesIntegration.test.tsx` and `myTexturesList.test.tsx` → `vi.spyOn` + `restoreAllMocks` per `userTextureCache.test.tsx:42-56` precedent. Phase 64 (BUG-04): real bug found and fixed — `WallMesh.tsx:218-223` registered material refs in test-mode `__wallMeshMaterials` registry but had no cleanup function (same React StrictMode double-mount class as Phase 58 thumbnail-callback bug). Fix: cleanup function with identity check `if (reg[wall.id] === matRefA.current) reg[wall.id] = null`. Plus 3000ms→8000ms timeout bump for chromium-dev (StrictMode 4 toggles × 2 = 8 effective render cycles). `--repeat-each=5` 10/10 green. Phase 65 (CEIL-02): ceiling resize handles via **override-anchor model** — 4 new optional fields on `Ceiling` (widthFtOverride, depthFtOverride, anchorXFt, anchorYFt). East/south drags use default anchors at bbox.min; west/north drags explicitly set the opposite-edge anchor (`anchorXFt = bbox.maxX` or `anchorYFt = bbox.maxY`) so the dragged edge moves with the cursor (not the opposite edge). `resolveCeilingPoints(ceiling)` resolver scales every polygon vertex from the anchor; original `Ceiling.points` array preserved as source of truth. L-shape ceilings supported via proportional bbox scaling. Phase 31 single-undo transaction; Phase 30 smart-snap consume-only with `excludeId: ceilingId`. Formal VERIFICATION 13/13 PASS. Phase 66 (TILE-02): investigation revealed Phase 42 (v1.9 closer) had already shipped data fields + actions + 2D/3D renderers + serialization. Phase 66 was just the missing UI tier — two `<input>` fields. Wallpaper TILE PATTERN was a checkbox toggle (stretch ↔ 2ft); v1.16 added a numeric input visible when tiling is on. Ceiling had no tile-size UI; v1.16 added one visible when a user-uploaded texture is applied. NO new types, NO new actions, NO snapshot bump. **Cross-phase wires:** Phase 30 snap engine + Phase 31 product types + snapshot version literal all `0 lines diff` vs pre-v1.16; `Ceiling.scaleFt` (Phase 42) and `Ceiling.widthFtOverride/depthFtOverride/anchorXFt/anchorYFt` (Phase 65) coexist with no field collision. **Audit `passed-with-notes`** — DEBT-06 cascade observed once during audit re-run (10 failed transient); pre-existing 4 baseline failures stable. **CLAUDE.md Pattern #7 (StrictMode-safe useEffect cleanup)** added between Phase 64 and 65, applied 3 times total in this milestone. 32 files modified, +3,713 LOC. **Lessons learned:** investigate before fixing (Phase 63 + Phase 66 both saved hours); capture recurring patterns (Pattern #7 caught third instance preemptively); backlog re-deferral is a signal — when a 999.x item gets parked twice, the next milestone needs explicit "stop adding features" framing. **Forward commitment: v1.17 TBD.**
 
@@ -97,38 +113,43 @@ See `.planning/ROADMAP.md` for links to each milestone archive.
 </details>
 
 
-## Current Milestone: v1.17 Library + Material Engine
+## Current Milestone: v1.18 Pascal Visual Parity
 
-**Goal:** Jessica picks real materials (marble, fabric, tile, paint, flooring) with real-world metadata (brand, SKU, cost, lead time) and applies them to walls, floors, ceilings, and objects. Her library finally feels organized — Materials, Assemblies, and Products as separate top-level sections.
+**Goal:** Make Room CAD Renderer look extremely similar to Pascal Editor. Adopt Pascal's design tokens, font stack, radius scale, layout patterns, and floating action menu. Every existing behavior, store, snapshot, hotkey, and test driver continues unchanged — this is a chrome-only rewrite.
 
-**Target features (4 issues → 4 phases):**
-- **Phase 67 / MAT-ENGINE-01 / [#25](https://github.com/micahbank2/room-cad-renderer/issues/25)** — Material engine foundation: texture maps (color / roughness / reflection), real-world tile size, brand / SKU / cost / lead-time metadata, IndexedDB persistence
-- **Phase 68 / MAT-APPLY-01 / [#27](https://github.com/micahbank2/room-cad-renderer/issues/27)** — Material application system: apply any material to walls / floors / ceilings / custom-element faces; replaces split paint+wallpaper+floor-material patchwork
-- **Phase 69 / MAT-LINK-01 / [#26](https://github.com/micahbank2/room-cad-renderer/issues/26)** — Product-to-material linking: products carry a finish slot; fabric swaps without re-placing the object
-- **Phase 70 / LIB-REBUILD-01 / [#24](https://github.com/micahbank2/room-cad-renderer/issues/24)** — Library rebuild: top-level Materials / Assemblies / Products toggle in sidebar with proper category tabs
+**Target features (6 phases, Phases 71-76):**
+- **Phase 71 / TOKEN-FOUNDATION** — Pascal oklch token system (16 semantic tokens), 10px squircle radius scale, Barlow + Geist Sans + Geist Mono fonts, light + dark dual-mode
+- **Phase 72 / PRIMITIVES-SHELF** — Component primitives via `cva`: Button, Tab, PanelSection (collapsible spring accordion), SegmentedControl, Switch, Slider, Tooltip, Dialog. Adopt `motion/react` for layout/spring transitions
+- **Phase 73 / SIDEBAR-RESTYLE** — Restyle Phase 46 rooms tree with Pascal's spine-and-branches geometry; convert right sidebar to **contextual** (only mounts when something selected)
+- **Phase 74 / TOOLBAR-REWORK** — **Floating two-row action menu replaces top-left toolbar entirely.** Lucide-icon fallback at 1.5x size for the chunky top row (commission isometric PNGs later if look is flat); flat tools on bottom row
+- **Phase 75 / PROPERTIES-LIBRARY-RESTYLE** — MaterialPicker, ProductLibrary, RoomSettings, PropertiesPanel adopt new tokens, primitives, and contextual mount pattern
+- **Phase 76 / MODALS-WELCOME-FINAL** — Modal/Dialog primitives, WelcomeScreen + ProjectManager adopt **light mode** (Pascal pattern: editor dark, marketing/empty light), final QA pass + carry-over test cleanup from v1.17
 
-**Sequencing intent:** Data foundation (67) before usability (68) before linking (69) before UI surface (70). Each phase ships independently — Phase 67 alone has value (materials stored + ready for apply in 68); Phase 68 alone unifies surface application; Phase 69 alone separates finish from object; Phase 70 alone reorganizes existing library. Migration work expected at every phase boundary because each replaces an existing subsystem.
+**Sequencing intent:** Tokens before primitives before sidebar before toolbar before properties before final. Each phase visibly progresses the look without breaking the previous. Phase 71 alone makes the app monochrome-soft; Phase 72 alone replaces every button click feel; Phase 73 alone reshapes the sidebar; Phase 74 alone is the biggest "Pascal-feeling" leap; Phase 75 alone polishes the properties surface; Phase 76 alone closes the loop with light-mode marketing surfaces.
 
-**Out of v1.17:**
-- PBR maps extension (#81 — AO / displacement / emissive) → v1.18
-- Cloud sync (#30) → deferred indefinitely
-- Parametric object controls (#28) → v1.18+
-- Window presets (#20) + columns/levels (#19) → v1.18+
-- R3F v9 / React 19 upgrade (#56) → wait for R3F v9 stable
-- Plain-English user guides (#31, #32, #33) → docs milestone
+**Out of v1.18:**
+- Functional changes — none. This is chrome-only.
+- Commissioned isometric PNG icon set → revisit at end of v1.18 if lucide fallback is flat
+- v1.17 carry-over phases (MAT-LINK-01, LIB-REBUILD-01) → **v1.19** in new chrome
+- PBR maps extension (#81 — AO + displacement + emissive) → v1.19+
+- Parametric object controls (#28) → v1.19+
+- Window presets (#20) + columns/levels (#19) → v1.19+
+- R3F v9 / React 19 upgrade (#56) → tracked separately, no dep on v1.18
 
 **Format / scope locks:**
-- Material schema: texture-map slots (albedo / roughness / reflection) — keep aligned with existing PBR pipeline
-- Real-world tile size in feet (matches Phase 32 user-texture convention)
-- Metadata fields: brand, SKU, cost, lead time (text + number; no validation against external systems)
-- IndexedDB persistence mirroring user-texture pipeline + SHA-256 dedup
-- Snapshot version bump per phase as needed (current is v5)
-- Defer 3D-asset materials (PBR maps) to v1.18
+- Tailwind v4 stays (already aligned with Pascal)
+- 16 oklch semantic tokens (no custom palette extensions in chrome — chart colors only for non-chrome viz)
+- Lucide-only icon library (drop the 10-file Material Symbols allowlist; D-33 policy gets stricter)
+- `cva` + `class-variance-authority` for variant management
+- `motion/react` (framer-motion v12) for layout + spring + AnimatePresence
+- `@radix-ui/react-slot` for `asChild` Button pattern
+- Snapshot version stays v6 (no data changes)
 
 **Tech debt acknowledged + accepted:**
+- 4 legacy tests carry over from v1.17 needing contract updates — fold into Phase 71 cleanup pass
 - 6 pre-existing vitest failures permanently accepted (Phase 37 D-02); CI vitest stays disabled
 - AUDIT-01 substitute-evidence policy formalized in v1.10 audit. SUMMARY.md is canonical evidence.
-- DEBT-06 vitest cascade observed once during v1.16 audit re-run; monitor; do not block v1.17 phases on it.
+- Squircle browser support varies — `corner-shape: squircle` is Safari/WebKit-only at writing; Chrome falls back to plain `border-radius`. Accepted as progressive enhancement.
 
 ## Target User
 
