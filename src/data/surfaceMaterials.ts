@@ -140,10 +140,54 @@ export const SURFACE_MATERIALS: Record<string, SurfaceMaterial> = {
   },
 };
 
-/** Returns all materials applicable to the given surface target.
- *  Includes entries where surface === target or surface === "both". */
-export function materialsForSurface(target: "floor" | "ceiling"): SurfaceMaterial[] {
+/** Returns all preset materials applicable to the given surface target.
+ *  Includes entries where surface === target or surface === "both".
+ *
+ *  TODO(v1.18): legacy preset catalog filter (Phase 20). Still used by
+ *  SurfaceMaterialPicker. Once Phase 68's MaterialPicker fully replaces it,
+ *  this function should be removed. The canonical Phase 68 entry point is
+ *  `materialsForSurface(materials, surface)` overload below. */
+export function legacyMaterialsForSurface(target: "floor" | "ceiling"): SurfaceMaterial[] {
   return Object.values(SURFACE_MATERIALS).filter(
     (m) => m.surface === target || m.surface === "both"
   );
+}
+
+// ── Phase 68 user-Material catalog filter ────────────────────────────────────
+import type { Material } from "@/types/material";
+
+/** Phase 68 D-03: discriminated kind for the four surface types Materials apply to. */
+export type SurfaceKind =
+  | "wallSide"
+  | "floor"
+  | "ceiling"
+  | "customElementFace";
+
+/**
+ * Phase 68 D-03: surface-specific Material filter for user-defined Materials.
+ *
+ * Overloaded with the legacy preset signature so SurfaceMaterialPicker keeps
+ * compiling. v1.18 cleanup will drop the legacy overload.
+ *
+ * For v1.17 the new signature returns ALL Materials (no filtering yet) — Material
+ * has no category metadata, so any Material can apply to any surface. Future
+ * (Phase 70+) will filter by Material.category once that field lands (e.g.
+ * "flooring" Materials only on floors).
+ */
+export function materialsForSurface(target: "floor" | "ceiling"): SurfaceMaterial[];
+export function materialsForSurface(
+  materials: ReadonlyArray<Material>,
+  surface: SurfaceKind,
+): ReadonlyArray<Material>;
+export function materialsForSurface(
+  arg1: "floor" | "ceiling" | ReadonlyArray<Material>,
+  arg2?: SurfaceKind,
+): SurfaceMaterial[] | ReadonlyArray<Material> {
+  // Legacy single-arg path: filter SURFACE_MATERIALS preset catalog.
+  if (typeof arg1 === "string") {
+    return legacyMaterialsForSurface(arg1);
+  }
+  // Phase 68 path: return passed-in user Materials, optionally filtered by surface.
+  void arg2; // reserved for Phase 70 category filtering
+  return arg1;
 }
