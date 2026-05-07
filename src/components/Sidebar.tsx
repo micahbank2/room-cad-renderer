@@ -81,17 +81,17 @@ export default function Sidebar({ productLibrary }: Props) {
         <CollapsibleSection label="System stats" defaultOpen={false}>
           <div className="space-y-1.5">
             <div className="flex justify-between">
-              <span className="font-sans text-[10px] text-muted-foreground/80">AREA</span>
+              <span className="font-sans text-[10px] text-muted-foreground/80">Area</span>
               <span className="font-sans text-[10px] text-foreground">
                 {(room.width * room.length).toFixed(0)} SQ FT
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="font-sans text-[10px] text-muted-foreground/80">WALLS</span>
+              <span className="font-sans text-[10px] text-muted-foreground/80">Walls</span>
               <span className="font-sans text-[10px] text-foreground">{wallCount}</span>
             </div>
             <div className="flex justify-between">
-              <span className="font-sans text-[10px] text-muted-foreground/80">PRODUCTS</span>
+              <span className="font-sans text-[10px] text-muted-foreground/80">Products</span>
               <span className="font-sans text-[10px] text-foreground">{productCount}</span>
             </div>
           </div>
@@ -106,7 +106,7 @@ export default function Sidebar({ productLibrary }: Props) {
                 onChange={toggleGrid}
                 className="w-3 h-3 accent-accent rounded-none"
               />
-              <span className="font-sans text-[10px] text-muted-foreground/80">GRID</span>
+              <span className="font-sans text-[10px] text-muted-foreground/80">Grid</span>
             </label>
           </div>
         </CollapsibleSection>
@@ -118,10 +118,10 @@ export default function Sidebar({ productLibrary }: Props) {
             onChange={(e) => setGridSnap(+e.target.value)}
             className="w-full px-2 py-1 text-[10px]"
           >
-            <option value={0}>OFF</option>
-            <option value={0.25}>3 INCH</option>
-            <option value={0.5}>6 INCH</option>
-            <option value={1}>1 FOOT</option>
+            <option value={0}>Off</option>
+            <option value={0.25}>3 inch</option>
+            <option value={0.5}>6 inch</option>
+            <option value={1}>1 foot</option>
           </select>
         </CollapsibleSection>
 

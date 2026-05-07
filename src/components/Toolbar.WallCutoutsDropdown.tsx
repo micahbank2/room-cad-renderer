@@ -22,9 +22,9 @@ const ITEMS: Array<{
   label: string;
   icon: "arch" | "lucide-rect" | "lucide-frame";
 }> = [
-  { kind: "archway", label: "ARCHWAY", icon: "arch" },
-  { kind: "passthrough", label: "PASSTHROUGH", icon: "lucide-rect" },
-  { kind: "niche", label: "NICHE", icon: "lucide-frame" },
+  { kind: "archway", label: "Archway", icon: "arch" },
+  { kind: "passthrough", label: "Passthrough", icon: "lucide-rect" },
+  { kind: "niche", label: "Niche", icon: "lucide-frame" },
 ];
 
 export function WallCutoutsDropdown({ anchorRef, onClose, onPick }: Props) {

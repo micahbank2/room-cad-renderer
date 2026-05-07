@@ -94,7 +94,7 @@ export default function WainscotLibrary() {
           {/* Height + color (always shown) */}
           <div className="flex items-center gap-1">
             <NumberKnob
-              label="HT"
+              label="Ht"
               value={draft.heightFt}
               step={0.25}
               min={0.5}
@@ -113,31 +113,31 @@ export default function WainscotLibrary() {
           {meta.knobs.length > 0 && (
             <div className="grid grid-cols-2 gap-1">
               {meta.knobs.includes("panelWidth") && (
-                <NumberKnob label="PANEL W" value={draft.panelWidth ?? 1.5} step={0.25} min={0.5} max={4}
+                <NumberKnob label="Panel W" value={draft.panelWidth ?? 1.5} step={0.25} min={0.5} max={4}
                   onChange={(v) => setDraft({ ...draft, panelWidth: v })} />
               )}
               {meta.knobs.includes("stileWidth") && (
-                <NumberKnob label="STILE W" value={draft.stileWidth ?? 0.33} step={0.08} min={0.08} max={1}
+                <NumberKnob label="Stile W" value={draft.stileWidth ?? 0.33} step={0.08} min={0.08} max={1}
                   onChange={(v) => setDraft({ ...draft, stileWidth: v })} />
               )}
               {meta.knobs.includes("plankWidth") && (
-                <NumberKnob label="PLANK W" value={draft.plankWidth ?? 0.25} step={0.08} min={0.08} max={1}
+                <NumberKnob label="Plank W" value={draft.plankWidth ?? 0.25} step={0.08} min={0.08} max={1}
                   onChange={(v) => setDraft({ ...draft, plankWidth: v })} />
               )}
               {meta.knobs.includes("battenWidth") && (
-                <NumberKnob label="BATTEN W" value={draft.battenWidth ?? 0.33} step={0.08} min={0.08} max={0.75}
+                <NumberKnob label="Batten W" value={draft.battenWidth ?? 0.33} step={0.08} min={0.08} max={0.75}
                   onChange={(v) => setDraft({ ...draft, battenWidth: v })} />
               )}
               {meta.knobs.includes("plankHeight") && (
-                <NumberKnob label="PLANK H" value={draft.plankHeight ?? 0.5} step={0.08} min={0.17} max={1}
+                <NumberKnob label="Plank H" value={draft.plankHeight ?? 0.5} step={0.08} min={0.17} max={1}
                   onChange={(v) => setDraft({ ...draft, plankHeight: v })} />
               )}
               {meta.knobs.includes("gridRows") && (
-                <NumberKnob label="ROWS" value={draft.gridRows ?? 2} step={1} min={1} max={5}
+                <NumberKnob label="Rows" value={draft.gridRows ?? 2} step={1} min={1} max={5}
                   onChange={(v) => setDraft({ ...draft, gridRows: Math.round(v) })} />
               )}
               {meta.knobs.includes("depth") && (
-                <NumberKnob label="DEPTH" value={draft.depth ?? 0.18} step={0.02} min={0.02} max={0.5}
+                <NumberKnob label="Depth" value={draft.depth ?? 0.18} step={0.02} min={0.02} max={0.5}
                   onChange={(v) => setDraft({ ...draft, depth: v })} />
               )}
             </div>
@@ -191,7 +191,7 @@ export default function WainscotLibrary() {
                   />
                   <div className="flex items-center gap-1">
                     <NumberKnob
-                      label="HT"
+                      label="Ht"
                       value={it.heightFt}
                       step={0.25}
                       min={0.5}

@@ -103,7 +103,7 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
 
       <div className="space-y-2 border-t border-border/50 pt-2">
         <NumberRow
-          label="WIDTH"
+          label="Width"
           ariaLabel="Width"
           suffix="FT"
           value={widthDraft}
@@ -139,7 +139,7 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
         )}
 
         <NumberRow
-          label="RISE"
+          label="Rise"
           ariaLabel="Rise"
           suffix="IN"
           value={riseDraft}
@@ -162,7 +162,7 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
         />
 
         <NumberRow
-          label="RUN"
+          label="Run"
           ariaLabel="Run"
           suffix="IN"
           value={runDraft}
@@ -185,7 +185,7 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
         />
 
         <NumberRow
-          label="STEP COUNT"
+          label="Step count"
           ariaLabel="Step count"
           suffix=""
           value={stepCountDraft}
@@ -208,7 +208,7 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
         />
 
         <NumberRow
-          label="ROTATION"
+          label="Rotation"
           ariaLabel="Rotation"
           suffix="DEG"
           value={rotationDraft}
@@ -235,14 +235,14 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
             className="font-sans text-sm text-muted-foreground/60 tracking-wider"
             htmlFor={`stair-label-${stair.id}`}
           >
-            LABEL
+            Label
           </label>
           <input
             id={`stair-label-${stair.id}`}
             type="text"
             value={labelDraft}
             maxLength={LABEL_MAX}
-            placeholder="STAIRS"
+            placeholder="Stairs"
             aria-label="Label"
             onChange={(e) => {
               const v = e.target.value;

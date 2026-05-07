@@ -294,7 +294,7 @@ function UploadSlot({ onClick }: UploadSlotProps): JSX.Element {
       className="aspect-square bg-card border-2 border-dashed border-border/60 rounded-md flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-accent/50 transition-colors"
     >
       <Plus className="size-5 text-muted-foreground/60" />
-      <span className="font-sans text-sm text-muted-foreground/60">UPLOAD</span>
+      <span className="font-sans text-sm text-muted-foreground/60">Upload</span>
     </button>
   );
 }

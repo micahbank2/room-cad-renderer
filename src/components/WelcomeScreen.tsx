@@ -56,7 +56,7 @@ export default function WelcomeScreen({ onStart }: Props) {
       {/* Minimal top bar — just the brand */}
       <header className="h-14 bg-background flex items-center px-6 border border-border/50 border-0 border-b">
         <span className="font-sans font-bold text-foreground text-sm tracking-[0.1em]">
-          OBSIDIAN CAD
+          Room CAD Renderer
         </span>
       </header>
 
@@ -64,7 +64,7 @@ export default function WelcomeScreen({ onStart }: Props) {
       <div className="flex-1 flex flex-col items-center justify-center px-8">
         <div className="max-w-2xl text-center">
           <h1 className="font-sans font-bold text-5xl text-foreground tracking-tight mb-4 leading-tight">
-            DESIGN YOUR SPACE
+            Design Your Space
           </h1>
           <p className="text-muted-foreground/80 text-sm leading-relaxed max-w-lg mx-auto mb-10">
             Start by creating a new floor plan from a template, or upload a reference

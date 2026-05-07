@@ -191,7 +191,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                       className="w-3 h-3 accent-accent"
                     />
                     <span className="font-sans text-[8px] text-muted-foreground/60 tracking-wider">
-                      SKIP DIMENSIONS
+                      Skip dimensions
                     </span>
                   </label>
                 </div>
@@ -310,7 +310,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
               disabled={!name}
               className="font-sans text-[10px] tracking-widest px-5 py-2 bg-accent text-white rounded-smooth-md hover:opacity-90 active:scale-95 disabled:opacity-30 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
             >
-              ADD TO REGISTRY
+              Add to registry
             </button>
           </div>
         </form>

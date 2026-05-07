@@ -118,9 +118,9 @@ export default function WallSurfacePanel() {
                 : "border-border/60 text-muted-foreground/80"
             }`}
           >
-            SIDE {s}
+            Side {s}
             {interiorSide === s && (
-              <span className="text-[8px] text-success ml-1">INTERIOR</span>
+              <span className="text-[8px] text-success ml-1">Interior</span>
             )}
           </button>
         ))}
@@ -130,7 +130,7 @@ export default function WallSurfacePanel() {
           onClick={() => swapWallSides(wall.id)}
           className="flex-1 font-sans text-[11px] text-muted-foreground/80 hover:text-accent tracking-widest py-1.5 border border-border/60 rounded-smooth-md hover:bg-accent/10"
         >
-          SWAP A/B
+          Swap A/B
         </button>
         <button
           onClick={() => {
@@ -139,7 +139,7 @@ export default function WallSurfacePanel() {
           }}
           className="flex-1 font-sans text-[11px] text-foreground hover:text-accent tracking-widest py-1.5 border border-ring rounded-smooth-md hover:bg-accent/10"
         >
-          COPY TO {activeSide === "A" ? "B" : "A"}
+          Copy to {activeSide === "A" ? "B" : "A"}
         </button>
       </div>
 
@@ -170,13 +170,13 @@ export default function WallSurfacePanel() {
             }
             className="w-3 h-3 accent-accent rounded-none"
           />
-          <span className="font-sans text-[11px] text-muted-foreground/80 tracking-wider">WAINSCOTING</span>
+          <span className="font-sans text-[11px] text-muted-foreground/80 tracking-wider">Wainscoting</span>
         </label>
         {wains?.enabled && (
           <div className="ml-5 mt-1 space-y-1">
             {wainscotStyles.length === 0 ? (
               <div className="font-sans text-[8px] text-muted-foreground/60">
-                CREATE STYLE IN LIBRARY FIRST
+                Create style in library first
               </div>
             ) : (
               <select

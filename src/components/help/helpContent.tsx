@@ -96,15 +96,15 @@ export function GettingStartedContent() {
 
       <H2 id="help-h-first-room">Your First Room</H2>
       <P>
-        Set the room dimensions in the sidebar under <em className="text-foreground not-italic">ROOM CONFIG</em>.
+        Set the room dimensions in the sidebar under <em className="text-foreground not-italic">Room Config</em>.
         The default is 12×14 ft. Walls snap to a 6-inch grid by default — change
-        the snap increment in the sidebar under <em className="text-foreground not-italic">SNAP</em>.
+        the snap increment in the sidebar under <em className="text-foreground not-italic">Snap</em>.
       </P>
 
       <H2 id="help-h-saving">Saving Your Work</H2>
       <P>
         Everything auto-saves after a 2-second pause. The status bar shows
-        <em className="text-foreground not-italic"> SAVED</em> when the last
+        <em className="text-foreground not-italic"> Saved</em> when the last
         change has been written. When you reload the page, your most recent
         project loads automatically — rooms, walls, products, and active room
         all restored.
@@ -112,7 +112,7 @@ export function GettingStartedContent() {
 
       <H2 id="help-h-exporting">Exporting</H2>
       <P>
-        Click <em className="text-foreground not-italic">EXPORT</em> while in
+        Click <em className="text-foreground not-italic">Export</em> while in
         3D or split view to save the current 3D render as a PNG.
       </P>
     </div>
@@ -174,8 +174,8 @@ export function ProductLibraryContent() {
 
       <H2 id="help-h-uploading">Uploading Products</H2>
       <P>
-        Click <em className="text-foreground not-italic">LIBRARY</em> in the
-        toolbar, then <em className="text-foreground not-italic">ADD PRODUCT</em>.
+        Click <em className="text-foreground not-italic">Library</em> in the
+        toolbar, then <em className="text-foreground not-italic">Add product</em>.
         Drop an image, give it a name, pick a category, enter dimensions (width
         × depth × height in feet). Products you add appear in every project —
         the library is global.
@@ -183,11 +183,11 @@ export function ProductLibraryContent() {
 
       <H2 id="help-h-skipping-dims">Skipping Dimensions</H2>
       <P>
-        Check <em className="text-foreground not-italic">SKIP DIMENSIONS</em>{" "}
+        Check <em className="text-foreground not-italic">Skip dimensions</em>{" "}
         if you just want to see a product in the space without pinning down
         exact sizes. Products without dimensions render as a placeholder dashed
         box at a default size — you can edit dimensions later in the{" "}
-        <em className="text-foreground not-italic">PROPERTIES</em> panel.
+        <em className="text-foreground not-italic">Properties</em> panel.
       </P>
 
       <H2 id="help-h-searching">Searching</H2>
@@ -216,9 +216,9 @@ export function ProductLibraryContent() {
       <H2 id="help-h-snap-grid">Snap & Grid</H2>
       <P>
         Adjust the snap increment in the sidebar under{" "}
-        <em className="text-foreground not-italic">SNAP</em> — options are
-        OFF, 3 INCH, 6 INCH, and 1 FOOT. Toggle the grid on/off under{" "}
-        <em className="text-foreground not-italic">LAYERS</em>.
+        <em className="text-foreground not-italic">Snap</em> — options are
+        Off, 3 inch, 6 inch, and 1 foot. Toggle the grid on/off under{" "}
+        <em className="text-foreground not-italic">Layers</em>.
       </P>
     </div>
   );
@@ -231,10 +231,10 @@ export function ThreeDContent() {
 
       <H2 id="help-h-views">View Modes</H2>
       <UL>
-        <li><em className="text-foreground not-italic">2D PLAN</em> — top-down editable floor plan</li>
-        <li><em className="text-foreground not-italic">3D VIEW</em> — rendered 3D scene with products</li>
-        <li><em className="text-foreground not-italic">SPLIT</em> — 2D and 3D side-by-side</li>
-        <li><em className="text-foreground not-italic">LIBRARY</em> — browse and manage your products</li>
+        <li><em className="text-foreground not-italic">2D Plan</em> — top-down editable floor plan</li>
+        <li><em className="text-foreground not-italic">3D View</em> — rendered 3D scene with products</li>
+        <li><em className="text-foreground not-italic">Split</em> — 2D and 3D side-by-side</li>
+        <li><em className="text-foreground not-italic">Library</em> — browse and manage your products</li>
       </UL>
 
       <H2 id="help-h-orbit">Orbit Camera</H2>
@@ -246,7 +246,7 @@ export function ThreeDContent() {
       <H2 id="help-h-walk">Walk Mode</H2>
       <P>
         The core "feel the space" feature. Switch from orbit to walk with the{" "}
-        <em className="text-foreground not-italic">WALK</em> toolbar button
+        <em className="text-foreground not-italic">Walk</em> toolbar button
         or press <Kbd>E</Kbd>.
       </P>
       <OL>
@@ -254,7 +254,7 @@ export function ThreeDContent() {
         <li>Move with <Kbd>W</Kbd> <Kbd>A</Kbd> <Kbd>S</Kbd> <Kbd>D</Kbd></li>
         <li>Look around with the mouse</li>
         <li>Press <Kbd>Esc</Kbd> to release the mouse</li>
-        <li>Press <Kbd>E</Kbd> again (or click <em className="text-foreground not-italic">ORBIT</em>) to return to orbit view</li>
+        <li>Press <Kbd>E</Kbd> again (or click <em className="text-foreground not-italic">Orbit</em>) to return to orbit view</li>
       </OL>
       <P>
         Walls block movement — you can't walk through them. If you switch rooms
@@ -275,7 +275,7 @@ export function ThreeDContent() {
 
       <H2 id="help-h-export">Exporting the View</H2>
       <P>
-        Click <em className="text-foreground not-italic">EXPORT</em> from the
+        Click <em className="text-foreground not-italic">Export</em> from the
         toolbar while in 3D or split view to save the current 3D render as a
         PNG file.
       </P>

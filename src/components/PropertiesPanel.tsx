@@ -294,10 +294,10 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
         </div>
         <CollapsibleSection id="dimensions" label="Dimensions">
           <div className="space-y-1.5">
-            <Row label="WIDTH" value={`${activeDoc?.room.width ?? 0} FT`} />
-            <Row label="LENGTH" value={`${activeDoc?.room.length ?? 0} FT`} />
-            <Row label="HEIGHT" value={`${activeDoc?.room.wallHeight ?? 0} FT`} />
-            {areaSqFt > 0 && <Row label="AREA" value={`${Math.round(areaSqFt)} SQ FT`} />}
+            <Row label="Width" value={`${activeDoc?.room.width ?? 0} FT`} />
+            <Row label="Length" value={`${activeDoc?.room.length ?? 0} FT`} />
+            <Row label="Height" value={`${activeDoc?.room.wallHeight ?? 0} FT`} />
+            {areaSqFt > 0 && <Row label="Area" value={`${Math.round(areaSqFt)} SQ FT`} />}
           </div>
         </CollapsibleSection>
         <p className="font-sans text-sm text-muted-foreground/80 leading-snug">
@@ -326,15 +326,15 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
               <CeilingDimInput
                 ceiling={ceiling}
                 axis="width"
-                label="WIDTH"
+                label="Width"
               />
               <CeilingDimInput
                 ceiling={ceiling}
                 axis="depth"
-                label="DEPTH"
+                label="Depth"
               />
-              <Row label="HEIGHT" value={`${ceiling.height.toFixed(1)} FT`} />
-              <Row label="VERTICES" value={String(ceiling.points.length)} />
+              <Row label="Height" value={`${ceiling.height.toFixed(1)} FT`} />
+              <Row label="Vertices" value={String(ceiling.points.length)} />
             </div>
           </CollapsibleSection>
           {(ceiling.widthFtOverride !== undefined ||
@@ -374,7 +374,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
           <CollapsibleSection id="dimensions" label="Dimensions">
             <div className="space-y-1.5">
               <EditableRow
-                label="LENGTH"
+                label="Length"
                 value={wallLength(wall)}
                 suffix="FT"
                 onCommit={(v) => resizeWallByLabel(wall.id, v)}
@@ -382,7 +382,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
                 parser={validateInput}
               />
               <EditableRow
-                label="THICKNESS"
+                label="Thickness"
                 value={wall.thickness}
                 suffix="FT"
                 onCommit={(v) => updateWall(wall.id, { thickness: v })}
@@ -390,7 +390,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
                 step={0.1}
               />
               <EditableRow
-                label="HEIGHT"
+                label="Height"
                 value={wall.height}
                 suffix="FT"
                 onCommit={(v) => updateWall(wall.id, { height: v })}
@@ -401,11 +401,11 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
           <CollapsibleSection id="position" label="Position">
             <div className="space-y-1.5">
               <Row
-                label="START"
+                label="Start"
                 value={`${wall.start.x.toFixed(1)}, ${wall.start.y.toFixed(1)}`}
               />
               <Row
-                label="END"
+                label="End"
                 value={`${wall.end.x.toFixed(1)}, ${wall.end.y.toFixed(1)}`}
               />
             </div>
@@ -438,20 +438,20 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
                   <div className="space-y-1.5">
                     {hasDimensions(product) ? (
                       <>
-                        <Row label="WIDTH" value={`${product.width} FT`} />
-                        <Row label="DEPTH" value={`${product.depth} FT`} />
-                        <Row label="HEIGHT" value={`${product.height} FT`} />
+                        <Row label="Width" value={`${product.width} FT`} />
+                        <Row label="Depth" value={`${product.depth} FT`} />
+                        <Row label="Height" value={`${product.height} FT`} />
                       </>
                     ) : (
-                      <Row label="SIZE" value="UNSET" />
+                      <Row label="Size" value="Unset" />
                     )}
                   </div>
                 </CollapsibleSection>
                 <CollapsibleSection id="material" label="Material">
                   <div className="space-y-1.5">
-                    <Row label="CATEGORY" value={product.category.toUpperCase()} />
+                    <Row label="Category" value={product.category.toUpperCase()} />
                     {product.material && (
-                      <Row label="MATERIAL" value={product.material.toUpperCase()} />
+                      <Row label="Material" value={product.material.toUpperCase()} />
                     )}
                   </div>
                 </CollapsibleSection>
@@ -460,7 +460,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
             <CollapsibleSection id="position" label="Position">
               <div className="space-y-1.5">
                 <Row
-                  label="POSITION"
+                  label="Position"
                   value={`${pp.position.x.toFixed(1)}, ${pp.position.y.toFixed(1)}`}
                 />
               </div>
@@ -468,7 +468,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
             <CollapsibleSection id="rotation" label="Rotation">
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between gap-2">
-                  <Row label="ROTATION" value={`${pp.rotation.toFixed(0)}°`} />
+                  <Row label="Rotation" value={`${pp.rotation.toFixed(0)}°`} />
                 </div>
                 <RotationPresetChips
                   currentRotation={pp.rotation}
@@ -481,7 +481,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
             {libProduct && !hasDimensions(libProduct) && (
               <div className="space-y-1.5 pt-2 border-t border-border/50">
                 <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">
-                  SET DIMENSIONS (FT)
+                  Set dimensions (ft)
                 </span>
                 <div className="grid grid-cols-3 gap-1">
                   {(["width", "depth", "height"] as const).map((axis) => (
@@ -521,15 +521,15 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
           </div>
           <CollapsibleSection id="dimensions" label="Dimensions">
             <div className="space-y-1.5">
-              <Row label="WIDTH" value={`${ce.width} FT`} />
-              <Row label="DEPTH" value={`${ce.depth} FT`} />
-              <Row label="HEIGHT" value={`${ce.height} FT`} />
+              <Row label="Width" value={`${ce.width} FT`} />
+              <Row label="Depth" value={`${ce.depth} FT`} />
+              <Row label="Height" value={`${ce.height} FT`} />
             </div>
           </CollapsibleSection>
           <CollapsibleSection id="position" label="Position">
             <div className="space-y-1.5">
               <Row
-                label="POSITION"
+                label="Position"
                 value={`${pce.position.x.toFixed(1)}, ${pce.position.y.toFixed(1)}`}
               />
             </div>
@@ -537,7 +537,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
           <CollapsibleSection id="rotation" label="Rotation">
             <div className="space-y-1.5">
               <div className="flex items-center justify-between gap-2">
-                <Row label="ROTATION" value={`${pce.rotation.toFixed(0)}°`} />
+                <Row label="Rotation" value={`${pce.rotation.toFixed(0)}°`} />
               </div>
               <RotationPresetChips
                 currentRotation={pce.rotation}

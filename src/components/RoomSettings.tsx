@@ -18,7 +18,7 @@ export default function RoomSettings() {
     <div className="space-y-2">
       <div className="grid grid-cols-2 gap-2">
         <label className="space-y-1">
-          <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">WIDTH FT</span>
+          <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">Width (ft)</span>
           <input
             type="number"
             min={4}
@@ -30,7 +30,7 @@ export default function RoomSettings() {
           />
         </label>
         <label className="space-y-1">
-          <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">LENGTH FT</span>
+          <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">Length (ft)</span>
           <input
             type="number"
             min={4}
@@ -43,7 +43,7 @@ export default function RoomSettings() {
         </label>
       </div>
       <label className="space-y-1 block">
-        <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">HEIGHT FT</span>
+        <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">Height (ft)</span>
         <input
           type="number"
           min={6}

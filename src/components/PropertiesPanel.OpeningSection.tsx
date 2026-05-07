@@ -70,14 +70,14 @@ function OpeningEditor({ wall, opening }: { wall: WallSegment; opening: Opening 
   return (
     <div className="px-2 pb-2 pt-1 space-y-1">
       <NumericRow
-        label="WIDTH"
+        label="Width"
         unit="ft"
         value={opening.width}
         onPreview={(v) => updateNoHistory(wall.id, opening.id, { width: v })}
         onCommit={(v) => update(wall.id, opening.id, { width: v })}
       />
       <NumericRow
-        label="HEIGHT"
+        label="Height"
         unit="ft"
         value={opening.height}
         placeholder={opening.type === "passthrough" ? "Wall height" : undefined}
@@ -85,14 +85,14 @@ function OpeningEditor({ wall, opening }: { wall: WallSegment; opening: Opening 
         onCommit={(v) => update(wall.id, opening.id, { height: v })}
       />
       <NumericRow
-        label="SILL"
+        label="Sill"
         unit="ft"
         value={opening.sillHeight}
         onPreview={(v) => updateNoHistory(wall.id, opening.id, { sillHeight: v })}
         onCommit={(v) => update(wall.id, opening.id, { sillHeight: v })}
       />
       <NumericRow
-        label="OFFSET"
+        label="Offset"
         unit="ft"
         value={opening.offset}
         onPreview={(v) => updateNoHistory(wall.id, opening.id, { offset: v })}
@@ -100,7 +100,7 @@ function OpeningEditor({ wall, opening }: { wall: WallSegment; opening: Opening 
       />
       {opening.type === "niche" && (
         <NumericRow
-          label="DEPTH"
+          label="Depth"
           unit="in"
           // Display the depth in inches (1ft = 12in).
           value={(opening.depthFt ?? 0.5) * 12}

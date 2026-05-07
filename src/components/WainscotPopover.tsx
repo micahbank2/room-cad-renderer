@@ -105,7 +105,7 @@ export function WainscotPopover({ wallId, side, style, onClose }: Props) {
       {/* Height input */}
       <div>
         <div className="font-sans text-[10px] text-muted-foreground/60 tracking-widest uppercase mb-0.5">
-          HEIGHT FT
+          Height (ft)
         </div>
         <input
           type="number"

@@ -53,19 +53,19 @@ const PRESET_ICONS: Record<PresetId, LucideIcon> = {
 
 /** Phase 47 D-09: display-mode segmented-control config. */
 const DISPLAY_MODES = [
-  { id: "normal" as const,  label: "NORMAL",  Icon: LayoutGrid, tooltip: "All rooms render together" },
-  { id: "solo" as const,    label: "SOLO",    Icon: Square,     tooltip: "Only the active room renders" },
-  { id: "explode" as const, label: "EXPLODE", Icon: Move3d,     tooltip: "Rooms separated along X-axis" },
+  { id: "normal" as const,  label: "Normal",  Icon: LayoutGrid, tooltip: "All rooms render together" },
+  { id: "solo" as const,    label: "Solo",    Icon: Square,     tooltip: "Only the active room renders" },
+  { id: "explode" as const, label: "Explode", Icon: Move3d,     tooltip: "Rooms separated along X-axis" },
 ];
 
 // D-15: lucide-react icon map for tool palette (Material Symbols replaced)
 const tools: { id: ToolType; label: string; Icon: LucideIcon }[] = [
-  { id: "select", label: "SELECT", Icon: MousePointer },
-  { id: "wall",   label: "WALL",   Icon: Minus },
-  { id: "door",   label: "DOOR",   Icon: DoorOpen },
-  { id: "window", label: "WINDOW", Icon: RectangleVertical }, // D-15: substitute for material-symbols 'window'
-  { id: "ceiling", label: "CEILING", Icon: Triangle },        // D-15: substitute for material-symbols 'roofing'
-  { id: "stair", label: "STAIRS", Icon: Footprints },         // D-15: substitute for material-symbols 'stairs'
+  { id: "select", label: "Select", Icon: MousePointer },
+  { id: "wall",   label: "Wall",   Icon: Minus },
+  { id: "door",   label: "Door",   Icon: DoorOpen },
+  { id: "window", label: "Window", Icon: RectangleVertical }, // D-15: substitute for material-symbols 'window'
+  { id: "ceiling", label: "Ceiling", Icon: Triangle },        // D-15: substitute for material-symbols 'roofing'
+  { id: "stair", label: "Stairs", Icon: Footprints },         // D-15: substitute for material-symbols 'stairs'
 ];
 
 interface Props {
@@ -112,7 +112,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
         className="font-sans font-bold text-foreground text-sm tracking-[0.1em] mr-6 hover:text-foreground transition-colors"
         title="Back to home"
       >
-        OBSIDIAN CAD
+        Room CAD Renderer
       </button>
 
       {/* View tabs */}
@@ -254,7 +254,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
             onClick={() => setCutawayMode(cutawayMode === "off" ? "auto" : "off")}
             aria-label="Toggle wall cutaway"
             aria-pressed={cutawayMode === "auto"}
-            title={`CUTAWAY: ${cutawayMode === "auto" ? "AUTO" : "OFF"}`}
+            title={`Cutaway: ${cutawayMode === "auto" ? "Auto" : "Off"}`}
             className={`flex items-center justify-center gap-1 px-2 py-1 rounded-smooth-md font-sans text-sm transition-colors duration-150 border mr-6 ${
               cutawayMode === "auto"
                 ? "bg-accent/10 text-foreground border-ring"
@@ -262,7 +262,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
             }`}
           >
             <EyeOff size={14} strokeWidth={1.5} />
-            <span>CUTAWAY</span>
+            <span>Cutaway</span>
           </button>
         </Tooltip>
       )}
@@ -452,7 +452,7 @@ export function ToolPalette() {
       {tools.map((t) => (
         <Tooltip
           key={t.id}
-          content={t.label.charAt(0) + t.label.slice(1).toLowerCase() + " tool"}
+          content={t.label + " tool"}
           shortcut={TOOL_SHORTCUTS[t.id]}
           placement="right"
         >

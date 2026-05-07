@@ -53,7 +53,7 @@ export default function AddRoomDialog({ open, onClose }: Props) {
           className="w-full bg-background text-foreground px-2 py-1.5 border border-border/60 mb-4 font-sans text-xs outline-none focus:border-accent"
           placeholder="ROOM NAME"
         />
-        <label className="block text-muted-foreground/80 text-[9px] tracking-wider mb-2">TEMPLATE</label>
+        <label className="block text-muted-foreground/80 text-[9px] tracking-wider mb-2">Template</label>
         <div className="grid grid-cols-2 gap-2 mb-4">
           {TEMPLATE_IDS.map((id) => (
             <button

@@ -137,7 +137,7 @@ describe("App silent restore (D-02, D-02a, D-02b)", () => {
 
     // WelcomeScreen must NOT be visible after silent restore lands.
     await waitFor(() => {
-      expect(screen.queryByText("DESIGN YOUR SPACE")).not.toBeInTheDocument();
+      expect(screen.queryByText("Design Your Space")).not.toBeInTheDocument();
     });
     // The active project should be set to the restored id.
     expect(useProjectStore.getState().activeId).toBe("proj_abc");
@@ -151,7 +151,7 @@ describe("App silent restore (D-02, D-02a, D-02b)", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText("DESIGN YOUR SPACE")).toBeInTheDocument();
+      expect(screen.getByText("Design Your Space")).toBeInTheDocument();
     });
     expect(useProjectStore.getState().activeId).toBeNull();
   });
@@ -165,7 +165,7 @@ describe("App silent restore (D-02, D-02a, D-02b)", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText("DESIGN YOUR SPACE")).toBeInTheDocument();
+      expect(screen.getByText("Design Your Space")).toBeInTheDocument();
     });
     expect(useProjectStore.getState().activeId).toBeNull();
     // D-02b: loadProject must be called with the pointer id (Plan 03 implements
@@ -191,7 +191,7 @@ describe("App silent restore (D-02, D-02a, D-02b)", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText("DESIGN YOUR SPACE")).toBeInTheDocument();
+      expect(screen.getByText("Design Your Space")).toBeInTheDocument();
     });
 
     if (typeof window !== "undefined") {

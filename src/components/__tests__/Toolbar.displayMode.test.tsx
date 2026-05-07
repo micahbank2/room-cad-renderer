@@ -95,8 +95,8 @@ describe("Toolbar — Phase 47 display-mode segmented control (D-01, D-09)", () 
 
   it("buttons have aria-label matching mode (D-09)", () => {
     renderToolbarWithViewMode("3d");
-    expect(screen.getByTestId("display-mode-normal")).toHaveAttribute("aria-label", "NORMAL");
-    expect(screen.getByTestId("display-mode-solo")).toHaveAttribute("aria-label", "SOLO");
-    expect(screen.getByTestId("display-mode-explode")).toHaveAttribute("aria-label", "EXPLODE");
+    expect(screen.getByTestId("display-mode-normal")).toHaveAttribute("aria-label", "Normal");
+    expect(screen.getByTestId("display-mode-solo")).toHaveAttribute("aria-label", "Solo");
+    expect(screen.getByTestId("display-mode-explode")).toHaveAttribute("aria-label", "Explode");
   });
 });
