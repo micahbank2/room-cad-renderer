@@ -1,66 +1,106 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
 
-/* ── Obsidian CAD Design System Tokens ── */
+/* Pascal Visual Parity — v1.18 Phase 71 (TOKEN-FOUNDATION).
+   Replaces Obsidian CAD palette with Pascal's oklch system + Barlow/Geist fonts.
+   Implements D-01..D-16. */
+
+:root {
+  --background: oklch(0.998 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(0.998 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(0.998 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+
+  --radius: 0.625rem;
+}
+
+.dark {
+  --background: oklch(0.205 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.235 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.235 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.235 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.235 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.235 0 0);
+  --input: oklch(0.235 0 0);
+  --ring: oklch(0.439 0 0);
+}
+
 @theme {
-  /* Surface palette — deep obsidian layering */
-  --color-obsidian-deepest: #0d0d18;
-  --color-obsidian-base: #12121d;
-  --color-obsidian-low: #1b1a26;
-  --color-obsidian-mid: #1f1e2a;
-  --color-obsidian-high: #292935;
-  --color-obsidian-highest: #343440;
-  --color-obsidian-bright: #383845;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
-  /* Primary — lavender/purple accent */
-  --color-accent: #7c5bf0;
-  --color-accent-light: #ccbeff;
-  --color-accent-dim: #4a3d7b;
-  --color-accent-deep: #340098;
-  --color-accent-glow: rgba(124, 91, 240, 0.2);
-  --color-accent-subtle: rgba(124, 91, 240, 0.08);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 
-  /* Text */
-  --color-text-primary: #e3e0f1;
-  --color-text-muted: #cac3d7;
-  --color-text-dim: #938ea0;
-  /* Phase 43 (UX-02 / GH #98): bumped from #484554 (~2.0:1 against
-     obsidian-deepest, fails WCAG AA) to #888494 (~5.15:1, passes AA).
-     Affects 124+ existing usages globally. --color-text-dim and
-     --color-text-muted unchanged (already pass AA). */
-  --color-text-ghost: #888494;
+  /* D-14: Pascal-aligned spacing scale (was 4/8/16/24 in Phase 33) */
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
 
-  /* Semantic */
-  --color-success: #22c55e;
-  --color-warning: #ffb875;
-  --color-error: #ffb4ab;
-  --color-info: #0ea5e9;
+  /* Fonts (D-15 / D-16 — drop Material Symbols + Plex/Inter/SpaceGrotesk) */
+  --font-sans: 'Barlow', 'Geist Sans', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Outline/border */
-  --color-outline: #938ea0;
-  --color-outline-variant: #484554;
-
-  /* Shadows — purple-tinted */
-  --shadow-glow: 0 0 20px rgba(124, 91, 240, 0.3);
-  --shadow-glow-sm: 0 0 15px rgba(124, 91, 240, 0.2);
-  --shadow-glow-lg: 0 0 30px rgba(124, 91, 240, 0.3);
-  --shadow-ambient: 0 20px 40px -10px rgba(124, 91, 240, 0.08);
-
-  /* Radii — machined precision (Phase 33: --radius-lg canonicalized 6px → 8px per D-34) */
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 8px;
-
-  /* Fonts */
-  --font-display: 'Space Grotesk', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', 'Fira Code', monospace;
-
-  /* Phase 33 — Typography scale (D-03, 3 CSS tokens → 6 semantic roles).
-     v4 naming: --text-* exposes as text-{name} utility class. */
+  /* Phase 33 typography (preserved) */
   --text-display: 28px;
   --text-base: 13px;
   --text-sm: 11px;
+}
+
+/* D-13: Squircle progressive enhancement — Safari/WebKit only.
+   Chrome/Firefox/Edge ignore corner-shape and render border-radius alone. */
+.rounded-smooth     { border-radius: var(--radius-lg); corner-shape: squircle; }
+.rounded-smooth-md  { border-radius: var(--radius-md); corner-shape: squircle; }
+.rounded-smooth-lg  { border-radius: var(--radius-lg); corner-shape: squircle; }
+.rounded-smooth-xl  { border-radius: var(--radius-xl); corner-shape: squircle; }
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 /* ── Base styles ── */
@@ -68,32 +108,25 @@ html, body, #root {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  font-family: var(--font-body);
-  background: var(--color-obsidian-base);
-  color: var(--color-text-primary);
 }
 
-html {
-  color-scheme: dark;
-}
-
-/* ── Input overrides for dark theme ── */
+/* ── Input overrides ── */
 input, select, textarea {
-  background: var(--color-obsidian-deepest);
-  border: 1px solid rgba(72, 69, 84, 0.3);
-  color: var(--color-text-primary);
+  background: var(--input);
+  border: 1px solid var(--border);
+  color: var(--foreground);
   font-family: var(--font-mono);
   border-radius: var(--radius-sm);
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: var(--color-accent);
+  border-color: var(--ring);
   outline: none;
-  box-shadow: 0 0 0 1px rgba(124, 91, 240, 0.3);
+  box-shadow: 0 0 0 1px var(--ring);
 }
 
 input::placeholder {
-  color: var(--color-text-ghost);
+  color: var(--muted-foreground);
 }
 
 /* ── Scrollbar ── */
@@ -104,41 +137,14 @@ input::placeholder {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-obsidian-highest);
+  background: var(--border);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-outline-variant);
+  background: var(--ring);
 }
 
 /* ── Canvas cursor overrides ── */
 .cursor-crosshair canvas { cursor: crosshair !important; }
 .cursor-grab canvas { cursor: grab !important; }
 
-/* ── CAD grid background pattern ── */
-.cad-grid-bg {
-  background-image: radial-gradient(circle, #292935 1px, transparent 1px);
-  background-size: 48px 48px;
-}
-
-/* ── Ghost border utility ── */
-.ghost-border {
-  border: 1px solid rgba(147, 142, 160, 0.15);
-}
-
-/* ── Glassmorphism panels ── */
-.glass-panel {
-  background: rgba(31, 30, 42, 0.8);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(72, 69, 84, 0.2);
-}
-
-/* ── Accent glow for focus states ── */
-.accent-glow {
-  box-shadow: 0 0 15px rgba(124, 91, 240, 0.2);
-}
-
-/* ── Material Symbols ── */
-.material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-}
