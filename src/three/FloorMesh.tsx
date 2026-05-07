@@ -12,6 +12,7 @@ import { FLOOR_PRESETS, type FloorPresetId } from "@/data/floorMaterials";
 import { SURFACE_MATERIALS } from "@/data/surfaceMaterials";
 import { PbrSurface } from "./PbrSurface";
 import { useUserTexture } from "@/hooks/useUserTexture";
+import { useResolvedMaterial } from "./useResolvedMaterial";
 
 interface Props {
   width: number;
@@ -20,6 +21,12 @@ interface Props {
   halfL: number;
   material: FloorMaterial | undefined;
   fallbackTexture: THREE.Texture;
+  /** Phase 68 Plan 04 — priority-1 Material reference. When set AND resolves,
+   *  beats every legacy floor branch. Plumbed from RoomDoc.floorMaterialId. */
+  floorMaterialId?: string;
+  /** Phase 68 D-04 — per-surface tile-size override. Plumbed from
+   *  RoomDoc.floorScaleFt. */
+  floorScaleFt?: number;
 }
 
 /** Module-level texture cache for uploaded custom floor images (data URLs). */
@@ -44,7 +51,21 @@ function getCustomTexture(dataUrl: string, scaleFt: number, rotationDeg: number,
   return tex;
 }
 
-export default function FloorMesh({ width, length, halfW, halfL, material, fallbackTexture }: Props) {
+export default function FloorMesh({
+  width,
+  length,
+  halfW,
+  halfL,
+  material,
+  fallbackTexture,
+  floorMaterialId,
+  floorScaleFt,
+}: Props) {
+  // Phase 68 Plan 04 — priority-1 floorMaterialId resolution. Hooks called
+  // unconditionally at top (Rules of Hooks). Null when materialId unset or
+  // missing → caller falls through to the legacy priority chain below.
+  const resolved = useResolvedMaterial(floorMaterialId, floorScaleFt, width, length);
+
   // PBR branch: if material.presetId resolves to a SURFACE_MATERIALS entry with pbr, route through PbrSurface
   const pbrMaterial = useMemo(() => {
     if (material?.kind !== "preset" || !material.presetId) return null;
@@ -95,6 +116,12 @@ export default function FloorMesh({ width, length, halfW, halfL, material, fallb
   const useUserTextureBranch =
     material?.kind === "user-texture" && userTex !== null;
 
+  // Phase 68 Plan 04 — priority-1 materialId branch wins over every legacy
+  // path when resolved is non-null AND has either colorHex or colorMap.
+  // Orphan colorMap (texture deleted from IDB) falls through to legacy chain.
+  const useResolvedBranch =
+    resolved !== null && (Boolean(resolved.colorHex) || Boolean(resolved.colorMap));
+
   return (
     <mesh
       position={[halfW, 0, halfL]}
@@ -102,7 +129,24 @@ export default function FloorMesh({ width, length, halfW, halfL, material, fallb
       receiveShadow
     >
       <planeGeometry args={[width, length]} />
-      {useUserTextureBranch ? (
+      {useResolvedBranch ? (
+        resolved!.colorHex ? (
+          <meshStandardMaterial
+            color={resolved!.colorHex}
+            roughness={resolved!.roughness}
+            metalness={resolved!.metalness}
+          />
+        ) : (
+          <meshStandardMaterial
+            color="#ffffff"
+            roughness={resolved!.roughness}
+            metalness={resolved!.metalness}
+            map={resolved!.colorMap ?? undefined}
+            roughnessMap={resolved!.roughnessMap ?? undefined}
+            metalnessMap={resolved!.reflectionMap ?? undefined}
+          />
+        )
+      ) : useUserTextureBranch ? (
         // Phase 34 user-texture: non-disposing cache (userTextureCache.ts).
         // `userTex` is guaranteed non-null by `useUserTextureBranch`.
         <meshStandardMaterial color="#ffffff" roughness={0.75} metalness={0}>
