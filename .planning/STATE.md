@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.18
 milestone_name: Pascal Visual Parity
-status: planning
-last_updated: "2026-05-07T17:30:00.000Z"
+status: executing
+last_updated: "2026-05-07T19:09:55.548Z"
 last_activity: 2026-05-07
 progress:
   total_phases: 6
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 7
+  completed_plans: 1
 ---
 
 # Project State
@@ -19,15 +19,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-07 — v1.17 partial-shipped 67+68; v1.18 Pascal Visual Parity opened; Phases 69+70 deferred to v1.19)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Milestone v1.18 — chrome-only rewrite to emulate Pascal Editor
+**Current focus:** Phase 71 — Token Foundation
 
 ## Current Position
 
-Phase: TBD (next: Phase 71 TOKEN-FOUNDATION after roadmap approval)
+Phase: 71 (Token Foundation) — EXECUTING
 Milestone: v1.18 Pascal Visual Parity
 Phases: 6 (71, 72, 73, 74, 75, 76) — 0 complete
-Plan: Not started
-Status: Roadmap pending approval
+Plan: 2 of 7
+Status: Ready to execute
 Last activity: 2026-05-07
 
 ## Decisions
@@ -41,6 +41,7 @@ Last activity: 2026-05-07
 - **D-A7 (user-confirmed):** Right sidebar becomes **contextual** — appears only when something is selected. PropertiesPanel un-mounts on empty selection.
 - **D-A8 (sequencing):** v1.17 closed early at "shipped 67 + 68". Phases 69 (MAT-LINK-01) + 70 (LIB-REBUILD-01) deferred to v1.19 to ship in v1.18 chrome rather than be designed twice.
 - **D-A9 (carry-over):** 4 legacy tests need contract updates from Phase 68 — fold into v1.18 Phase 71: `tests/snapshotMigration.test.ts:32` (asserts version 5, bump to 6), `tests/pickerMyTexturesIntegration.test.tsx` (tests removed wallpaper "MY TEXTURES" tab), `tests/WallMesh.cutaway.test.tsx` (Phase 59 ghost-spread audit on new material sites — open question whether ghost cutaway should propagate through resolved Materials), `tests/lib/contextMenuActionCounts.test.ts` (test pollution).
+- [Phase 71]: Wave 0 test scaffold (Plan 00): RED tests lock useTheme + __driveTheme contract before implementation; Plan 71-01 turns GREEN
 
 ## Performance Metrics
 
@@ -56,6 +57,7 @@ Last activity: 2026-05-07
 | 74 | TOOLBAR-REWORK | Floating two-row action menu replaces top-left toolbar | Pending |
 | 75 | PROPERTIES-LIBRARY-RESTYLE | MaterialPicker / ProductLibrary / RoomSettings restyle | Pending |
 | 76 | MODALS-WELCOME-FINAL | Modal primitives + light-mode Welcome/ProjectManager + carry-over test cleanup | Pending |
+| Phase 71 P00 | 6 | 2 tasks | 2 files |
 
 ## Recent Milestones
 
