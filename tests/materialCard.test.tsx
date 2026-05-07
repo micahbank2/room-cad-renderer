@@ -81,9 +81,11 @@ describe("MaterialCard — orphan handling", () => {
     getUserTextureMock.mockResolvedValue(undefined);
     render(<MaterialCard material={makeMaterial()} />);
     await waitFor(() => {
-      expect(
-        screen.getByText("Color map missing — re-upload to restore"),
-      ).toBeInTheDocument();
+      // Warning appears in two surfaces (placeholder thumbnail body +
+      // hover tooltip) — both are intentional. Use getAllByText to match
+      // either-or-both without coupling to layout.
+      const matches = screen.getAllByText("Color map missing — re-upload to restore");
+      expect(matches.length).toBeGreaterThanOrEqual(1);
     });
   });
 });
@@ -116,8 +118,8 @@ describe("MaterialCard — hover tooltip metadata", () => {
       expect(tooltipText).toContain("X-99");
       expect(tooltipText).toContain("$5.99/sqft");
       expect(tooltipText).toContain("2-4 weeks");
-      // formatFeet(2.5) -> "2'6\""
-      expect(tooltipText).toContain("2'6\"");
+      // formatFeet(2.5) -> "2'-6\"" (hyphenated per src/lib/geometry.ts:190).
+      expect(tooltipText).toContain("2'-6\"");
     });
   });
 
@@ -138,11 +140,11 @@ describe("MaterialCard — hover tooltip metadata", () => {
     });
   });
 
-  it("tile size formatted via formatFeet (2.5 → '2'6\"')", async () => {
+  it("tile size formatted via formatFeet (2.5 → '2'-6\"' per geometry.ts)", async () => {
     const mat = makeMaterial({ tileSizeFt: 2.5 });
     const { container } = render(<MaterialCard material={mat} />);
     await waitFor(() => {
-      expect(container.textContent ?? "").toContain("2'6\"");
+      expect(container.textContent ?? "").toContain("2'-6\"");
     });
   });
 });
