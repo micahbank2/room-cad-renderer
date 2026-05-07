@@ -7,6 +7,7 @@ import { setPendingProduct } from "@/canvas/tools/productTool";
 import { LibraryCard, CategoryTabs } from "@/components/library";
 import type { CategoryTab } from "@/components/library";
 import { getCachedGltfThumbnail } from "@/three/gltfThumbnailGenerator";
+import { MaterialsSection } from "./MaterialsSection";
 
 interface Props {
   products: Product[];
@@ -95,6 +96,12 @@ export function ProductLibrary({
           {filtered.length} ITEMS
         </span>
       </div>
+
+      {/* Phase 67 — Materials section (collapsible) above the products grid.
+          Phase 70 will lift this into a top-level Materials/Assemblies/Products
+          toggle; for now it's a sub-section of ProductLibrary per D-06. */}
+      <MaterialsSection />
+      <div className="border-t border-outline-variant/20 my-2 mx-6" />
 
       {/* Filters */}
       <div className="px-6 pb-3 shrink-0 space-y-3">
