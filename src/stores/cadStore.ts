@@ -22,7 +22,13 @@ import type {
 import { DEFAULT_STAIR } from "@/types/cad";
 import { uid, resizeWall } from "@/lib/geometry";
 import { ROOM_TEMPLATES, type RoomTemplateId } from "@/data/roomTemplates";
-import { migrateSnapshot, migrateFloorMaterials, migrateV3ToV4, migrateV4ToV5 } from "@/lib/snapshotMigration";
+import {
+  migrateSnapshot,
+  migrateFloorMaterials,
+  migrateV3ToV4,
+  migrateV4ToV5,
+  migrateV5ToV6,
+} from "@/lib/snapshotMigration";
 import type { PaintColor } from "@/types/paint";
 
 const MAX_HISTORY = 50;
@@ -203,7 +209,7 @@ function snapshot(state: CADState): CADSnapshot {
   const root = state as any;
   const t0 = import.meta.env.DEV ? performance.now() : 0;
   const snap: CADSnapshot = {
-    version: 5,
+    version: 6,
     rooms: structuredClone(toPlain(state.rooms)),
     activeRoomId: state.activeRoomId,
     ...(root.customElements
@@ -1337,10 +1343,11 @@ export const useCADStore = create<CADState>()((set) => ({
 
   loadSnapshot: async (raw: unknown): Promise<void> => {
     // Phase 51 Pattern A: async pre-pass runs BEFORE produce() (Immer constraint)
-    const shaped = migrateSnapshot(raw);             // sync: v1→v2 (or v3/v4/v5 passthrough)
+    const shaped = migrateSnapshot(raw);             // sync: v1→v2 (or v3/v4/v5/v6 passthrough)
     const migratedV3 = await migrateFloorMaterials(shaped); // async: v2→v3 IDB migration
     const migratedV4 = migrateV3ToV4(migratedV3);    // sync: v3→v4 stair seed (Phase 60)
-    const migrated = migrateV4ToV5(migratedV4);      // sync: v4→v5 measure/annotation seed (Phase 62)
+    const migratedV5 = migrateV4ToV5(migratedV4);    // sync: v4→v5 measure/annotation seed (Phase 62)
+    const migrated = await migrateV5ToV6(migratedV5); // async: v5→v6 surface Material migration (Phase 68)
     set(
       produce((s: CADState) => {
         s.rooms = migrated.rooms;
