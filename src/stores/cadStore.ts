@@ -1838,4 +1838,126 @@ if (typeof window !== "undefined" && import.meta.env.MODE === "test") {
   // to assert preset switches never push to the undo stack.
   (window as unknown as { __getCADHistoryLength?: () => number }).__getCADHistoryLength =
     () => useCADStore.getState().past.length;
+
+  // ─────────────────────────────────────────────────────────────────────
+  // Phase 68 MAT-APPLY-01 — test driver bridges for Material apply flow.
+  //
+  // Installed at MODULE EVAL time (not useEffect), gated by `MODE === "test"`.
+  // Mirrors the Phase 67 useMaterials.ts:139-148 + Phase 31 patterns:
+  // - Module-eval install runs once, never re-runs, never needs cleanup
+  //   (Pattern #7 cleanup-on-unmount applies to useEffect-installed registries,
+  //   not module-level globals).
+  //
+  // - __driveApplyMaterial(target, materialId)
+  //     Single-undo apply (D-06). Pushes one history entry.
+  // - __driveApplyMaterialNoHistory(target, materialId)
+  //     Mid-pick preview helper. No history entry.
+  // - __getResolvedMaterial(target)
+  //     Async reader. Returns serializable summary `{ materialId, hasColorHex,
+  //     hasColorMap }` or null. THREE.Texture refs are NOT exposed here —
+  //     Playwright cannot serialize them across page.evaluate.
+  // ─────────────────────────────────────────────────────────────────────
+  type ResolvedSummary = {
+    materialId: string | null;
+    hasColorHex: boolean;
+    hasColorMap: boolean;
+  };
+
+  (window as unknown as {
+    __driveApplyMaterial?: (
+      target: SurfaceTarget,
+      materialId: string | undefined,
+    ) => void;
+  }).__driveApplyMaterial = (target, materialId) =>
+    useCADStore.getState().applySurfaceMaterial(target, materialId);
+
+  (window as unknown as {
+    __driveApplyMaterialNoHistory?: (
+      target: SurfaceTarget,
+      materialId: string | undefined,
+    ) => void;
+  }).__driveApplyMaterialNoHistory = (target, materialId) =>
+    useCADStore.getState().applySurfaceMaterialNoHistory(target, materialId);
+
+  (window as unknown as {
+    __getResolvedMaterial?: (
+      target: SurfaceTarget,
+    ) => Promise<ResolvedSummary | null>;
+  }).__getResolvedMaterial = async (target) => {
+    const { listMaterials } = await import("@/lib/materialStore");
+    const { resolveSurfaceMaterial } = await import("@/lib/surfaceMaterial");
+    const mats = await listMaterials();
+    const state = useCADStore.getState();
+    const doc = state.activeRoomId ? state.rooms[state.activeRoomId] : undefined;
+    if (!doc) return null;
+    let mid: string | undefined;
+    let scaleFt: number | undefined;
+    switch (target.kind) {
+      case "wallSide": {
+        const w = doc.walls?.[target.wallId];
+        if (!w) return null;
+        mid = target.side === "A" ? w.materialIdA : w.materialIdB;
+        scaleFt = target.side === "A" ? w.scaleFtA : w.scaleFtB;
+        break;
+      }
+      case "floor": {
+        mid = doc.floorMaterialId;
+        scaleFt = doc.floorScaleFt;
+        break;
+      }
+      case "ceiling": {
+        const c = doc.ceilings?.[target.ceilingId];
+        if (!c) return null;
+        mid = c.materialId;
+        scaleFt = c.scaleFt;
+        break;
+      }
+      case "customElementFace": {
+        const p = doc.placedCustomElements?.[target.placedId];
+        if (!p) return null;
+        mid = p.faceMaterials?.[target.face];
+        break;
+      }
+    }
+    if (!mid) {
+      return { materialId: null, hasColorHex: false, hasColorMap: false };
+    }
+    const r = resolveSurfaceMaterial(mid, scaleFt, mats);
+    if (!r) {
+      // materialId set but Material missing from catalog (orphan).
+      return { materialId: mid, hasColorHex: false, hasColorMap: false };
+    }
+    return {
+      materialId: mid,
+      hasColorHex: !!r.colorHex,
+      hasColorMap: !!r.colorMapId,
+    };
+  };
+
+  // Phase 68 — convenience seed helper. Lets the e2e spec drop a fully-formed
+  // wall into the active room without going through the wallTool drag flow.
+  // Mirrors Phase 36 specs that seed via __cadStore.loadSnapshot, but the
+  // sub-state surgical mutation is friendlier when we want to preserve other
+  // store state (autosave debounce, project metadata, etc.).
+  (window as unknown as {
+    __driveSeedWall?: (
+      wallId: string,
+      partial: { start: { x: number; y: number }; end: { x: number; y: number }; thickness?: number },
+    ) => void;
+  }).__driveSeedWall = (wallId, partial) => {
+    useCADStore.setState(
+      produce((s: CADState) => {
+        const doc = s.activeRoomId ? s.rooms[s.activeRoomId] : undefined;
+        if (!doc) return;
+        doc.walls[wallId] = {
+          id: wallId,
+          start: partial.start,
+          end: partial.end,
+          thickness: partial.thickness ?? 0.5,
+          height: doc.room.wallHeight,
+          openings: [],
+        };
+      }) as (s: CADState) => void,
+    );
+  };
 }
