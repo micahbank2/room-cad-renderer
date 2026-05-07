@@ -82,3 +82,32 @@ export const DialogContent = React.forwardRef<
   );
 });
 DialogContent.displayName = "DialogContent";
+
+// ─── DialogOverlay (standalone, for external use) ─────────────────────────────
+export const DialogOverlay = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Overlay
+    ref={ref}
+    className={cn("fixed inset-0 z-50 bg-background/80 backdrop-blur-sm", className)}
+    {...props}
+  />
+));
+DialogOverlay.displayName = "DialogOverlay";
+
+// ─── DialogHeader ─────────────────────────────────────────────────────────────
+export function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className={cn("flex flex-col gap-1.5 mb-4", className)} {...props} />
+  );
+}
+DialogHeader.displayName = "DialogHeader";
+
+// ─── DialogFooter ─────────────────────────────────────────────────────────────
+export function DialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className={cn("flex justify-end gap-2 mt-4", className)} {...props} />
+  );
+}
+DialogFooter.displayName = "DialogFooter";
