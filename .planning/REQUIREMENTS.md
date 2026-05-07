@@ -73,13 +73,13 @@ See `.planning/milestones/v1.0-REQUIREMENTS.md` through `.planning/milestones/v1
 
 | Requirement | Phase | Plans |
 |-------------|-------|-------|
-| TOKEN-FOUNDATION | Phase 71 | TBD |
-| PRIMITIVES-SHELF | Phase 72 | TBD |
-| SIDEBAR-RESTYLE | Phase 73 | TBD |
-| TOOLBAR-REWORK | Phase 74 | TBD |
-| PROPERTIES-LIBRARY-RESTYLE | Phase 75 | TBD |
-| MODALS-WELCOME-FINAL | Phase 76 | TBD |
+| TOKEN-FOUNDATION | Phase 71 | TBD (planning) |
+| PRIMITIVES-SHELF | Phase 72 | TBD (planning) |
+| SIDEBAR-RESTYLE | Phase 73 | TBD (planning) |
+| TOOLBAR-REWORK | Phase 74 | TBD (planning) |
+| PROPERTIES-LIBRARY-RESTYLE | Phase 75 | TBD (planning) |
+| MODALS-WELCOME-FINAL | Phase 76 | TBD (planning) |
 
 ---
 
-*Last updated: 2026-05-07 — v1.18 roadmap to be created (6 phases, 6/6 requirements mapped)*
+*Last updated: 2026-05-07 — v1.18 roadmap created; 6/6 requirements mapped to Phases 71-76; success criteria + dependencies populated; plans pending /gsd:plan-phase*
