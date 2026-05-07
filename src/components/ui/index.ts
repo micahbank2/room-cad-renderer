@@ -1,3 +1,5 @@
 // Phase 72 primitive barrel — each primitive re-exports from here.
-// Populated by Plans 02-05 as primitives ship.
-export {} // placeholder until first primitive lands
+// Tabs, SegmentedControl, Switch (72-05 Task 1)
+export { Tabs, TabsList, TabsTrigger, TabsContent } from "./Tabs";
+export { SegmentedControl } from "./SegmentedControl";
+export { Switch } from "./Switch";
