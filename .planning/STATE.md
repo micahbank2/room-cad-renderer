@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.18
 milestone_name: Pascal Visual Parity
 status: verifying
-last_updated: "2026-05-07T21:45:09.755Z"
+last_updated: "2026-05-07T21:45:54.332Z"
 last_activity: 2026-05-07
 progress:
   total_phases: 6
@@ -52,7 +52,7 @@ Last activity: 2026-05-07
 - [Phase 71]: productStore addProduct: restored pre-load guard (LIB-03 safety — prevents writing empty library before load resolves)
 - [Phase 71]: contextMenuActionCounts: duplicate vi.mock() caused full-suite TypeErrors; removed first incomplete mock declaration
 - [Phase 72-01]: Import type Transition from motion/react (no runtime side-effects)
-- [Phase 72]: type='button' default spread before props — D-08 Pitfall 6 prevention
+- [Phase 72-primitives-shelf]: AnimatePresence initial=false prevents first-mount animation in PanelSection (Pitfall 1)
 
 ## Performance Metrics
 
@@ -76,7 +76,7 @@ Last activity: 2026-05-07
 | Phase 71 P05 | 11 | 2 tasks | 19 files |
 | Phase 71 P06 | 45 | 3 tasks | 16 files |
 | Phase 72-primitives-shelf P01 | 110 | 2 tasks | 6 files |
-| Phase 72 P02 | 8 | 1 tasks | 3 files |
+| Phase 72-primitives-shelf P03 | 15 | 1 tasks | 3 files |
 
 ## Recent Milestones
 
