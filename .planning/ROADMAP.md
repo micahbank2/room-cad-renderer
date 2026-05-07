@@ -19,7 +19,8 @@
 - ✅ **v1.13 UX Polish Bundle** — shipped 2026-04-28
 - ✅ **v1.14 Real 3D Models** — Phases 55–58 (shipped 2026-05-05)
 - ✅ **v1.15 Architectural Toolbar Expansion** — Phases 59–62 (shipped 2026-05-06)
-- 🚧 **v1.16 Maintenance Pass** — Phases 63–66 (in progress)
+- ✅ **v1.16 Maintenance Pass** — Phases 63–66 (shipped 2026-05-06)
+- 🚧 **v1.17 Library + Material Engine** — Phases 67–70 (in progress)
 
 ---
 
@@ -91,7 +92,7 @@
 <details>
 <summary>✅ v1.9 Polish & Feedback (Phases 38, 39, 42 — 40 + 41 cancelled mid-milestone) — SHIPPED 2026-04-25</summary>
 
-3 phases, 4 plans, 3/3 shipped requirements (POLISH-01, FEEDBACK-01, BUG-01). VERIFICATION.md backfill closed v1.8 audit AUDIT-01 carry-over (3 retroactive verification reports for Phases 35/36/37). Real-use feedback signal pivoted from in-person hybrid to async 5-question questionnaire per CONTEXT D-08 due to calendar constraints — Jessica reported zero friction and zero new wishes beyond the GH backlog; all 3 Phase 35 HUMAN-UAT items confirmed; 8 GH issues curated as v2.0 scope seeds. **Mid-milestone re-scope:** Phases 40 (CEIL-01) and 41 (TILE-01) CANCELLED after Phase 39 contradicted their hypotheses ("ceilings went fine", "texture sizing feels right") — re-deferred to Phase 999.1 and Phase 999.3 backlogs. Narrower BUG-01 (Phase 42) shipped per-surface scaleFt isolation closing GH #96 — Ceiling.scaleFt added (mirrors Wallpaper.scaleFt + FloorMaterial.scaleFt convention), CeilingMesh resolver ceiling.scaleFt ?? entry?.tileSizeFt ?? 2, apply-time write in CeilingPaintSection, 4 new tests guard the invariant. 22 commits, +2,840/-40 LOC, single-day milestone. Audit passed_with_carry_over (AUDIT-01 recurring: v1.9 phases also lack VERIFICATION.md). The mid-milestone re-scope is itself the milestone's most valuable artifact — validated the "feedback-first" sequencing pattern by acting on its own hedge. See [milestones/v1.9-ROADMAP.md](milestones/v1.9-ROADMAP.md).
+3 phases, 4 plans, 3/3 shipped requirements (POLISH-01, FEEDBACK-01, BUG-01). VERIFICATION.md backfill closed v1.8 audit AUDIT-01 carry-over (3 retroactive verification reports for Phases 35/36/37). Real-use feedback signal pivoted from in-person hybrid to async 5-question questionnaire per CONTEXT D-08 due to calendar constraints — Jessica reported zero friction and zero new wishes beyond the GH backlog; all 3 Phase 35 HUMAN-UAT items confirmed; 8 GH issues curated as v2.0 scope seeds. **Mid-milestone re-scope:** Phases 40 (CEIL-01) and 41 (TILE-01) CANCELLED after Phase 39 contradicted their hypotheses ("ceilings went fine", "texture sizing feels right") — re-deferred to Phase 999.1 and Phase 999.3 backlogs (later cleared by v1.16). Narrower BUG-01 (Phase 42) shipped per-surface scaleFt isolation closing GH #96 — Ceiling.scaleFt added (mirrors Wallpaper.scaleFt + FloorMaterial.scaleFt convention), CeilingMesh resolver ceiling.scaleFt ?? entry?.tileSizeFt ?? 2, apply-time write in CeilingPaintSection, 4 new tests guard the invariant. 22 commits, +2,840/-40 LOC, single-day milestone. Audit passed_with_carry_over (AUDIT-01 recurring: v1.9 phases also lack VERIFICATION.md). The mid-milestone re-scope is itself the milestone's most valuable artifact — validated the "feedback-first" sequencing pattern by acting on its own hedge. See [milestones/v1.9-ROADMAP.md](milestones/v1.9-ROADMAP.md).
 
 </details>
 
@@ -102,103 +103,122 @@
 
 </details>
 
----
-
-## v1.11 Pascal Feature Set (shipped 2026-04-26)
+<details>
+<summary>✅ v1.11 Pascal Feature Set (Phases 45–48) — SHIPPED 2026-04-26</summary>
 
 4 phases (45-48), 13 plans, 4/4 requirements (THUMB-01, TREE-01, DISPLAY-01, CAM-04). Auto-rendered material swatches, sidebar rooms hierarchy tree, NORMAL/SOLO/EXPLODE display modes, per-node saved cameras with tree double-click focus. Audit passed_with_carry_over (Phase 999.4 EXPLODE+saved-camera offset gap deferred). 60+ commits, single-day milestone span. See [milestones/v1.11-ROADMAP.md](milestones/v1.11-ROADMAP.md).
 
----
+</details>
 
-## v1.12 Maintenance Pass (shipped 2026-04-27)
+<details>
+<summary>✅ v1.12 Maintenance Pass (Phases 49–52) — SHIPPED 2026-04-27</summary>
 
 4 phases (49-52), 7 plans, 4/4 requirements (BUG-02, BUG-03, DEBT-05, HOTKEY-01). Two carry-over texture bugs closed (wall first-apply + wallpaper/wallArt 2D↔3D persistence) using a shared direct-`map` prop pattern. Legacy FloorMaterial data-URL entries auto-migrate to userTextureId references on snapshot load — `loadSnapshot` is now async (Pattern A pre-pass before Immer produce; 23 caller sites updated). Keyboard shortcuts cheat sheet overlay shipped via new single-source-of-truth registry at `src/lib/shortcuts.ts` (26 entries, coverage-gate test prevents drift). Audit `passed` — zero gaps, zero carry-over. ~5,700 LOC, 4 PRs, single-day milestone. See [milestones/v1.12-ROADMAP.md](milestones/v1.12-ROADMAP.md).
 
----
+</details>
 
-## v1.13 UX Polish Bundle (shipped 2026-04-28)
+<details>
+<summary>✅ v1.13 UX Polish Bundle (Phases 53–54) — SHIPPED 2026-04-28</summary>
 
 2 phases (53-54), 2 plans, 2/2 requirements (CTXMENU-01, PROPS3D-01). Editor-flow maturity milestone before v1.14's real-3D-models work. Phase 53: right-click context menus via `CanvasContextMenu` (2D Fabric + 3D R3F, auto-flip, 5 close paths). Phase 54: 3D click-to-select via new `useClickDetect` hook (5px drag-threshold) + Canvas `onPointerMissed` deselect. Audit caught + fixed one cross-phase gap (CustomElementMesh missing right-click). ~21 files modified, 2 PRs, single-day milestone. Audit `passed` — zero carry-over. See [milestones/v1.13-ROADMAP.md](milestones/v1.13-ROADMAP.md).
 
----
+</details>
 
-## v1.14 Real 3D Models (shipped 2026-05-05)
+<details>
+<summary>✅ v1.14 Real 3D Models (Phases 55–58) — SHIPPED 2026-05-05</summary>
 
 4 phases (55-58), 4 plans, 4/4 requirements (GLTF-UPLOAD-01, GLTF-RENDER-3D-01, GLTF-RENDER-2D-01, GLTF-INTEGRATION-01). Biggest user-visible win in project history. Phase 55: `.gltf`/`.glb` upload to IDB with SHA-256 dedup (mirrors Phase 32 user-texture pattern). Phase 56: drei `useGLTF` 3D rendering with auto-scale + Y-floor + `<box3Helper>` selection outline. Phase 57: top-down convex-hull silhouette polygons via Andrew's monotone chain + FIX-01 async cache. Phase 58: library Box badge top-LEFT + auto-thumbnail (mirrors Phase 45 swatch generator) + Phase 48 × GLTF e2e closing the only untested combo. 59 files modified, 11K LOC, 4 PRs ([#137](https://github.com/micahbank2/room-cad-renderer/pull/137), [#138](https://github.com/micahbank2/room-cad-renderer/pull/138), [#139](https://github.com/micahbank2/room-cad-renderer/pull/139), [#140](https://github.com/micahbank2/room-cad-renderer/pull/140)). Audit `passed` — zero regressions on Phase 31/48/53/54. Post-merge fix for React StrictMode double-mount in thumbnail callback. See [milestones/v1.14-ROADMAP.md](milestones/v1.14-ROADMAP.md).
 
----
+</details>
 
-## v1.15 Architectural Toolbar Expansion (shipped 2026-05-06)
+<details>
+<summary>✅ v1.15 Architectural Toolbar Expansion (Phases 59–62) — SHIPPED 2026-05-06</summary>
 
 4 phases (59-62), 4 plans, 4/4 requirements (CUTAWAY-01, STAIRS-01, OPEN-01, MEASURE-01). After v1.14 made the *furniture* real, v1.15 made the *room itself* richer. Phase 59: wall cutaway via most-opposed-normal raycast (auto/off/manual modes; per-room Map in EXPLODE; constant `transparent: true` + opacity-only animation avoids Phase 49 BUG-02). Phase 60: `Stair` as new top-level entity (not customElement.kind) with D-04 origin-asymmetry handling — bottom-step center vs. bbox-center translation for snap; Material Symbols `stairs` glyph; first D-33 allowlist expansion since Phase 33; snapshot v3→v4. Phase 61: archway / passthrough / niche openings extending `Opening.type` enum (no version bump); D-11' lesson — Phase 53/54 don't auto-inherit, NEW wiring required; niche math sign-convention trap (`+N_out × d/2` recess INTO wall); Wall Cutouts dropdown. Phase 62: measureLine + annotation entities; `polygonArea` shoelace winding-agnostic + connectivity check; centroid for canvas overlay; click-preview-click measure flow with Phase 30 smart-snap; DOM-overlay label edit at zIndex 30; snapshot v4→v5. 90 files modified, +15.7K LOC, 4 PRs ([#142](https://github.com/micahbank2/room-cad-renderer/pull/142), [#143](https://github.com/micahbank2/room-cad-renderer/pull/143), [#144](https://github.com/micahbank2/room-cad-renderer/pull/144), [#145](https://github.com/micahbank2/room-cad-renderer/pull/145)). Audit `passed` — 85/85 e2e pass on chromium-preview. CI evolution: workflow timeout bumped 20m→35m then sharded by Playwright project to halve wall-clock. See [milestones/v1.15-ROADMAP.md](milestones/v1.15-ROADMAP.md).
 
+</details>
+
+<details>
+<summary>✅ v1.16 Maintenance Pass (Phases 63–66) — SHIPPED 2026-05-06</summary>
+
+4 phases (63-66), 4 plans, 4/4 requirements (DEBT-06, BUG-04, CEIL-02, TILE-02). Mirrored the v1.12 maintenance-pass pattern after two big feature milestones (v1.14 + v1.15 = 8 phases in 10 days). **Two long-parked Phase 999.x backlog items dating back to v1.9 finally cleared:** 999.1 ceiling resize handles (re-deferred twice) and 999.3 per-surface tile-size override (re-deferred once). Phase 63: investigated #146 vitest cascade — could not reproduce; shipped hygiene cleanup (top-level `global.URL` mutation → `vi.spyOn` + `restoreAllMocks`) as preventative. Phase 64: real bug found — WallMesh useEffect cleanup missing (StrictMode double-mount class, mirrors Phase 58 pattern); fix + 3000ms→8000ms timeout bump → `--repeat-each=5` 10/10 green. Phase 65: ceiling resize handles via override-anchor model (4 fields: widthFtOverride/depthFtOverride/anchorXFt/anchorYFt) with `resolveCeilingPoints` resolver — east/south drags use default anchors; west/north explicitly set opposite-edge anchor so dragged edge moves with cursor. Formal VERIFICATION 13/13 PASS. Phase 66: investigation revealed Phase 42 had already shipped data fields + actions + renderers + serialization; Phase 66 was just the missing UI tier (two `<input>` fields, no schema changes, no version bump). 32 files modified, +3,713 LOC, 4 PRs ([#147](https://github.com/micahbank2/room-cad-renderer/pull/147), [#148](https://github.com/micahbank2/room-cad-renderer/pull/148), [#149](https://github.com/micahbank2/room-cad-renderer/pull/149), [#150](https://github.com/micahbank2/room-cad-renderer/pull/150)). 3 of 4 phases used `/gsd:quick`; CEIL-02 used full pipeline. **Total wall-clock: ~55 minutes** — fastest milestone in project history. Audit `passed-with-notes` (DEBT-06 cascade observed once during audit re-run; monitor for v1.17). CLAUDE.md Pattern #7 (StrictMode useEffect cleanup) added between Phase 64 and 65, applied 3 times total in this milestone. See [milestones/v1.16-ROADMAP.md](milestones/v1.16-ROADMAP.md).
+
+</details>
+
 ---
 
-## v1.16 Maintenance Pass
+## v1.17 Library + Material Engine (active)
 
-**Goal:** After two big feature milestones back-to-back (v1.14 + v1.15 = 8 phases in 10 days), v1.16 clears accumulated tech debt and parked backlog items before the next big feature push. Mirrors the v1.12 maintenance-pass pattern. Source: [#146](https://github.com/micahbank2/room-cad-renderer/issues/146), [#141](https://github.com/micahbank2/room-cad-renderer/issues/141), [#70](https://github.com/micahbank2/room-cad-renderer/issues/70), [#105](https://github.com/micahbank2/room-cad-renderer/issues/105).
+**Goal:** Jessica picks real materials (marble, fabric, tile, paint, flooring) with real-world metadata (brand, SKU, cost, lead time) and applies them to walls, floors, ceilings, and objects. Her library finally feels organized — Materials, Assemblies, and Products as separate top-level sections. **First milestone since v1.2 to introduce a new core data system.** Source: [#24](https://github.com/micahbank2/room-cad-renderer/issues/24), [#25](https://github.com/micahbank2/room-cad-renderer/issues/25), [#26](https://github.com/micahbank2/room-cad-renderer/issues/26), [#27](https://github.com/micahbank2/room-cad-renderer/issues/27).
 
-**Sequencing rationale:** DEBT-06 first because it unblocks clean v1.16 milestone audits. BUG-04 second because it's a small fix that closes a recurring CI flake. CEIL-02 third — biggest work item, clean reuse of Phase 31 patterns. TILE-02 last — extends Phase 42's data model with the missing UI.
+**Sequencing rationale (locked):** Foundation → Apply → Link → UI Surface. Phase 67 lays the data foundation (no surface-area changes yet). Phase 68 makes materials usable on real surfaces (the moment Jessica can SEE Carrara marble on a wall). Phase 69 unlocks finish-swapping on placed objects (gold faucet → matte black without re-placing). Phase 70 surfaces all of it in a properly organized sidebar. Each phase replaces an existing subsystem — migration work + snapshot version bump expected at every boundary.
 
-**Forward signal:** Clears CI hygiene + completes two long-parked backlog items before v1.17 picks up the next big feature direction (likely Materials overhaul or Jessica-feedback-driven scope, depending on what surfaces).
+**Forward signal:** This is the longest-arc milestone since v1.8. Each phase ships independently — Phase 67 alone has user value (uploaded materials persist in the library, ready for Phase 68's apply flow). Two-tier cross-cutting risk: (a) snapshot version chain must thread cleanly v5 → v6 → v7 → v8 across phases, and (b) existing paint/wallpaper/floor-material systems either alias under Material or migrate fully — research at plan-phase decides per phase.
+
+### Phases
+
+- [ ] **Phase 67: Material Engine Foundation** — Material entity + texture-map upload + IDB persistence, mirroring Phase 32 user-texture pipeline
+- [ ] **Phase 68: Material Application System** — Unified surface-material picker replacing split paint / wallpaper / floor-material flows
+- [ ] **Phase 69: Product–Material Linking** — Finish slot on placed products, swap fabric/finish without re-placing
+- [ ] **Phase 70: Library Rebuild** — Materials / Assemblies / Products top-level toggle with category tabs
 
 ### Phase Details
 
-#### Phase 63: Vitest pollution fix (DEBT-06)
+#### Phase 67: Material Engine Foundation (MAT-ENGINE-01)
 
-**Goal:** Fix the `pickerMyTexturesIntegration.test.tsx` parallel-execution pollution that cascades 281 React errors and inflates the failure count from 4 → 10 in CI/audit reports.
-**Depends on:** None (CI-only)
-**Requirements:** [DEBT-06](https://github.com/micahbank2/room-cad-renderer/issues/146)
+**Goal:** Jessica uploads a Material with texture maps (color / roughness / reflection) plus real-world metadata (brand, SKU, cost, lead time, name, real-world tile size in feet+inches), and that Material persists in the library across reload, dedupes on identical color-map upload, and shows its metadata on hover/inspect.
+**Depends on:** Phase 32 (user-texture IDB pipeline — SHA-256 dedup, 2048px downscale, 25MB cap)
+**Requirements:** [MAT-ENGINE-01](https://github.com/micahbank2/room-cad-renderer/issues/25)
 **Success Criteria** (what must be TRUE):
-  1. `npx vitest run` reports `4 failed / N passed` (only the pre-existing 4 baseline failures); 0 cascade errors
-  2. `npx vitest run tests/pickerMyTexturesIntegration.test.tsx` continues to pass in isolation
-  3. Full-suite report no longer shows phantom failures in unrelated test files
-  4. Audit reports stable across runs (deterministic baseline)
-**Plans:** 0/1 plans complete
-**UI hint:** no
-
-#### Phase 64: Wall-texture flake fix (BUG-04)
-
-**Goal:** Fix the wall-user-texture-first-apply flaky e2e on chromium-dev (`__getWallMeshMapResolved` timeout after 2D→3D→2D→3D toggle).
-**Depends on:** Phase 49 (BUG-02 wall texture pipeline), Phase 63 (clean baseline before validating fix)
-**Requirements:** [BUG-04](https://github.com/micahbank2/room-cad-renderer/issues/141)
-**Success Criteria** (what must be TRUE):
-  1. `npx playwright test e2e/wall-user-texture-first-apply.spec.ts --project=chromium-dev --repeat-each=5` passes 5/5
-  2. Phase 49/50 e2e specs continue to pass
-  3. Root-cause documented in commit / VERIFICATION.md (which of the 3 hypothesized causes was correct)
-**Plans:** 0/1 plans complete
-**UI hint:** no
-
-#### Phase 65: Ceiling resize handles (CEIL-02)
-
-**Goal:** Add edge-handle resize for ceilings. Currently users can only delete + redraw a ceiling. Mirror the Phase 31 product-resize pattern.
-**Depends on:** Phase 31 (size-override resolver pattern), Phase 30 (smart-snap), Phase 42 (Ceiling.scaleFt field), Phase 53 (right-click reset action)
-**Requirements:** [CEIL-02](https://github.com/micahbank2/room-cad-renderer/issues/70)
-**Success Criteria** (what must be TRUE):
-  1. Select a ceiling in 2D → 4 edge handles appear (rectangular ceilings only in v1.16)
-  2. Drag edge → ceiling resizes; PropertiesPanel dimensions update live; 3D ceiling re-extrudes
-  3. Single Ctrl+Z undoes the entire drag
-  4. Phase 30 smart-snap engages (snap to wall edges); Alt disables
-  5. Phase 53 right-click "Reset size" clears overrides
-  6. Snapshot serialization preserves new override fields
-**Plans:** 1/1 plans complete
+  1. User opens the library → clicks "Upload Material" → can drag a JPEG/PNG color map (and optionally roughness/reflection maps) plus type a name, brand, SKU, cost, lead time, and real-world tile size in feet+inches
+  2. After save, the new Material appears in the library and persists across browser reload
+  3. Re-uploading the same color-map file dedupes (no duplicate IDB entry; SHA-256 collision uses the existing texture)
+  4. Hovering or inspecting a Material shows its metadata (brand, SKU, cost, lead time, tile size)
+  5. Materials live in a separate `materialStore` (not in `cadStore`) — no impact on existing snapshot serialization at this phase
+**Plans:** TBD
 **UI hint:** yes
 
-#### Phase 66: Per-surface tile-size UI (TILE-02)
+#### Phase 68: Material Application System (MAT-APPLY-01)
 
-**Goal:** Per-surface tile-size override UI completion. Phase 42 added the data fields (`Wallpaper.scaleFt`, `FloorMaterial.scaleFt`, `Ceiling.scaleFt`); v1.16 finishes the PropertiesPanel UI so end-users can adjust each surface independently.
-**Depends on:** Phase 42 (per-surface scaleFt field), Phase 31 (single-undo drag pattern)
-**Requirements:** [TILE-02](https://github.com/micahbank2/room-cad-renderer/issues/105)
+**Goal:** Jessica selects any wall side, floor, ceiling, or custom-element face and applies a Material from the library through one unified picker, replacing today's split paint / wallpaper / floor-material flows. Existing assignments still render correctly (back-compat or migration — research picks).
+**Depends on:** Phase 67 (Material entity + library), Phase 32 (texture pipeline), Phase 13/17 (legacy wallpaper / floor-material / wall-side surface model), Phase 31 (single-undo apply pattern)
+**Requirements:** [MAT-APPLY-01](https://github.com/micahbank2/room-cad-renderer/issues/27)
 **Success Criteria** (what must be TRUE):
-  1. Select a wall with wallpaper → PropertiesPanel shows tile-size input (slider OR feet+inches — research picks)
-  2. Same for floor surface and ceiling
-  3. Adjust → wallpaper / floor / ceiling repeat updates live in 2D and 3D
-  4. Per-surface override persists in snapshot
-  5. Reset button reverts to catalog default
-  6. No regression on Phase 17 wallpaper / Phase 11 floor / Phase 13 ceiling rendering
-**Plans:** 0/1 plans complete
+  1. Selecting a wall side, floor, ceiling, or custom-element face shows a unified "Material" picker in PropertiesPanel
+  2. Picking a Material from the library renders it correctly in 2D fabric texture-fill AND 3D mesh material (color map + roughness)
+  3. Applying a material is a single undo entry (Ctrl+Z reverts the apply)
+  4. Existing paint colors, wallpaper assignments, and floor-material assignments continue to render correctly after the milestone (either via aliasing or via snapshot migration — research chooses)
+  5. Snapshot serialization preserves `surface.materialId` and round-trips cleanly through save/load
+**Plans:** TBD
 **UI hint:** yes
 
+#### Phase 69: Product–Material Linking (MAT-LINK-01)
+
+**Goal:** Jessica swaps the finish material on a placed product (couch fabric, faucet finish, cabinet color) without re-placing or re-uploading the object. Products carry an optional finish slot referencing a Material from the library.
+**Depends on:** Phase 67 (Material entity), Phase 68 (Material picker UI), Phase 31 (placement-instance state per D-02), Phase 56/58 (GLTF PBR material slot handling)
+**Requirements:** [MAT-LINK-01](https://github.com/micahbank2/room-cad-renderer/issues/26)
+**Success Criteria** (what must be TRUE):
+  1. User selects a placed product → PropertiesPanel shows a "Finish" picker → picks a Material from the library
+  2. Product's 3D rendering updates to use that Material's color + roughness; placement, position, scale, and rotation are preserved
+  3. Single Ctrl+Z reverts the finish change
+  4. Finish persists across save/load (`PlacedProduct.finishMaterialId` round-trips through the snapshot)
+  5. Products placed without an explicit finish continue to render with the catalog default (today's behavior unchanged)
+**Plans:** TBD
+**UI hint:** yes
+
+#### Phase 70: Library Rebuild (LIB-REBUILD-01)
+
+**Goal:** Sidebar library reorganizes around a top-level Materials / Assemblies / Products toggle. Each tab has its own category sub-tabs (Materials: Flooring, Wall coverings, Countertops, Paint; Products: Furniture, Plumbing fixtures, Appliances, Lighting, Curtains & blinds, Decor; Assemblies: empty placeholder).
+**Depends on:** Phase 67 (Materials live in their own store), Phase 33 (CategoryTabs primitive), Phase 14 (custom-element library precedent)
+**Requirements:** [LIB-REBUILD-01](https://github.com/micahbank2/room-cad-renderer/issues/24)
+**Success Criteria** (what must be TRUE):
+  1. Sidebar library shows a 3-way Materials / Assemblies / Products toggle at the top; switching tabs swaps the visible content cleanly
+  2. Materials tab shows category sub-tabs (Flooring / Wall coverings / Countertops / Paint) and the Phase 67 materials filtered by category
+  3. Products tab shows category sub-tabs (Furniture / Plumbing fixtures / Appliances / Lighting / Curtains & blinds / Decor); existing products migrate to the right category (or "Uncategorized" if metadata is missing)
+  4. Assemblies tab shows a clear empty-state placeholder ("Coming soon — pre-built combos like kitchen cabinetry"), not broken UI
+  5. Upload buttons are context-aware: in Materials tab → "Upload Material"; in Products tab → "Add Product"; existing upload + place flows continue to work end-to-end
+**Plans:** TBD
+**UI hint:** yes
 
 ## Progress
 
@@ -212,8 +232,8 @@
 | 37. Tech-Debt Sweep | 1/1 | Complete   | 2026-04-25 |
 | 38. VERIFICATION.md Backfill | 1/1 | Complete   | 2026-04-25 |
 | 39. Real-Use Feedback Session | 2/2 | Complete   | 2026-04-25 |
-| ~~40. Ceiling Resize Handles~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.1) |
-| ~~41. Per-Surface Tile-Size Override~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.3) |
+| ~~40. Ceiling Resize Handles~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.1; later cleared by Phase 65) |
+| ~~41. Per-Surface Tile-Size Override~~ | n/a | CANCELLED   | 2026-04-25 (deferred to Phase 999.3; later cleared by Phase 66) |
 | 42. Per-Surface tileSizeFt Bug Fix | 1/1 | Complete   | 2026-04-25 |
 | 43. UI Polish Bundle | 1/1 | Complete   | 2026-04-25 |
 | 44. Reduced-Motion Sweep | 1/1 | Complete   | 2026-04-25 |
@@ -224,7 +244,7 @@
 | 49. Wall Texture First-Apply Fix | 1/1 | Complete    | 2026-04-27 |
 | 50. Wallpaper/WallArt View-Toggle Persistence | 1/1 | Complete    | 2026-04-27 |
 | 51. Legacy FloorMaterial Snapshot Migration | 1/1 | Complete    | 2026-04-28 |
-| 52. Keyboard Shortcuts Overlay | 0/1 | Complete    | 2026-04-28 |
+| 52. Keyboard Shortcuts Overlay | 1/1 | Complete    | 2026-04-28 |
 | 53. Canvas Context Menus | 1/1 | Complete    | 2026-04-28 |
 | 54. PropertiesPanel in 3D & Split View | 1/1 | Complete    | 2026-04-29 |
 | 55. GLTF Upload & Storage | 1/1 | Complete    | 2026-04-29 |
@@ -235,45 +255,28 @@
 | 60. Stairs | 1/1 | Complete    | 2026-05-06 |
 | 61. Openings — Archway/Passthrough/Niche | 1/1 | Complete    | 2026-05-06 |
 | 62. Measurement + Annotation Tools | 1/1 | Complete    | 2026-05-06 |
-| 63. Vitest Pollution Fix | 1/1 | Complete    | 2026-05-04 |
-| 64. Wall-Texture Flake Fix | 1/1 | Complete    | 2026-05-04 |
+| 63. Vitest Pollution Fix | 1/1 | Complete    | 2026-05-06 |
+| 64. Wall-Texture Flake Fix | 1/1 | Complete    | 2026-05-06 |
 | 65. Ceiling Resize Handles | 1/1 | Complete    | 2026-05-06 |
-| 66. Per-Surface Tile-Size UI | 0/1 | Pending    |   |
+| 66. Per-Surface Tile-Size UI | 1/1 | Complete    | 2026-05-06 |
+| 67. Material Engine Foundation | 0/0 | Not started   | — |
+| 68. Material Application System | 0/0 | Not started   | — |
+| 69. Product–Material Linking | 0/0 | Not started   | — |
+| 70. Library Rebuild | 0/0 | Not started   | — |
 
 ## Backlog
 
-### Phase 999.1: Ceiling resize handles (BACKLOG — re-deferred from v1.9)
+### Phase 999.1: Ceiling resize handles — CLEARED by Phase 65 (v1.16)
 
-**Goal:** Extend drag-to-resize handles from Phase 31 (products + custom-elements) to cover ceilings. Ceilings (customElements with `kind: "ceiling"`) currently have no resize handles — users can only move or delete and redraw. Mirror Phase 31's width/depth override pattern (`widthFtOverride` / `depthFtOverride`, single-undo drag transaction, Alt disables smart-snap).
-
-**Requirements:** CEIL-01 (re-parked here from v1.9 Phase 40 cancellation 2026-04-25)
-**Plans:** 0 plans
-
-Plans:
-- [ ] TBD (promote with /gsd:review-backlog or v2.0 milestone scoping)
-
-**Discovered:** 2026-04-21 during Phase 32 T4 human UAT (Jessica) — pre-existing.
-**Promoted to v1.9 as Phase 40 (CEIL-01)** during 2026-04-25 v1.9 scoping.
-**Re-deferred 2026-04-25** after Phase 39 feedback signal showed Jessica reported zero pain on ceilings ("went fine"). Building drag-resize on hypothesis-only would be guessing; revisit when a future feedback session surfaces actual ceiling-resize friction.
+Originally captured 2026-04-21 Phase 32 T4 human UAT; re-deferred from cancelled v1.9 Phase 40. Promoted to v1.16 Phase 65 (CEIL-02), shipped 2026-05-06 via PR [#149](https://github.com/micahbank2/room-cad-renderer/pull/149) with the override-anchor model (4 new optional fields on `Ceiling`). Issue [#70](https://github.com/micahbank2/room-cad-renderer/issues/70) auto-closed.
 
 ### Phase 999.2: Wallpaper + wallArt view-toggle regression — PROMOTED to Phase 36 under v1.8
 
-Originally captured 2026-04-21 Phase 32 T4 human UAT. Promoted into v1.8 as Phase 36 (VIZ-10). See Phase 36 Details above.
+Originally captured 2026-04-21 Phase 32 T4 human UAT. Promoted into v1.8 as Phase 36 (VIZ-10). Shipped.
 
-### Phase 999.3: Per-surface texture tile-size override — design-effect (BACKLOG — re-deferred from v1.9)
+### Phase 999.3: Per-surface texture tile-size override — CLEARED by Phase 66 (v1.16)
 
-**Goal:** Let users scale a texture for design effect on a single surface without re-uploading. e.g., preview the same wood floor at 6"/12"/18" plank widths in the same room. Default behavior (real-world tiling via `RepeatWrapping`) stays correct; override is optional per surface.
-
-**Requirements:** TILE-01 (re-parked here from v1.9 Phase 41 cancellation 2026-04-25). Distinct from BUG-01 (#96 fix in v1.9 Phase 42) which only handles per-surface `tileSizeFt` isolation, not the full design-effect override UI.
-**GH Issue:** [#105](https://github.com/micahbank2/room-cad-renderer/issues/105)
-**Plans:** 0 plans
-
-Plans:
-- [ ] TBD (promote with /gsd:review-backlog or v2.0 milestone scoping)
-
-**Discovered:** 2026-04-25 during Phase 35 HUMAN-UAT — user asked why wood oak doesn't grow with the floor. Confirmed by-design behavior; captured as a natural follow-up enhancement.
-**Promoted to v1.9 as Phase 41 (TILE-01)** during 2026-04-25 v1.9 scoping.
-**Re-deferred 2026-04-25** after Phase 39 feedback signal showed Jessica reported zero pain on texture sizing ("feels right"). Full design-effect override is hypothesis-only; the narrower BUG-01 fix (Phase 42) handles the per-surface isolation that's needed regardless. Revisit design-effect scaling when a future feedback session surfaces demand.
+Originally captured 2026-04-25 during Phase 35 HUMAN-UAT; re-deferred from cancelled v1.9 Phase 41. Promoted to v1.16 Phase 66 (TILE-02), shipped 2026-05-06 via PR [#150](https://github.com/micahbank2/room-cad-renderer/pull/150). Investigation revealed Phase 42 had already shipped the data fields + actions + renderers; Phase 66 was just the missing UI tier (two `<input>` fields). Issue [#105](https://github.com/micahbank2/room-cad-renderer/issues/105) auto-closed.
 
 ### Phase 999.4: Saved camera EXPLODE-mode offset correction (BACKLOG — v1.11 carry-over)
 
@@ -292,6 +295,14 @@ Plans:
 - Apply `roomOffsets[roomId]` from `computeRoomOffsets()` to savedCameraPos/Target inside `focusOnSavedCamera` before dispatching to `requestCameraTarget`
 - Or: store saved cameras in room-relative coordinates and add the offset at focus-dispatch time
 
-**Why deferred:** Narrow trigger (cross-mode use of saved camera). Most users save + use bookmarks within a single display mode. EXPLODE is an inspection mode, not a navigation mode. Revisit if real-use feedback surfaces the bug.
+**Why deferred:** Narrow trigger (cross-mode use of saved camera). Most users save + use bookmarks within a single display mode. EXPLODE is an inspection mode, not a navigation mode. Re-deferred again at v1.16 scoping (2026-05-06). Revisit if real-use feedback surfaces the bug.
 
 **Discovered:** 2026-04-26 during v1.11 milestone audit (gsd-integration-checker).
+
+### Phase 999.5: DEBT-07 vitest cascade observability (POTENTIAL — v1.16 carry-over)
+
+**Goal:** If the 10-failure transient observed once during the v1.16 audit re-run (DEBT-06 cascade pattern) reappears consistently in v1.17 PR audits, file as a new requirement and surface the underlying flake.
+
+**Status:** Not yet a confirmed bug — observed once, did not reproduce in three deterministic local runs. Monitor in v1.17 PR audits.
+
+**Discovered:** 2026-05-06 during v1.16 milestone audit. Captured in v1.16-REQUIREMENTS.md "Out of Scope" section.

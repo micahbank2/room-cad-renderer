@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.17
 milestone_name: Library + Material Engine
-status: "Defining requirements"
-last_updated: "2026-05-06T22:15:00.000Z"
+status: "Ready for `/gsd:discuss-phase 67`"
+last_updated: "2026-05-06T22:30:00.000Z"
 progress:
   total_phases: 4
   completed_phases: 0
@@ -15,21 +15,21 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-06 — v1.16 archived; v1.17 Library + Material Engine queued next)
+See: .planning/PROJECT.md (updated 2026-05-06 — v1.16 archived; v1.17 Library + Material Engine roadmap finalized)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
 **Current focus:** v1.17 Library + Material Engine — first new core data system since v1.2; materials become first-class with metadata + unified surface application
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Not started (roadmap created)
 Milestone: v1.17 Library + Material Engine
 Phases: 4 (67, 68, 69, 70) — 0 complete
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-06 — Milestone v1.17 started
+Status: Ready for `/gsd:discuss-phase 67`
+Last activity: 2026-05-06 — v1.17 roadmap created (4 phases, 4/4 requirements mapped, 100% coverage)
 
-## v1.17 Roadmap (provisional — finalized after roadmapper)
+## v1.17 Roadmap
 
 | Phase | Requirement | Goal | Status |
 |-------|-------------|------|--------|
@@ -47,11 +47,14 @@ Last activity: 2026-05-06 — Milestone v1.17 started
 
 ## Accumulated Context
 
-- v1.16 carry-over notes: monitor DEBT-06 vitest cascade pattern; observed once during audit re-run, not blocking.
+- v1.16 carry-over notes: monitor DEBT-06 vitest cascade pattern; observed once during audit re-run, not blocking. Captured as potential Phase 999.5 (DEBT-07) if it reappears in v1.17 PR audits.
 - StrictMode useEffect cleanup pattern (CLAUDE.md #7) applies to any new module-level registry writes — relevant if Phase 67/68 introduces material-registry bridges.
-- Phase 32 user-texture pipeline is the architectural template for Phase 67 (SHA-256 dedup, IDB store, real-world tile size convention).
-- Snapshot version chain: currently v5 (Phase 62 MEASURE-01). Each v1.17 phase that touches stored CAD state likely needs a version bump + migration.
+- Phase 32 user-texture pipeline is the architectural template for Phase 67 (SHA-256 dedup, IDB store, real-world tile size convention, 25MB cap, 2048px longest-edge downscale).
+- Snapshot version chain: currently v5 (Phase 62 MEASURE-01). Phases 68 + 69 likely each need a version bump + migration; Phase 67 isolates new entity to its own store and skips snapshot impact.
+- Phase 31 D-02 placement-instance separation pattern (override fields on PlacedProduct, not Product) is the template for Phase 69's `finishMaterialId` slot.
+- Phase 33 CategoryTabs primitive is reused by Phase 70 library tabs.
+- v1.17 sequencing locked: Foundation (67) → Apply (68) → Link (69) → UI Surface (70). Each phase ships independently; Phase 67 alone has user value (uploaded materials persist, ready for Phase 68 apply).
 
 ## Next Step
 
-Run requirements gathering and roadmap creation, then `/gsd:discuss-phase 67` to scope Phase 67 (MAT-ENGINE-01).
+Run `/gsd:discuss-phase 67` to scope Phase 67 (MAT-ENGINE-01 — Material engine foundation).

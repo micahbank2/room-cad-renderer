@@ -71,4 +71,4 @@ See `.planning/milestones/v1.0-REQUIREMENTS.md` through `.planning/milestones/v1
 
 ---
 
-*Last updated: 2026-05-06 — v1.17 milestone start*
+*Last updated: 2026-05-06 — v1.17 roadmap created (4 phases, 4/4 requirements mapped)*
