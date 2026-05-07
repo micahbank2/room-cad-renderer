@@ -2,18 +2,16 @@
  * Phase 72 Plan 03 — PanelSection unit tests
  * TDD RED phase: tests written before implementation.
  */
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, beforeEach } from "vitest";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { PanelSection } from "@/components/ui/PanelSection";
 
 const STORAGE_KEY = "ui:propertiesPanel:sections";
 
-// Reset localStorage before each test
+// Reset localStorage before each test (do NOT clear __drivePanelSection — it's registered once at module load)
 beforeEach(() => {
   localStorage.clear();
-  // Clean up window driver between tests
-  (window as Record<string, unknown>).__drivePanelSection = undefined;
 });
 
 describe("PanelSection", () => {
@@ -112,7 +110,7 @@ describe("PanelSection", () => {
       getPersisted: () => Record<string, boolean>;
     };
     expect(driver).toBeDefined();
-    driver.toggle("test-8");
+    act(() => { driver.toggle("test-8"); });
     const btn = screen.getByRole("button", { name: /Section 8/i });
     expect(btn).toHaveAttribute("aria-expanded", "true");
   });
