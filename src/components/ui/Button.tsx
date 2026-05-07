@@ -64,7 +64,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         data-active={active || undefined}
         className={cn(
           buttonVariants({ variant, size }),
-          active && "bg-accent/20 ring-1 ring-ring",
+          active && "bg-accent/10 text-foreground border-ring",
           className
         )}
         {...props}

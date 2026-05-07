@@ -73,8 +73,8 @@ describe("Button primitive", () => {
     render(<Button active>Active button</Button>);
     const btn = screen.getByRole("button");
     expect(btn).toHaveAttribute("data-active");
-    expect(btn.className).toContain("bg-accent/20");
-    expect(btn.className).toContain("ring-1");
+    expect(btn.className).toContain("bg-accent/10");
+    expect(btn.className).toContain("text-foreground");
   });
 
   it("Test 6: asChild renders child element instead of button", () => {
