@@ -192,7 +192,7 @@
   3. Click a Tab → muted-background pill active state (no neon glow, no hard accent ring)
   4. Expand any panel section → spring-animated height transition with chevron rotation; collapsed/expanded state persists per section
   5. ~30 existing button sites + ~5 tab sites + ~5 panel sites migrated to the new primitives in this phase; remaining sites continue to work with their inline styles until touched in Phases 73-76
-**Plans:** 7 plans
+**Plans:** 0/7 plans executed
 - [ ] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
 - [ ] 72-02-PLAN.md — Button primitive + tests
 - [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
@@ -417,7 +417,7 @@
 | 69. Product–Material Linking | 0/0 | Deferred to v1.19   | — |
 | 70. Library Rebuild | 0/0 | Deferred to v1.19   | — |
 | 71. Token Foundation | 7/7 | Complete   | 2026-05-07 |
-| 72. Primitives Shelf | 0/0 | Not started   | — |
+| 72. Primitives Shelf | 0/7 | Planned    |  |
 | 73. Sidebar Restyle | 0/0 | Not started   | — |
 | 74. Toolbar Rework | 0/0 | Not started   | — |
 | 75. Properties + Library Restyle | 0/0 | Not started   | — |
