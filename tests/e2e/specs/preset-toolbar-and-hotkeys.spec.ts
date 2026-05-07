@@ -2,7 +2,7 @@
  * Phase 35 CAM-01 — toolbar + hotkeys round-trip.
  *
  * Asserts all 4 preset buttons apply via (a) click and (b) bare-key hotkeys,
- * and that the active button gets the `bg-accent/20` class (D-02 indicator).
+ * and that the active button gets the `bg-accent/10` class (D-02 indicator; Phase 72 aligned to bg-accent/10).
  */
 import { test, expect } from "@playwright/test";
 import { getActivePreset } from "../playwright-helpers/applyCameraPreset";
@@ -30,7 +30,7 @@ test.describe("CAM-01 preset toolbar + hotkeys", () => {
       await settle(page);
       expect(await getActivePreset(page)).toBe(id);
       const btn = page.locator(`[data-testid="preset-${id}"]`);
-      await expect(btn).toHaveClass(/bg-accent\/20/);
+      await expect(btn).toHaveClass(/bg-accent\/10/);
     }
   });
 
