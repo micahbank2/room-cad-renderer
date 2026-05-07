@@ -66,7 +66,7 @@ export function WainscotPopover({ wallId, side, style, onClose }: Props) {
           onClose();
         }
       }}
-      className="bg-card border border-border rounded-sm p-2 w-[180px] outline-none"
+      className="bg-card border border-border rounded-smooth-md p-2 w-[180px] outline-none"
     >
       <div className="font-sans text-[10px] text-muted-foreground/60 tracking-widest uppercase mb-2">
         WAINSCOT EDIT
@@ -91,7 +91,7 @@ export function WainscotPopover({ wallId, side, style, onClose }: Props) {
               id
             );
           }}
-          className="w-full font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-sm"
+          className="w-full font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-smooth-md"
         >
           <option value="">(LEGACY DEFAULT)</option>
           {wainscotStyles.map((it) => (
@@ -125,7 +125,7 @@ export function WainscotPopover({ wallId, side, style, onClose }: Props) {
               config.styleItemId
             );
           }}
-          className="w-full font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-sm"
+          className="w-full font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-smooth-md"
         />
       </div>
     </div>

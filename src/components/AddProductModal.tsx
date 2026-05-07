@@ -81,7 +81,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
       />
 
       {/* Modal */}
-      <div className="relative w-[600px] bg-popover/90 backdrop-blur-xl border border-border/50 rounded-sm shadow-2xl">
+      <div className="relative w-[600px] bg-popover/90 backdrop-blur-xl border border-border/50 rounded-smooth-md shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between p-5 pb-4">
           <h2 className="font-sans text-sm text-foreground tracking-widest">
@@ -104,7 +104,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                 onDrop={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
                 onClick={() => fileRef.current?.click()}
-                className={`aspect-square rounded-sm border border-dashed cursor-pointer flex flex-col items-center justify-center transition-colors ${
+                className={`aspect-square rounded-smooth-md border border-dashed cursor-pointer flex flex-col items-center justify-center transition-colors ${
                   imageUrl
                     ? "border-ring bg-background"
                     : "border-border/60 bg-background hover:border-accent/40"
@@ -262,7 +262,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                   <button
                     type="button"
                     onClick={() => gltfRef.current?.click()}
-                    className="font-sans text-[9px] px-3 py-1.5 border border-border/60 rounded-sm text-muted-foreground/80 hover:text-foreground hover:border-accent/40 transition-colors"
+                    className="font-sans text-[9px] px-3 py-1.5 border border-border/60 rounded-smooth-md text-muted-foreground/80 hover:text-foreground hover:border-accent/40 transition-colors"
                   >
                     {gltfFile ? gltfFile.name.toUpperCase() : "CHOOSE .GLTF / .GLB"}
                   </button>
@@ -310,7 +310,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
             <button
               type="submit"
               disabled={!name}
-              className="font-sans text-[10px] tracking-widest px-5 py-2 bg-accent text-white rounded-sm hover:opacity-90 active:scale-95 disabled:opacity-30 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
+              className="font-sans text-[10px] tracking-widest px-5 py-2 bg-accent text-white rounded-smooth-md hover:opacity-90 active:scale-95 disabled:opacity-30 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
             >
               ADD TO REGISTRY
             </button>

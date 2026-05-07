@@ -26,7 +26,7 @@ export interface LibraryCardProps {
  * Shared library card primitive (Phase 33 GH #89).
  *
  * Root element includes `data-testid="library-card"` for count-regression tests.
- * Styling uses canonical Plan 01/03 tokens (rounded-md, rounded-sm, p-2, gap-4).
+ * Styling uses canonical Plan 01/03 tokens (rounded-md, rounded-smooth-md, p-2, gap-4).
  *
  * Phase 58: optional top-LEFT badge slot for capability indicators (e.g. lucide
  * Box icon for products with a real GLTF model). The slot is always-visible and
@@ -59,7 +59,7 @@ export function LibraryCard({
         className={`${baseClasses} ${stateClasses} flex items-center gap-2 p-2`}
         onClick={onClick}
       >
-        <div className="w-8 h-8 rounded-sm bg-accent overflow-hidden shrink-0 relative">
+        <div className="w-8 h-8 rounded-smooth-md bg-accent overflow-hidden shrink-0 relative">
           {thumbnail ? (
             <img
               src={thumbnail}
@@ -118,7 +118,7 @@ export function LibraryCard({
           {badge}
         </div>
       ) : null}
-      <div className="aspect-square rounded-sm bg-accent overflow-hidden">
+      <div className="aspect-square rounded-smooth-md bg-accent overflow-hidden">
         {thumbnail ? (
           <img
             src={thumbnail}

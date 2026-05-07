@@ -75,7 +75,7 @@ export default function WelcomeScreen({ onStart }: Props) {
             {/* Create floor plan */}
             <button
               onClick={() => setShowTemplates(true)}
-              className="w-72 bg-card border border-border/10 hover:border-accent/40 rounded-sm p-6 text-left transition-all group"
+              className="w-72 bg-card border border-border/10 hover:border-accent/40 rounded-smooth-md p-6 text-left transition-all group"
             >
               <span className="material-symbols-outlined text-[28px] text-foreground mb-3 block">
                 add_box
@@ -91,7 +91,7 @@ export default function WelcomeScreen({ onStart }: Props) {
             {/* Upload floor plan */}
             <button
               onClick={handleUploadClick}
-              className="w-72 bg-card border border-border/10 hover:border-accent/40 rounded-sm p-6 text-left transition-all group"
+              className="w-72 bg-card border border-border/10 hover:border-accent/40 rounded-smooth-md p-6 text-left transition-all group"
             >
               <span className="material-symbols-outlined text-[28px] text-foreground mb-3 block">
                 upload_file
@@ -108,7 +108,7 @@ export default function WelcomeScreen({ onStart }: Props) {
             {projects.length > 0 && (
               <button
                 onClick={() => setShowProjects((v) => !v)}
-                className="w-72 bg-card border border-border/10 hover:border-accent/40 rounded-sm p-6 text-left transition-all group"
+                className="w-72 bg-card border border-border/10 hover:border-accent/40 rounded-smooth-md p-6 text-left transition-all group"
               >
                 <span className="material-symbols-outlined text-[28px] text-foreground mb-3 block">
                   folder_open
@@ -126,7 +126,7 @@ export default function WelcomeScreen({ onStart }: Props) {
           {/* Saved project list */}
           {showProjects && projects.length > 0 && (
             <div className="mt-6 w-full max-w-2xl">
-              <div className="bg-card border border-border/10 rounded-sm p-4 space-y-2">
+              <div className="bg-card border border-border/10 rounded-smooth-md p-4 space-y-2">
                 <h4 className="font-sans text-[9px] text-muted-foreground/60 tracking-widest mb-3">
                   SAVED PROJECTS
                 </h4>
@@ -134,7 +134,7 @@ export default function WelcomeScreen({ onStart }: Props) {
                   <button
                     key={p.id}
                     onClick={() => handleOpenProject(p)}
-                    className="w-full flex items-center justify-between p-3 rounded-sm border border-border/10 hover:border-accent/40 bg-background transition-all group text-left"
+                    className="w-full flex items-center justify-between p-3 rounded-smooth-md border border-border/10 hover:border-accent/40 bg-background transition-all group text-left"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="font-sans text-xs text-foreground tracking-wide group-hover:text-foreground transition-colors truncate">

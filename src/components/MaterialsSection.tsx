@@ -65,7 +65,7 @@ export function MaterialsSection(): JSX.Element {
         <button
           type="button"
           onClick={() => setUploadOpen(true)}
-          className="font-sans text-sm tracking-widest px-2 py-1 text-foreground border border-ring rounded-sm hover:bg-accent/10 transition-colors"
+          className="font-sans text-sm tracking-widest px-2 py-1 text-foreground border border-ring rounded-smooth-md hover:bg-accent/10 transition-colors"
         >
           + UPLOAD_MATERIAL
         </button>

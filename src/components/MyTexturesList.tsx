@@ -241,7 +241,7 @@ function TextureCard({
           <MoreHorizontal className="size-4" />
         </button>
         {menuOpen && (
-          <div className="absolute right-0 top-6 z-10 bg-secondary border border-border/50 rounded-sm shadow-lg">
+          <div className="absolute right-0 top-6 z-10 bg-secondary border border-border/50 rounded-smooth-md shadow-lg">
             <button
               type="button"
               onClick={(e) => {
@@ -263,7 +263,7 @@ function TextureCard({
       </div>
 
       {/* Thumbnail */}
-      <div className="aspect-square rounded-sm bg-accent overflow-hidden">
+      <div className="aspect-square rounded-smooth-md bg-accent overflow-hidden">
         {thumbnailUrl ? (
           <img src={thumbnailUrl} alt={texture.name} className="w-full h-full object-cover" />
         ) : null}

@@ -279,7 +279,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
 
       {/* Surface */}
       <div
-        className={`relative w-[520px] bg-popover/90 backdrop-blur-xl border border-border/50 rounded-sm shadow-2xl${surfaceTransition}`}
+        className={`relative w-[520px] bg-popover/90 backdrop-blur-xl border border-border/50 rounded-smooth-md shadow-2xl${surfaceTransition}`}
         role="dialog"
         aria-modal="true"
       >
@@ -307,7 +307,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
                   <img
                     src={previewUrl}
                     alt="Texture preview"
-                    className="w-40 h-30 rounded-sm border border-border/50 object-cover"
+                    className="w-40 h-30 rounded-smooth-md border border-border/50 object-cover"
                     style={{ width: 160, height: 120 }}
                   />
                   <button
@@ -375,7 +375,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
               placeholder="e.g. Oak Floor"
               maxLength={40}
               autoFocus={mode === "edit"}
-              className="bg-card border border-border/50 rounded-sm px-2 py-1 text-sm font-sans text-foreground w-full placeholder:text-muted-foreground/60"
+              className="bg-card border border-border/50 rounded-smooth-md px-2 py-1 text-sm font-sans text-foreground w-full placeholder:text-muted-foreground/60"
             />
           </div>
 
@@ -400,7 +400,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
               }}
               onBlur={handleTileSizeBlur}
               placeholder="2'"
-              className={`bg-card border rounded-sm px-2 py-1 text-sm font-sans text-foreground w-full placeholder:text-muted-foreground/60 ${
+              className={`bg-card border rounded-smooth-md px-2 py-1 text-sm font-sans text-foreground w-full placeholder:text-muted-foreground/60 ${
                 tileSizeError ? "border-error" : "border-border/50"
               }`}
             />
@@ -416,7 +416,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
             type="button"
             onClick={onClose}
             disabled={saving}
-            className="rounded-sm px-4 py-1 font-sans text-sm text-muted-foreground hover:text-foreground bg-accent hover:bg-secondary border border-border/50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-smooth-md px-4 py-1 font-sans text-sm text-muted-foreground hover:text-foreground bg-accent hover:bg-secondary border border-border/50 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ minHeight: 44 }}
           >
             <span>Discard</span>
@@ -425,7 +425,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
             type="button"
             onClick={submit}
             disabled={primaryDisabled}
-            className="rounded-sm px-4 py-1 font-sans text-sm text-foreground bg-accent hover:bg-accent/90 border-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="rounded-smooth-md px-4 py-1 font-sans text-sm text-foreground bg-accent hover:bg-accent/90 border-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             style={{ minHeight: 44 }}
           >
             {saving || processing ? (

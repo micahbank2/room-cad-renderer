@@ -70,19 +70,19 @@ export default function WainscotLibrary() {
       </div>
 
       {creating && (
-        <div className="space-y-1.5 bg-accent rounded-sm p-2 mb-2">
+        <div className="space-y-1.5 bg-accent rounded-smooth-md p-2 mb-2">
           <input
             type="text"
             placeholder="NAME..."
             value={draft.name}
             onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-sm placeholder:text-muted-foreground/60"
+            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-smooth-md placeholder:text-muted-foreground/60"
           />
 
           <select
             value={draft.style}
             onChange={(e) => selectStyle(e.target.value as WainscotStyle)}
-            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-sm"
+            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-smooth-md"
           >
             {ALL_STYLES.map((s) => (
               <option key={s} value={s}>
@@ -105,7 +105,7 @@ export default function WainscotLibrary() {
               type="color"
               value={draft.color}
               onChange={(e) => setDraft({ ...draft, color: e.target.value })}
-              className="w-7 h-6 bg-transparent border border-border/60 rounded-sm cursor-pointer"
+              className="w-7 h-6 bg-transparent border border-border/60 rounded-smooth-md cursor-pointer"
             />
           </div>
 
@@ -146,7 +146,7 @@ export default function WainscotLibrary() {
           {/* Live 3D preview (lazy-loaded) */}
           <Suspense
             fallback={
-              <div className="w-full aspect-video bg-background rounded-sm border border-border/60 grid place-items-center">
+              <div className="w-full aspect-video bg-background rounded-smooth-md border border-border/60 grid place-items-center">
                 <span className="font-sans text-[11px] text-muted-foreground/60">LOADING PREVIEW...</span>
               </div>
             }
@@ -157,7 +157,7 @@ export default function WainscotLibrary() {
           <button
             onClick={handleCreate}
             disabled={!draft.name.trim()}
-            className="w-full font-sans text-[10px] tracking-widest py-1 bg-primary text-primary-foreground rounded-sm hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-full font-sans text-[10px] tracking-widest py-1 bg-primary text-primary-foreground rounded-smooth-md hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             SAVE TO LIBRARY
           </button>
@@ -173,7 +173,7 @@ export default function WainscotLibrary() {
           {items.map((it) => (
             <li
               key={it.id}
-              className="bg-accent rounded-sm px-2 py-1.5"
+              className="bg-accent rounded-smooth-md px-2 py-1.5"
               onDoubleClick={() => setEditingId(it.id)}
               title="DOUBLE CLICK TO EDIT"
             >
@@ -187,7 +187,7 @@ export default function WainscotLibrary() {
                       if (e.key === "Enter" || e.key === "Escape") setEditingId(null);
                     }}
                     autoFocus
-                    className="w-full font-sans text-[10px] bg-background text-foreground border border-accent/50 px-1 py-0.5 rounded-sm"
+                    className="w-full font-sans text-[10px] bg-background text-foreground border border-accent/50 px-1 py-0.5 rounded-smooth-md"
                   />
                   <div className="flex items-center gap-1">
                     <NumberKnob
@@ -202,7 +202,7 @@ export default function WainscotLibrary() {
                       type="color"
                       value={it.color}
                       onChange={(e) => updateItem(it.id, { color: e.target.value })}
-                      className="w-7 h-6 bg-transparent border border-border/60 rounded-sm cursor-pointer"
+                      className="w-7 h-6 bg-transparent border border-border/60 rounded-smooth-md cursor-pointer"
                     />
                     <button
                       onClick={() => setEditingId(null)}
@@ -216,7 +216,7 @@ export default function WainscotLibrary() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <div
-                      className="w-3 h-3 rounded-sm border border-border/60 shrink-0"
+                      className="w-3 h-3 rounded-smooth-md border border-border/60 shrink-0"
                       style={{ backgroundColor: it.color }}
                     />
                     <div className="min-w-0 flex-1">
@@ -270,7 +270,7 @@ function NumberKnob({
         max={max}
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
-        className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-1 py-0.5 rounded-sm"
+        className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-1 py-0.5 rounded-smooth-md"
       />
     </label>
   );

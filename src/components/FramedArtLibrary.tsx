@@ -42,13 +42,13 @@ export default function FramedArtLibrary() {
       </div>
 
       {creating && (
-        <div className="space-y-1.5 bg-accent rounded-sm p-2 mb-2">
+        <div className="space-y-1.5 bg-accent rounded-smooth-md p-2 mb-2">
           <input
             type="text"
             placeholder="NAME..."
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-sm placeholder:text-muted-foreground/60"
+            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-smooth-md placeholder:text-muted-foreground/60"
           />
           <input
             ref={fileInputRef}
@@ -62,19 +62,19 @@ export default function FramedArtLibrary() {
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full font-sans text-[9px] tracking-widest py-1 bg-background text-muted-foreground/80 border border-border/60 rounded-sm hover:text-foreground"
+            className="w-full font-sans text-[9px] tracking-widest py-1 bg-background text-muted-foreground/80 border border-border/60 rounded-smooth-md hover:text-foreground"
           >
             {imageUrl ? "CHANGE IMAGE" : "+ UPLOAD IMAGE"}
           </button>
           {imageUrl && (
-            <div className="w-full aspect-video bg-background rounded-sm border border-border/60 overflow-hidden">
+            <div className="w-full aspect-video bg-background rounded-smooth-md border border-border/60 overflow-hidden">
               <img src={imageUrl} alt="preview" className="w-full h-full object-contain" />
             </div>
           )}
           <select
             value={frameStyle}
             onChange={(e) => setFrameStyle(e.target.value as FrameStyle)}
-            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-sm"
+            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-smooth-md"
           >
             {FRAME_STYLES.map((s) => (
               <option key={s} value={s}>
@@ -85,7 +85,7 @@ export default function FramedArtLibrary() {
           <button
             onClick={handleCreate}
             disabled={!name.trim() || !imageUrl}
-            className="w-full font-sans text-[10px] tracking-widest py-1 bg-primary text-primary-foreground rounded-sm hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-full font-sans text-[10px] tracking-widest py-1 bg-primary text-primary-foreground rounded-smooth-md hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             SAVE TO LIBRARY
           </button>
@@ -103,11 +103,11 @@ export default function FramedArtLibrary() {
             return (
               <li
                 key={it.id}
-                className="flex items-center justify-between bg-accent rounded-sm px-2 py-1.5"
+                className="flex items-center justify-between bg-accent rounded-smooth-md px-2 py-1.5"
               >
                 <div className="flex items-center gap-2 min-w-0 flex-1">
                   <div
-                    className="w-6 h-6 rounded-sm overflow-hidden shrink-0 border"
+                    className="w-6 h-6 rounded-smooth-md overflow-hidden shrink-0 border"
                     style={{ borderColor: preset.color, borderWidth: Math.max(1, preset.width * 8) }}
                   >
                     <img src={it.imageUrl} alt={it.name} className="w-full h-full object-cover" />

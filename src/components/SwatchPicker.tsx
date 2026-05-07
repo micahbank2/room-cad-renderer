@@ -101,7 +101,7 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
                   key={id}
                   title={id}
                   onClick={() => onSelectPaint(id)}
-                  className={`w-[18px] h-[18px] rounded-sm border ${
+                  className={`w-[18px] h-[18px] rounded-smooth-md border ${
                     activePaintId === id
                       ? "ring-2 ring-accent ring-offset-1 ring-offset-card"
                       : "hover:ring-1 hover:ring-white/30"
@@ -124,7 +124,7 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
             <button
               key={family}
               onClick={() => setActiveHue((prev) => (prev === family ? null : family))}
-              className={`w-[14px] h-[14px] rounded-sm border ${
+              className={`w-[14px] h-[14px] rounded-smooth-md border ${
                 activeHue === family
                   ? "border-accent bg-accent/10"
                   : "border-border/60 hover:border-border/60"
@@ -142,7 +142,7 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
         placeholder="SEARCH BY NAME"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full bg-accent border border-border/50 rounded-sm px-2 py-1 font-sans text-[9px] text-foreground placeholder:text-muted-foreground/60 focus:border-accent/50 outline-none"
+        className="w-full bg-accent border border-border/50 rounded-smooth-md px-2 py-1 font-sans text-[9px] text-foreground placeholder:text-muted-foreground/60 focus:border-accent/50 outline-none"
       />
 
       {/* F&B_CATALOG swatch grid */}
@@ -162,7 +162,7 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
                 onClick={() => onSelectPaint(c.id)}
                 onMouseEnter={(e) => handleSwatchMouseEnter(c.id, c.name, e)}
                 onMouseLeave={handleSwatchMouseLeave}
-                className={`w-[20px] h-[20px] rounded-sm ${
+                className={`w-[20px] h-[20px] rounded-smooth-md ${
                   activePaintId === c.id
                     ? "ring-2 ring-accent ring-offset-1 ring-offset-card"
                     : "hover:ring-1 hover:ring-white/30"
@@ -203,7 +203,7 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
                   setDeleteMenuId(c.id);
                   setMenuPos({ x: e.clientX, y: e.clientY });
                 }}
-                className={`w-[20px] h-[20px] rounded-sm ${
+                className={`w-[20px] h-[20px] rounded-smooth-md ${
                   activePaintId === c.id
                     ? "ring-2 ring-accent ring-offset-1 ring-offset-card"
                     : "hover:ring-1 hover:ring-white/30"
@@ -217,7 +217,7 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
 
         {/* Inline add-color form */}
         {showAddForm && (
-          <div className="mt-2 space-y-2 p-2 bg-popover border border-border/50 rounded-sm">
+          <div className="mt-2 space-y-2 p-2 bg-popover border border-border/50 rounded-smooth-md">
             <input
               type="text"
               placeholder="COLOR NAME"
@@ -226,7 +226,7 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleSaveColor();
               }}
-              className="w-full bg-accent border border-border/50 rounded-sm px-2 py-1 font-sans text-[9px] text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-accent/50"
+              className="w-full bg-accent border border-border/50 rounded-smooth-md px-2 py-1 font-sans text-[9px] text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-accent/50"
             />
             <HexColorPicker
               color={newHex}
@@ -251,7 +251,7 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
       {/* Tooltip */}
       {tooltipId && (
         <div
-          className="fixed z-50 font-sans text-[8px] text-foreground bg-secondary border border-border/60 rounded-sm px-1 py-1 pointer-events-none"
+          className="fixed z-50 font-sans text-[8px] text-foreground bg-secondary border border-border/60 rounded-smooth-md px-1 py-1 pointer-events-none"
           style={{ left: tooltipPos.x + 8, top: tooltipPos.y - 24 }}
         >
           {(() => {
@@ -266,7 +266,7 @@ export default function SwatchPicker({ activePaintId, onSelectPaint }: Props) {
       {/* Context menu for deleting custom swatches */}
       {deleteMenuId && (
         <div
-          className="fixed z-50 bg-secondary border border-border/60 rounded-sm px-2 py-1"
+          className="fixed z-50 bg-secondary border border-border/60 rounded-smooth-md px-2 py-1"
           style={{ left: menuPos.x, top: menuPos.y }}
           onClick={(e) => e.stopPropagation()}
         >

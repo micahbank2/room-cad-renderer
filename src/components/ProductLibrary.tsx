@@ -87,7 +87,7 @@ export function ProductLibrary({
           </div>
           <button
             onClick={onOpenAddModal}
-            className="font-sans text-[10px] tracking-widest px-4 py-2 bg-primary text-primary-foreground rounded-sm hover:opacity-90 active:scale-95 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
+            className="font-sans text-[10px] tracking-widest px-4 py-2 bg-primary text-primary-foreground rounded-smooth-md hover:opacity-90 active:scale-95 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
           >
             + ADD PRODUCT
           </button>
@@ -131,7 +131,7 @@ export function ProductLibrary({
             </span>
             <button
               onClick={onOpenAddModal}
-              className="mt-3 font-sans text-[10px] tracking-widest px-4 py-1.5 text-foreground border border-ring rounded-sm hover:bg-accent/10 transition-colors"
+              className="mt-3 font-sans text-[10px] tracking-widest px-4 py-1.5 text-foreground border border-ring rounded-smooth-md hover:bg-accent/10 transition-colors"
             >
               + ADD PRODUCT
             </button>

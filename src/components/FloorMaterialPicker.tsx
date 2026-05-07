@@ -107,7 +107,7 @@ export default function FloorMaterialPicker() {
           {/* Upload button */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full font-sans text-[10px] text-muted-foreground/60 hover:text-foreground tracking-widest uppercase py-1 border border-border/50 rounded-sm mt-2"
+            className="w-full font-sans text-[10px] text-muted-foreground/60 hover:text-foreground tracking-widest uppercase py-1 border border-border/50 rounded-smooth-md mt-2"
           >
             {isCustom ? "CUSTOM IMAGE" : "UPLOAD IMAGE..."}
           </button>
@@ -116,7 +116,7 @@ export default function FloorMaterialPicker() {
           {!isCustom && !isUserTexture && currentPresetId !== "DEFAULT" && (
             <div className="flex items-center gap-2 mb-2 mt-2">
               <div
-                className="w-4 h-4 rounded-sm border border-border/60"
+                className="w-4 h-4 rounded-smooth-md border border-border/60"
                 style={{ backgroundColor: FLOOR_PRESETS[currentPresetId as FloorPresetId].color }}
               />
               <span className="font-sans text-[9px] text-muted-foreground/80">
@@ -148,7 +148,7 @@ export default function FloorMaterialPicker() {
                   min="0.1"
                   value={current.scaleFt}
                   onChange={(e) => handleScaleChange(parseFloat(e.target.value) || 1)}
-                  className="w-full font-sans text-[10px] bg-accent text-foreground border border-border/60 px-2 py-1 rounded-sm"
+                  className="w-full font-sans text-[10px] bg-accent text-foreground border border-border/60 px-2 py-1 rounded-smooth-md"
                 />
               </label>
               <label className="block">
@@ -158,7 +158,7 @@ export default function FloorMaterialPicker() {
                   step="15"
                   value={current.rotationDeg}
                   onChange={(e) => handleRotationChange(parseFloat(e.target.value) || 0)}
-                  className="w-full font-sans text-[10px] bg-accent text-foreground border border-border/60 px-2 py-1 rounded-sm"
+                  className="w-full font-sans text-[10px] bg-accent text-foreground border border-border/60 px-2 py-1 rounded-smooth-md"
                 />
               </label>
               <button

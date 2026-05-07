@@ -66,7 +66,7 @@ export function TreeRow(props: TreeRowProps) {
   // Row container classes — h-6 (24px) per UI-SPEC § Row height contract
   // ---------------------------------------------------------------------------
   const rowBase = [
-    "group flex items-center h-6 pr-2 rounded-sm cursor-pointer",
+    "group flex items-center h-6 pr-2 rounded-smooth-md cursor-pointer",
     INDENT[depth],
     "hover:bg-accent",
     "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent",

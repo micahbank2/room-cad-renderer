@@ -34,17 +34,17 @@ export default function SidebarProductPicker() {
               e.dataTransfer.setData(DRAG_MIME, p.id);
               e.dataTransfer.effectAllowed = "copy";
             }}
-            className="flex items-center gap-2 p-1.5 hover:bg-accent cursor-grab rounded-sm"
+            className="flex items-center gap-2 p-1.5 hover:bg-accent cursor-grab rounded-smooth-md"
             data-testid="picker-row"
           >
             {p.imageUrl ? (
               <img
                 src={p.imageUrl}
                 alt=""
-                className="w-8 h-8 object-cover rounded-sm shrink-0"
+                className="w-8 h-8 object-cover rounded-smooth-md shrink-0"
               />
             ) : (
-              <div className="w-8 h-8 bg-accent rounded-sm shrink-0" />
+              <div className="w-8 h-8 bg-accent rounded-smooth-md shrink-0" />
             )}
             <span className="font-sans text-[10px] text-muted-foreground/80 truncate">
               {p.name.toUpperCase()}

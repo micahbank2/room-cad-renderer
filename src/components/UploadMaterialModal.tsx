@@ -15,7 +15,7 @@
  *
  * Design system:
  *   - D-33: lucide-react icons only (Upload, X, Loader2)
- *   - D-34: canonical spacing tokens (p-1/2/4/6, gap-1/2/4, rounded-sm/md)
+ *   - D-34: canonical spacing tokens (p-1/2/4/6, gap-1/2/4, rounded-smooth-md/md)
  *   - D-39: useReducedMotion guard on open transition + spinner
  *
  * Pattern #7 (StrictMode-safety): no useEffect mutates a module-level
@@ -353,7 +353,7 @@ export function UploadMaterialModal(
 
       {/* Surface */}
       <div
-        className={`relative w-[560px] max-h-[90vh] overflow-y-auto bg-popover/90 backdrop-blur-xl border border-border/50 rounded-sm shadow-2xl${surfaceTransition}`}
+        className={`relative w-[560px] max-h-[90vh] overflow-y-auto bg-popover/90 backdrop-blur-xl border border-border/50 rounded-smooth-md shadow-2xl${surfaceTransition}`}
         role="dialog"
         aria-modal="true"
       >
@@ -425,7 +425,7 @@ export function UploadMaterialModal(
               }}
               placeholder="e.g. Carrara Marble"
               maxLength={40}
-              className="bg-card border border-border/50 rounded-sm px-2 py-1 text-sm font-sans text-foreground w-full placeholder:text-muted-foreground/60"
+              className="bg-card border border-border/50 rounded-smooth-md px-2 py-1 text-sm font-sans text-foreground w-full placeholder:text-muted-foreground/60"
             />
             {nameError && (
               <p className="font-sans text-sm text-error">{nameError}</p>
@@ -451,7 +451,7 @@ export function UploadMaterialModal(
               }}
               onBlur={handleTileSizeBlur}
               placeholder="2'"
-              className={`bg-card border rounded-sm px-2 py-1 text-sm font-sans text-foreground w-full placeholder:text-muted-foreground/60 ${
+              className={`bg-card border rounded-smooth-md px-2 py-1 text-sm font-sans text-foreground w-full placeholder:text-muted-foreground/60 ${
                 tileSizeError ? "border-error" : "border-border/50"
               }`}
             />
@@ -497,7 +497,7 @@ export function UploadMaterialModal(
             type="button"
             onClick={onClose}
             disabled={saving}
-            className="rounded-sm px-4 py-1 font-sans text-sm text-muted-foreground hover:text-foreground bg-accent hover:bg-secondary border border-border/50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-smooth-md px-4 py-1 font-sans text-sm text-muted-foreground hover:text-foreground bg-accent hover:bg-secondary border border-border/50 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ minHeight: 44 }}
           >
             <span>{COPY.ctaDiscard}</span>
@@ -506,7 +506,7 @@ export function UploadMaterialModal(
             type="button"
             onClick={submit}
             disabled={primaryDisabled}
-            className="rounded-sm px-4 py-1 font-sans text-sm text-foreground bg-accent hover:bg-accent/90 border-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="rounded-smooth-md px-4 py-1 font-sans text-sm text-foreground bg-accent hover:bg-accent/90 border-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             style={{ minHeight: 44 }}
           >
             {saving || processing ? (
@@ -583,7 +583,7 @@ function DropZone({
           <img
             src={processed.previewUrl}
             alt={`${label} preview`}
-            className="w-16 h-16 rounded-sm border border-border/50 object-cover"
+            className="w-16 h-16 rounded-smooth-md border border-border/50 object-cover"
             style={{ width: 64, height: 64 }}
           />
           <button
@@ -603,7 +603,7 @@ function DropZone({
           }}
           onDragLeave={() => setDragOver(false)}
           onDrop={onDrop}
-          className={`rounded-sm border-2 border-dashed p-4 flex flex-col items-center gap-1 cursor-pointer transition-colors ${
+          className={`rounded-smooth-md border-2 border-dashed p-4 flex flex-col items-center gap-1 cursor-pointer transition-colors ${
             dragOver
               ? "border-accent bg-accent/5"
               : "border-border/40 bg-card"
@@ -661,7 +661,7 @@ function MetaField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="bg-card border border-border/50 rounded-sm px-2 py-1 text-sm font-sans text-foreground w-full placeholder:text-muted-foreground/60"
+        className="bg-card border border-border/50 rounded-smooth-md px-2 py-1 text-sm font-sans text-foreground w-full placeholder:text-muted-foreground/60"
       />
     </div>
   );

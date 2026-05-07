@@ -262,7 +262,7 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
                 labelOverride: v.trim() === "" ? undefined : v.slice(0, LABEL_MAX),
               });
             }}
-            className="px-2 py-1 font-sans text-sm text-foreground bg-background border border-border/60 rounded-sm"
+            className="px-2 py-1 font-sans text-sm text-foreground bg-background border border-border/60 rounded-smooth-md"
           />
         </div>
       </div>
@@ -325,7 +325,7 @@ function NumberRow({
             }
             onCommit();
           }}
-          className="flex-1 px-2 py-1 font-sans text-sm text-foreground bg-background border border-border/60 rounded-sm"
+          className="flex-1 px-2 py-1 font-sans text-sm text-foreground bg-background border border-border/60 rounded-smooth-md"
         />
         {suffix && (
           <span className="font-sans text-sm text-muted-foreground/60">{suffix}</span>

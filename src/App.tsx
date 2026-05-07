@@ -195,7 +195,7 @@ export default function App() {
         {isCanvas && !showSidebar && (
           <button
             onClick={toggleSidebar}
-            className="absolute left-2 top-2 z-20 w-8 h-8 bg-card rounded-sm border border-border/60 flex items-center justify-center hover:bg-popover"
+            className="absolute left-2 top-2 z-20 w-8 h-8 bg-card rounded-smooth-md border border-border/60 flex items-center justify-center hover:bg-popover"
             title="SHOW SIDEBAR"
           >
             <span className="font-sans text-[10px] text-muted-foreground/80">&#9776;</span>

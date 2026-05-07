@@ -66,7 +66,7 @@ function RotationPresetChips({
             onClick={() => onSelect(preset)}
             data-rotation-preset={preset}
             className={
-              "px-2 py-0.5 rounded-sm font-sans text-sm border transition-colors " +
+              "px-2 py-0.5 rounded-smooth-md font-sans text-sm border transition-colors " +
               (isActive
                 ? "bg-accent/20 text-foreground border-ring"
                 : "bg-accent text-muted-foreground/80 border-border/50 hover:bg-secondary")
@@ -151,7 +151,7 @@ function SavedCameraButtons({
         aria-label="Save camera"
         title={saveTitle}
         className={
-          "px-2 py-1 rounded-sm font-sans text-sm border flex items-center gap-1 transition-colors " +
+          "px-2 py-1 rounded-smooth-md font-sans text-sm border flex items-center gap-1 transition-colors " +
           (disabled
             ? "bg-accent text-muted-foreground/60 border-border/50 cursor-not-allowed"
             : "bg-accent text-muted-foreground/80 border-border/50 hover:bg-secondary hover:text-foreground")
@@ -167,7 +167,7 @@ function SavedCameraButtons({
           data-testid="clear-camera-btn"
           aria-label="Clear saved camera"
           title="Remove saved camera angle"
-          className="px-2 py-1 rounded-sm font-sans text-sm border flex items-center gap-1 transition-colors bg-accent text-muted-foreground/80 border-border/50 hover:bg-secondary hover:text-foreground"
+          className="px-2 py-1 rounded-smooth-md font-sans text-sm border flex items-center gap-1 transition-colors bg-accent text-muted-foreground/80 border-border/50 hover:bg-secondary hover:text-foreground"
         >
           <CameraOff className="w-3.5 h-3.5" />
           <span>Clear</span>
@@ -229,7 +229,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
     const totalCount = selectedIds.length;
 
     return (
-      <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto bg-card border border-border rounded-sm p-4 space-y-3">
+      <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto bg-card border border-border rounded-smooth-md p-4 space-y-3">
         <h3 id="bulk-actions" className="font-sans text-base font-medium text-muted-foreground">
           Bulk actions
         </h3>
@@ -252,7 +252,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
                     useCADStore.getState().setWallpaper(wId, "B", { kind: "color", color });
                   }
                 }}
-                className="w-8 h-7 bg-transparent border border-border/60 rounded-sm cursor-pointer"
+                className="w-8 h-7 bg-transparent border border-border/60 rounded-smooth-md cursor-pointer"
               />
               <span className="font-sans text-[11px] text-muted-foreground/60">
                 APPLIES TO BOTH SIDES
@@ -263,7 +263,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
 
         <button
           onClick={handleDelete}
-          className="w-full font-sans text-sm font-normal text-error tracking-widest py-1 border border-error/30 rounded-sm hover:bg-error/10"
+          className="w-full font-sans text-sm font-normal text-error tracking-widest py-1 border border-error/30 rounded-smooth-md hover:bg-error/10"
         >
           Delete all ({totalCount})
         </button>
@@ -283,7 +283,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
     const areaSqFt = polygonArea(wallList);
     return (
       <div
-        className="absolute right-3 top-3 z-10 w-64 bg-card border border-border rounded-sm p-4 space-y-3"
+        className="absolute right-3 top-3 z-10 w-64 bg-card border border-border rounded-smooth-md p-4 space-y-3"
         aria-label="Properties (room)"
       >
         <h3 className="font-sans text-base font-medium text-muted-foreground">
@@ -308,7 +308,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
   }
 
   return (
-    <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto bg-card border border-border rounded-sm p-4 space-y-3">
+    <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto bg-card border border-border rounded-smooth-md p-4 space-y-3">
       <h3 id="properties" aria-label="Properties" className="font-sans text-base font-medium text-muted-foreground">
         Properties
       </h3>
@@ -344,7 +344,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
             <button
               type="button"
               onClick={() => useCADStore.getState().clearCeilingOverrides(ceiling.id)}
-              className="w-full font-sans text-sm font-normal text-foreground hover:text-foreground tracking-wider py-1 border border-ring rounded-sm"
+              className="w-full font-sans text-sm font-normal text-foreground hover:text-foreground tracking-wider py-1 border border-ring rounded-smooth-md"
             >
               Reset size
             </button>
@@ -555,7 +555,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
             <button
               type="button"
               onClick={() => clearCustomElementOverrides(pce.id)}
-              className="w-full font-sans text-sm font-normal text-foreground hover:text-foreground tracking-wider py-1 border border-ring rounded-sm"
+              className="w-full font-sans text-sm font-normal text-foreground hover:text-foreground tracking-wider py-1 border border-ring rounded-smooth-md"
             >
               Reset size
             </button>
@@ -580,7 +580,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
                   key={f}
                   type="button"
                   onClick={() => setActiveFace(f)}
-                  className={`font-sans text-[--font-size-sm] uppercase p-1 rounded-sm ${
+                  className={`font-sans text-[--font-size-sm] uppercase p-1 rounded-smooth-md ${
                     activeFace === f
                       ? "bg-accent text-foreground"
                       : "bg-popover text-muted-foreground hover:bg-accent"
@@ -616,7 +616,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
           <button
             type="button"
             onClick={() => clearProductOverrides(pp.id)}
-            className="w-full font-sans text-sm font-normal text-foreground hover:text-foreground tracking-wider py-1 border border-ring rounded-sm"
+            className="w-full font-sans text-sm font-normal text-foreground hover:text-foreground tracking-wider py-1 border border-ring rounded-smooth-md"
           >
             Reset size
           </button>
@@ -639,7 +639,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
 
       <button
         onClick={handleDelete}
-        className="w-full py-1.5 rounded-sm font-sans text-sm font-normal bg-red-900/30 text-red-400 border border-red-900/40 hover:bg-red-900/50 transition-colors"
+        className="w-full py-1.5 rounded-smooth-md font-sans text-sm font-normal bg-red-900/30 text-red-400 border border-red-900/40 hover:bg-red-900/50 transition-colors"
       >
         Delete element
       </button>
@@ -777,7 +777,7 @@ function LabelOverrideInput({
           }
         }}
         onBlur={commit}
-        className="px-2 py-1 font-sans text-[11px] text-foreground bg-background border border-border/60 rounded-sm"
+        className="px-2 py-1 font-sans text-[11px] text-foreground bg-background border border-border/60 rounded-smooth-md"
       />
     </div>
   );
@@ -867,7 +867,7 @@ function CeilingDimInput({
           }
         }}
         onBlur={commit}
-        className="w-20 px-1 py-0.5 text-right font-sans text-[11px] text-foreground bg-background border border-ring rounded-sm outline-none"
+        className="w-20 px-1 py-0.5 text-right font-sans text-[11px] text-foreground bg-background border border-ring rounded-smooth-md outline-none"
       />
     </div>
   );
@@ -944,7 +944,7 @@ function EditableRow({
             if (e.key === "Enter") commit();
             if (e.key === "Escape") setEditing(false);
           }}
-          className="w-20 px-1 py-0.5 text-right font-sans text-[11px] text-foreground bg-background border border-ring rounded-sm outline-none"
+          className="w-20 px-1 py-0.5 text-right font-sans text-[11px] text-foreground bg-background border border-ring rounded-smooth-md outline-none"
         />
       </div>
     );

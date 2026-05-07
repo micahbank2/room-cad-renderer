@@ -100,14 +100,14 @@ export function WallCutoutsDropdown({ anchorRef, onClose, onPick }: Props) {
           onClose();
         }
       }}
-      className="bg-card border border-border rounded-sm p-1 min-w-[160px] outline-none"
+      className="bg-card border border-border rounded-smooth-md p-1 min-w-[160px] outline-none"
     >
       {ITEMS.map((item) => (
         <button
           key={item.kind}
           data-testid={`wall-cutout-${item.kind}`}
           onClick={() => onPick(item.kind)}
-          className="w-full flex items-center gap-2 px-2 py-1 rounded-sm font-sans text-[11px] text-foreground hover:bg-accent transition-colors"
+          className="w-full flex items-center gap-2 px-2 py-1 rounded-smooth-md font-sans text-[11px] text-foreground hover:bg-accent transition-colors"
         >
           {item.icon === "arch" && (
             <span className="material-symbols-outlined text-[14px]">arch</span>

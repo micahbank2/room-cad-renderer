@@ -64,18 +64,18 @@ export default function CustomElementsPanel() {
       </div>
 
       {creating && (
-        <div className="space-y-1.5 bg-accent rounded-sm p-2 mb-2">
+        <div className="space-y-1.5 bg-accent rounded-smooth-md p-2 mb-2">
           <input
             type="text"
             placeholder="NAME..."
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-sm placeholder:text-muted-foreground/60"
+            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-smooth-md placeholder:text-muted-foreground/60"
           />
           <div className="flex gap-1">
             <button
               onClick={() => setShape("box")}
-              className={`flex-1 font-sans text-[9px] tracking-widest py-1 rounded-sm border ${
+              className={`flex-1 font-sans text-[9px] tracking-widest py-1 rounded-smooth-md border ${
                 shape === "box"
                   ? "border-accent text-foreground bg-accent/10"
                   : "border-border/60 text-muted-foreground/80"
@@ -85,7 +85,7 @@ export default function CustomElementsPanel() {
             </button>
             <button
               onClick={() => setShape("plane")}
-              className={`flex-1 font-sans text-[9px] tracking-widest py-1 rounded-sm border ${
+              className={`flex-1 font-sans text-[9px] tracking-widest py-1 rounded-smooth-md border ${
                 shape === "plane"
                   ? "border-accent text-foreground bg-accent/10"
                   : "border-border/60 text-muted-foreground/80"
@@ -104,14 +104,14 @@ export default function CustomElementsPanel() {
               type="color"
               value={color}
               onChange={(e) => setColor(e.target.value)}
-              className="w-7 h-6 bg-transparent border border-border/60 rounded-sm cursor-pointer"
+              className="w-7 h-6 bg-transparent border border-border/60 rounded-smooth-md cursor-pointer"
             />
             <span className="font-sans text-[9px] text-muted-foreground/80">{color}</span>
           </div>
           <button
             onClick={handleCreate}
             disabled={!name.trim()}
-            className="w-full font-sans text-[10px] tracking-widest py-1 bg-primary text-primary-foreground rounded-sm hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-full font-sans text-[10px] tracking-widest py-1 bg-primary text-primary-foreground rounded-smooth-md hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             CREATE
           </button>
@@ -151,7 +151,7 @@ function DimInput({ label, value, onChange }: { label: string; value: number; on
         min="0.1"
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
-        className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-1 py-0.5 rounded-sm"
+        className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-1 py-0.5 rounded-smooth-md"
       />
     </label>
   );

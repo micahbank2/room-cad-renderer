@@ -23,7 +23,7 @@ export const SHORTCUTS: Shortcut[] = SHORTCUT_DISPLAY_LIST;
 
 function Kbd({ children }: { children: React.ReactNode }) {
   return (
-    <kbd className="font-sans text-[10px] text-foreground bg-accent px-1.5 py-0.5 rounded-sm border border-border/50 inline-block">
+    <kbd className="font-sans text-[10px] text-foreground bg-accent px-1.5 py-0.5 rounded-smooth-md border border-border/50 inline-block">
       {children}
     </kbd>
   );

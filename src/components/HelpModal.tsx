@@ -59,7 +59,7 @@ export default function HelpModal() {
 
       {/* Modal */}
       <div
-        className="relative w-[900px] h-[640px] max-w-[95vw] max-h-[90vh] bg-popover border border-border/60 rounded-sm shadow-2xl flex flex-col overflow-hidden"
+        className="relative w-[900px] h-[640px] max-w-[95vw] max-h-[90vh] bg-popover border border-border/60 rounded-smooth-md shadow-2xl flex flex-col overflow-hidden"
         role="dialog"
         aria-label="Help and documentation"
       >

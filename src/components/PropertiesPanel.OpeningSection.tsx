@@ -46,7 +46,7 @@ function OpeningRow({ wall, opening }: { wall: WallSegment; opening: Opening }) 
   const offsetLabel = `${opening.offset.toFixed(1)}'`;
 
   return (
-    <div className="bg-card border border-border/50 rounded-sm">
+    <div className="bg-card border border-border/50 rounded-smooth-md">
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
@@ -177,7 +177,7 @@ function NumericRow({
               (e.target as HTMLInputElement).blur();
             }
           }}
-          className="w-16 font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-sm text-right"
+          className="w-16 font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-smooth-md text-right"
         />
         <span className="font-sans text-[10px] text-muted-foreground/60">{unit}</span>
       </div>

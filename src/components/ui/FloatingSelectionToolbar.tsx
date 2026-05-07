@@ -139,7 +139,7 @@ export function FloatingSelectionToolbar({ fc, wrapperRef }: Props) {
       <button
         type="button"
         onClick={handleDuplicate}
-        className="p-1 rounded-sm text-muted-foreground hover:bg-accent/20 hover:text-foreground"
+        className="p-1 rounded-smooth-md text-muted-foreground hover:bg-accent/20 hover:text-foreground"
         aria-label="Duplicate"
       >
         <Copy size={14} />
@@ -147,7 +147,7 @@ export function FloatingSelectionToolbar({ fc, wrapperRef }: Props) {
       <button
         type="button"
         onClick={handleDelete}
-        className="p-1 rounded-sm text-muted-foreground hover:bg-error/20 hover:text-error"
+        className="p-1 rounded-smooth-md text-muted-foreground hover:bg-error/20 hover:text-error"
         aria-label="Delete"
       >
         <Trash2 size={14} />

@@ -52,7 +52,7 @@ export default function SurfaceMaterialPicker({
             key={m.id}
             onClick={() => onSelect(isActive ? undefined : m.id)}
             className={[
-              "p-1 rounded-sm border",
+              "p-1 rounded-smooth-md border",
               isActive
                 ? "border-accent ring-1 ring-accent/30"
                 : "border-border/50 hover:border-border/40",

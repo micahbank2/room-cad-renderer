@@ -92,7 +92,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
         onClick={onClose}
       />
       <div
-        className="relative w-[700px] max-w-[95vw] bg-popover border border-border/60 rounded-sm shadow-2xl"
+        className="relative w-[700px] max-w-[95vw] bg-popover border border-border/60 rounded-smooth-md shadow-2xl"
         role="dialog"
         aria-label="Choose a floor plan template"
       >
@@ -113,7 +113,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
             <button
               key={t.id}
               onClick={() => pickTemplate(t.id)}
-              className="group text-left bg-card border border-border/10 hover:border-accent/40 rounded-sm p-4 transition-all"
+              className="group text-left bg-card border border-border/10 hover:border-accent/40 rounded-smooth-md p-4 transition-all"
             >
               <span className="material-symbols-outlined text-[28px] text-foreground mb-2 block">
                 {t.icon}
@@ -130,7 +130,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
             <>
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="group text-left bg-card border border-border/10 hover:border-accent/40 rounded-sm p-4 transition-all"
+                className="group text-left bg-card border border-border/10 hover:border-accent/40 rounded-smooth-md p-4 transition-all"
               >
                 <span className="material-symbols-outlined text-[28px] text-foreground mb-2 block">
                   upload_file
@@ -144,7 +144,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
               </button>
               <button
                 onClick={handleRemoveImage}
-                className="group text-left bg-card border border-border/10 hover:border-accent/40 rounded-sm p-4 transition-all"
+                className="group text-left bg-card border border-border/10 hover:border-accent/40 rounded-smooth-md p-4 transition-all"
               >
                 <span className="material-symbols-outlined text-[28px] text-muted-foreground/60 mb-2 block">
                   image_not_supported

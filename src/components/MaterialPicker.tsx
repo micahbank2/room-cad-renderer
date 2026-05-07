@@ -146,7 +146,7 @@ export function MaterialPicker({
               type="number"
               step="0.1"
               min="0.05"
-              className="font-sans text-[--font-size-sm] bg-popover p-1 rounded-sm w-20"
+              className="font-sans text-[--font-size-sm] bg-popover p-1 rounded-smooth-md w-20"
               placeholder={selected.tileSizeFt.toString()}
               value={tileSizeOverride ?? ""}
               onChange={(e) => {

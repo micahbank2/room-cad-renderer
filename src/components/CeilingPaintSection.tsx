@@ -78,7 +78,7 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
             value={ceiling.scaleFt}
             onChange={(e) => handleSetTileSize(parseFloat(e.target.value) || 2)}
             data-testid="ceiling-tile-size"
-            className="w-full font-sans text-[10px] bg-accent text-foreground border border-border/60 px-2 py-1 rounded-sm"
+            className="w-full font-sans text-[10px] bg-accent text-foreground border border-border/60 px-2 py-1 rounded-smooth-md"
           />
         </label>
       )}

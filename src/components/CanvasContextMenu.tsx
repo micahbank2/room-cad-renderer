@@ -302,7 +302,7 @@ export function CanvasContextMenu() {
       ref={menuRef}
       data-testid="context-menu"
       style={{ position: "fixed", left: adjustedPos.x, top: adjustedPos.y, zIndex: 9999 }}
-      className="bg-popover border border-border/50 rounded-sm py-1 min-w-[160px] shadow-lg"
+      className="bg-popover border border-border/50 rounded-smooth-md py-1 min-w-[160px] shadow-lg"
       onContextMenu={(e) => e.preventDefault()}
     >
       {actions.map((action) => (

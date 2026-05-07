@@ -111,7 +111,7 @@ export function MaterialCard({
           opacity toggles on hover. */}
       <div
         role="tooltip"
-        className={`absolute bottom-full left-0 mb-1 z-20 bg-secondary border border-border/50 rounded-sm px-2 py-1 font-sans text-sm text-muted-foreground truncate max-w-xs pointer-events-none shadow-lg transition-opacity ${
+        className={`absolute bottom-full left-0 mb-1 z-20 bg-secondary border border-border/50 rounded-smooth-md px-2 py-1 font-sans text-sm text-muted-foreground truncate max-w-xs pointer-events-none shadow-lg transition-opacity ${
           hover ? "opacity-100" : "opacity-0"
         }`}
       >
@@ -119,7 +119,7 @@ export function MaterialCard({
       </div>
 
       {/* Thumbnail */}
-      <div className="aspect-square rounded-sm bg-accent overflow-hidden">
+      <div className="aspect-square rounded-smooth-md bg-accent overflow-hidden">
         {thumbnailUrl ? (
           <img
             src={thumbnailUrl}

@@ -101,7 +101,7 @@ export function DeleteTextureDialog(props: DeleteTextureDialogProps): JSX.Elemen
 
       {/* Surface */}
       <div
-        className="relative w-[400px] bg-popover/90 backdrop-blur-xl border border-border/50 rounded-sm shadow-2xl"
+        className="relative w-[400px] bg-popover/90 backdrop-blur-xl border border-border/50 rounded-smooth-md shadow-2xl"
         role="dialog"
         aria-modal="true"
       >
@@ -136,14 +136,14 @@ export function DeleteTextureDialog(props: DeleteTextureDialogProps): JSX.Elemen
             type="button"
             onClick={onClose}
             disabled={deleting}
-            className="rounded-sm px-4 py-1 font-sans text-sm text-muted-foreground hover:text-foreground bg-accent hover:bg-secondary border border-border/50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-smooth-md px-4 py-1 font-sans text-sm text-muted-foreground hover:text-foreground bg-accent hover:bg-secondary border border-border/50 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ minHeight: 44 }}
           ><span>Discard</span></button>
           <button
             type="button"
             onClick={handleDelete}
             disabled={deleting}
-            className="rounded-sm px-4 py-1 font-sans text-sm text-error bg-accent hover:bg-error/10 border border-error/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="rounded-smooth-md px-4 py-1 font-sans text-sm text-error bg-accent hover:bg-error/10 border border-error/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             style={{ minHeight: 44 }}
           >
             {deleting ? (

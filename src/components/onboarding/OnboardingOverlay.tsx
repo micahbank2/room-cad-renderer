@@ -82,7 +82,7 @@ export default function OnboardingOverlay() {
       {/* Spotlight dim — uses a box-shadow ring trick to darken outside the cutout */}
       {!isCenter && rect && (
         <div
-          className="absolute ring-2 ring-accent ring-offset-2 ring-offset-background rounded-sm pointer-events-none"
+          className="absolute ring-2 ring-accent ring-offset-2 ring-offset-background rounded-smooth-md pointer-events-none"
           style={{
             top: rect.top - PAD,
             left: rect.left - PAD,
@@ -198,7 +198,7 @@ function CoachMark({
   return (
     <div
       style={{ ...style, width: cardWidth }}
-      className="fixed bg-popover border border-accent/40 rounded-sm shadow-2xl p-4 pointer-events-auto"
+      className="fixed bg-popover border border-accent/40 rounded-smooth-md shadow-2xl p-4 pointer-events-auto"
     >
       {/* Progress */}
       <div className="flex items-center justify-between mb-3">
@@ -206,7 +206,7 @@ function CoachMark({
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div
               key={i}
-              className={`h-1 w-6 rounded-sm transition-colors ${
+              className={`h-1 w-6 rounded-smooth-md transition-colors ${
                 i === stepIndex
                   ? "bg-accent"
                   : i < stepIndex
@@ -248,7 +248,7 @@ function CoachMark({
           )}
           <button
             onClick={onNext}
-            className="font-sans text-[10px] tracking-widest px-3 py-1 border border-accent text-foreground hover:bg-accent/10 transition-colors rounded-sm"
+            className="font-sans text-[10px] tracking-widest px-3 py-1 border border-accent text-foreground hover:bg-accent/10 transition-colors rounded-smooth-md"
           >
             {isLast ? "GOT IT" : "NEXT"}
           </button>

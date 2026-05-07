@@ -25,7 +25,7 @@ export default function HelpSearch({ query, onQueryChange, onSelect }: Props) {
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
           placeholder="SEARCH HELP..."
-          className="w-full font-sans text-[10px] tracking-wider text-foreground placeholder:text-muted-foreground/60 bg-accent border border-border/60 pl-7 pr-2 py-1.5 rounded-sm focus:outline-none focus:border-accent/50"
+          className="w-full font-sans text-[10px] tracking-wider text-foreground placeholder:text-muted-foreground/60 bg-accent border border-border/60 pl-7 pr-2 py-1.5 rounded-smooth-md focus:outline-none focus:border-accent/50"
         />
         {hasQuery && (
           <button
@@ -39,7 +39,7 @@ export default function HelpSearch({ query, onQueryChange, onSelect }: Props) {
       </div>
 
       {hasQuery && (
-        <div className="mt-2 max-h-[380px] overflow-y-auto border border-border/50 rounded-sm bg-background">
+        <div className="mt-2 max-h-[380px] overflow-y-auto border border-border/50 rounded-smooth-md bg-background">
           {results.length === 0 ? (
             <div className="px-3 py-4 font-sans text-[10px] text-muted-foreground/60 text-center">
               NO RESULTS

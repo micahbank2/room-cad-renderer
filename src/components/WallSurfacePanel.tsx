@@ -112,7 +112,7 @@ export default function WallSurfacePanel() {
           <button
             key={s}
             onClick={() => focusWallSide(wall.id, s)}
-            className={`flex-1 font-sans text-[11px] tracking-widest py-2 rounded-sm border ${
+            className={`flex-1 font-sans text-[11px] tracking-widest py-2 rounded-smooth-md border ${
               activeSide === s
                 ? "border-accent text-foreground bg-accent/10"
                 : "border-border/60 text-muted-foreground/80"
@@ -128,7 +128,7 @@ export default function WallSurfacePanel() {
       <div className="flex gap-1">
         <button
           onClick={() => swapWallSides(wall.id)}
-          className="flex-1 font-sans text-[11px] text-muted-foreground/80 hover:text-accent tracking-widest py-1.5 border border-border/60 rounded-sm hover:bg-accent/10"
+          className="flex-1 font-sans text-[11px] text-muted-foreground/80 hover:text-accent tracking-widest py-1.5 border border-border/60 rounded-smooth-md hover:bg-accent/10"
         >
           SWAP A/B
         </button>
@@ -137,7 +137,7 @@ export default function WallSurfacePanel() {
             const target = activeSide === "A" ? "B" : "A";
             copyWallSide(wall.id, activeSide, target);
           }}
-          className="flex-1 font-sans text-[11px] text-foreground hover:text-accent tracking-widest py-1.5 border border-ring rounded-sm hover:bg-accent/10"
+          className="flex-1 font-sans text-[11px] text-foreground hover:text-accent tracking-widest py-1.5 border border-ring rounded-smooth-md hover:bg-accent/10"
         >
           COPY TO {activeSide === "A" ? "B" : "A"}
         </button>
@@ -193,7 +193,7 @@ export default function WallSurfacePanel() {
                     id
                   );
                 }}
-                className="w-full font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-sm"
+                className="w-full font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-smooth-md"
               >
                 <option value="">(LEGACY DEFAULT)</option>
                 {wainscotStyles.map((it) => (
@@ -231,7 +231,7 @@ export default function WallSurfacePanel() {
               onChange={(e) =>
                 toggleCrownMolding(wall.id, activeSide, true, parseFloat(e.target.value) || 0.33, crown.color)
               }
-              className="w-16 font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-sm"
+              className="w-16 font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-smooth-md"
             />
             <span className="font-sans text-[8px] text-muted-foreground/60">FT</span>
             <input
@@ -240,7 +240,7 @@ export default function WallSurfacePanel() {
               onChange={(e) =>
                 toggleCrownMolding(wall.id, activeSide, true, crown.heightFt, e.target.value)
               }
-              className="w-6 h-5 bg-transparent border border-border/60 rounded-sm cursor-pointer"
+              className="w-6 h-5 bg-transparent border border-border/60 rounded-smooth-md cursor-pointer"
             />
           </div>
         )}
@@ -268,7 +268,7 @@ export default function WallSurfacePanel() {
           </div>
         </div>
         {showLibrary && (
-          <div className="bg-accent rounded-sm p-2 mb-1 max-h-40 overflow-y-auto">
+          <div className="bg-accent rounded-smooth-md p-2 mb-1 max-h-40 overflow-y-auto">
             {framedArtItems.length === 0 ? (
               <div className="font-sans text-[11px] text-muted-foreground/60 text-center py-1">
                 ART LIBRARY EMPTY
@@ -279,10 +279,10 @@ export default function WallSurfacePanel() {
                   <li key={it.id}>
                     <button
                       onClick={() => handleAddFromLibrary(it.id)}
-                      className="w-full flex items-center gap-2 px-1 py-1 hover:bg-secondary rounded-sm"
+                      className="w-full flex items-center gap-2 px-1 py-1 hover:bg-secondary rounded-smooth-md"
                     >
                       <div
-                        className="w-5 h-5 rounded-sm overflow-hidden shrink-0 border"
+                        className="w-5 h-5 rounded-smooth-md overflow-hidden shrink-0 border"
                         style={{
                           borderColor: FRAME_PRESETS[it.frameStyle].color,
                           borderWidth: Math.max(1, FRAME_PRESETS[it.frameStyle].width * 8),
@@ -309,7 +309,7 @@ export default function WallSurfacePanel() {
             {artItems.map((a) => (
               <li
                 key={a.id}
-                className="flex items-center justify-between font-sans text-[11px] text-muted-foreground/80 px-2 py-1 bg-accent rounded-sm"
+                className="flex items-center justify-between font-sans text-[11px] text-muted-foreground/80 px-2 py-1 bg-accent rounded-smooth-md"
               >
                 <div className="flex items-center gap-2 min-w-0 flex-1">
                   <span className="truncate">
@@ -330,7 +330,7 @@ export default function WallSurfacePanel() {
                         })
                       }
                       title="FRAME COLOR OVERRIDE"
-                      className="w-5 h-4 bg-transparent border border-border/60 rounded-sm cursor-pointer shrink-0"
+                      className="w-5 h-4 bg-transparent border border-border/60 rounded-smooth-md cursor-pointer shrink-0"
                     />
                   )}
                 </div>

@@ -178,7 +178,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
                   disabled={isWalkMode}
                   aria-label={label}
                   aria-pressed={isActive}
-                  className={`flex items-center justify-center p-1 rounded-sm transition-colors duration-150 ${
+                  className={`flex items-center justify-center p-1 rounded-smooth-md transition-colors duration-150 ${
                     isActive
                       ? "bg-accent/20 text-foreground border border-ring"
                       : "text-muted-foreground/80 hover:text-foreground border border-transparent"
@@ -209,7 +209,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
                   aria-label={label}
                   aria-pressed={isActive}
                   title={tooltip}
-                  className={`flex items-center justify-center gap-1 px-2 py-1 rounded-sm font-sans text-sm transition-colors duration-150 border ${
+                  className={`flex items-center justify-center gap-1 px-2 py-1 rounded-smooth-md font-sans text-sm transition-colors duration-150 border ${
                     isActive
                       ? "bg-accent/10 text-foreground border-ring"
                       : "text-muted-foreground/80 hover:text-foreground border-transparent"
@@ -238,7 +238,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
             aria-label="Toggle wall cutaway"
             aria-pressed={cutawayMode === "auto"}
             title={`CUTAWAY: ${cutawayMode === "auto" ? "AUTO" : "OFF"}`}
-            className={`flex items-center justify-center gap-1 px-2 py-1 rounded-sm font-sans text-sm transition-colors duration-150 border mr-6 ${
+            className={`flex items-center justify-center gap-1 px-2 py-1 rounded-smooth-md font-sans text-sm transition-colors duration-150 border mr-6 ${
               cutawayMode === "auto"
                 ? "bg-accent/10 text-foreground border-ring"
                 : "text-muted-foreground/80 hover:text-foreground border-transparent"
@@ -304,7 +304,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
               }
               exportRenderedImage();
             }}
-            className="font-sans text-sm font-normal px-4 py-1 border border-accent text-foreground hover:bg-accent/10 transition-colors rounded-sm"
+            className="font-sans text-sm font-normal px-4 py-1 border border-accent text-foreground hover:bg-accent/10 transition-colors rounded-smooth-md"
             aria-label="Export"
           >
             Export
@@ -436,7 +436,7 @@ export function ToolPalette() {
   const isCutoutTool = activeTool === "archway" || activeTool === "passthrough" || activeTool === "niche";
 
   return (
-    <div className="absolute left-3 top-3 z-10 flex flex-col gap-1 bg-card border border-border p-1.5 rounded-sm">
+    <div className="absolute left-3 top-3 z-10 flex flex-col gap-1 bg-card border border-border p-1.5 rounded-smooth-md">
       {tools.map((t) => (
         <Tooltip
           key={t.id}
@@ -448,7 +448,7 @@ export function ToolPalette() {
             onClick={() => onSelectTool(t.id)}
             data-onboarding={`tool-${t.id}`}
             data-testid={`tool-${t.id}`}
-            className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-150 ${
+            className={`w-8 h-8 flex items-center justify-center rounded-smooth-md transition-all duration-150 ${
               activeTool === t.id
                 ? "bg-primary text-primary-foreground shadow-[0_0_15px_rgba(124,91,240,0.3)]"
                 : "text-muted-foreground/80 hover:text-foreground hover:bg-accent"
@@ -466,7 +466,7 @@ export function ToolPalette() {
           ref={wallCutoutsTriggerRef}
           data-testid="wall-cutouts-trigger"
           onClick={() => setShowWallCutouts((v) => !v)}
-          className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-150 ${
+          className={`w-8 h-8 flex items-center justify-center rounded-smooth-md transition-all duration-150 ${
             isCutoutTool
               ? "bg-primary text-primary-foreground shadow-[0_0_15px_rgba(124,91,240,0.3)]"
               : "text-muted-foreground/80 hover:text-foreground hover:bg-accent"
@@ -490,7 +490,7 @@ export function ToolPalette() {
         <button
           onClick={() => setTool("measure")}
           data-testid="tool-measure"
-          className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-150 ${
+          className={`w-8 h-8 flex items-center justify-center rounded-smooth-md transition-all duration-150 ${
             activeTool === "measure"
               ? "bg-primary text-primary-foreground shadow-[0_0_15px_rgba(124,91,240,0.3)]"
               : "text-muted-foreground/80 hover:text-foreground hover:bg-accent"
@@ -503,7 +503,7 @@ export function ToolPalette() {
         <button
           onClick={() => setTool("label")}
           data-testid="tool-label"
-          className={`w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-150 ${
+          className={`w-8 h-8 flex items-center justify-center rounded-smooth-md transition-all duration-150 ${
             activeTool === "label"
               ? "bg-primary text-primary-foreground shadow-[0_0_15px_rgba(124,91,240,0.3)]"
               : "text-muted-foreground/80 hover:text-foreground hover:bg-accent"
@@ -516,7 +516,7 @@ export function ToolPalette() {
       <Tooltip content="Toggle grid" placement="right">
         <button
           onClick={toggleGrid}
-          className={`w-8 h-8 flex items-center justify-center rounded-sm transition-colors ${
+          className={`w-8 h-8 flex items-center justify-center rounded-smooth-md transition-colors ${
             showGrid ? "text-foreground" : "text-muted-foreground/60"
           } hover:bg-accent`}
         >
@@ -527,7 +527,7 @@ export function ToolPalette() {
       <Tooltip content="Zoom in" placement="right">
         <button
           onClick={() => setUserZoom(userZoom * 1.2)}
-          className="w-8 h-8 flex items-center justify-center rounded-sm text-muted-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-smooth-md text-muted-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
         >
           <span className="material-symbols-outlined text-[18px]">zoom_in</span>
         </button>
@@ -535,7 +535,7 @@ export function ToolPalette() {
       <Tooltip content="Zoom out" placement="right">
         <button
           onClick={() => setUserZoom(userZoom / 1.2)}
-          className="w-8 h-8 flex items-center justify-center rounded-sm text-muted-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-smooth-md text-muted-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
         >
           <span className="material-symbols-outlined text-[18px]">zoom_out</span>
         </button>
@@ -543,7 +543,7 @@ export function ToolPalette() {
       <Tooltip content="Fit to view" shortcut="0" placement="right">
         <button
           onClick={resetView}
-          className="w-8 h-8 flex items-center justify-center rounded-sm text-muted-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-smooth-md text-muted-foreground/80 hover:text-foreground hover:bg-accent transition-colors"
         >
           <span className="material-symbols-outlined text-[18px]">fit_screen</span>
         </button>
