@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.18
 milestone_name: Pascal Visual Parity
-status: verifying
-last_updated: "2026-05-07T21:38:58.883Z"
-last_activity: 2026-05-07
+status: executing
+last_updated: "2026-05-07T21:35:59.557Z"
+last_activity: 2026-05-07 -- Phase 72 execution started
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 7
+  total_plans: 14
   completed_plans: 7
 ---
 
@@ -19,16 +19,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-07 — v1.17 partial-shipped 67+68; v1.18 Pascal Visual Parity opened; Phases 69+70 deferred to v1.19)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 71 — Token Foundation
+**Current focus:** Phase 72 — primitives-shelf
 
 ## Current Position
 
-Phase: 71 (Token Foundation) — EXECUTING
+Phase: 72 (primitives-shelf) — EXECUTING
 Milestone: v1.18 Pascal Visual Parity
 Phases: 6 (71, 72, 73, 74, 75, 76) — 0 complete
-Plan: 7 of 7
-Status: Phase complete — ready for verification
-Last activity: 2026-05-07
+Plan: 1 of 7
+Status: Executing Phase 72
+Last activity: 2026-05-07 -- Phase 72 execution started
 
 ## Decisions
 
@@ -51,7 +51,6 @@ Last activity: 2026-05-07
 - [Phase 71]: D-15 stairs e2e: data-stair-icon is on the SVG element itself (lucide Footprints), not a span with text content
 - [Phase 71]: productStore addProduct: restored pre-load guard (LIB-03 safety — prevents writing empty library before load resolves)
 - [Phase 71]: contextMenuActionCounts: duplicate vi.mock() caused full-suite TypeErrors; removed first incomplete mock declaration
-- [Phase 72-01]: Import type Transition from motion/react (no runtime side-effects)
 
 ## Performance Metrics
 
@@ -74,7 +73,6 @@ Last activity: 2026-05-07
 | Phase 71 P04 | 11m | 3 tasks | 48 files |
 | Phase 71 P05 | 11 | 2 tasks | 19 files |
 | Phase 71 P06 | 45 | 3 tasks | 16 files |
-| Phase 72-primitives-shelf P01 | 110 | 2 tasks | 6 files |
 
 ## Recent Milestones
 
