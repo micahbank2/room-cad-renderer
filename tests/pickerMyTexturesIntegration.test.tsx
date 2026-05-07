@@ -206,26 +206,10 @@ describe("SurfaceMaterialPicker (ceiling) — MY TEXTURES tab", () => {
   });
 });
 
-describe("WallSurfacePanel — MY TEXTURES tab", () => {
-  it("renders MY TEXTURES tab", () => {
-    render(<WallSurfacePanel />);
-    expect(screen.getByText("MY TEXTURES")).toBeInTheDocument();
-  });
-
-  it("selecting a user texture dispatches setWallpaper with userTextureId", () => {
-    render(<WallSurfacePanel />);
-    fireEvent.click(screen.getByText("MY TEXTURES"));
-    fireEvent.click(screen.getByTestId("texture-card-utex_abc"));
-    expect(setWallpaperSpy).toHaveBeenCalled();
-    const [wallId, side, wallpaper] = setWallpaperSpy.mock.calls[0];
-    expect(wallId).toBe("wall1");
-    expect(side).toBe("A");
-    expect(wallpaper).toMatchObject({
-      userTextureId: "utex_abc",
-      scaleFt: 2.5,
-    });
-  });
-});
+// WallSurfacePanel — MY TEXTURES tab tests removed in Phase 71 (v1.18).
+// WallSurfacePanel was reworked in Phase 68 MAT-APPLY-01 and no longer exposes
+// the MY TEXTURES tab (wallpaper texture selection moved to a different surface).
+// FloorMaterialPicker + SurfaceMaterialPicker still carry MY TEXTURES — see below.
 
 describe("Empty-state preservation", () => {
   it("FloorMaterialPicker MY TEXTURES tab shows empty state when no textures exist", () => {
