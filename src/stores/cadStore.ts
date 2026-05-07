@@ -22,7 +22,14 @@ import type {
 import { DEFAULT_STAIR } from "@/types/cad";
 import { uid, resizeWall } from "@/lib/geometry";
 import { ROOM_TEMPLATES, type RoomTemplateId } from "@/data/roomTemplates";
-import { migrateSnapshot, migrateFloorMaterials, migrateV3ToV4, migrateV4ToV5 } from "@/lib/snapshotMigration";
+import {
+  migrateSnapshot,
+  migrateFloorMaterials,
+  migrateV3ToV4,
+  migrateV4ToV5,
+  migrateV5ToV6,
+} from "@/lib/snapshotMigration";
+import type { SurfaceTarget } from "@/lib/surfaceMaterial";
 import type { PaintColor } from "@/types/paint";
 
 const MAX_HISTORY = 50;
@@ -80,6 +87,12 @@ interface CADState {
   removeCeiling: (id: string) => void;
   setFloorMaterial: (material: FloorMaterial | undefined) => void;
   setWallpaper: (wallId: string, side: WallSide, wallpaper: Wallpaper | undefined) => void;
+  // Phase 68 MAT-APPLY-01 (D-06): Material assignment + tile-size override per
+  // surface, with the standard history / NoHistory pair (mid-pick preview).
+  applySurfaceMaterial: (target: SurfaceTarget, materialId: string | undefined) => void;
+  applySurfaceMaterialNoHistory: (target: SurfaceTarget, materialId: string | undefined) => void;
+  applySurfaceTileSize: (target: SurfaceTarget, scaleFt: number | undefined) => void;
+  applySurfaceTileSizeNoHistory: (target: SurfaceTarget, scaleFt: number | undefined) => void;
   toggleWainscoting: (wallId: string, side: WallSide, enabled: boolean, heightFt?: number, color?: string, styleItemId?: string) => void;
   toggleCrownMolding: (wallId: string, side: WallSide, enabled: boolean, heightFt?: number, color?: string) => void;
   addWallArt: (wallId: string, art: Omit<WallArt, "id">) => string;
@@ -203,7 +216,7 @@ function snapshot(state: CADState): CADSnapshot {
   const root = state as any;
   const t0 = import.meta.env.DEV ? performance.now() : 0;
   const snap: CADSnapshot = {
-    version: 5,
+    version: 6,
     rooms: structuredClone(toPlain(state.rooms)),
     activeRoomId: state.activeRoomId,
     ...(root.customElements
@@ -270,6 +283,101 @@ function initialState(): Pick<CADState, "rooms" | "activeRoomId" | "past" | "fut
     past: [],
     future: [],
   };
+}
+
+/**
+ * Phase 68 MAT-APPLY-01 (D-06): apply a Material id to a surface. Pure mutator
+ * — no history side effect, no doc lookup. Caller (the action wrapper) is
+ * responsible for `pushHistory` and `activeDoc`. Passing `materialId === undefined`
+ * deletes the field so the legacy fallback chain (wallpaper / floorMaterial /
+ * ceiling.paintId / etc.) takes over per D-01.
+ */
+function applySurfaceMaterialMut(
+  doc: RoomDoc,
+  target: SurfaceTarget,
+  materialId: string | undefined,
+): void {
+  switch (target.kind) {
+    case "wallSide": {
+      const wall = doc.walls?.[target.wallId];
+      if (!wall) return;
+      if (target.side === "A") {
+        if (materialId) wall.materialIdA = materialId;
+        else delete wall.materialIdA;
+      } else {
+        if (materialId) wall.materialIdB = materialId;
+        else delete wall.materialIdB;
+      }
+      return;
+    }
+    case "floor": {
+      if (materialId) doc.floorMaterialId = materialId;
+      else delete doc.floorMaterialId;
+      return;
+    }
+    case "ceiling": {
+      const c = doc.ceilings?.[target.ceilingId];
+      if (!c) return;
+      if (materialId) c.materialId = materialId;
+      else delete c.materialId;
+      return;
+    }
+    case "customElementFace": {
+      const placed = doc.placedCustomElements?.[target.placedId];
+      if (!placed) return;
+      if (!placed.faceMaterials) placed.faceMaterials = {};
+      if (materialId) {
+        placed.faceMaterials[target.face] = materialId;
+      } else {
+        delete placed.faceMaterials[target.face];
+      }
+      return;
+    }
+  }
+}
+
+/**
+ * Phase 68 MAT-APPLY-01 (D-04): apply a tile-size override to a surface.
+ * Custom-element face tile-size overrides are NOT supported in v1.17
+ * (faces inherit `Material.tileSizeFt`); the call is a logged no-op.
+ */
+function applySurfaceTileSizeMut(
+  doc: RoomDoc,
+  target: SurfaceTarget,
+  scaleFt: number | undefined,
+): void {
+  switch (target.kind) {
+    case "wallSide": {
+      const wall = doc.walls?.[target.wallId];
+      if (!wall) return;
+      if (target.side === "A") {
+        if (scaleFt !== undefined) wall.scaleFtA = scaleFt;
+        else delete wall.scaleFtA;
+      } else {
+        if (scaleFt !== undefined) wall.scaleFtB = scaleFt;
+        else delete wall.scaleFtB;
+      }
+      return;
+    }
+    case "floor": {
+      if (scaleFt !== undefined) doc.floorScaleFt = scaleFt;
+      else delete doc.floorScaleFt;
+      return;
+    }
+    case "ceiling": {
+      const c = doc.ceilings?.[target.ceilingId];
+      if (!c) return;
+      if (scaleFt !== undefined) c.scaleFt = scaleFt;
+      else delete c.scaleFt;
+      return;
+    }
+    case "customElementFace":
+      // eslint-disable-next-line no-console
+      console.info(
+        "[Phase68] tile-size override on customElementFace not supported in v1.17",
+      );
+      return;
+  }
 }
 
 export const useCADStore = create<CADState>()((set) => ({
@@ -702,6 +810,45 @@ export const useCADStore = create<CADState>()((set) => ({
           const recent: string[] = root.recentPaints ?? [];
           root.recentPaints = [wallpaper.paintId, ...recent.filter((id: string) => id !== wallpaper.paintId)].slice(0, 8);
         }
+      })
+    ),
+
+  // Phase 68 MAT-APPLY-01 (D-06): four-action contract for surface Material
+  // assignment. History variant pushes once at the start; NoHistory variant
+  // skips pushHistory for mid-pick preview (matches Phase 31 single-undo
+  // template — see resizeProductAxis pair).
+  applySurfaceMaterial: (target, materialId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        pushHistory(s);
+        applySurfaceMaterialMut(doc, target, materialId);
+      })
+    ),
+  applySurfaceMaterialNoHistory: (target, materialId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        applySurfaceMaterialMut(doc, target, materialId);
+      })
+    ),
+  applySurfaceTileSize: (target, scaleFt) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        pushHistory(s);
+        applySurfaceTileSizeMut(doc, target, scaleFt);
+      })
+    ),
+  applySurfaceTileSizeNoHistory: (target, scaleFt) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        applySurfaceTileSizeMut(doc, target, scaleFt);
       })
     ),
 
@@ -1337,10 +1484,11 @@ export const useCADStore = create<CADState>()((set) => ({
 
   loadSnapshot: async (raw: unknown): Promise<void> => {
     // Phase 51 Pattern A: async pre-pass runs BEFORE produce() (Immer constraint)
-    const shaped = migrateSnapshot(raw);             // sync: v1→v2 (or v3/v4/v5 passthrough)
+    const shaped = migrateSnapshot(raw);             // sync: v1→v2 (or v3/v4/v5/v6 passthrough)
     const migratedV3 = await migrateFloorMaterials(shaped); // async: v2→v3 IDB migration
     const migratedV4 = migrateV3ToV4(migratedV3);    // sync: v3→v4 stair seed (Phase 60)
-    const migrated = migrateV4ToV5(migratedV4);      // sync: v4→v5 measure/annotation seed (Phase 62)
+    const migratedV5 = migrateV4ToV5(migratedV4);    // sync: v4→v5 measure/annotation seed (Phase 62)
+    const migrated = await migrateV5ToV6(migratedV5); // async: v5→v6 surface Material migration (Phase 68)
     set(
       produce((s: CADState) => {
         s.rooms = migrated.rooms;
@@ -1690,4 +1838,146 @@ if (typeof window !== "undefined" && import.meta.env.MODE === "test") {
   // to assert preset switches never push to the undo stack.
   (window as unknown as { __getCADHistoryLength?: () => number }).__getCADHistoryLength =
     () => useCADStore.getState().past.length;
+
+  // ─────────────────────────────────────────────────────────────────────
+  // Phase 68 MAT-APPLY-01 — test driver bridges for Material apply flow.
+  //
+  // Installed at MODULE EVAL time (not useEffect), gated by `MODE === "test"`.
+  // Mirrors the Phase 67 useMaterials.ts:139-148 + Phase 31 patterns:
+  // - Module-eval install runs once, never re-runs, never needs cleanup
+  //   (Pattern #7 cleanup-on-unmount applies to useEffect-installed registries,
+  //   not module-level globals).
+  //
+  // - __driveApplyMaterial(target, materialId)
+  //     Single-undo apply (D-06). Pushes one history entry.
+  // - __driveApplyMaterialNoHistory(target, materialId)
+  //     Mid-pick preview helper. No history entry.
+  // - __getResolvedMaterial(target)
+  //     Async reader. Returns serializable summary `{ materialId, hasColorHex,
+  //     hasColorMap }` or null. THREE.Texture refs are NOT exposed here —
+  //     Playwright cannot serialize them across page.evaluate.
+  // ─────────────────────────────────────────────────────────────────────
+  type ResolvedSummary = {
+    materialId: string | null;
+    hasColorHex: boolean;
+    hasColorMap: boolean;
+  };
+
+  (window as unknown as {
+    __driveApplyMaterial?: (
+      target: SurfaceTarget,
+      materialId: string | undefined,
+    ) => void;
+  }).__driveApplyMaterial = (target, materialId) =>
+    useCADStore.getState().applySurfaceMaterial(target, materialId);
+
+  (window as unknown as {
+    __driveApplyMaterialNoHistory?: (
+      target: SurfaceTarget,
+      materialId: string | undefined,
+    ) => void;
+  }).__driveApplyMaterialNoHistory = (target, materialId) =>
+    useCADStore.getState().applySurfaceMaterialNoHistory(target, materialId);
+
+  (window as unknown as {
+    __getResolvedMaterial?: (
+      target: SurfaceTarget,
+    ) => Promise<ResolvedSummary | null>;
+  }).__getResolvedMaterial = async (target) => {
+    const { listMaterials } = await import("@/lib/materialStore");
+    const { resolveSurfaceMaterial } = await import("@/lib/surfaceMaterial");
+    const mats = await listMaterials();
+    const state = useCADStore.getState();
+    const doc = state.activeRoomId ? state.rooms[state.activeRoomId] : undefined;
+    if (!doc) return null;
+    let mid: string | undefined;
+    let scaleFt: number | undefined;
+    switch (target.kind) {
+      case "wallSide": {
+        const w = doc.walls?.[target.wallId];
+        if (!w) return null;
+        mid = target.side === "A" ? w.materialIdA : w.materialIdB;
+        scaleFt = target.side === "A" ? w.scaleFtA : w.scaleFtB;
+        break;
+      }
+      case "floor": {
+        mid = doc.floorMaterialId;
+        scaleFt = doc.floorScaleFt;
+        break;
+      }
+      case "ceiling": {
+        const c = doc.ceilings?.[target.ceilingId];
+        if (!c) return null;
+        mid = c.materialId;
+        scaleFt = c.scaleFt;
+        break;
+      }
+      case "customElementFace": {
+        const p = doc.placedCustomElements?.[target.placedId];
+        if (!p) return null;
+        mid = p.faceMaterials?.[target.face];
+        break;
+      }
+    }
+    if (!mid) {
+      return { materialId: null, hasColorHex: false, hasColorMap: false };
+    }
+    const r = resolveSurfaceMaterial(mid, scaleFt, mats);
+    if (!r) {
+      // materialId set but Material missing from catalog (orphan).
+      return { materialId: mid, hasColorHex: false, hasColorMap: false };
+    }
+    return {
+      materialId: mid,
+      hasColorHex: !!r.colorHex,
+      hasColorMap: !!r.colorMapId,
+    };
+  };
+
+  // Phase 68 — synthetic paint Material seeder. Saves a colorHex-only Material
+  // directly (no file processing) so the e2e spec can apply a Material in
+  // sub-millisecond time without needing a JPEG fixture or async pattern load.
+  // Returns the new Material id.
+  (window as unknown as {
+    __driveSeedPaintMaterial?: (
+      colorHex: string,
+      name?: string,
+      tileSizeFt?: number,
+    ) => Promise<string>;
+  }).__driveSeedPaintMaterial = async (colorHex, name, tileSizeFt) => {
+    const { saveMaterialDirect } = await import("@/lib/materialStore");
+    const mat = await saveMaterialDirect({
+      name: name ?? `Test Paint ${colorHex}`,
+      tileSizeFt: tileSizeFt ?? 1,
+      colorHex,
+    });
+    return mat.id;
+  };
+
+  // Phase 68 — convenience seed helper. Lets the e2e spec drop a fully-formed
+  // wall into the active room without going through the wallTool drag flow.
+  // Mirrors Phase 36 specs that seed via __cadStore.loadSnapshot, but the
+  // sub-state surgical mutation is friendlier when we want to preserve other
+  // store state (autosave debounce, project metadata, etc.).
+  (window as unknown as {
+    __driveSeedWall?: (
+      wallId: string,
+      partial: { start: { x: number; y: number }; end: { x: number; y: number }; thickness?: number },
+    ) => void;
+  }).__driveSeedWall = (wallId, partial) => {
+    useCADStore.setState(
+      produce((s: CADState) => {
+        const doc = s.activeRoomId ? s.rooms[s.activeRoomId] : undefined;
+        if (!doc) return;
+        doc.walls[wallId] = {
+          id: wallId,
+          start: partial.start,
+          end: partial.end,
+          thickness: partial.thickness ?? 0.5,
+          height: doc.room.wallHeight,
+          openings: [],
+        };
+      }) as (s: CADState) => void,
+    );
+  };
 }

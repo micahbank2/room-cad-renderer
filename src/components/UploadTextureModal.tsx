@@ -451,27 +451,11 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
 
 export default UploadTextureModal;
 
-// ---- Test driver (Phase 29/30/31 pattern) ---------------------------------
-// Bypasses the React tree so vitest cases can exercise the persistence path
-// end-to-end without simulating drag-drop or file-input events (happy-dom
-// cannot synthesize a real `change` event against a native <input type="file">
-// with `.files` populated in a way that satisfies React's controlled-input
-// contract). Returns the saved id (or dedup id).
-if (typeof window !== "undefined" && import.meta.env.MODE === "test") {
-  (window as unknown as {
-    __driveTextureUpload: (file: File, name: string, tileSizeFt: number) => Promise<string>;
-  }).__driveTextureUpload = async (file, textureName, tileSizeFt) => {
-    const result = await processTextureFile(file);
-    const { saveUserTextureWithDedup } = await import("@/lib/userTextureStore");
-    const { id } = await saveUserTextureWithDedup(
-      {
-        name: textureName,
-        tileSizeFt,
-        blob: result.blob,
-        mimeType: result.mimeType,
-      },
-      result.sha256,
-    );
-    return id;
-  };
-}
+// __driveTextureUpload now lives in src/test-utils/textureDrivers.ts and is
+// installed unconditionally from src/main.tsx. The previous module-eval install
+// in this file required UploadTextureModal to be transitively imported by an
+// always-mounted UI surface. After Phase 68-06 removed the wallpaper "MY
+// TEXTURES" tab (and with it the WallSurfacePanel → MyTexturesList →
+// UploadTextureModal import chain), the driver vanished from the bundle in
+// production, breaking three legacy e2e specs. Decoupling driver registration
+// from UI mount is the architectural fix.

@@ -37,6 +37,7 @@ import { useWallpaperTexture } from "./wallpaperTextureCache";
 import { useWallArtTextures } from "./wallArtTextureCache";
 import { useUserTexture } from "@/hooks/useUserTexture";
 import { useClickDetect } from "@/hooks/useClickDetect";
+import { useResolvedMaterial, type ResolvedSurfaceMaterialWithTextures } from "./useResolvedMaterial";
 
 interface Props {
   wall: WallSegment;
@@ -196,6 +197,13 @@ export default function WallMesh({ wall, isSelected, roomId }: Props) {
     }
   }, [userTexB, wall.wallpaper?.B?.scaleFt, length, height]);
 
+  // Phase 68 Plan 04 — priority-1 materialId resolution per side. Called
+  // unconditionally at component top (Rules of Hooks). When non-null, the
+  // priority-1 branch in renderWallpaperOverlay takes over before any legacy
+  // wallpaper/userTexture/paint branch fires (D-01 safety net keeps legacy).
+  const resolvedA = useResolvedMaterial(wall.materialIdA, wall.scaleFtA, length, height);
+  const resolvedB = useResolvedMaterial(wall.materialIdB, wall.scaleFtB, length, height);
+
   const artA = (wall.wallArt ?? []).filter((a) => (a.side ?? "A") === "A");
   const artB = (wall.wallArt ?? []).filter((a) => (a.side ?? "A") === "B");
   const allArt = useMemo(
@@ -239,8 +247,54 @@ export default function WallMesh({ wall, isSelected, roomId }: Props) {
     tex: THREE.Texture | null,
     userTex: THREE.Texture | null,
     key: string,
-    matRef?: Ref<THREE.MeshStandardMaterial>,
+    matRef: Ref<THREE.MeshStandardMaterial> | undefined,
+    resolved: ResolvedSurfaceMaterialWithTextures | null,
   ) => {
+    // Phase 68 Plan 04 — priority-1 materialId branch. When wall.materialIdA/B
+    // is set AND the Material exists in the catalog, render here and DO NOT
+    // fall through to the legacy wallpaper/paint chain (D-01 keeps legacy
+    // fields readable for one milestone, but materialId wins when both set).
+    if (resolved) {
+      if (resolved.colorHex) {
+        return (
+          <mesh key={key} position={[0, 0, thickness / 2 + bandOffset / 2]}>
+            <planeGeometry args={[length, height]} />
+            <meshStandardMaterial
+              color={resolved.colorHex}
+              roughness={resolved.roughness}
+              metalness={resolved.metalness}
+              side={THREE.DoubleSide}
+              {...ghost}
+            />
+          </mesh>
+        );
+      }
+      if (resolved.colorMap) {
+        // Direct map={...} prop pattern (Phase 49 BUG-02 contract). The
+        // userTextureCache retains ownership; R3F never auto-disposes
+        // externally-passed texture props.
+        return (
+          <mesh key={key} position={[0, 0, thickness / 2 + bandOffset / 2]}>
+            <planeGeometry args={[length, height]} />
+            <meshStandardMaterial
+              ref={matRef}
+              color="#ffffff"
+              roughness={resolved.roughness}
+              metalness={resolved.metalness}
+              side={THREE.DoubleSide}
+              map={resolved.colorMap}
+              roughnessMap={resolved.roughnessMap ?? undefined}
+              metalnessMap={resolved.reflectionMap ?? undefined}
+              {...ghost}
+            />
+          </mesh>
+        );
+      }
+      // resolved with neither colorHex nor colorMap (e.g. orphan colorMapId
+      // — texture deleted from IDB) → fall through to legacy chain so the
+      // surface still has a sensible look.
+    }
+
     if (!wp) return null;
 
     // Phase 34 priority: user-uploaded texture beats the legacy data-URL
@@ -488,13 +542,13 @@ export default function WallMesh({ wall, isSelected, roomId }: Props) {
 
       {/* Side B — positive Z face (matches +perp / right side in 2D) */}
       <group>
-        {renderWallpaperOverlay(wall.wallpaper?.B, wallpaperBTex, userTexB, "wp-B", matRefB)}
+        {renderWallpaperOverlay(wall.wallpaper?.B, wallpaperBTex, userTexB, "wp-B", matRefB, resolvedB)}
         {renderSideDecor(wall.wainscoting?.B, wall.crownMolding?.B, artB)}
       </group>
 
       {/* Side A — flip 180° around Y to -Z face (matches -perp / left side in 2D) */}
       <group rotation={[0, Math.PI, 0]}>
-        {renderWallpaperOverlay(wall.wallpaper?.A, wallpaperATex, userTexA, "wp-A", matRefA)}
+        {renderWallpaperOverlay(wall.wallpaper?.A, wallpaperATex, userTexA, "wp-A", matRefA, resolvedA)}
         {renderSideDecor(wall.wainscoting?.A, wall.crownMolding?.A, artA)}
       </group>
     </group>

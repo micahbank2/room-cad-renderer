@@ -148,6 +148,44 @@ export async function findMaterialByColorSha256(
   return all.find((m) => m.colorSha256 === sha256);
 }
 
+/**
+ * Phase 68 — paint Material dedup helper. Returns an existing paint Material
+ * (one with `colorHex` set) whose hex matches `hex` (case-insensitive), or
+ * undefined when none exists. Used by snapshot v5→v6 migration to avoid
+ * spawning duplicate paint Materials when the same hex appears on multiple
+ * surfaces.
+ */
+export async function findPaintMaterialByHex(
+  hex: string,
+): Promise<Material | undefined> {
+  const target = hex.toLowerCase();
+  const all = await listMaterials();
+  return all.find((m) => m.colorHex?.toLowerCase() === target);
+}
+
+/**
+ * Phase 68 — direct Material write (NO file processing). Used by snapshot
+ * v5→v6 migration to persist Materials that wrap pre-existing UserTexture ids
+ * (no new file upload happens during migration) or that represent paint
+ * (no texture at all). DO NOT use from UI flows — those go through
+ * `saveMaterialWithDedup` to ensure SHA-256 dedup + file processing.
+ */
+export async function saveMaterialDirect(
+  partial: Omit<Material, "id" | "createdAt"> & {
+    id?: string;
+    createdAt?: number;
+  },
+): Promise<Material> {
+  const id = partial.id ?? `${MATERIAL_ID_PREFIX}${uid()}`;
+  const mat: Material = {
+    ...partial,
+    id,
+    createdAt: partial.createdAt ?? Date.now(),
+  };
+  await set(id, mat, materialIdbStore);
+  return mat;
+}
+
 /** Look up a Material by id. Returns `undefined` when absent. */
 export async function getMaterial(id: string): Promise<Material | undefined> {
   return get<Material>(id, materialIdbStore);

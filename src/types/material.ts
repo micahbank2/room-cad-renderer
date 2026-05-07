@@ -19,6 +19,27 @@
  */
 export const MATERIAL_ID_PREFIX = "mat_";
 
+/**
+ * Phase 68 D-07: face directions for `PlacedCustomElement.faceMaterials`.
+ * Each face independently resolves to a Material (or falls back to the catalog
+ * `CustomElement.color`).
+ *
+ * Coordinate convention (matches CustomElementMesh box geometry):
+ * - top    → +Z face (looking down at the box)
+ * - bottom → -Z face
+ * - north  → +Y face (away from origin in 2D plan)
+ * - south  → -Y face
+ * - east   → +X face
+ * - west   → -X face
+ */
+export type FaceDirection =
+  | "top"
+  | "bottom"
+  | "north"
+  | "south"
+  | "east"
+  | "west";
+
 export interface Material {
   /** Opaque id, prefixed with MATERIAL_ID_PREFIX. */
   id: string;
@@ -27,10 +48,31 @@ export interface Material {
   /** Real-world tile size in decimal feet. Required, parsed via validateInput. */
   tileSizeFt: number;
 
-  /** Reference into userTextureIdbStore. Required (D-09 wrapper). */
-  colorMapId: string;
+  /**
+   * Phase 68 D-02: paint Material — flat color (no texture).
+   *
+   * Mutually exclusive with `colorMapId` at the data-model level. If both are
+   * set, `resolveSurfaceMaterial` (src/lib/surfaceMaterial.ts) treats it as a
+   * data error: it `console.warn`s and prefers `colorHex`. TypeScript can't
+   * cheaply enforce mutual exclusion at the struct level, so this is a runtime
+   * guard — auto-generated paint Materials from snapshot v5→v6 migration leave
+   * `colorMapId` unset, while textured Materials leave `colorHex` unset.
+   *
+   * Standard CSS hex: `#rrggbb` lowercase (e.g. `"#f5f0e8"`).
+   */
+  colorHex?: string;
+
+  /**
+   * Reference into userTextureIdbStore. Required for textured Materials, omitted
+   * for paint Materials (when `colorHex` is set instead — D-02).
+   *
+   * Marked optional in the type system to allow paint Materials; runtime invariant
+   * (enforced by validators / saveMaterialWithDedup) is that exactly one of
+   * `colorHex` or `colorMapId` is set per Material.
+   */
+  colorMapId?: string;
   /** Lowercase hex SHA-256 of the color map's downscaled JPEG bytes. D-08 dedup key. */
-  colorSha256: string;
+  colorSha256?: string;
   /** Optional reference into userTextureIdbStore. */
   roughnessMapId?: string;
   /** Optional reference into userTextureIdbStore. */

@@ -122,6 +122,8 @@ export function RoomGroup({
         halfL={halfL}
         material={floorMaterial}
         fallbackTexture={floorTexture}
+        floorMaterialId={roomDoc.floorMaterialId}
+        floorScaleFt={roomDoc.floorScaleFt}
       />
       {Object.values(walls ?? {})
         .filter((w) => !effectivelyHidden.has(w.id))

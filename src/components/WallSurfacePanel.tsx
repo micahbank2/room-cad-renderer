@@ -4,36 +4,26 @@ import { useUIStore } from "@/stores/uiStore";
 import { angle } from "@/lib/geometry";
 import { useFramedArtStore } from "@/stores/framedArtStore";
 import { useWainscotStyleStore } from "@/stores/wainscotStyleStore";
-import { useUserTextures } from "@/hooks/useUserTextures";
-import type { Wallpaper } from "@/types/cad";
 import { FRAME_PRESETS } from "@/types/framedArt";
 import { STYLE_META } from "@/types/wainscotStyle";
-import PaintSection from "./PaintSection";
-import { CategoryTabs, type CategoryTab } from "@/components/library/CategoryTabs";
-import { MyTexturesList } from "@/components/MyTexturesList";
+import { MaterialPicker } from "./MaterialPicker";
 
 /** Appears in PropertiesPanel when exactly one wall is selected. */
 export default function WallSurfacePanel() {
   const selectedIds = useUIStore((s) => s.selectedIds);
   const walls = useActiveWalls();
   const activeSide = useUIStore((s) => s.activeWallSide);
-  const setActiveSide = useUIStore((s) => s.setActiveWallSide);
   const focusWallSide = useUIStore((s) => s.focusWallSide);
-  const setWallpaper = useCADStore((s) => s.setWallpaper);
   const toggleWainscoting = useCADStore((s) => s.toggleWainscoting);
   const toggleCrownMolding = useCADStore((s) => s.toggleCrownMolding);
   const addWallArt = useCADStore((s) => s.addWallArt);
   const removeWallArt = useCADStore((s) => s.removeWallArt);
   const copyWallSide = useCADStore((s) => s.copyWallSide);
   const swapWallSides = useCADStore((s) => s.swapWallSides);
-  const wallpaperFileRef = useRef<HTMLInputElement>(null);
   const artFileRef = useRef<HTMLInputElement>(null);
   const framedArtItems = useFramedArtStore((s) => s.items);
   const wainscotStyles = useWainscotStyleStore((s) => s.items);
   const [showLibrary, setShowLibrary] = useState(false);
-  // Phase 34 — WALLPAPER source tab (presets/upload vs MY TEXTURES).
-  const { textures: userTextures } = useUserTextures();
-  const [wallpaperTab, setWallpaperTab] = useState<string>("presets");
 
   // Detect which side faces the room interior (centroid of all wall endpoints)
   const interiorSide = useMemo(() => {
@@ -71,62 +61,13 @@ export default function WallSurfacePanel() {
   const wall = walls[selectedIds[0]];
   if (!wall) return null;
 
-  const wp = wall.wallpaper?.[activeSide];
   const wains = wall.wainscoting?.[activeSide];
   const crown = wall.crownMolding?.[activeSide];
   const artItems = (wall.wallArt ?? []).filter((a) => (a.side ?? "A") === activeSide);
 
-  const handleWallpaperColor = (color: string) => {
-    setWallpaper(wall.id, activeSide, { kind: "color", color });
-  };
-
-  const handleWallpaperImage = (file: File) => {
-    if (!file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      // Default to STRETCH (scaleFt=0) — users mostly upload wallpaper murals
-      const material: Wallpaper = {
-        kind: "pattern",
-        imageUrl: reader.result as string,
-        scaleFt: 0,
-      };
-      setWallpaper(wall.id, activeSide, material);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const toggleTile = () => {
-    if (!wp || wp.kind !== "pattern") return;
-    const newScale = (wp.scaleFt ?? 0) > 0 ? 0 : 2;
-    setWallpaper(wall.id, activeSide, { ...wp, scaleFt: newScale });
-  };
-
-  // Phase 66 (TILE-02, #105): per-surface tile-size override. Range 0.5-10 ft.
-  // Clamps to safe range to prevent zero/negative values that break texture.repeat.
-  const setTileSize = (value: number) => {
-    if (!wp || wp.kind !== "pattern") return;
-    const clamped = Math.max(0.5, Math.min(10, value));
-    setWallpaper(wall.id, activeSide, { ...wp, scaleFt: clamped });
-  };
-
-  // Phase 34 — apply a user-uploaded texture as wallpaper on the active side.
-  const handleWallpaperUserTexture = (id: string, tileSizeFt: number) => {
-    const material: Wallpaper = {
-      kind: "pattern",
-      userTextureId: id,
-      scaleFt: tileSizeFt,
-    };
-    setWallpaper(wall.id, activeSide, material);
-  };
-
-  const wallpaperTabs: CategoryTab[] = [
-    { id: "presets", label: "PRESETS" },
-    {
-      id: "my-textures",
-      label: "MY TEXTURES",
-      count: userTextures.length > 0 ? userTextures.length : undefined,
-    },
-  ];
+  // Phase 68 D-05: per-side material lookup. Replaces wallpaper + paint state.
+  const sideMaterialId = activeSide === "A" ? wall.materialIdA : wall.materialIdB;
+  const sideScaleFt = activeSide === "A" ? wall.scaleFtA : wall.scaleFtB;
 
   const handleAddArt = (file: File) => {
     if (!file.type.startsWith("image/")) return;
@@ -202,90 +143,14 @@ export default function WallSurfacePanel() {
         </button>
       </div>
 
-      {/* Wallpaper */}
-      <div>
-        <div className="font-mono text-[11px] text-text-dim mb-1">WALLPAPER</div>
-        <CategoryTabs
-          tabs={wallpaperTabs}
-          activeId={wallpaperTab}
-          onChange={setWallpaperTab}
-        />
-        {wallpaperTab === "my-textures" ? (
-          <MyTexturesList
-            selectedId={wp?.kind === "pattern" ? wp.userTextureId : undefined}
-            onSelect={handleWallpaperUserTexture}
-          />
-        ) : (
-        <div className="flex items-center gap-2 mt-1">
-          <input
-            type="color"
-            value={wp?.color ?? "#f8f5ef"}
-            onChange={(e) => handleWallpaperColor(e.target.value)}
-            className="w-8 h-7 bg-transparent border border-outline-variant/30 rounded-sm cursor-pointer"
-          />
-          <button
-            onClick={() => wallpaperFileRef.current?.click()}
-            className="flex-1 font-mono text-[11px] text-text-dim hover:text-accent-light tracking-widest uppercase px-2 py-1 border border-outline-variant/30 rounded-sm"
-          >
-            UPLOAD PATTERN
-          </button>
-          {wp && (
-            <button
-              onClick={() => setWallpaper(wall.id, activeSide, undefined)}
-              className="font-mono text-[11px] text-text-ghost hover:text-text-primary px-2 py-1"
-              title="Remove wallpaper"
-            >
-              ✕
-            </button>
-          )}
-        </div>
-        )}
-        <input
-          ref={wallpaperFileRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) handleWallpaperImage(f);
-            e.target.value = "";
-          }}
-        />
-        {wp?.kind === "pattern" && (
-          <div className="mt-1 space-y-1.5">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={(wp.scaleFt ?? 0) > 0}
-                onChange={toggleTile}
-                className="w-3 h-3 accent-accent rounded-none"
-              />
-              <span className="font-mono text-[11px] text-text-dim tracking-wider">
-                TILE PATTERN {(wp.scaleFt ?? 0) > 0 ? `(${wp.scaleFt}ft)` : "(stretch)"}
-              </span>
-            </label>
-            {/* Phase 66 (TILE-02, #105): per-surface tile-size input. Visible only when tiling is on. */}
-            {(wp.scaleFt ?? 0) > 0 && (
-              <label className="block">
-                <span className="font-mono text-[9px] text-text-dim block">TILE SIZE (ft)</span>
-                <input
-                  type="number"
-                  step="0.5"
-                  min="0.5"
-                  max="10"
-                  value={wp.scaleFt}
-                  onChange={(e) => setTileSize(parseFloat(e.target.value) || 2)}
-                  data-testid="wallpaper-tile-size"
-                  className="w-full font-mono text-[10px] bg-obsidian-high text-accent-light border border-outline-variant/30 px-2 py-1 rounded-sm"
-                />
-              </label>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Paint — F&B catalog + custom colors (Phase 18) */}
-      <PaintSection wallId={wall.id} side={activeSide} currentWallpaper={wp} />
+      {/* Phase 68 D-05: unified Material picker replaces wallpaper + paint pickers.
+          Legacy PaintSection / SurfaceMaterialPicker remain on disk for v1.18 cleanup. */}
+      <MaterialPicker
+        surface="wallSide"
+        target={{ kind: "wallSide", wallId: wall.id, side: activeSide }}
+        value={sideMaterialId}
+        tileSizeOverride={sideScaleFt}
+      />
 
       {/* Wainscoting — pick from library (Phase 16) */}
       <div>

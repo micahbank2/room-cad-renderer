@@ -158,7 +158,7 @@
 ### Phases
 
 - [x] **Phase 67: Material Engine Foundation** — Material entity + texture-map upload + IDB persistence, mirroring Phase 32 user-texture pipeline (completed 2026-05-07)
-- [ ] **Phase 68: Material Application System** — Unified surface-material picker replacing split paint / wallpaper / floor-material flows
+- [x] **Phase 68: Material Application System** — Unified surface-material picker replacing split paint / wallpaper / floor-material flows (completed 2026-05-07)
 - [ ] **Phase 69: Product–Material Linking** — Finish slot on placed products, swap fabric/finish without re-placing
 - [ ] **Phase 70: Library Rebuild** — Materials / Assemblies / Products top-level toggle with category tabs
 
@@ -181,16 +181,23 @@
 
 #### Phase 68: Material Application System (MAT-APPLY-01)
 
-**Goal:** Jessica selects any wall side, floor, ceiling, or custom-element face and applies a Material from the library through one unified picker, replacing today's split paint / wallpaper / floor-material flows. Existing assignments still render correctly (back-compat or migration — research picks).
-**Depends on:** Phase 67 (Material entity + library), Phase 32 (texture pipeline), Phase 13/17 (legacy wallpaper / floor-material / wall-side surface model), Phase 31 (single-undo apply pattern)
+**Goal:** Jessica selects any wall side, floor, ceiling, or custom-element face and applies a Material from the library through one unified picker, replacing today's split paint / wallpaper / floor-material flows. Existing assignments auto-migrate v5→v6 (D-01).
+**Depends on:** Phase 67 (Material entity + library), Phase 32 (texture pipeline), Phase 13/17 (legacy wallpaper / floor-material / wall-side surface model), Phase 31 (single-undo apply pattern), Phase 51 (async snapshot migration template)
 **Requirements:** [MAT-APPLY-01](https://github.com/micahbank2/room-cad-renderer/issues/27)
 **Success Criteria** (what must be TRUE):
   1. Selecting a wall side, floor, ceiling, or custom-element face shows a unified "Material" picker in PropertiesPanel
   2. Picking a Material from the library renders it correctly in 2D fabric texture-fill AND 3D mesh material (color map + roughness)
   3. Applying a material is a single undo entry (Ctrl+Z reverts the apply)
-  4. Existing paint colors, wallpaper assignments, and floor-material assignments continue to render correctly after the milestone (either via aliasing or via snapshot migration — research chooses)
+  4. Existing paint colors, wallpaper assignments, and floor-material assignments auto-migrate at load time (snapshot v5→v6, idempotent — D-01)
   5. Snapshot serialization preserves `surface.materialId` and round-trips cleanly through save/load
-**Plans:** TBD
+**Plans:** 7/7 plans complete
+- [x] 68-01-PLAN.md — Wave 0 RED test scaffolding (6 failing tests pin the contract)
+- [x] 68-02-PLAN.md — Type extensions (Material.colorHex, FaceDirection, materialIdA/B, floorMaterialId, ceiling.materialId, faceMaterials, snapshot v5→v6) + resolveSurfaceMaterial / resolveSurfaceTileSize
+- [x] 68-03-PLAN.md — migrateV5ToV6 async pre-pass (paint→Material, wallpaper→Material, floor→Material, ceiling→Material, idempotent) + applySurfaceMaterial / *NoHistory + applySurfaceTileSize / *NoHistory store actions
+- [x] 68-04-PLAN.md — useResolvedMaterial R3F hook + priority-1 materialId branch in WallMesh / FloorMesh / CeilingMesh / per-face material array on CustomElementMesh
+- [x] 68-05-PLAN.md — materialPatternCache (async fabric.Pattern loader) + fabricSync wall fill materialId branch + new renderFloor 2D top-down floor render
+- [x] 68-06-PLAN.md — Unified MaterialPicker (replaces 4 legacy pickers) + mount in PropertiesPanel / WallSurfacePanel / RoomSettings (legacy picker files kept on disk per D-01 safety net)
+- [x] 68-07-PLAN.md — Test drivers (`__driveApplyMaterial`, `__getResolvedMaterial`) + e2e Wave 0 spec GREEN + HUMAN-UAT.md + Jessica checkpoint
 **UI hint:** yes
 
 #### Phase 69: Product–Material Linking (MAT-LINK-01)
@@ -261,7 +268,7 @@
 | 65. Ceiling Resize Handles | 1/1 | Complete    | 2026-05-06 |
 | 66. Per-Surface Tile-Size UI | 1/1 | Complete    | 2026-05-06 |
 | 67. Material Engine Foundation | 1/1 | Complete    | 2026-05-07 |
-| 68. Material Application System | 0/0 | Not started   | — |
+| 68. Material Application System | 7/7 | Complete   | 2026-05-07 |
 | 69. Product–Material Linking | 0/0 | Not started   | — |
 | 70. Library Rebuild | 0/0 | Not started   | — |
 

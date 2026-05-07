@@ -17,8 +17,9 @@ import { validateInput } from "@/canvas/dimensionEditor";
 import type { Product } from "@/types/product";
 import { hasDimensions } from "@/types/product";
 import type { PlacedCustomElement, Ceiling } from "@/types/cad";
+import type { FaceDirection } from "@/types/material";
 import WallSurfacePanel from "./WallSurfacePanel";
-import CeilingPaintSection from "./CeilingPaintSection";
+import { MaterialPicker } from "./MaterialPicker";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { Camera, CameraOff } from "lucide-react";
 import { OpeningsSection } from "@/components/PropertiesPanel.OpeningSection";
@@ -205,6 +206,9 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
   const setSavedCameraOnCustomElementNoHistory = useCADStore((s) => s.setSavedCameraOnCustomElementNoHistory);
   const clearSavedCameraNoHistory = useCADStore((s) => s.clearSavedCameraNoHistory);
 
+  // Phase 68 D-07: which face of a selected custom element the picker targets.
+  const [activeFace, setActiveFace] = useState<FaceDirection>("top");
+
   const id = selectedIds[0];
   const wall = id ? walls[id] : undefined;
   const pp = id ? placedProducts[id] : undefined;
@@ -345,7 +349,12 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
               Reset size
             </button>
           )}
-          <CeilingPaintSection ceilingId={ceiling.id} ceiling={ceiling} />
+          <MaterialPicker
+            surface="ceiling"
+            target={{ kind: "ceiling", ceilingId: ceiling.id }}
+            value={ceiling.materialId}
+            tileSizeOverride={ceiling.scaleFt}
+          />
           <SavedCameraButtons
             kind="ceiling"
             id={ceiling.id}
@@ -551,6 +560,46 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
               Reset size
             </button>
           )}
+          {/* Phase 68 D-07: per-face Material picker. */}
+          <section className="flex flex-col gap-2 p-4 bg-obsidian-low rounded-md">
+            <header className="font-mono text-[--font-size-sm] text-text-muted uppercase">
+              Face
+            </header>
+            <div className="grid grid-cols-3 gap-1">
+              {(
+                [
+                  "top",
+                  "bottom",
+                  "north",
+                  "south",
+                  "east",
+                  "west",
+                ] as FaceDirection[]
+              ).map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => setActiveFace(f)}
+                  className={`font-mono text-[--font-size-sm] uppercase p-1 rounded-sm ${
+                    activeFace === f
+                      ? "bg-accent text-text-primary"
+                      : "bg-obsidian-mid text-text-muted hover:bg-obsidian-high"
+                  }`}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+          </section>
+          <MaterialPicker
+            surface="customElementFace"
+            target={{
+              kind: "customElementFace",
+              placedId: pce.id,
+              face: activeFace,
+            }}
+            value={pce.faceMaterials?.[activeFace]}
+          />
           <SavedCameraButtons
             kind="custom"
             id={pce.id}

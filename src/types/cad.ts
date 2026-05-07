@@ -1,3 +1,5 @@
+import type { FaceDirection } from "./material";
+
 export interface Point {
   x: number;
   y: number;
@@ -29,6 +31,18 @@ export interface WallSegment {
   openings: Opening[];
   /** Wallpaper per side (Phase 17). */
   wallpaper?: { A?: Wallpaper; B?: Wallpaper };
+  /** Phase 68 D-03: per-side Material reference. Wins over `wallpaper` at render
+   *  time. Legacy `wallpaper` is kept readable through v1.17 as a safety net
+   *  (D-01); removal scheduled for v1.18 cleanup. */
+  materialIdA?: string;
+  /** Phase 68 D-03: per-side Material reference for wall side B. */
+  materialIdB?: string;
+  /** Phase 68 D-04: per-side tile-size override (feet) for the resolved
+   *  Material. Read precedence in `resolveSurfaceTileSize`:
+   *  `scaleFtA ?? material.tileSizeFt ?? 1`. Mirrors `Wallpaper.scaleFt`. */
+  scaleFtA?: number;
+  /** Phase 68 D-04: per-side tile-size override for wall side B. */
+  scaleFtB?: number;
   /** Wainscoting per side (Phase 17). */
   wainscoting?: { A?: WainscotConfig; B?: WainscotConfig };
   /** Crown molding per side (Phase 17). */
@@ -188,6 +202,12 @@ export interface PlacedCustomElement {
   depthFtOverride?: number;
   /** D-13: per-placement display name override. Empty/undefined → render catalog name. Max 40 chars (client-enforced). */
   labelOverride?: string;
+  /** Phase 68 D-07: per-face Material override. Each face independently resolves
+   *  to a Material; missing faces fall back to the catalog `CustomElement.color`.
+   *  Per-placement (NOT catalog) so two placements of the same custom element
+   *  can carry different finishes. `Partial<Record<...>>` so missing faces are
+   *  valid (no need to populate all six). */
+  faceMaterials?: Partial<Record<FaceDirection, string>>;
   /** Phase 48 CAM-04 (D-03). */
   savedCameraPos?: [number, number, number];
   /** Phase 48 CAM-04 (D-03). */
@@ -211,6 +231,10 @@ export interface Ceiling {
   /** Phase 34 (LIB-06/08): id of a UserTexture in the `room-cad-user-textures`
    *  IDB keyspace. When present, takes priority over `surfaceMaterialId` at render. */
   userTextureId?: string;
+  /** Phase 68 D-03: ceiling Material reference. Wins over all legacy fields
+   *  (`material`, `paintId`, `surfaceMaterialId`, `userTextureId`) at render
+   *  time. Legacy fields kept readable through v1.17 (D-01). */
+  materialId?: string;
   /** Phase 42 (BUG-01): per-ceiling tile-size override (in feet) for the
    *  user-uploaded texture. Written at apply-time when the user picks a
    *  `userTextureId`. Mirrors `Wallpaper.scaleFt` + `FloorMaterial.scaleFt`.
@@ -271,6 +295,14 @@ export interface RoomDoc {
   ceilings?: Record<string, Ceiling>;
   /** Floor material (preset or custom upload). Per-room. */
   floorMaterial?: FloorMaterial;
+  /** Phase 68 D-03: floor Material reference. Wins over `floorMaterial` at
+   *  render time. Legacy `floorMaterial` kept readable through v1.17 (D-01).
+   *  When the migration encounters a preset (e.g. `WOOD_OAK`), it stores the
+   *  preset id directly here without generating a new Material entry. */
+  floorMaterialId?: string;
+  /** Phase 68 D-04: floor tile-size override (feet). Mirrors `FloorMaterial.scaleFt`.
+   *  Read precedence: `floorScaleFt ?? material.tileSizeFt ?? 1`. */
+  floorScaleFt?: number;
   /** Placed custom elements (references customElements catalog on snapshot). */
   placedCustomElements?: Record<string, PlacedCustomElement>;
   /** Phase 60 STAIRS-01 (D-01): per-room stairs. Optional — older snapshots
@@ -308,9 +340,11 @@ export interface Annotation {
 }
 
 export interface CADSnapshot {
-  /** Phase 62 MEASURE-01 (D-02): bumped from 4 to 5 — new RoomDoc fields
-   *  measureLines + annotations. v4 snapshots migrate via migrateV4ToV5. */
-  version: 5;
+  /** Phase 68 MAT-APPLY-01 (D-03): bumped from 5 to 6 — new surface Material
+   *  reference fields (Wall.materialIdA/B, RoomDoc.floorMaterialId,
+   *  Ceiling.materialId, PlacedCustomElement.faceMaterials). v5 snapshots
+   *  migrate via migrateV5ToV6 (Plan 03). */
+  version: 6;
   rooms: Record<string, RoomDoc>;
   activeRoomId: string | null;
   /** Per-project catalog of custom elements (reusable across rooms). */

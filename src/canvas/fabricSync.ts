@@ -30,6 +30,9 @@ import { getWallEndpointHandles, getWallThicknessHandle } from "./wallEditHandle
 import { getOpeningHandles } from "./openingEditHandles";
 import { resolvePaintHex } from "@/lib/colorUtils";
 import { usePaintStore } from "@/stores/paintStore";
+import type { Material } from "@/types/material";
+import { resolveSurfaceTileSize } from "@/lib/surfaceMaterial";
+import { getMaterialPattern } from "@/canvas/materialPatternCache";
 
 // ---------------------------------------------------------------------------
 // Lime wash pattern — cached to prevent flicker on every redraw (Pitfall 5).
@@ -300,7 +303,13 @@ export function renderWalls(
   walls: Record<string, WallSegment>,
   scale: number,
   origin: { x: number; y: number },
-  selectedIds: string[]
+  selectedIds: string[],
+  // Phase 68 Plan 05 — Material catalog for D-03 per-side materialId resolution.
+  // pixelsPerFoot is the canvas scale (renamed for the pattern-cache contract);
+  // both default to empty/0 for legacy callers (e.g. tests that don't exercise
+  // Material rendering).
+  materials: ReadonlyArray<Material> = [],
+  pixelsPerFoot: number = scale,
 ) {
   // Pre-compute shared endpoints so we can draw corner caps that hide the
   // visible seams where wall rectangles overlap.
@@ -332,15 +341,46 @@ export function renderWalls(
       y: origin.y + c.y * scale,
     }));
 
-    // Resolve per-side paint fills
+    // Phase 68 D-03 priority-1: per-side Material reference. When a Material
+    // resolves, its colorHex (paint Material) or fabric.Pattern (textured
+    // Material) wins over the legacy `wallpaper.A/B` paint chain. Async
+    // pattern loads trigger fc.requestRenderAll() once the texture resolves.
+    const materialIdA = wall.materialIdA;
+    const materialIdB = wall.materialIdB;
+    const resolveMaterialFill = (
+      materialId: string | undefined,
+      surfaceScaleFt: number | undefined,
+    ): string | fabric.Pattern | null => {
+      if (!materialId) return null;
+      const m = materials.find((mat) => mat.id === materialId);
+      if (!m) return null;
+      if (m.colorHex) return m.colorHex;
+      if (m.colorMapId) {
+        const tileFt = resolveSurfaceTileSize(surfaceScaleFt, m);
+        const pattern = getMaterialPattern(m, tileFt, pixelsPerFoot, () =>
+          fc.requestRenderAll(),
+        );
+        // Synchronous fallback: solid placeholder until async load resolves.
+        return pattern ?? "#888";
+      }
+      return null;
+    };
+    const matFillA = resolveMaterialFill(materialIdA, wall.scaleFtA);
+    const matFillB = resolveMaterialFill(materialIdB, wall.scaleFtB);
+
+    // Resolve per-side paint fills (legacy fallback when Material absent).
     const wpA = wall.wallpaper?.A;
     const wpB = wall.wallpaper?.B;
-    const fillA = wpA?.kind === "paint" && wpA.paintId
+    const paintFillA = wpA?.kind === "paint" && wpA.paintId
       ? resolvePaintHex(wpA.paintId, customColors)
       : null;
-    const fillB = wpB?.kind === "paint" && wpB.paintId
+    const paintFillB = wpB?.kind === "paint" && wpB.paintId
       ? resolvePaintHex(wpB.paintId, customColors)
       : null;
+
+    // Material wins over legacy paint per D-03.
+    const fillA = matFillA ?? paintFillA;
+    const fillB = matFillB ?? paintFillB;
 
     const hasSidePaint = fillA || fillB;
 
@@ -1248,6 +1288,89 @@ export function renderRoomAreaOverlay(
 ) {
   const overlay = buildRoomAreaOverlay(Object.values(walls), scale, origin);
   if (overlay) fc.add(overlay);
+}
+
+/**
+ * Phase 68 Plan 05 — render the room floor as a fabric.Polygon at the wall
+ * footprint when `RoomDoc.floorMaterialId` resolves to a Material in the
+ * catalog.
+ *
+ * No-op when:
+ *   - room is null/undefined
+ *   - room.floorMaterialId is unset (Phase 67- behavior preserved)
+ *   - the materialId does not resolve in `materials` (orphan tolerance)
+ *   - the wall footprint produces fewer than 3 points
+ *
+ * The polygon is added to the canvas and pushed behind all other objects via
+ * `fc.sendObjectToBack` so walls/products/ceilings layer above it.
+ *
+ * Footprint computation: collects wall.start points in insertion order and
+ * builds a closed polygon. This is the simple "convex room" path adequate for
+ * v1.17 — non-convex rooms are documented as an edge case in the SUMMARY.
+ *
+ * Async pattern loads (textured Materials) call `fc.requestRenderAll()` once
+ * the Pattern resolves, just like the wall material branch.
+ *
+ * Ceiling 2D fill is intentionally NOT added in this plan: top-down 2D view
+ * shows ceilings as outlines only (RESEARCH Open Question 5 recommendation).
+ */
+export function renderFloor(
+  fc: fabric.Canvas,
+  room:
+    | {
+        walls?: Record<string, WallSegment> | WallSegment[];
+        floorMaterialId?: string;
+        floorScaleFt?: number;
+      }
+    | null
+    | undefined,
+  scale: number,
+  origin: { x: number; y: number },
+  materials: ReadonlyArray<Material>,
+): void {
+  if (!room || !room.floorMaterialId) return;
+  const mat = materials.find((m) => m.id === room.floorMaterialId);
+  if (!mat) return;
+
+  const wallList: Array<Pick<WallSegment, "start" | "end">> = Array.isArray(
+    room.walls,
+  )
+    ? (room.walls as WallSegment[])
+    : Object.values(room.walls ?? {});
+  if (wallList.length < 3) return;
+
+  const points = wallList
+    .filter((w) => w?.start && typeof w.start.x === "number")
+    .map((w) => ({
+      x: origin.x + w.start.x * scale,
+      y: origin.y + w.start.y * scale,
+    }));
+  if (points.length < 3) return;
+
+  let fill: string | fabric.Pattern = "#444";
+  if (mat.colorHex) {
+    fill = mat.colorHex;
+  } else if (mat.colorMapId) {
+    const tileFt = resolveSurfaceTileSize(room.floorScaleFt, mat);
+    const pattern = getMaterialPattern(mat, tileFt, scale, () =>
+      fc.requestRenderAll(),
+    );
+    if (pattern) fill = pattern;
+  }
+
+  const poly = new fabric.Polygon(points, {
+    fill: fill as unknown as string,
+    stroke: undefined,
+    strokeWidth: 0,
+    selectable: false,
+    evented: false,
+    objectCaching: false,
+    data: { type: "floor", floorMaterialId: room.floorMaterialId },
+  });
+  fc.add(poly);
+  // Push beneath grid/walls/products. Phase 25 D-02 keeps renderOnAddRemove
+  // off, so the next requestRenderAll/renderAll commit picks up the order.
+  fc.sendObjectToBack(poly);
 }
 
 // Phase 31 — install __getCustomElementLabel test bridge so the

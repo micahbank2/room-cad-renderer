@@ -17,6 +17,7 @@ import { PbrSurface } from "./PbrSurface";
 import { useUserTexture } from "@/hooks/useUserTexture";
 import { useUserTextures } from "@/hooks/useUserTextures";
 import { useClickDetect } from "@/hooks/useClickDetect";
+import { useResolvedMaterial } from "./useResolvedMaterial";
 
 interface Props {
   ceiling: Ceiling;
@@ -81,6 +82,13 @@ export default function CeilingMesh({ ceiling, isSelected }: Props) {
     return { w: Math.max(0.1, b.width), l: Math.max(0.1, b.depth) };
   }, [renderedPoints]);
 
+  // Phase 68 Plan 04 — priority-1 ceiling.materialId resolution. Beats every
+  // legacy ceiling branch (userTextureId, surfaceMaterialId, paintId, raw
+  // material string) when set AND the Material exists in the catalog.
+  // Hooks called unconditionally (Rules of Hooks); ceiling.scaleFt overrides
+  // material.tileSizeFt per D-04.
+  const resolved = useResolvedMaterial(ceiling.materialId, ceiling.scaleFt, bbox.w, bbox.l);
+
   const geometry = useMemo(() => {
     const shape = new THREE.Shape();
     if (renderedPoints.length === 0) return new THREE.ShapeGeometry(shape);
@@ -142,7 +150,33 @@ export default function CeilingMesh({ ceiling, isSelected }: Props) {
         });
       }}
     >
-      {useUserTextureBranch ? (
+      {resolved && (resolved.colorHex || resolved.colorMap) ? (
+        // Phase 68 Plan 04 — priority-1 materialId branch. Wins over every
+        // legacy ceiling render path. Orphan colorMap (texture missing from
+        // IDB) falls through to legacy chain so the ceiling still renders.
+        resolved.colorHex ? (
+          <meshStandardMaterial
+            color={resolved.colorHex}
+            side={THREE.DoubleSide}
+            roughness={resolved.roughness}
+            metalness={resolved.metalness}
+            emissive={isSelected ? "#7c5bf0" : "#000000"}
+            emissiveIntensity={isSelected ? 0.2 : 0}
+          />
+        ) : (
+          <meshStandardMaterial
+            color="#ffffff"
+            side={THREE.DoubleSide}
+            roughness={resolved.roughness}
+            metalness={resolved.metalness}
+            map={resolved.colorMap ?? undefined}
+            roughnessMap={resolved.roughnessMap ?? undefined}
+            metalnessMap={resolved.reflectionMap ?? undefined}
+            emissive={isSelected ? "#7c5bf0" : "#000000"}
+            emissiveIntensity={isSelected ? 0.2 : 0}
+          />
+        )
+      ) : useUserTextureBranch ? (
         <meshStandardMaterial
           color="#ffffff"
           side={THREE.DoubleSide}
