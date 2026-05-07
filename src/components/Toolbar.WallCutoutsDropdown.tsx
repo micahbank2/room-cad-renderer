@@ -100,7 +100,7 @@ export function WallCutoutsDropdown({ anchorRef, onClose, onPick }: Props) {
           onClose();
         }
       }}
-      className="glass-panel ghost-border rounded-sm p-1 min-w-[160px] outline-none"
+      className="bg-card border border-border rounded-sm p-1 min-w-[160px] outline-none"
     >
       {ITEMS.map((item) => (
         <button

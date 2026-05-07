@@ -42,7 +42,7 @@ export function LibraryCard({
   badge,
 }: LibraryCardProps) {
   const baseClasses =
-    "group relative ghost-border rounded-md cursor-pointer transition-colors";
+    "group relative border border-border/50 rounded-md cursor-pointer transition-colors";
   const stateClasses = selected
     ? "border-accent/60 bg-accent/10"
     : "bg-card hover:bg-accent";

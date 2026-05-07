@@ -46,7 +46,7 @@ function OpeningRow({ wall, opening }: { wall: WallSegment; opening: Opening }) 
   const offsetLabel = `${opening.offset.toFixed(1)}'`;
 
   return (
-    <div className="bg-card ghost-border rounded-sm">
+    <div className="bg-card border border-border/50 rounded-sm">
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}

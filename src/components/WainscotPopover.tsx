@@ -66,7 +66,7 @@ export function WainscotPopover({ wallId, side, style, onClose }: Props) {
           onClose();
         }
       }}
-      className="glass-panel ghost-border rounded-sm p-2 w-[180px] outline-none"
+      className="bg-card border border-border rounded-sm p-2 w-[180px] outline-none"
     >
       <div className="font-mono text-[10px] text-muted-foreground/60 tracking-widest uppercase mb-2">
         WAINSCOT EDIT

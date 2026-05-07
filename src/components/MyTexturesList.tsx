@@ -218,7 +218,7 @@ function TextureCard({
   onDelete,
 }: TextureCardProps): JSX.Element {
   const base =
-    "group relative ghost-border rounded-md cursor-pointer transition-colors flex flex-col p-2";
+    "group relative border border-border/50 rounded-md cursor-pointer transition-colors flex flex-col p-2";
   const state = selected
     ? "border-accent/60 bg-accent/10 ring-2 ring-accent ring-offset-1 ring-offset-card"
     : "bg-card hover:bg-accent";

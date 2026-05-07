@@ -18,7 +18,7 @@ export default function StatusBar() {
   const cameraMode = useUIStore((s) => s.cameraMode);
 
   return (
-    <div className="h-8 bg-background flex items-center px-4 ghost-border border-0 border-t shrink-0">
+    <div className="h-8 bg-background flex items-center px-4 border border-border/50 border-0 border-t shrink-0">
       <div className="flex items-center gap-1.5">
         <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
         <span className="font-mono text-[9px] text-muted-foreground/60 tracking-widest">

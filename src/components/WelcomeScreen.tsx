@@ -53,7 +53,7 @@ export default function WelcomeScreen({ onStart }: Props) {
   return (
     <div className="h-full flex flex-col bg-background">
       {/* Minimal top bar — just the brand */}
-      <header className="h-14 bg-background flex items-center px-6 ghost-border border-0 border-b">
+      <header className="h-14 bg-background flex items-center px-6 border border-border/50 border-0 border-b">
         <span className="font-display font-bold text-foreground text-sm tracking-[0.1em]">
           OBSIDIAN CAD
         </span>
@@ -167,7 +167,7 @@ export default function WelcomeScreen({ onStart }: Props) {
       </div>
 
       {/* Simple status bar */}
-      <div className="h-8 bg-background flex items-center px-4 ghost-border border-0 border-t">
+      <div className="h-8 bg-background flex items-center px-4 border border-border/50 border-0 border-t">
         <div className="flex items-center gap-1.5">
           <div className="w-1.5 h-1.5 rounded-full bg-success" />
           <span className="font-mono text-[9px] text-muted-foreground/60 tracking-widest">

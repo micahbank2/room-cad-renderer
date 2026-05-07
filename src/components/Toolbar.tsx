@@ -88,7 +88,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
   const displayValue = draftName ?? activeName;
 
   return (
-    <header className="h-14 bg-background flex items-center px-4 shrink-0 ghost-border border-0 border-b">
+    <header className="h-14 bg-background flex items-center px-4 shrink-0 border border-border/50 border-0 border-b">
       {/* Brand — click to go home */}
       <button
         onClick={onHome}
@@ -240,7 +240,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
             title={`CUTAWAY: ${cutawayMode === "auto" ? "AUTO" : "OFF"}`}
             className={`flex items-center justify-center gap-1 px-2 py-1 rounded-sm font-mono text-sm transition-colors duration-150 border mr-6 ${
               cutawayMode === "auto"
-                ? "bg-accent/10 text-foreground border-ring accent-glow"
+                ? "bg-accent/10 text-foreground border-ring"
                 : "text-muted-foreground/80 hover:text-foreground border-transparent"
             }`}
           >
@@ -436,7 +436,7 @@ export function ToolPalette() {
   const isCutoutTool = activeTool === "archway" || activeTool === "passthrough" || activeTool === "niche";
 
   return (
-    <div className="absolute left-3 top-3 z-10 flex flex-col gap-1 glass-panel p-1.5 rounded-sm">
+    <div className="absolute left-3 top-3 z-10 flex flex-col gap-1 bg-card border border-border p-1.5 rounded-sm">
       {tools.map((t) => (
         <Tooltip
           key={t.id}

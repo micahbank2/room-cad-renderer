@@ -88,7 +88,7 @@ export function MaterialCard({
   return (
     <div
       data-testid={`material-card-${material.id}`}
-      className="group relative ghost-border rounded-md cursor-pointer transition-colors flex flex-col p-2 bg-card hover:bg-accent"
+      className="group relative border border-border/50 rounded-md cursor-pointer transition-colors flex flex-col p-2 bg-card hover:bg-accent"
       onClick={onClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}

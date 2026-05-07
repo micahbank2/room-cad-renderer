@@ -229,7 +229,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
     const totalCount = selectedIds.length;
 
     return (
-      <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto glass-panel rounded-sm p-4 space-y-3">
+      <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto bg-card border border-border rounded-sm p-4 space-y-3">
         <h3 id="bulk-actions" className="font-mono text-base font-medium text-muted-foreground">
           Bulk actions
         </h3>
@@ -283,7 +283,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
     const areaSqFt = polygonArea(wallList);
     return (
       <div
-        className="absolute right-3 top-3 z-10 w-64 glass-panel rounded-sm p-4 space-y-3"
+        className="absolute right-3 top-3 z-10 w-64 bg-card border border-border rounded-sm p-4 space-y-3"
         aria-label="Properties (room)"
       >
         <h3 className="font-mono text-base font-medium text-muted-foreground">
@@ -308,7 +308,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
   }
 
   return (
-    <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto glass-panel rounded-sm p-4 space-y-3">
+    <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto bg-card border border-border rounded-sm p-4 space-y-3">
       <h3 id="properties" aria-label="Properties" className="font-mono text-base font-medium text-muted-foreground">
         Properties
       </h3>
