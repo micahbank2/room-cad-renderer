@@ -312,7 +312,7 @@ export function CanvasContextMenu() {
           data-action-id={action.id}
           className={[
             "w-full flex items-center gap-2 px-3 h-6",
-            "font-mono text-sm",
+            "font-sans text-sm",
             action.destructive
               ? "text-error hover:bg-accent"
               : "text-foreground hover:bg-accent",

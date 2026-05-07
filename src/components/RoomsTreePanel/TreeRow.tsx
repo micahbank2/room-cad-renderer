@@ -90,7 +90,7 @@ export function TreeRow(props: TreeRowProps) {
     "text-foreground";
 
   const labelClass = [
-    "flex-1 text-left font-mono truncate overflow-hidden text-ellipsis whitespace-nowrap",
+    "flex-1 text-left font-sans truncate overflow-hidden text-ellipsis whitespace-nowrap",
     labelSize,
     labelColor,
   ].join(" ");
@@ -245,7 +245,7 @@ export function TreeRow(props: TreeRowProps) {
 
       {/* Empty-state rows — UI-SPEC § Empty States VERBATIM (italic, text-muted-foreground/60, pl-6, h-6) */}
       {isGroup && node.children && node.children.length === 0 && (
-        <div className="flex items-center h-6 pl-6 pr-2 italic text-muted-foreground/60 font-mono text-sm">
+        <div className="flex items-center h-6 pl-6 pr-2 italic text-muted-foreground/60 font-sans text-sm">
           {node.groupKey === "walls" && "No walls yet"}
           {node.groupKey === "products" && "No products placed"}
           {node.groupKey === "custom" && "No custom elements placed"}

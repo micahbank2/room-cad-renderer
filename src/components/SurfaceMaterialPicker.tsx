@@ -59,7 +59,7 @@ export default function SurfaceMaterialPicker({
             ].join(" ")}
           >
             <MaterialThumbnail materialId={m.id} fallbackColor={m.color} />
-            <span className="font-mono text-[8px] text-muted-foreground/80 block mt-1 truncate">
+            <span className="font-sans text-[8px] text-muted-foreground/80 block mt-1 truncate">
               {m.label}
             </span>
           </button>

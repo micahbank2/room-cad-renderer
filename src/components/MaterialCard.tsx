@@ -111,7 +111,7 @@ export function MaterialCard({
           opacity toggles on hover. */}
       <div
         role="tooltip"
-        className={`absolute bottom-full left-0 mb-1 z-20 bg-secondary border border-border/50 rounded-sm px-2 py-1 font-mono text-sm text-muted-foreground truncate max-w-xs pointer-events-none shadow-lg transition-opacity ${
+        className={`absolute bottom-full left-0 mb-1 z-20 bg-secondary border border-border/50 rounded-sm px-2 py-1 font-sans text-sm text-muted-foreground truncate max-w-xs pointer-events-none shadow-lg transition-opacity ${
           hover ? "opacity-100" : "opacity-0"
         }`}
       >
@@ -129,7 +129,7 @@ export function MaterialCard({
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             {orphan && (
-              <span className="font-mono text-sm text-muted-foreground/60 px-2 text-center">
+              <span className="font-sans text-sm text-muted-foreground/60 px-2 text-center">
                 {ORPHAN_WARNING}
               </span>
             )}
@@ -139,10 +139,10 @@ export function MaterialCard({
 
       {/* Name + tile size */}
       <div className="mt-2 flex flex-col gap-1">
-        <span className="font-mono text-sm font-medium uppercase text-foreground truncate">
+        <span className="font-sans text-sm font-medium uppercase text-foreground truncate">
           {material.name.toUpperCase()}
         </span>
-        <span className="font-mono text-sm text-foreground">
+        <span className="font-sans text-sm text-foreground">
           {formatFeet(material.tileSizeFt)}
         </span>
       </div>

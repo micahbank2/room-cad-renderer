@@ -33,10 +33,10 @@ function CollapsibleSection({
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between mb-2 py-1"
       >
-        <h3 className="font-mono text-base font-medium text-muted-foreground">
+        <h3 className="font-sans text-base font-medium text-muted-foreground">
           {label}
         </h3>
-        <span className="font-mono text-sm text-muted-foreground/60">
+        <span className="font-sans text-sm text-muted-foreground/60">
           {open ? "\u2212" : "+"}
         </span>
       </button>
@@ -61,10 +61,10 @@ export default function Sidebar({ productLibrary }: Props) {
     <aside className="w-64 shrink-0 bg-card flex flex-col overflow-hidden">
       {/* Sidebar header with collapse button */}
       <div className="flex items-center justify-between px-4 pt-2 pb-2">
-        <span className="font-mono text-sm font-medium text-muted-foreground">Panels</span>
+        <span className="font-sans text-sm font-medium text-muted-foreground">Panels</span>
         <button
           onClick={toggleSidebar}
-          className="font-mono text-base text-muted-foreground/60 hover:text-foreground px-1"
+          className="font-sans text-base text-muted-foreground/60 hover:text-foreground px-1"
           title="Collapse sidebar"
         >
           &#x25C0;
@@ -81,18 +81,18 @@ export default function Sidebar({ productLibrary }: Props) {
         <CollapsibleSection label="System stats" defaultOpen={false}>
           <div className="space-y-1.5">
             <div className="flex justify-between">
-              <span className="font-mono text-[10px] text-muted-foreground/80">AREA</span>
-              <span className="font-mono text-[10px] text-foreground">
+              <span className="font-sans text-[10px] text-muted-foreground/80">AREA</span>
+              <span className="font-sans text-[10px] text-foreground">
                 {(room.width * room.length).toFixed(0)} SQ FT
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="font-mono text-[10px] text-muted-foreground/80">WALLS</span>
-              <span className="font-mono text-[10px] text-foreground">{wallCount}</span>
+              <span className="font-sans text-[10px] text-muted-foreground/80">WALLS</span>
+              <span className="font-sans text-[10px] text-foreground">{wallCount}</span>
             </div>
             <div className="flex justify-between">
-              <span className="font-mono text-[10px] text-muted-foreground/80">PRODUCTS</span>
-              <span className="font-mono text-[10px] text-foreground">{productCount}</span>
+              <span className="font-sans text-[10px] text-muted-foreground/80">PRODUCTS</span>
+              <span className="font-sans text-[10px] text-foreground">{productCount}</span>
             </div>
           </div>
         </CollapsibleSection>
@@ -106,7 +106,7 @@ export default function Sidebar({ productLibrary }: Props) {
                 onChange={toggleGrid}
                 className="w-3 h-3 accent-accent rounded-none"
               />
-              <span className="font-mono text-[10px] text-muted-foreground/80">GRID</span>
+              <span className="font-sans text-[10px] text-muted-foreground/80">GRID</span>
             </label>
           </div>
         </CollapsibleSection>

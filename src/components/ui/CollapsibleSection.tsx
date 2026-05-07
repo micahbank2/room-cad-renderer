@@ -62,7 +62,7 @@ export function CollapsibleSection({
             style={{ transition: chevronTransition }}
           />
         )}
-        <span className="font-mono text-sm font-medium">{label}</span>
+        <span className="font-sans text-sm font-medium">{label}</span>
       </button>
       <div
         style={{

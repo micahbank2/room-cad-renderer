@@ -58,12 +58,12 @@ export default function WainscotLibrary() {
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <h3 className="font-mono text-[10px] text-muted-foreground/60 tracking-widest uppercase">
+        <h3 className="font-sans text-[10px] text-muted-foreground/60 tracking-widest uppercase">
           WAINSCOT LIBRARY
         </h3>
         <button
           onClick={() => setCreating((v) => !v)}
-          className="font-mono text-[11px] text-foreground hover:text-accent tracking-widest"
+          className="font-sans text-[11px] text-foreground hover:text-accent tracking-widest"
         >
           {creating ? "CANCEL" : "+ NEW"}
         </button>
@@ -76,13 +76,13 @@ export default function WainscotLibrary() {
             placeholder="NAME..."
             value={draft.name}
             onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-            className="w-full font-mono text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-sm placeholder:text-muted-foreground/60"
+            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-sm placeholder:text-muted-foreground/60"
           />
 
           <select
             value={draft.style}
             onChange={(e) => selectStyle(e.target.value as WainscotStyle)}
-            className="w-full font-mono text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-sm"
+            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-sm"
           >
             {ALL_STYLES.map((s) => (
               <option key={s} value={s}>
@@ -147,7 +147,7 @@ export default function WainscotLibrary() {
           <Suspense
             fallback={
               <div className="w-full aspect-video bg-background rounded-sm border border-border/60 grid place-items-center">
-                <span className="font-mono text-[11px] text-muted-foreground/60">LOADING PREVIEW...</span>
+                <span className="font-sans text-[11px] text-muted-foreground/60">LOADING PREVIEW...</span>
               </div>
             }
           >
@@ -157,7 +157,7 @@ export default function WainscotLibrary() {
           <button
             onClick={handleCreate}
             disabled={!draft.name.trim()}
-            className="w-full font-mono text-[10px] tracking-widest py-1 bg-primary text-primary-foreground rounded-sm hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-full font-sans text-[10px] tracking-widest py-1 bg-primary text-primary-foreground rounded-sm hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             SAVE TO LIBRARY
           </button>
@@ -165,7 +165,7 @@ export default function WainscotLibrary() {
       )}
 
       {items.length === 0 ? (
-        <div className="font-mono text-[11px] text-muted-foreground/60 text-center py-2">
+        <div className="font-sans text-[11px] text-muted-foreground/60 text-center py-2">
           NO WAINSCOT STYLES YET
         </div>
       ) : (
@@ -187,7 +187,7 @@ export default function WainscotLibrary() {
                       if (e.key === "Enter" || e.key === "Escape") setEditingId(null);
                     }}
                     autoFocus
-                    className="w-full font-mono text-[10px] bg-background text-foreground border border-accent/50 px-1 py-0.5 rounded-sm"
+                    className="w-full font-sans text-[10px] bg-background text-foreground border border-accent/50 px-1 py-0.5 rounded-sm"
                   />
                   <div className="flex items-center gap-1">
                     <NumberKnob
@@ -206,7 +206,7 @@ export default function WainscotLibrary() {
                     />
                     <button
                       onClick={() => setEditingId(null)}
-                      className="font-mono text-[11px] text-foreground hover:text-accent px-1"
+                      className="font-sans text-[11px] text-foreground hover:text-accent px-1"
                     >
                       DONE
                     </button>
@@ -220,10 +220,10 @@ export default function WainscotLibrary() {
                       style={{ backgroundColor: it.color }}
                     />
                     <div className="min-w-0 flex-1">
-                      <div className="font-mono text-[10px] text-foreground truncate">
+                      <div className="font-sans text-[10px] text-foreground truncate">
                         {it.name.toUpperCase()}
                       </div>
-                      <div className="font-mono text-[11px] text-muted-foreground/60">
+                      <div className="font-sans text-[11px] text-muted-foreground/60">
                         {STYLE_META[it.style].label} · {it.heightFt}'
                       </div>
                     </div>
@@ -231,7 +231,7 @@ export default function WainscotLibrary() {
                   <button
                     onClick={() => removeItem(it.id)}
                     title="Delete from library"
-                    className="font-mono text-[11px] text-muted-foreground/60 hover:text-foreground px-1"
+                    className="font-sans text-[11px] text-muted-foreground/60 hover:text-foreground px-1"
                   >
                     ✕
                   </button>
@@ -262,7 +262,7 @@ function NumberKnob({
 }) {
   return (
     <label className="block">
-      <span className="font-mono text-[11px] text-muted-foreground/60 block">{label}</span>
+      <span className="font-sans text-[11px] text-muted-foreground/60 block">{label}</span>
       <input
         type="number"
         step={step}
@@ -270,7 +270,7 @@ function NumberKnob({
         max={max}
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
-        className="w-full font-mono text-[10px] bg-background text-foreground border border-border/60 px-1 py-0.5 rounded-sm"
+        className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-1 py-0.5 rounded-sm"
       />
     </label>
   );

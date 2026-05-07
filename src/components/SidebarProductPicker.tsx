@@ -10,7 +10,7 @@ export default function SidebarProductPicker() {
 
   return (
     <div>
-      <h3 className="font-mono text-[10px] text-muted-foreground/60 tracking-widest uppercase mb-2">
+      <h3 className="font-sans text-[10px] text-muted-foreground/60 tracking-widest uppercase mb-2">
         PRODUCT LIBRARY
       </h3>
       <input
@@ -18,11 +18,11 @@ export default function SidebarProductPicker() {
         placeholder="SEARCH..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full px-2 py-1 text-[10px] mb-2 font-mono bg-background border border-border/60 text-foreground placeholder:text-muted-foreground/60"
+        className="w-full px-2 py-1 text-[10px] mb-2 font-sans bg-background border border-border/60 text-foreground placeholder:text-muted-foreground/60"
       />
       <div className="space-y-1 max-h-64 overflow-y-auto" data-testid="picker-list">
         {filtered.length === 0 && (
-          <div className="font-mono text-[9px] text-muted-foreground/60 py-2 text-center">
+          <div className="font-sans text-[9px] text-muted-foreground/60 py-2 text-center">
             {products.length === 0 ? "NO PRODUCTS YET" : "NO MATCHES"}
           </div>
         )}
@@ -46,7 +46,7 @@ export default function SidebarProductPicker() {
             ) : (
               <div className="w-8 h-8 bg-accent rounded-sm shrink-0" />
             )}
-            <span className="font-mono text-[10px] text-muted-foreground/80 truncate">
+            <span className="font-sans text-[10px] text-muted-foreground/80 truncate">
               {p.name.toUpperCase()}
             </span>
           </div>

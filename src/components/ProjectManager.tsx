@@ -65,13 +65,13 @@ export default function ProjectManager() {
 
   return (
     <div className="space-y-3">
-      <h3 className="font-mono text-base font-medium text-muted-foreground">
+      <h3 className="font-sans text-base font-medium text-muted-foreground">
         Project
       </h3>
 
       {/* Phase 33 GH #88 — inline editing relocated to Toolbar. Read-only here. */}
       <div
-        className="w-full px-2 py-1.5 font-mono text-sm text-muted-foreground/80 truncate"
+        className="w-full px-2 py-1.5 font-sans text-sm text-muted-foreground/80 truncate"
         title={projectName}
       >
         Editing: <span className="text-foreground">{projectName}</span>

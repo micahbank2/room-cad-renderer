@@ -65,7 +65,7 @@ export default function HelpModal() {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-border/50 shrink-0">
-          <h2 className="font-mono text-sm text-foreground tracking-widest uppercase">
+          <h2 className="font-sans text-sm text-foreground tracking-widest uppercase">
             Help &amp; Documentation
           </h2>
           <button
@@ -90,7 +90,7 @@ export default function HelpModal() {
                 setQuery("");
               }}
             />
-            <h3 className="font-mono text-[9px] text-muted-foreground/60 tracking-widest uppercase px-4 mb-2">
+            <h3 className="font-sans text-[9px] text-muted-foreground/60 tracking-widest uppercase px-4 mb-2">
               Topics
             </h3>
             <ul>
@@ -125,12 +125,12 @@ export default function HelpModal() {
                   // Start on next tick so modal has closed
                   setTimeout(() => startTour(), 50);
                 }}
-                className="font-mono text-[10px] tracking-widest text-muted-foreground/80 hover:text-foreground transition-colors flex items-center gap-1"
+                className="font-sans text-[10px] tracking-widest text-muted-foreground/80 hover:text-foreground transition-colors flex items-center gap-1"
               >
                 <span className="material-symbols-outlined text-[14px]">replay</span>
                 REPLAY TOUR
               </button>
-              <span className="font-mono text-[9px] text-muted-foreground/60 tracking-widest">
+              <span className="font-sans text-[9px] text-muted-foreground/60 tracking-widest">
                 ESC TO CLOSE
               </span>
             </div>
@@ -156,7 +156,7 @@ function HelpNavButton({
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-2 px-4 py-2 font-mono text-[10px] tracking-widest text-left transition-colors border-l-2 ${
+      className={`w-full flex items-center gap-2 px-4 py-2 font-sans text-[10px] tracking-widest text-left transition-colors border-l-2 ${
         active
           ? "text-foreground bg-accent/10 border-accent"
           : "text-muted-foreground/80 border-transparent hover:text-foreground hover:bg-accent"

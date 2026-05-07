@@ -127,7 +127,7 @@ export default function Tooltip({
           <div
             ref={tooltipRef}
             role="tooltip"
-            className="fixed z-[100] pointer-events-none font-mono text-[10px] text-foreground bg-secondary border border-border/60 px-2 py-1 rounded-sm shadow-lg flex items-center gap-2"
+            className="fixed z-[100] pointer-events-none font-sans text-[10px] text-foreground bg-secondary border border-border/60 px-2 py-1 rounded-sm shadow-lg flex items-center gap-2"
             style={
               coords
                 ? { top: coords.top, left: coords.left }
@@ -136,7 +136,7 @@ export default function Tooltip({
           >
             <span>{content}</span>
             {shortcut && (
-              <kbd className="font-mono text-[9px] text-foreground bg-background px-1 py-0.5 rounded-sm border border-border/50">
+              <kbd className="font-sans text-[9px] text-foreground bg-background px-1 py-0.5 rounded-sm border border-border/50">
                 {shortcut}
               </kbd>
             )}

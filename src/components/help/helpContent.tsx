@@ -23,7 +23,7 @@ export const SHORTCUTS: Shortcut[] = SHORTCUT_DISPLAY_LIST;
 
 function Kbd({ children }: { children: React.ReactNode }) {
   return (
-    <kbd className="font-mono text-[10px] text-foreground bg-accent px-1.5 py-0.5 rounded-sm border border-border/50 inline-block">
+    <kbd className="font-sans text-[10px] text-foreground bg-accent px-1.5 py-0.5 rounded-sm border border-border/50 inline-block">
       {children}
     </kbd>
   );
@@ -31,7 +31,7 @@ function Kbd({ children }: { children: React.ReactNode }) {
 
 function H1({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="font-mono text-[13px] text-foreground tracking-widest uppercase mb-4">
+    <h2 className="font-sans text-[13px] text-foreground tracking-widest uppercase mb-4">
       {children}
     </h2>
   );
@@ -39,7 +39,7 @@ function H1({ children }: { children: React.ReactNode }) {
 
 function H2({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="font-mono text-[11px] text-foreground tracking-wider uppercase mt-6 mb-2">
+    <h3 className="font-sans text-[11px] text-foreground tracking-wider uppercase mt-6 mb-2">
       {children}
     </h3>
   );
@@ -47,7 +47,7 @@ function H2({ children }: { children: React.ReactNode }) {
 
 function P({ children }: { children: React.ReactNode }) {
   return (
-    <p className="font-mono text-[11px] text-muted-foreground leading-relaxed mb-2">
+    <p className="font-sans text-[11px] text-muted-foreground leading-relaxed mb-2">
       {children}
     </p>
   );
@@ -55,7 +55,7 @@ function P({ children }: { children: React.ReactNode }) {
 
 function OL({ children }: { children: React.ReactNode }) {
   return (
-    <ol className="font-mono text-[11px] text-muted-foreground leading-relaxed list-decimal list-inside space-y-1.5 mb-2 [&_kbd]:mx-0.5">
+    <ol className="font-sans text-[11px] text-muted-foreground leading-relaxed list-decimal list-inside space-y-1.5 mb-2 [&_kbd]:mx-0.5">
       {children}
     </ol>
   );
@@ -63,7 +63,7 @@ function OL({ children }: { children: React.ReactNode }) {
 
 function UL({ children }: { children: React.ReactNode }) {
   return (
-    <ul className="font-mono text-[11px] text-muted-foreground leading-relaxed list-disc list-inside space-y-1.5 mb-2 [&_kbd]:mx-0.5">
+    <ul className="font-sans text-[11px] text-muted-foreground leading-relaxed list-disc list-inside space-y-1.5 mb-2 [&_kbd]:mx-0.5">
       {children}
     </ul>
   );
@@ -148,11 +148,11 @@ export function KeyboardShortcutsContent() {
                   ))}
                 </div>
                 <div className="flex-1">
-                  <div className="font-mono text-[11px] text-muted-foreground">
+                  <div className="font-sans text-[11px] text-muted-foreground">
                     {s.action}
                   </div>
                   {s.context && (
-                    <div className="font-mono text-[9px] text-muted-foreground/60 mt-0.5">
+                    <div className="font-sans text-[9px] text-muted-foreground/60 mt-0.5">
                       {s.context}
                     </div>
                   )}

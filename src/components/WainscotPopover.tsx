@@ -68,13 +68,13 @@ export function WainscotPopover({ wallId, side, style, onClose }: Props) {
       }}
       className="bg-card border border-border rounded-sm p-2 w-[180px] outline-none"
     >
-      <div className="font-mono text-[10px] text-muted-foreground/60 tracking-widest uppercase mb-2">
+      <div className="font-sans text-[10px] text-muted-foreground/60 tracking-widest uppercase mb-2">
         WAINSCOT EDIT
       </div>
 
       {/* Style dropdown */}
       <div className="mb-1.5">
-        <div className="font-mono text-[10px] text-muted-foreground/60 tracking-widest uppercase mb-0.5">
+        <div className="font-sans text-[10px] text-muted-foreground/60 tracking-widest uppercase mb-0.5">
           STYLE
         </div>
         <select
@@ -91,7 +91,7 @@ export function WainscotPopover({ wallId, side, style, onClose }: Props) {
               id
             );
           }}
-          className="w-full font-mono text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-sm"
+          className="w-full font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-sm"
         >
           <option value="">(LEGACY DEFAULT)</option>
           {wainscotStyles.map((it) => (
@@ -104,7 +104,7 @@ export function WainscotPopover({ wallId, side, style, onClose }: Props) {
 
       {/* Height input */}
       <div>
-        <div className="font-mono text-[10px] text-muted-foreground/60 tracking-widest uppercase mb-0.5">
+        <div className="font-sans text-[10px] text-muted-foreground/60 tracking-widest uppercase mb-0.5">
           HEIGHT FT
         </div>
         <input
@@ -125,7 +125,7 @@ export function WainscotPopover({ wallId, side, style, onClose }: Props) {
               config.styleItemId
             );
           }}
-          className="w-full font-mono text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-sm"
+          className="w-full font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-sm"
         />
       </div>
     </div>

@@ -30,12 +30,12 @@ export default function FramedArtLibrary() {
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <h3 className="font-mono text-[10px] text-muted-foreground/60 tracking-widest uppercase">
+        <h3 className="font-sans text-[10px] text-muted-foreground/60 tracking-widest uppercase">
           ART LIBRARY
         </h3>
         <button
           onClick={() => setCreating((v) => !v)}
-          className="font-mono text-[9px] text-foreground hover:text-accent tracking-widest"
+          className="font-sans text-[9px] text-foreground hover:text-accent tracking-widest"
         >
           {creating ? "CANCEL" : "+ NEW"}
         </button>
@@ -48,7 +48,7 @@ export default function FramedArtLibrary() {
             placeholder="NAME..."
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full font-mono text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-sm placeholder:text-muted-foreground/60"
+            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-sm placeholder:text-muted-foreground/60"
           />
           <input
             ref={fileInputRef}
@@ -62,7 +62,7 @@ export default function FramedArtLibrary() {
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full font-mono text-[9px] tracking-widest py-1 bg-background text-muted-foreground/80 border border-border/60 rounded-sm hover:text-foreground"
+            className="w-full font-sans text-[9px] tracking-widest py-1 bg-background text-muted-foreground/80 border border-border/60 rounded-sm hover:text-foreground"
           >
             {imageUrl ? "CHANGE IMAGE" : "+ UPLOAD IMAGE"}
           </button>
@@ -74,7 +74,7 @@ export default function FramedArtLibrary() {
           <select
             value={frameStyle}
             onChange={(e) => setFrameStyle(e.target.value as FrameStyle)}
-            className="w-full font-mono text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-sm"
+            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-sm"
           >
             {FRAME_STYLES.map((s) => (
               <option key={s} value={s}>
@@ -85,7 +85,7 @@ export default function FramedArtLibrary() {
           <button
             onClick={handleCreate}
             disabled={!name.trim() || !imageUrl}
-            className="w-full font-mono text-[10px] tracking-widest py-1 bg-primary text-primary-foreground rounded-sm hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-full font-sans text-[10px] tracking-widest py-1 bg-primary text-primary-foreground rounded-sm hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             SAVE TO LIBRARY
           </button>
@@ -93,7 +93,7 @@ export default function FramedArtLibrary() {
       )}
 
       {items.length === 0 ? (
-        <div className="font-mono text-[9px] text-muted-foreground/60 text-center py-2">
+        <div className="font-sans text-[9px] text-muted-foreground/60 text-center py-2">
           NO ART YET
         </div>
       ) : (
@@ -113,10 +113,10 @@ export default function FramedArtLibrary() {
                     <img src={it.imageUrl} alt={it.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="font-mono text-[10px] text-foreground truncate">
+                    <div className="font-sans text-[10px] text-foreground truncate">
                       {it.name.toUpperCase()}
                     </div>
-                    <div className="font-mono text-[8px] text-muted-foreground/60">
+                    <div className="font-sans text-[8px] text-muted-foreground/60">
                       {preset.label}
                     </div>
                   </div>
@@ -124,7 +124,7 @@ export default function FramedArtLibrary() {
                 <button
                   onClick={() => removeItem(it.id)}
                   title="Delete from library"
-                  className="font-mono text-[9px] text-muted-foreground/60 hover:text-foreground px-1 shrink-0"
+                  className="font-sans text-[9px] text-muted-foreground/60 hover:text-foreground px-1 shrink-0"
                 >
                   ✕
                 </button>

@@ -23,14 +23,14 @@ interface Props {
 export function OpeningsSection({ wall }: Props) {
   if (!wall.openings || wall.openings.length === 0) {
     return (
-      <div className="font-mono text-[11px] text-muted-foreground/60">
+      <div className="font-sans text-[11px] text-muted-foreground/60">
         0 OPENING(S)
       </div>
     );
   }
   return (
     <div className="space-y-1">
-      <div className="font-mono text-[10px] text-muted-foreground/60 tracking-widest uppercase">
+      <div className="font-sans text-[10px] text-muted-foreground/60 tracking-widest uppercase">
         {wall.openings.length} OPENING(S)
       </div>
       {wall.openings.map((op) => (
@@ -51,7 +51,7 @@ function OpeningRow({ wall, opening }: { wall: WallSegment; opening: Opening }) 
         type="button"
         onClick={() => setExpanded((v) => !v)}
         data-testid={`opening-row-${opening.id}`}
-        className="w-full flex items-center justify-between px-2 py-1 font-mono text-[11px] text-foreground hover:bg-accent transition-colors"
+        className="w-full flex items-center justify-between px-2 py-1 font-sans text-[11px] text-foreground hover:bg-accent transition-colors"
       >
         <span>
           {kindLabel} @ {offsetLabel}
@@ -143,7 +143,7 @@ function NumericRow({
   // (Lightweight controlled-on-blur pattern; matches Phase 31 convention.)
   return (
     <div className="flex items-center justify-between gap-2">
-      <span className="font-mono text-[10px] text-muted-foreground/60 tracking-widest uppercase">
+      <span className="font-sans text-[10px] text-muted-foreground/60 tracking-widest uppercase">
         {label}
       </span>
       <div className="flex items-center gap-1">
@@ -177,9 +177,9 @@ function NumericRow({
               (e.target as HTMLInputElement).blur();
             }
           }}
-          className="w-16 font-mono text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-sm text-right"
+          className="w-16 font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-sm text-right"
         />
-        <span className="font-mono text-[10px] text-muted-foreground/60">{unit}</span>
+        <span className="font-sans text-[10px] text-muted-foreground/60">{unit}</span>
       </div>
     </div>
   );

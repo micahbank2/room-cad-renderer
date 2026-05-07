@@ -33,7 +33,7 @@ export default function AddRoomDialog({ open, onClose }: Props) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-sm"
       data-testid="ADD_ROOM"
     >
-      <div className="bg-popover border border-border/60 p-6 w-[480px] font-mono">
+      <div className="bg-popover border border-border/60 p-6 w-[480px] font-sans">
         <h2 className="text-foreground text-sm mb-4 tracking-widest">ADD ROOM</h2>
         <label className="block text-muted-foreground/80 text-[9px] tracking-wider mb-1">ROOM NAME</label>
         <input
@@ -50,7 +50,7 @@ export default function AddRoomDialog({ open, onClose }: Props) {
               handleCancel();
             }
           }}
-          className="w-full bg-background text-foreground px-2 py-1.5 border border-border/60 mb-4 font-mono text-xs outline-none focus:border-accent"
+          className="w-full bg-background text-foreground px-2 py-1.5 border border-border/60 mb-4 font-sans text-xs outline-none focus:border-accent"
           placeholder="ROOM NAME"
         />
         <label className="block text-muted-foreground/80 text-[9px] tracking-wider mb-2">TEMPLATE</label>

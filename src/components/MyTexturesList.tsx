@@ -138,7 +138,7 @@ export function MyTexturesList({ selectedId, onSelect }: MyTexturesListProps): J
   } else if (textures.length === 0) {
     body = (
       <div className="py-8 px-4 text-center flex flex-col items-center gap-4">
-        <h3 className="font-mono text-base font-medium uppercase tracking-widest text-muted-foreground/80">
+        <h3 className="font-sans text-base font-medium uppercase tracking-widest text-muted-foreground/80">
           NO CUSTOM TEXTURES
         </h3>
         <p className="font-body text-base text-muted-foreground max-w-xs">
@@ -248,7 +248,7 @@ function TextureCard({
                 e.stopPropagation();
                 onEdit();
               }}
-              className="block w-full text-left px-2 py-1 font-mono text-sm text-muted-foreground hover:bg-accent hover:text-foreground cursor-pointer"
+              className="block w-full text-left px-2 py-1 font-sans text-sm text-muted-foreground hover:bg-accent hover:text-foreground cursor-pointer"
             ><span>Edit</span></button>
             <button
               type="button"
@@ -256,7 +256,7 @@ function TextureCard({
                 e.stopPropagation();
                 onDelete();
               }}
-              className="block w-full text-left px-2 py-1 font-mono text-sm text-error hover:bg-accent cursor-pointer"
+              className="block w-full text-left px-2 py-1 font-sans text-sm text-error hover:bg-accent cursor-pointer"
             ><span>Delete</span></button>
           </div>
         )}
@@ -271,10 +271,10 @@ function TextureCard({
 
       {/* Name + tile size */}
       <div className="mt-2 flex flex-col gap-1">
-        <span className="font-mono text-sm font-medium uppercase text-foreground truncate">
+        <span className="font-sans text-sm font-medium uppercase text-foreground truncate">
           {texture.name.toUpperCase()}
         </span>
-        <span className="font-mono text-sm text-foreground">
+        <span className="font-sans text-sm text-foreground">
           {formatFeet(texture.tileSizeFt)}
         </span>
       </div>
@@ -294,7 +294,7 @@ function UploadSlot({ onClick }: UploadSlotProps): JSX.Element {
       className="aspect-square bg-card border-2 border-dashed border-border/60 rounded-md flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-accent/50 transition-colors"
     >
       <Plus className="size-5 text-muted-foreground/60" />
-      <span className="font-mono text-sm text-muted-foreground/60">UPLOAD</span>
+      <span className="font-sans text-sm text-muted-foreground/60">UPLOAD</span>
     </button>
   );
 }

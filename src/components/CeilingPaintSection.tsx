@@ -50,7 +50,7 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
       {/* SURFACE_MATERIAL section */}
       <div
         className={[
-          "font-mono text-[10px] tracking-widest uppercase",
+          "font-sans text-[10px] tracking-widest uppercase",
           hasMaterial ? "text-foreground" : "text-muted-foreground/60",
         ].join(" ")}
       >
@@ -69,7 +69,7 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
           Visible only when a user-uploaded texture is applied. */}
       {ceiling.userTextureId && ceiling.scaleFt !== undefined && (
         <label className="block">
-          <span className="font-mono text-[9px] text-muted-foreground/80 block">TILE SIZE (ft)</span>
+          <span className="font-sans text-[9px] text-muted-foreground/80 block">TILE SIZE (ft)</span>
           <input
             type="number"
             step="0.5"
@@ -78,19 +78,19 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
             value={ceiling.scaleFt}
             onChange={(e) => handleSetTileSize(parseFloat(e.target.value) || 2)}
             data-testid="ceiling-tile-size"
-            className="w-full font-mono text-[10px] bg-accent text-foreground border border-border/60 px-2 py-1 rounded-sm"
+            className="w-full font-sans text-[10px] bg-accent text-foreground border border-border/60 px-2 py-1 rounded-sm"
           />
         </label>
       )}
 
       {hasMaterial && (
         <div className="flex items-center justify-between">
-          <div className="font-mono text-[10px] text-foreground">
+          <div className="font-sans text-[10px] text-foreground">
             MATERIAL: {SURFACE_MATERIALS[ceiling.surfaceMaterialId!]?.label}
           </div>
           <button
             onClick={() => setCeilingSurfaceMaterial(ceilingId, undefined)}
-            className="font-mono text-[10px] text-muted-foreground/60 hover:text-foreground tracking-widest uppercase py-1"
+            className="font-sans text-[10px] text-muted-foreground/60 hover:text-foreground tracking-widest uppercase py-1"
           >
             CLEAR MATERIAL
           </button>
@@ -103,7 +103,7 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
       {/* CEILING_PAINT section */}
       <div
         className={[
-          "font-mono text-[10px] tracking-widest uppercase",
+          "font-sans text-[10px] tracking-widest uppercase",
           !hasMaterial && ceiling.paintId ? "text-foreground" : "text-muted-foreground/60",
         ].join(" ")}
       >
@@ -113,7 +113,7 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
       <div className={hasMaterial ? "opacity-60" : undefined}>
         {hasMaterial && (
           <div className="mb-1">
-            <span className="font-mono text-[8px] text-muted-foreground/60 tracking-wider italic">
+            <span className="font-sans text-[8px] text-muted-foreground/60 tracking-wider italic">
               SELECT PAINT TO REPLACE MATERIAL
             </span>
           </div>
@@ -133,7 +133,7 @@ export default function CeilingPaintSection({ ceilingId, ceiling }: Props) {
             disabled={!ceiling.paintId}
             className="accent-accent"
           />
-          <span className="font-mono text-[9px] tracking-widest uppercase text-muted-foreground/80">
+          <span className="font-sans text-[9px] tracking-widest uppercase text-muted-foreground/80">
             LIME WASH FINISH
           </span>
         </label>

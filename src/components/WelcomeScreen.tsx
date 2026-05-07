@@ -54,7 +54,7 @@ export default function WelcomeScreen({ onStart }: Props) {
     <div className="h-full flex flex-col bg-background">
       {/* Minimal top bar — just the brand */}
       <header className="h-14 bg-background flex items-center px-6 border border-border/50 border-0 border-b">
-        <span className="font-display font-bold text-foreground text-sm tracking-[0.1em]">
+        <span className="font-sans font-bold text-foreground text-sm tracking-[0.1em]">
           OBSIDIAN CAD
         </span>
       </header>
@@ -62,7 +62,7 @@ export default function WelcomeScreen({ onStart }: Props) {
       {/* Centered hero with 2 CTAs */}
       <div className="flex-1 flex flex-col items-center justify-center px-8">
         <div className="max-w-2xl text-center">
-          <h1 className="font-display font-bold text-5xl text-foreground tracking-tight mb-4 leading-tight">
+          <h1 className="font-sans font-bold text-5xl text-foreground tracking-tight mb-4 leading-tight">
             DESIGN YOUR SPACE
           </h1>
           <p className="text-muted-foreground/80 text-sm leading-relaxed max-w-lg mx-auto mb-10">
@@ -80,7 +80,7 @@ export default function WelcomeScreen({ onStart }: Props) {
               <span className="material-symbols-outlined text-[28px] text-foreground mb-3 block">
                 add_box
               </span>
-              <h3 className="font-mono text-xs text-foreground tracking-widest mb-2 group-hover:text-foreground transition-colors">
+              <h3 className="font-sans text-xs text-foreground tracking-widest mb-2 group-hover:text-foreground transition-colors">
                 CREATE FLOOR PLAN
               </h3>
               <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
@@ -96,7 +96,7 @@ export default function WelcomeScreen({ onStart }: Props) {
               <span className="material-symbols-outlined text-[28px] text-foreground mb-3 block">
                 upload_file
               </span>
-              <h3 className="font-mono text-xs text-foreground tracking-widest mb-2 group-hover:text-foreground transition-colors">
+              <h3 className="font-sans text-xs text-foreground tracking-widest mb-2 group-hover:text-foreground transition-colors">
                 UPLOAD FLOOR PLAN
               </h3>
               <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
@@ -113,7 +113,7 @@ export default function WelcomeScreen({ onStart }: Props) {
                 <span className="material-symbols-outlined text-[28px] text-foreground mb-3 block">
                   folder_open
                 </span>
-                <h3 className="font-mono text-xs text-foreground tracking-widest mb-2 group-hover:text-foreground transition-colors">
+                <h3 className="font-sans text-xs text-foreground tracking-widest mb-2 group-hover:text-foreground transition-colors">
                   OPEN PROJECT
                 </h3>
                 <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
@@ -127,7 +127,7 @@ export default function WelcomeScreen({ onStart }: Props) {
           {showProjects && projects.length > 0 && (
             <div className="mt-6 w-full max-w-2xl">
               <div className="bg-card border border-border/10 rounded-sm p-4 space-y-2">
-                <h4 className="font-mono text-[9px] text-muted-foreground/60 tracking-widest mb-3">
+                <h4 className="font-sans text-[9px] text-muted-foreground/60 tracking-widest mb-3">
                   SAVED PROJECTS
                 </h4>
                 {projects.map((p) => (
@@ -137,10 +137,10 @@ export default function WelcomeScreen({ onStart }: Props) {
                     className="w-full flex items-center justify-between p-3 rounded-sm border border-border/10 hover:border-accent/40 bg-background transition-all group text-left"
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="font-mono text-xs text-foreground tracking-wide group-hover:text-foreground transition-colors truncate">
+                      <div className="font-sans text-xs text-foreground tracking-wide group-hover:text-foreground transition-colors truncate">
                         {p.name.toUpperCase().replace(/\s/g, "_")}
                       </div>
-                      <div className="font-mono text-[10px] text-muted-foreground/60 mt-0.5">
+                      <div className="font-sans text-[10px] text-muted-foreground/60 mt-0.5">
                         {new Date(p.updatedAt).toLocaleDateString()}
                       </div>
                     </div>
@@ -170,7 +170,7 @@ export default function WelcomeScreen({ onStart }: Props) {
       <div className="h-8 bg-background flex items-center px-4 border border-border/50 border-0 border-t">
         <div className="flex items-center gap-1.5">
           <div className="w-1.5 h-1.5 rounded-full bg-success" />
-          <span className="font-mono text-[9px] text-muted-foreground/60 tracking-widest">
+          <span className="font-sans text-[9px] text-muted-foreground/60 tracking-widest">
             SYSTEM STATUS: READY
           </span>
         </div>

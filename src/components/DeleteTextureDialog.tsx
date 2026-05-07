@@ -107,7 +107,7 @@ export function DeleteTextureDialog(props: DeleteTextureDialogProps): JSX.Elemen
       >
         {/* Header */}
         <div className="p-6 pb-4">
-          <h2 className="font-mono text-base font-medium uppercase tracking-widest text-foreground">
+          <h2 className="font-sans text-base font-medium uppercase tracking-widest text-foreground">
             DELETE TEXTURE
           </h2>
         </div>
@@ -136,14 +136,14 @@ export function DeleteTextureDialog(props: DeleteTextureDialogProps): JSX.Elemen
             type="button"
             onClick={onClose}
             disabled={deleting}
-            className="rounded-sm px-4 py-1 font-mono text-sm text-muted-foreground hover:text-foreground bg-accent hover:bg-secondary border border-border/50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-sm px-4 py-1 font-sans text-sm text-muted-foreground hover:text-foreground bg-accent hover:bg-secondary border border-border/50 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ minHeight: 44 }}
           ><span>Discard</span></button>
           <button
             type="button"
             onClick={handleDelete}
             disabled={deleting}
-            className="rounded-sm px-4 py-1 font-mono text-sm text-error bg-accent hover:bg-error/10 border border-error/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="rounded-sm px-4 py-1 font-sans text-sm text-error bg-accent hover:bg-error/10 border border-error/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             style={{ minHeight: 44 }}
           >
             {deleting ? (

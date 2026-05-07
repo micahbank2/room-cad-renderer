@@ -76,7 +76,7 @@ export function LibraryCard({
             </div>
           ) : null}
         </div>
-        <span className="font-mono text-sm text-muted-foreground truncate flex-1">
+        <span className="font-sans text-sm text-muted-foreground truncate flex-1">
           {label}
         </span>
         {onRemove ? (
@@ -127,7 +127,7 @@ export function LibraryCard({
           />
         ) : null}
       </div>
-      <span className="font-mono text-sm text-muted-foreground truncate mt-2">
+      <span className="font-sans text-sm text-muted-foreground truncate mt-2">
         {label}
       </span>
     </div>

@@ -52,12 +52,12 @@ export default function CustomElementsPanel() {
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <h3 className="font-mono text-[10px] text-muted-foreground/60 tracking-widest uppercase">
+        <h3 className="font-sans text-[10px] text-muted-foreground/60 tracking-widest uppercase">
           CUSTOM ELEMENTS
         </h3>
         <button
           onClick={() => setCreating((v) => !v)}
-          className="font-mono text-[9px] text-foreground hover:text-accent tracking-widest"
+          className="font-sans text-[9px] text-foreground hover:text-accent tracking-widest"
         >
           {creating ? "CANCEL" : "+ NEW"}
         </button>
@@ -70,12 +70,12 @@ export default function CustomElementsPanel() {
             placeholder="NAME..."
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full font-mono text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-sm placeholder:text-muted-foreground/60"
+            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-sm placeholder:text-muted-foreground/60"
           />
           <div className="flex gap-1">
             <button
               onClick={() => setShape("box")}
-              className={`flex-1 font-mono text-[9px] tracking-widest py-1 rounded-sm border ${
+              className={`flex-1 font-sans text-[9px] tracking-widest py-1 rounded-sm border ${
                 shape === "box"
                   ? "border-accent text-foreground bg-accent/10"
                   : "border-border/60 text-muted-foreground/80"
@@ -85,7 +85,7 @@ export default function CustomElementsPanel() {
             </button>
             <button
               onClick={() => setShape("plane")}
-              className={`flex-1 font-mono text-[9px] tracking-widest py-1 rounded-sm border ${
+              className={`flex-1 font-sans text-[9px] tracking-widest py-1 rounded-sm border ${
                 shape === "plane"
                   ? "border-accent text-foreground bg-accent/10"
                   : "border-border/60 text-muted-foreground/80"
@@ -106,12 +106,12 @@ export default function CustomElementsPanel() {
               onChange={(e) => setColor(e.target.value)}
               className="w-7 h-6 bg-transparent border border-border/60 rounded-sm cursor-pointer"
             />
-            <span className="font-mono text-[9px] text-muted-foreground/80">{color}</span>
+            <span className="font-sans text-[9px] text-muted-foreground/80">{color}</span>
           </div>
           <button
             onClick={handleCreate}
             disabled={!name.trim()}
-            className="w-full font-mono text-[10px] tracking-widest py-1 bg-primary text-primary-foreground rounded-sm hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-full font-sans text-[10px] tracking-widest py-1 bg-primary text-primary-foreground rounded-sm hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             CREATE
           </button>
@@ -119,7 +119,7 @@ export default function CustomElementsPanel() {
       )}
 
       {items.length === 0 ? (
-        <div className="font-mono text-[9px] text-muted-foreground/60 text-center py-2">
+        <div className="font-sans text-[9px] text-muted-foreground/60 text-center py-2">
           NO CUSTOM ELEMENTS YET
         </div>
       ) : (
@@ -144,14 +144,14 @@ export default function CustomElementsPanel() {
 function DimInput({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   return (
     <label className="block">
-      <span className="font-mono text-[8px] text-muted-foreground/60 block">{label}</span>
+      <span className="font-sans text-[8px] text-muted-foreground/60 block">{label}</span>
       <input
         type="number"
         step="0.5"
         min="0.1"
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
-        className="w-full font-mono text-[10px] bg-background text-foreground border border-border/60 px-1 py-0.5 rounded-sm"
+        className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-1 py-0.5 rounded-sm"
       />
     </label>
   );

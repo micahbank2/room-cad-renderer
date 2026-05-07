@@ -97,7 +97,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
         aria-label="Choose a floor plan template"
       >
         <div className="flex items-center justify-between px-5 py-3 border-b border-border/50">
-          <h2 className="font-mono text-sm text-foreground tracking-widest uppercase">
+          <h2 className="font-sans text-sm text-foreground tracking-widest uppercase">
             Choose A Template
           </h2>
           <button
@@ -118,10 +118,10 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
               <span className="material-symbols-outlined text-[28px] text-foreground mb-2 block">
                 {t.icon}
               </span>
-              <h3 className="font-mono text-[11px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
+              <h3 className="font-sans text-[11px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
                 {t.title}
               </h3>
-              <p className="font-mono text-[10px] text-muted-foreground/60 leading-relaxed">
+              <p className="font-sans text-[10px] text-muted-foreground/60 leading-relaxed">
                 {t.sub}
               </p>
             </button>
@@ -135,10 +135,10 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
                 <span className="material-symbols-outlined text-[28px] text-foreground mb-2 block">
                   upload_file
                 </span>
-                <h3 className="font-mono text-[11px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
+                <h3 className="font-sans text-[11px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
                   UPLOAD IMAGE
                 </h3>
-                <p className="font-mono text-[10px] text-muted-foreground/60 leading-relaxed">
+                <p className="font-sans text-[10px] text-muted-foreground/60 leading-relaxed">
                   Use an existing plan as a tracing reference.
                 </p>
               </button>
@@ -149,10 +149,10 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
                 <span className="material-symbols-outlined text-[28px] text-muted-foreground/60 mb-2 block">
                   image_not_supported
                 </span>
-                <h3 className="font-mono text-[11px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
+                <h3 className="font-sans text-[11px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
                   REMOVE IMAGE
                 </h3>
-                <p className="font-mono text-[10px] text-muted-foreground/60 leading-relaxed">
+                <p className="font-sans text-[10px] text-muted-foreground/60 leading-relaxed">
                   Clear the current tracing background.
                 </p>
               </button>
@@ -171,7 +171,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
           }}
         />
         <div className="px-5 pb-4">
-          <p className="font-mono text-[9px] text-muted-foreground/60 tracking-wider">
+          <p className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">
             ESC TO CLOSE
           </p>
         </div>

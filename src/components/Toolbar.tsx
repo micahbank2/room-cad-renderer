@@ -92,7 +92,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
       {/* Brand — click to go home */}
       <button
         onClick={onHome}
-        className="font-display font-bold text-foreground text-sm tracking-[0.1em] mr-6 hover:text-foreground transition-colors"
+        className="font-sans font-bold text-foreground text-sm tracking-[0.1em] mr-6 hover:text-foreground transition-colors"
         title="Back to home"
       >
         OBSIDIAN CAD
@@ -104,7 +104,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
           <Tooltip content="Change floor plan / upload reference image" placement="bottom">
             <button
               onClick={onFloorPlanClick}
-              className="flex items-center gap-1.5 font-mono text-sm font-normal px-2 py-1 text-muted-foreground/80 hover:text-foreground transition-colors duration-150"
+              className="flex items-center gap-1.5 font-sans text-sm font-normal px-2 py-1 text-muted-foreground/80 hover:text-foreground transition-colors duration-150"
             >
               <span className="material-symbols-outlined text-[14px]">grid_view</span>
               Floor plan
@@ -118,7 +118,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
               key={mode}
               data-testid={`view-mode-${mode}`}
               onClick={() => onViewChange(mode)}
-              className={`font-mono text-sm font-normal px-2 py-1 transition-colors duration-150 ${
+              className={`font-sans text-sm font-normal px-2 py-1 transition-colors duration-150 ${
                 viewMode === mode
                   ? "text-foreground border-b-2 border-accent"
                   : "text-muted-foreground/80 hover:text-foreground"
@@ -138,7 +138,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
         >
           <button
             onClick={toggleCameraMode}
-            className={`flex items-center gap-1.5 font-mono text-sm font-normal px-2 py-1 transition-colors duration-150 mr-6 ${
+            className={`flex items-center gap-1.5 font-sans text-sm font-normal px-2 py-1 transition-colors duration-150 mr-6 ${
               cameraMode === "walk"
                 ? "text-foreground border-b-2 border-accent"
                 : "text-muted-foreground/80 hover:text-foreground"
@@ -209,7 +209,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
                   aria-label={label}
                   aria-pressed={isActive}
                   title={tooltip}
-                  className={`flex items-center justify-center gap-1 px-2 py-1 rounded-sm font-mono text-sm transition-colors duration-150 border ${
+                  className={`flex items-center justify-center gap-1 px-2 py-1 rounded-sm font-sans text-sm transition-colors duration-150 border ${
                     isActive
                       ? "bg-accent/10 text-foreground border-ring"
                       : "text-muted-foreground/80 hover:text-foreground border-transparent"
@@ -238,7 +238,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
             aria-label="Toggle wall cutaway"
             aria-pressed={cutawayMode === "auto"}
             title={`CUTAWAY: ${cutawayMode === "auto" ? "AUTO" : "OFF"}`}
-            className={`flex items-center justify-center gap-1 px-2 py-1 rounded-sm font-mono text-sm transition-colors duration-150 border mr-6 ${
+            className={`flex items-center justify-center gap-1 px-2 py-1 rounded-sm font-sans text-sm transition-colors duration-150 border mr-6 ${
               cutawayMode === "auto"
                 ? "bg-accent/10 text-foreground border-ring"
                 : "text-muted-foreground/80 hover:text-foreground border-transparent"
@@ -264,7 +264,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
           maxLength={60}
           data-testid="inline-doc-title"
           placeholder="Untitled Room"
-          className="font-mono text-sm text-foreground text-center min-w-0 max-w-[320px] truncate"
+          className="font-sans text-sm text-foreground text-center min-w-0 max-w-[320px] truncate"
         />
       </div>
 
@@ -304,7 +304,7 @@ export function Toolbar({ viewMode, onViewChange, onHome, onFloorPlanClick }: Pr
               }
               exportRenderedImage();
             }}
-            className="font-mono text-sm font-normal px-4 py-1 border border-accent text-foreground hover:bg-accent/10 transition-colors rounded-sm"
+            className="font-sans text-sm font-normal px-4 py-1 border border-accent text-foreground hover:bg-accent/10 transition-colors rounded-sm"
             aria-label="Export"
           >
             Export
@@ -365,7 +365,7 @@ function ToolbarSaveStatus() {
     return (
       <div className="flex items-center gap-1.5 min-w-[72px]" aria-label="Save status">
         <span className="material-symbols-outlined text-[14px] text-error">error</span>
-        <span className="font-mono text-base tracking-widest text-error">
+        <span className="font-sans text-base tracking-widest text-error">
           SAVE_FAILED
         </span>
       </div>
@@ -385,7 +385,7 @@ function ToolbarSaveStatus() {
           >
             progress_activity
           </span>
-          <span className="font-mono text-base tracking-widest text-foreground">
+          <span className="font-sans text-base tracking-widest text-foreground">
             SAVING
           </span>
         </>
@@ -395,7 +395,7 @@ function ToolbarSaveStatus() {
             cloud_done
           </span>
           <span
-            className={`font-mono text-base tracking-widest ${
+            className={`font-sans text-base tracking-widest ${
               isSaved ? "text-success" : "text-muted-foreground/60"
             }`}
           >
@@ -548,7 +548,7 @@ export function ToolPalette() {
           <span className="material-symbols-outlined text-[18px]">fit_screen</span>
         </button>
       </Tooltip>
-      <div className="w-8 h-5 flex items-center justify-center font-mono text-[9px] text-muted-foreground/60 tracking-wider">
+      <div className="w-8 h-5 flex items-center justify-center font-sans text-[9px] text-muted-foreground/60 tracking-wider">
         {Math.round(userZoom * 100)}%
       </div>
     </div>

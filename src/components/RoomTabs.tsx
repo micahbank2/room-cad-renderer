@@ -39,7 +39,7 @@ export default function RoomTabs({ onAddClick }: Props) {
             onClick={() => {
               if (!isActive) handleSwitch(room.id);
             }}
-            className={`group flex items-center gap-1.5 px-2 h-10 -mb-px font-mono text-[10px] tracking-wider transition-colors ${
+            className={`group flex items-center gap-1.5 px-2 h-10 -mb-px font-sans text-[10px] tracking-wider transition-colors ${
               isActive
                 ? "text-foreground border-b-2 border-accent-light cursor-text"
                 : "text-muted-foreground/80 hover:text-muted-foreground cursor-pointer"
@@ -56,7 +56,7 @@ export default function RoomTabs({ onAddClick }: Props) {
                 }
                 maxLength={60}
                 data-testid={`inline-room-tab-${room.id}`}
-                className="font-mono text-[10px] tracking-wider min-w-[40px] max-w-[200px]"
+                className="font-sans text-[10px] tracking-wider min-w-[40px] max-w-[200px]"
               />
             ) : (
               <span>{room.name}</span>
@@ -75,7 +75,7 @@ export default function RoomTabs({ onAddClick }: Props) {
       })}
       <button
         onClick={onAddClick}
-        className="ml-auto font-mono text-[10px] tracking-wider text-muted-foreground/80 hover:text-foreground transition-colors px-2"
+        className="ml-auto font-sans text-[10px] tracking-wider text-muted-foreground/80 hover:text-foreground transition-colors px-2"
       >
         + ADD ROOM
       </button>

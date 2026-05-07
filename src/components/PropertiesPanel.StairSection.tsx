@@ -97,7 +97,7 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
 
   return (
     <div className="space-y-2">
-      <div className="font-mono text-xs text-foreground">
+      <div className="font-sans text-xs text-foreground">
         STAIR {stair.id.slice(-4).toUpperCase()}
       </div>
 
@@ -132,7 +132,7 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
               setWidthDraft(String(DEFAULT_STAIR_WIDTH_FT));
             }}
             data-testid="reset-stair-size"
-            className="font-mono text-sm text-foreground hover:text-foreground"
+            className="font-sans text-sm text-foreground hover:text-foreground"
           >
             Reset size
           </button>
@@ -232,7 +232,7 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
 
         <div className="flex flex-col gap-1">
           <label
-            className="font-mono text-sm text-muted-foreground/60 tracking-wider"
+            className="font-sans text-sm text-muted-foreground/60 tracking-wider"
             htmlFor={`stair-label-${stair.id}`}
           >
             LABEL
@@ -262,7 +262,7 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
                 labelOverride: v.trim() === "" ? undefined : v.slice(0, LABEL_MAX),
               });
             }}
-            className="px-2 py-1 font-mono text-sm text-foreground bg-background border border-border/60 rounded-sm"
+            className="px-2 py-1 font-sans text-sm text-foreground bg-background border border-border/60 rounded-sm"
           />
         </div>
       </div>
@@ -298,7 +298,7 @@ function NumberRow({
   return (
     <div className="flex flex-col gap-1">
       <label
-        className="font-mono text-sm text-muted-foreground/60 tracking-wider"
+        className="font-sans text-sm text-muted-foreground/60 tracking-wider"
         htmlFor={`stair-input-${ariaLabel}`}
       >
         {label}
@@ -325,10 +325,10 @@ function NumberRow({
             }
             onCommit();
           }}
-          className="flex-1 px-2 py-1 font-mono text-sm text-foreground bg-background border border-border/60 rounded-sm"
+          className="flex-1 px-2 py-1 font-sans text-sm text-foreground bg-background border border-border/60 rounded-sm"
         />
         {suffix && (
-          <span className="font-mono text-sm text-muted-foreground/60">{suffix}</span>
+          <span className="font-sans text-sm text-muted-foreground/60">{suffix}</span>
         )}
       </div>
     </div>

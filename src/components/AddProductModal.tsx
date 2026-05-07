@@ -84,7 +84,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
       <div className="relative w-[600px] bg-popover/90 backdrop-blur-xl border border-border/50 rounded-sm shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between p-5 pb-4">
-          <h2 className="font-mono text-sm text-foreground tracking-widest">
+          <h2 className="font-sans text-sm text-foreground tracking-widest">
             ADD PRODUCT
           </h2>
           <button
@@ -121,10 +121,10 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                     <span className="material-symbols-outlined text-2xl text-muted-foreground/60 mb-2">
                       cloud_upload
                     </span>
-                    <span className="font-mono text-[8px] text-muted-foreground/60 tracking-wider text-center px-3">
+                    <span className="font-sans text-[8px] text-muted-foreground/60 tracking-wider text-center px-3">
                       DRAG ASSETS HERE
                     </span>
-                    <span className="font-mono text-[7px] text-muted-foreground/60/50 mt-1">
+                    <span className="font-sans text-[7px] text-muted-foreground/60/50 mt-1">
                       JPG, PNG, GLB (MAX 20MB)
                     </span>
                   </>
@@ -141,7 +141,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                 />
               </div>
               {imageName && (
-                <span className="font-mono text-[8px] text-muted-foreground/60 block mt-1 truncate">
+                <span className="font-sans text-[8px] text-muted-foreground/60 block mt-1 truncate">
                   {imageName}
                 </span>
               )}
@@ -150,7 +150,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
             {/* Right: form fields */}
             <div className="flex-1 space-y-3">
               <label className="block space-y-1">
-                <span className="font-mono text-[9px] text-muted-foreground/60 tracking-wider">
+                <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">
                   PRODUCT NAME
                 </span>
                 <input
@@ -164,7 +164,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
               </label>
 
               <label className="block space-y-1">
-                <span className="font-mono text-[9px] text-muted-foreground/60 tracking-wider">
+                <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">
                   CATEGORY
                 </span>
                 <select
@@ -182,7 +182,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-mono text-[9px] text-muted-foreground/60 tracking-wider block">
+                  <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider block">
                     DIMENSIONS (W / D / H)
                   </span>
                   <label className="flex items-center gap-1.5 cursor-pointer">
@@ -192,7 +192,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                       onChange={(e) => setSkipDims(e.target.checked)}
                       className="w-3 h-3 accent-accent"
                     />
-                    <span className="font-mono text-[8px] text-muted-foreground/60 tracking-wider">
+                    <span className="font-sans text-[8px] text-muted-foreground/60 tracking-wider">
                       SKIP DIMENSIONS
                     </span>
                   </label>
@@ -207,7 +207,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                       onChange={(e) => setWidth(+e.target.value)}
                       className="w-full px-3 py-2 text-xs pr-8"
                     />
-                    <span className="absolute right-2 top-1/2 -translate-y-1/2 font-mono text-[8px] text-muted-foreground/60">
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 font-sans text-[8px] text-muted-foreground/60">
                       FT
                     </span>
                   </div>
@@ -220,7 +220,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                       onChange={(e) => setDepth(+e.target.value)}
                       className="w-full px-3 py-2 text-xs pr-8"
                     />
-                    <span className="absolute right-2 top-1/2 -translate-y-1/2 font-mono text-[8px] text-muted-foreground/60">
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 font-sans text-[8px] text-muted-foreground/60">
                       FT
                     </span>
                   </div>
@@ -233,7 +233,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                       onChange={(e) => setHeight(+e.target.value)}
                       className="w-full px-3 py-2 text-xs pr-8"
                     />
-                    <span className="absolute right-2 top-1/2 -translate-y-1/2 font-mono text-[8px] text-muted-foreground/60">
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 font-sans text-[8px] text-muted-foreground/60">
                       FT
                     </span>
                   </div>
@@ -241,7 +241,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
               </div>
 
               <label className="block space-y-1">
-                <span className="font-mono text-[9px] text-muted-foreground/60 tracking-wider">
+                <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">
                   MATERIAL FINISH
                 </span>
                 <input
@@ -255,14 +255,14 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
 
               {/* 3D Model — optional (Phase 55 GLTF-UPLOAD-01) */}
               <div className="space-y-1">
-                <span className="font-mono text-[9px] text-muted-foreground/60 tracking-wider">
+                <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">
                   3D MODEL (OPTIONAL)
                 </span>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => gltfRef.current?.click()}
-                    className="font-mono text-[9px] px-3 py-1.5 border border-border/60 rounded-sm text-muted-foreground/80 hover:text-foreground hover:border-accent/40 transition-colors"
+                    className="font-sans text-[9px] px-3 py-1.5 border border-border/60 rounded-sm text-muted-foreground/80 hover:text-foreground hover:border-accent/40 transition-colors"
                   >
                     {gltfFile ? gltfFile.name.toUpperCase() : "CHOOSE .GLTF / .GLB"}
                   </button>
@@ -292,7 +292,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                   />
                 </div>
                 {gltfError && (
-                  <span className="font-mono text-[8px] text-error block">{gltfError}</span>
+                  <span className="font-sans text-[8px] text-error block">{gltfError}</span>
                 )}
               </div>
             </div>
@@ -303,14 +303,14 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="font-mono text-[10px] tracking-widest px-4 py-2 text-muted-foreground/80 hover:text-foreground transition-colors"
+              className="font-sans text-[10px] tracking-widest px-4 py-2 text-muted-foreground/80 hover:text-foreground transition-colors"
             >
               CANCEL
             </button>
             <button
               type="submit"
               disabled={!name}
-              className="font-mono text-[10px] tracking-widest px-5 py-2 bg-accent text-white rounded-sm hover:opacity-90 active:scale-95 disabled:opacity-30 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
+              className="font-sans text-[10px] tracking-widest px-5 py-2 bg-accent text-white rounded-sm hover:opacity-90 active:scale-95 disabled:opacity-30 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
             >
               ADD TO REGISTRY
             </button>

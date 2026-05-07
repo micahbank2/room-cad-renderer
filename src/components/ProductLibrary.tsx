@@ -78,21 +78,21 @@ export function ProductLibrary({
       <div className="p-6 pb-4 shrink-0">
         <div className="flex items-start justify-between mb-1">
           <div>
-            <span className="font-mono text-[10px] text-muted-foreground/60 tracking-widest block mb-1">
+            <span className="font-sans text-[10px] text-muted-foreground/60 tracking-widest block mb-1">
               YOUR LIBRARY
             </span>
-            <h1 className="font-display font-bold text-2xl text-foreground tracking-tight">
+            <h1 className="font-sans font-bold text-2xl text-foreground tracking-tight">
               PRODUCT REGISTRY
             </h1>
           </div>
           <button
             onClick={onOpenAddModal}
-            className="font-mono text-[10px] tracking-widest px-4 py-2 bg-primary text-primary-foreground rounded-sm hover:opacity-90 active:scale-95 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
+            className="font-sans text-[10px] tracking-widest px-4 py-2 bg-primary text-primary-foreground rounded-sm hover:opacity-90 active:scale-95 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
           >
             + ADD PRODUCT
           </button>
         </div>
-        <span className="font-mono text-sm text-foreground">
+        <span className="font-sans text-sm text-foreground">
           {filtered.length} ITEMS
         </span>
       </div>
@@ -126,12 +126,12 @@ export function ProductLibrary({
             <span className="material-symbols-outlined text-4xl text-muted-foreground/60 mb-3">
               inventory_2
             </span>
-            <span className="font-mono text-[10px] text-muted-foreground/60 tracking-widest">
+            <span className="font-sans text-[10px] text-muted-foreground/60 tracking-widest">
               NO ITEMS FOUND
             </span>
             <button
               onClick={onOpenAddModal}
-              className="mt-3 font-mono text-[10px] tracking-widest px-4 py-1.5 text-foreground border border-ring rounded-sm hover:bg-accent/10 transition-colors"
+              className="mt-3 font-sans text-[10px] tracking-widest px-4 py-1.5 text-foreground border border-ring rounded-sm hover:bg-accent/10 transition-colors"
             >
               + ADD PRODUCT
             </button>

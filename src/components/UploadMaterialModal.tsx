@@ -359,7 +359,7 @@ export function UploadMaterialModal(
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-4">
-          <h2 className="font-mono text-base font-medium uppercase tracking-widest text-foreground">
+          <h2 className="font-sans text-base font-medium uppercase tracking-widest text-foreground">
             {heading}
           </h2>
           <button
@@ -410,7 +410,7 @@ export function UploadMaterialModal(
           <div className="flex flex-col gap-1">
             <label
               htmlFor="mat-name"
-              className="font-mono text-sm font-medium uppercase tracking-wide text-muted-foreground/80"
+              className="font-sans text-sm font-medium uppercase tracking-wide text-muted-foreground/80"
             >
               NAME
             </label>
@@ -425,10 +425,10 @@ export function UploadMaterialModal(
               }}
               placeholder="e.g. Carrara Marble"
               maxLength={40}
-              className="bg-card border border-border/50 rounded-sm px-2 py-1 text-sm font-mono text-foreground w-full placeholder:text-muted-foreground/60"
+              className="bg-card border border-border/50 rounded-sm px-2 py-1 text-sm font-sans text-foreground w-full placeholder:text-muted-foreground/60"
             />
             {nameError && (
-              <p className="font-mono text-sm text-error">{nameError}</p>
+              <p className="font-sans text-sm text-error">{nameError}</p>
             )}
           </div>
 
@@ -436,7 +436,7 @@ export function UploadMaterialModal(
           <div className="flex flex-col gap-1">
             <label
               htmlFor="mat-tile-size"
-              className="font-mono text-sm font-medium uppercase tracking-wide text-muted-foreground/80"
+              className="font-sans text-sm font-medium uppercase tracking-wide text-muted-foreground/80"
             >
               TILE_SIZE
             </label>
@@ -451,12 +451,12 @@ export function UploadMaterialModal(
               }}
               onBlur={handleTileSizeBlur}
               placeholder="2'"
-              className={`bg-card border rounded-sm px-2 py-1 text-sm font-mono text-foreground w-full placeholder:text-muted-foreground/60 ${
+              className={`bg-card border rounded-sm px-2 py-1 text-sm font-sans text-foreground w-full placeholder:text-muted-foreground/60 ${
                 tileSizeError ? "border-error" : "border-border/50"
               }`}
             />
             {tileSizeError && (
-              <p className="font-mono text-sm text-error">{tileSizeError}</p>
+              <p className="font-sans text-sm text-error">{tileSizeError}</p>
             )}
           </div>
 
@@ -497,7 +497,7 @@ export function UploadMaterialModal(
             type="button"
             onClick={onClose}
             disabled={saving}
-            className="rounded-sm px-4 py-1 font-mono text-sm text-muted-foreground hover:text-foreground bg-accent hover:bg-secondary border border-border/50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-sm px-4 py-1 font-sans text-sm text-muted-foreground hover:text-foreground bg-accent hover:bg-secondary border border-border/50 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ minHeight: 44 }}
           >
             <span>{COPY.ctaDiscard}</span>
@@ -506,7 +506,7 @@ export function UploadMaterialModal(
             type="button"
             onClick={submit}
             disabled={primaryDisabled}
-            className="rounded-sm px-4 py-1 font-mono text-sm text-foreground bg-accent hover:bg-accent/90 border-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="rounded-sm px-4 py-1 font-sans text-sm text-foreground bg-accent hover:bg-accent/90 border-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             style={{ minHeight: 44 }}
           >
             {saving || processing ? (
@@ -567,12 +567,12 @@ function DropZone({
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-2">
-        <span className="font-mono text-sm font-medium uppercase tracking-wide text-muted-foreground/80">
+        <span className="font-sans text-sm font-medium uppercase tracking-wide text-muted-foreground/80">
           {label}
         </span>
-        {required && <span className="text-error font-mono text-sm">*</span>}
+        {required && <span className="text-error font-sans text-sm">*</span>}
         {optional && (
-          <span className="font-mono text-sm text-muted-foreground/60 tracking-widest">
+          <span className="font-sans text-sm text-muted-foreground/60 tracking-widest">
             OPTIONAL
           </span>
         )}
@@ -589,7 +589,7 @@ function DropZone({
           <button
             type="button"
             onClick={openPicker}
-            className="text-foreground text-sm font-mono hover:text-foreground"
+            className="text-foreground text-sm font-sans hover:text-foreground"
           >
             Change
           </button>
@@ -627,7 +627,7 @@ function DropZone({
         {...inputProps}
       />
 
-      {error && <p className="font-mono text-sm text-error">{error}</p>}
+      {error && <p className="font-sans text-sm text-error">{error}</p>}
     </div>
   );
 }
@@ -651,7 +651,7 @@ function MetaField({
     <div className="flex flex-col gap-1">
       <label
         htmlFor={id}
-        className="font-mono text-sm font-medium uppercase tracking-wide text-muted-foreground/80"
+        className="font-sans text-sm font-medium uppercase tracking-wide text-muted-foreground/80"
       >
         {label}
       </label>
@@ -661,7 +661,7 @@ function MetaField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="bg-card border border-border/50 rounded-sm px-2 py-1 text-sm font-mono text-foreground w-full placeholder:text-muted-foreground/60"
+        className="bg-card border border-border/50 rounded-sm px-2 py-1 text-sm font-sans text-foreground w-full placeholder:text-muted-foreground/60"
       />
     </div>
   );

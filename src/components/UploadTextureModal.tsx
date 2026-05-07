@@ -285,7 +285,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-4">
-          <h2 className="font-mono text-base font-medium uppercase tracking-widest text-foreground">
+          <h2 className="font-sans text-base font-medium uppercase tracking-widest text-foreground">
             {heading}
           </h2>
           <button
@@ -313,7 +313,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
                   <button
                     type="button"
                     onClick={openFilePicker}
-                    className="text-foreground text-[11px] font-mono text-left hover:text-foreground"
+                    className="text-foreground text-[11px] font-sans text-left hover:text-foreground"
                   >
                     Change
                   </button>
@@ -351,7 +351,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
               />
 
               {fileError && (
-                <p className="font-mono text-[11px] text-error">{fileError}</p>
+                <p className="font-sans text-[11px] text-error">{fileError}</p>
               )}
             </>
           )}
@@ -360,7 +360,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
           <div className="flex flex-col gap-1">
             <label
               htmlFor="utex-name"
-              className={`font-mono text-sm font-medium uppercase tracking-wide ${
+              className={`font-sans text-sm font-medium uppercase tracking-wide ${
                 mode === "edit" ? "text-foreground" : "text-muted-foreground/80"
               }`}
             >
@@ -375,7 +375,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
               placeholder="e.g. Oak Floor"
               maxLength={40}
               autoFocus={mode === "edit"}
-              className="bg-card border border-border/50 rounded-sm px-2 py-1 text-sm font-mono text-foreground w-full placeholder:text-muted-foreground/60"
+              className="bg-card border border-border/50 rounded-sm px-2 py-1 text-sm font-sans text-foreground w-full placeholder:text-muted-foreground/60"
             />
           </div>
 
@@ -383,7 +383,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
           <div className="flex flex-col gap-1">
             <label
               htmlFor="utex-tile-size"
-              className="font-mono text-sm font-medium uppercase tracking-wide text-muted-foreground/80"
+              className="font-sans text-sm font-medium uppercase tracking-wide text-muted-foreground/80"
             >
               TILE SIZE
             </label>
@@ -400,12 +400,12 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
               }}
               onBlur={handleTileSizeBlur}
               placeholder="2'"
-              className={`bg-card border rounded-sm px-2 py-1 text-sm font-mono text-foreground w-full placeholder:text-muted-foreground/60 ${
+              className={`bg-card border rounded-sm px-2 py-1 text-sm font-sans text-foreground w-full placeholder:text-muted-foreground/60 ${
                 tileSizeError ? "border-error" : "border-border/50"
               }`}
             />
             {tileSizeError && (
-              <p className="font-mono text-[11px] text-error">{tileSizeError}</p>
+              <p className="font-sans text-[11px] text-error">{tileSizeError}</p>
             )}
           </div>
         </div>
@@ -416,7 +416,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
             type="button"
             onClick={onClose}
             disabled={saving}
-            className="rounded-sm px-4 py-1 font-mono text-sm text-muted-foreground hover:text-foreground bg-accent hover:bg-secondary border border-border/50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-sm px-4 py-1 font-sans text-sm text-muted-foreground hover:text-foreground bg-accent hover:bg-secondary border border-border/50 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ minHeight: 44 }}
           >
             <span>Discard</span>
@@ -425,7 +425,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
             type="button"
             onClick={submit}
             disabled={primaryDisabled}
-            className="rounded-sm px-4 py-1 font-mono text-sm text-foreground bg-accent hover:bg-accent/90 border-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="rounded-sm px-4 py-1 font-sans text-sm text-foreground bg-accent hover:bg-accent/90 border-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             style={{ minHeight: 44 }}
           >
             {saving || processing ? (
