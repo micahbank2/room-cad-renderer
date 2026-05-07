@@ -157,7 +157,7 @@
 
 ### Phases
 
-- [ ] **Phase 67: Material Engine Foundation** — Material entity + texture-map upload + IDB persistence, mirroring Phase 32 user-texture pipeline
+- [x] **Phase 67: Material Engine Foundation** — Material entity + texture-map upload + IDB persistence, mirroring Phase 32 user-texture pipeline (completed 2026-05-07)
 - [ ] **Phase 68: Material Application System** — Unified surface-material picker replacing split paint / wallpaper / floor-material flows
 - [ ] **Phase 69: Product–Material Linking** — Finish slot on placed products, swap fabric/finish without re-placing
 - [ ] **Phase 70: Library Rebuild** — Materials / Assemblies / Products top-level toggle with category tabs
@@ -175,7 +175,8 @@
   3. Re-uploading the same color-map file dedupes (no duplicate IDB entry; SHA-256 collision uses the existing texture)
   4. Hovering or inspecting a Material shows its metadata (brand, SKU, cost, lead time, tile size)
   5. Materials live in a separate `materialStore` (not in `cadStore`) — no impact on existing snapshot serialization at this phase
-**Plans:** TBD
+**Plans:** 1/1 plans complete
+- [x] 67-01-PLAN.md — Material entity + IDB store + useMaterials hook + UploadMaterialModal + MaterialCard + MaterialsSection in ProductLibrary
 **UI hint:** yes
 
 #### Phase 68: Material Application System (MAT-APPLY-01)
@@ -259,7 +260,7 @@
 | 64. Wall-Texture Flake Fix | 1/1 | Complete    | 2026-05-06 |
 | 65. Ceiling Resize Handles | 1/1 | Complete    | 2026-05-06 |
 | 66. Per-Surface Tile-Size UI | 1/1 | Complete    | 2026-05-06 |
-| 67. Material Engine Foundation | 0/0 | Not started   | — |
+| 67. Material Engine Foundation | 1/1 | Complete   | 2026-05-07 |
 | 68. Material Application System | 0/0 | Not started   | — |
 | 69. Product–Material Linking | 0/0 | Not started   | — |
 | 70. Library Rebuild | 0/0 | Not started   | — |

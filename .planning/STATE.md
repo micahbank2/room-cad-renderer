@@ -2,13 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.17
 milestone_name: Library + Material Engine
-status: "Ready for `/gsd:discuss-phase 67`"
-last_updated: "2026-05-06T22:30:00.000Z"
+status: verifying
+last_updated: "2026-05-07T01:03:31.819Z"
+last_activity: 2026-05-07
 progress:
-  total_phases: 4
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_phases: 9
+  completed_phases: 1
+  total_plans: 1
+  completed_plans: 1
 ---
 
 # Project State
@@ -18,22 +19,32 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-06 — v1.16 archived; v1.17 Library + Material Engine roadmap finalized)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** v1.17 Library + Material Engine — first new core data system since v1.2; materials become first-class with metadata + unified surface application
+**Current focus:** Phase 67 — material-engine-foundation-mat-engine-01 (complete, awaiting verification)
 
 ## Current Position
 
-Phase: Not started (roadmap created)
+Phase: 67 (material-engine-foundation-mat-engine-01) — COMPLETE
 Milestone: v1.17 Library + Material Engine
-Phases: 4 (67, 68, 69, 70) — 0 complete
-Plan: —
-Status: Ready for `/gsd:discuss-phase 67`
-Last activity: 2026-05-06 — v1.17 roadmap created (4 phases, 4/4 requirements mapped, 100% coverage)
+Phases: 4 (67, 68, 69, 70) — 1 complete
+Plan: 1 of 1 (DONE)
+Status: Phase complete — ready for verification
+Last activity: 2026-05-07 -- Phase 67 Plan 01 shipped
+
+## Decisions
+
+- **D-09 RESOLVED (Phase 67):** wrapper architecture confirmed. Material stores `utex_`-prefixed colorMapId references into the existing userTextureStore (Phase 34 pipeline) rather than owning blobs directly. Phase 68 surface renderers consume Material via the existing pbrTextureCache plumbing — zero new texture-cache code needed for apply.
+
+## Performance Metrics
+
+| Phase-Plan | Duration | Tasks | Files | Date |
+|---|---|---|---|---|
+| 67-01 | ~25min | 3 | 13 (6 src + 6 tests + 1 mod) | 2026-05-07 |
 
 ## v1.17 Roadmap
 
 | Phase | Requirement | Goal | Status |
 |-------|-------------|------|--------|
-| 67 | MAT-ENGINE-01 | Material engine foundation — texture maps + metadata + IDB persistence (#25) | Pending |
+| 67 | MAT-ENGINE-01 | Material engine foundation — texture maps + metadata + IDB persistence (#25) | Complete |
 | 68 | MAT-APPLY-01 | Material application system — unified surface picker (#27) | Pending |
 | 69 | MAT-LINK-01 | Product-to-material linking — finish slot on placed products (#26) | Pending |
 | 70 | LIB-REBUILD-01 | Library rebuild — Materials / Assemblies / Products top-level toggle (#24) | Pending |
@@ -57,4 +68,4 @@ Last activity: 2026-05-06 — v1.17 roadmap created (4 phases, 4/4 requirements 
 
 ## Next Step
 
-Run `/gsd:discuss-phase 67` to scope Phase 67 (MAT-ENGINE-01 — Material engine foundation).
+Run `/gsd:verify-work` to gate Phase 67 — confirm all 5 success criteria, run e2e Playwright suite (`npx playwright test tests/e2e/specs/material-upload.spec.ts`), and validate Pattern #7 / D-09 wrapper architecture before promoting to Phase 68.
