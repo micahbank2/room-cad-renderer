@@ -29,6 +29,7 @@ import {
   migrateV4ToV5,
   migrateV5ToV6,
 } from "@/lib/snapshotMigration";
+import type { SurfaceTarget } from "@/lib/surfaceMaterial";
 import type { PaintColor } from "@/types/paint";
 
 const MAX_HISTORY = 50;
@@ -86,6 +87,12 @@ interface CADState {
   removeCeiling: (id: string) => void;
   setFloorMaterial: (material: FloorMaterial | undefined) => void;
   setWallpaper: (wallId: string, side: WallSide, wallpaper: Wallpaper | undefined) => void;
+  // Phase 68 MAT-APPLY-01 (D-06): Material assignment + tile-size override per
+  // surface, with the standard history / NoHistory pair (mid-pick preview).
+  applySurfaceMaterial: (target: SurfaceTarget, materialId: string | undefined) => void;
+  applySurfaceMaterialNoHistory: (target: SurfaceTarget, materialId: string | undefined) => void;
+  applySurfaceTileSize: (target: SurfaceTarget, scaleFt: number | undefined) => void;
+  applySurfaceTileSizeNoHistory: (target: SurfaceTarget, scaleFt: number | undefined) => void;
   toggleWainscoting: (wallId: string, side: WallSide, enabled: boolean, heightFt?: number, color?: string, styleItemId?: string) => void;
   toggleCrownMolding: (wallId: string, side: WallSide, enabled: boolean, heightFt?: number, color?: string) => void;
   addWallArt: (wallId: string, art: Omit<WallArt, "id">) => string;
@@ -276,6 +283,101 @@ function initialState(): Pick<CADState, "rooms" | "activeRoomId" | "past" | "fut
     past: [],
     future: [],
   };
+}
+
+/**
+ * Phase 68 MAT-APPLY-01 (D-06): apply a Material id to a surface. Pure mutator
+ * — no history side effect, no doc lookup. Caller (the action wrapper) is
+ * responsible for `pushHistory` and `activeDoc`. Passing `materialId === undefined`
+ * deletes the field so the legacy fallback chain (wallpaper / floorMaterial /
+ * ceiling.paintId / etc.) takes over per D-01.
+ */
+function applySurfaceMaterialMut(
+  doc: RoomDoc,
+  target: SurfaceTarget,
+  materialId: string | undefined,
+): void {
+  switch (target.kind) {
+    case "wallSide": {
+      const wall = doc.walls?.[target.wallId];
+      if (!wall) return;
+      if (target.side === "A") {
+        if (materialId) wall.materialIdA = materialId;
+        else delete wall.materialIdA;
+      } else {
+        if (materialId) wall.materialIdB = materialId;
+        else delete wall.materialIdB;
+      }
+      return;
+    }
+    case "floor": {
+      if (materialId) doc.floorMaterialId = materialId;
+      else delete doc.floorMaterialId;
+      return;
+    }
+    case "ceiling": {
+      const c = doc.ceilings?.[target.ceilingId];
+      if (!c) return;
+      if (materialId) c.materialId = materialId;
+      else delete c.materialId;
+      return;
+    }
+    case "customElementFace": {
+      const placed = doc.placedCustomElements?.[target.placedId];
+      if (!placed) return;
+      if (!placed.faceMaterials) placed.faceMaterials = {};
+      if (materialId) {
+        placed.faceMaterials[target.face] = materialId;
+      } else {
+        delete placed.faceMaterials[target.face];
+      }
+      return;
+    }
+  }
+}
+
+/**
+ * Phase 68 MAT-APPLY-01 (D-04): apply a tile-size override to a surface.
+ * Custom-element face tile-size overrides are NOT supported in v1.17
+ * (faces inherit `Material.tileSizeFt`); the call is a logged no-op.
+ */
+function applySurfaceTileSizeMut(
+  doc: RoomDoc,
+  target: SurfaceTarget,
+  scaleFt: number | undefined,
+): void {
+  switch (target.kind) {
+    case "wallSide": {
+      const wall = doc.walls?.[target.wallId];
+      if (!wall) return;
+      if (target.side === "A") {
+        if (scaleFt !== undefined) wall.scaleFtA = scaleFt;
+        else delete wall.scaleFtA;
+      } else {
+        if (scaleFt !== undefined) wall.scaleFtB = scaleFt;
+        else delete wall.scaleFtB;
+      }
+      return;
+    }
+    case "floor": {
+      if (scaleFt !== undefined) doc.floorScaleFt = scaleFt;
+      else delete doc.floorScaleFt;
+      return;
+    }
+    case "ceiling": {
+      const c = doc.ceilings?.[target.ceilingId];
+      if (!c) return;
+      if (scaleFt !== undefined) c.scaleFt = scaleFt;
+      else delete c.scaleFt;
+      return;
+    }
+    case "customElementFace":
+      // eslint-disable-next-line no-console
+      console.info(
+        "[Phase68] tile-size override on customElementFace not supported in v1.17",
+      );
+      return;
+  }
 }
 
 export const useCADStore = create<CADState>()((set) => ({
@@ -708,6 +810,45 @@ export const useCADStore = create<CADState>()((set) => ({
           const recent: string[] = root.recentPaints ?? [];
           root.recentPaints = [wallpaper.paintId, ...recent.filter((id: string) => id !== wallpaper.paintId)].slice(0, 8);
         }
+      })
+    ),
+
+  // Phase 68 MAT-APPLY-01 (D-06): four-action contract for surface Material
+  // assignment. History variant pushes once at the start; NoHistory variant
+  // skips pushHistory for mid-pick preview (matches Phase 31 single-undo
+  // template — see resizeProductAxis pair).
+  applySurfaceMaterial: (target, materialId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        pushHistory(s);
+        applySurfaceMaterialMut(doc, target, materialId);
+      })
+    ),
+  applySurfaceMaterialNoHistory: (target, materialId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        applySurfaceMaterialMut(doc, target, materialId);
+      })
+    ),
+  applySurfaceTileSize: (target, scaleFt) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        pushHistory(s);
+        applySurfaceTileSizeMut(doc, target, scaleFt);
+      })
+    ),
+  applySurfaceTileSizeNoHistory: (target, scaleFt) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        applySurfaceTileSizeMut(doc, target, scaleFt);
       })
     ),
 

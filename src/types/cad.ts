@@ -37,6 +37,12 @@ export interface WallSegment {
   materialIdA?: string;
   /** Phase 68 D-03: per-side Material reference for wall side B. */
   materialIdB?: string;
+  /** Phase 68 D-04: per-side tile-size override (feet) for the resolved
+   *  Material. Read precedence in `resolveSurfaceTileSize`:
+   *  `scaleFtA ?? material.tileSizeFt ?? 1`. Mirrors `Wallpaper.scaleFt`. */
+  scaleFtA?: number;
+  /** Phase 68 D-04: per-side tile-size override for wall side B. */
+  scaleFtB?: number;
   /** Wainscoting per side (Phase 17). */
   wainscoting?: { A?: WainscotConfig; B?: WainscotConfig };
   /** Crown molding per side (Phase 17). */
@@ -294,6 +300,9 @@ export interface RoomDoc {
    *  When the migration encounters a preset (e.g. `WOOD_OAK`), it stores the
    *  preset id directly here without generating a new Material entry. */
   floorMaterialId?: string;
+  /** Phase 68 D-04: floor tile-size override (feet). Mirrors `FloorMaterial.scaleFt`.
+   *  Read precedence: `floorScaleFt ?? material.tileSizeFt ?? 1`. */
+  floorScaleFt?: number;
   /** Placed custom elements (references customElements catalog on snapshot). */
   placedCustomElements?: Record<string, PlacedCustomElement>;
   /** Phase 60 STAIRS-01 (D-01): per-room stairs. Optional — older snapshots
