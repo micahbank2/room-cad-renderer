@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useCADStore } from "@/stores/cadStore";
 import { ROOM_TEMPLATES, type RoomTemplateId } from "@/data/roomTemplates";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
 
 interface Props {
   open: boolean;
@@ -12,7 +13,6 @@ const TEMPLATE_IDS: RoomTemplateId[] = ["LIVING_ROOM", "BEDROOM", "KITCHEN", "BL
 export default function AddRoomDialog({ open, onClose }: Props) {
   const [name, setName] = useState("");
   const [tpl, setTpl] = useState<RoomTemplateId>("BLANK");
-  if (!open) return null;
 
   const handleCreate = () => {
     if (!name.trim()) return;
@@ -29,12 +29,11 @@ export default function AddRoomDialog({ open, onClose }: Props) {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-sm"
-      data-testid="ADD_ROOM"
-    >
-      <div className="bg-popover border border-border/60 p-6 w-[480px] font-sans">
-        <h2 className="text-foreground text-sm mb-4 tracking-widest">ADD ROOM</h2>
+    <Dialog open={open} onOpenChange={(o) => { if (!o) handleCancel(); }}>
+      <DialogContent className="w-[480px] max-w-[480px]" data-testid="ADD_ROOM">
+        <DialogHeader>
+          <DialogTitle className="text-sm tracking-widest">ADD ROOM</DialogTitle>
+        </DialogHeader>
         <label className="block text-muted-foreground/80 text-[9px] tracking-wider mb-1">ROOM NAME</label>
         <input
           autoFocus
@@ -45,6 +44,7 @@ export default function AddRoomDialog({ open, onClose }: Props) {
               e.preventDefault();
               handleCreate();
             }
+            // Escape is handled by Radix via onOpenChange; this handles input-level cancel
             if (e.key === "Escape") {
               e.preventDefault();
               handleCancel();
@@ -87,7 +87,7 @@ export default function AddRoomDialog({ open, onClose }: Props) {
             CREATE
           </button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

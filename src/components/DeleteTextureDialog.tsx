@@ -18,12 +18,13 @@
  * Design system: lucide-react only (D-33), canonical tokens (D-34),
  * useReducedMotion guard on spinner (D-39).
  */
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useUserTextures } from "@/hooks/useUserTextures";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { countTextureRefs } from "@/lib/countTextureRefs";
 import { useCADStore } from "@/stores/cadStore";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
 import type { UserTexture } from "@/types/userTexture";
 import type { CADSnapshot } from "@/types/cad";
 
@@ -56,15 +57,7 @@ export function DeleteTextureDialog(props: DeleteTextureDialogProps): JSX.Elemen
 
   const [deleting, setDeleting] = useState(false);
 
-  // Escape = Discard; Enter = confirm when not deleting.
-  useEffect(() => {
-    if (!open || !texture) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [open, texture, onClose]);
+  // Escape is handled natively by Radix via onOpenChange; manual window listener removed.
 
   const handleDelete = useCallback(async () => {
     if (!texture || deleting) return;
@@ -86,34 +79,21 @@ export function DeleteTextureDialog(props: DeleteTextureDialogProps): JSX.Elemen
     }
   }, [texture, deleting, remove, onDeleted, onClose]);
 
-  if (!open || !texture) return null;
-
   const spinnerClass = reducedMotion ? "size-4" : "size-4 animate-spin";
-  const nameUpper = texture.name.toUpperCase();
+  const nameUpper = texture?.name.toUpperCase() ?? "";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-        onClick={deleting ? undefined : onClose}
-      />
-
-      {/* Surface */}
-      <div
-        className="relative w-[400px] bg-popover/90 backdrop-blur-xl border border-border/50 rounded-smooth-md shadow-2xl"
-        role="dialog"
-        aria-modal="true"
-      >
+    <Dialog open={open && !!texture} onOpenChange={(o) => { if (!o && !deleting) onClose(); }}>
+      <DialogContent className="w-[400px] max-w-[400px]">
         {/* Header */}
-        <div className="p-6 pb-4">
-          <h2 className="font-sans text-base font-medium uppercase tracking-widest text-foreground">
+        <DialogHeader>
+          <DialogTitle className="text-base font-medium uppercase tracking-widest">
             DELETE TEXTURE
-          </h2>
-        </div>
+          </DialogTitle>
+        </DialogHeader>
 
         {/* Body — locked D-07 copy */}
-        <div className="px-6 pb-4">
+        <div className="py-2">
           {count === 0 ? (
             <p className="font-body text-base text-muted-foreground">
               Delete{" "}
@@ -131,7 +111,7 @@ export function DeleteTextureDialog(props: DeleteTextureDialogProps): JSX.Elemen
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-2 p-6 pt-4">
+        <div className="flex justify-end gap-2 pt-2">
           <button
             type="button"
             onClick={onClose}
@@ -156,8 +136,8 @@ export function DeleteTextureDialog(props: DeleteTextureDialogProps): JSX.Elemen
             )}
           </button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
