@@ -20,7 +20,8 @@
 - ✅ **v1.14 Real 3D Models** — Phases 55–58 (shipped 2026-05-05)
 - ✅ **v1.15 Architectural Toolbar Expansion** — Phases 59–62 (shipped 2026-05-06)
 - ✅ **v1.16 Maintenance Pass** — Phases 63–66 (shipped 2026-05-06)
-- 🚧 **v1.17 Library + Material Engine** — Phases 67–70 (in progress)
+- ✅ **v1.17 Library + Material Engine** — Phases 67–68 (partial-shipped 2026-05-07; Phases 69 MAT-LINK-01 + 70 LIB-REBUILD-01 deferred to v1.19)
+- 🚧 **v1.18 Pascal Visual Parity** — Phases 71–76 (in progress) — chrome-only rewrite to emulate pascalorg/editor
 
 ---
 
@@ -147,7 +148,112 @@
 
 ---
 
-## v1.17 Library + Material Engine (active)
+## v1.18 Pascal Visual Parity (active)
+
+**Goal:** Make Room CAD Renderer look extremely similar to Pascal Editor. Adopt Pascal's design tokens (oklch shadcn/ui v4 palette), font stack (Barlow + Geist Sans + Geist Mono), 10px squircle radius, layout patterns (contextual right sidebar, floating two-row action menu), and light + dark dual-mode. Every existing behavior, store, snapshot v6, hotkey, and test driver continues to work — chrome-only rewrite. Audit reference: `.planning/competitive/pascal-visual-audit.md`.
+
+**Sequencing rationale (locked):** Tokens → Primitives → Sidebar → Toolbar → Properties → Final. Phase 71 establishes the new design language at the variable level (every Tailwind class downstream picks up the new look). Phase 72 builds the primitive library so subsequent phases assemble UIs from one consistent vocabulary. Phase 73 reshapes the rooms tree + makes the right sidebar contextual — biggest layout change before the toolbar rework. Phase 74 swaps the top-left toolbar for the floating action menu — single most "Pascal-feeling" leap. Phase 75 polishes the properties + library surfaces with the new vocabulary. Phase 76 finishes with light-mode marketing surfaces + carry-over test cleanup + audit.
+
+**Forward signal:** Roadmap will be filled in by gsd-roadmapper. 6 phases, ~5–7 days. Functionality regression-tested by existing 800+ test suite. Lucide-icon fallback first for the action menu's chunky top row; commission isometric PNG icons later if look is flat.
+
+### Phases
+
+- [x] **Phase 71: Token Foundation (TOKEN-FOUNDATION)** — Replace Obsidian palette with Pascal's oklch tokens; Barlow + Geist fonts; 10px squircle radius; light + dark dual-mode (completed 2026-05-07)
+- [ ] **Phase 72: Primitives Shelf (PRIMITIVES-SHELF)** — `cva`-driven primitives (Button / Tab / PanelSection / SegmentedControl / Switch / Slider / Tooltip / Dialog / Input / Popover) with `motion/react` animations
+- [ ] **Phase 73: Sidebar Restyle (SIDEBAR-RESTYLE)** — Pascal spine-and-branches rooms tree; right sidebar becomes contextual (mounts only when something is selected)
+- [ ] **Phase 74: Toolbar Rework (TOOLBAR-REWORK)** — Floating two-row action menu at canvas-bottom-center replaces the top-left toolbar entirely
+- [ ] **Phase 75: Properties + Library Restyle (PROPERTIES-LIBRARY-RESTYLE)** — MaterialPicker / ProductLibrary / RoomSettings / PropertiesPanel / Add+UploadModals adopt new tokens, primitives, and contextual mount pattern
+- [ ] **Phase 76: Modals + Welcome + Final (MODALS-WELCOME-FINAL)** — Modal/Dialog primitives finalized; WelcomeScreen + ProjectManager adopt light mode; carry-over v1.17 test cleanup; final audit pass
+
+### Phase Details
+
+#### Phase 71: Token Foundation (TOKEN-FOUNDATION)
+
+**Goal:** Jessica opens the app and sees a different application — neutral grays instead of dark blue, soft 10px corners instead of sharp 2px, Barlow / Geist Sans body text instead of monospace. Toggling theme moves cleanly between light and dark surfaces. Every existing screen still works because the change is purely at the CSS-token level.
+**Depends on:** Phase 33 (Tailwind v4 `@theme {}` baseline + `useReducedMotion` D-39 — preserved); Phase 47 (display modes), Phase 48 (saved cameras), Phase 53 (context menus), Phase 67 (material library), Phase 68 (unified MaterialPicker) — all consume the new tokens at render time, no API changes
+**Requirements:** TOKEN-FOUNDATION (no GH issue — internal v1.18 milestone requirement)
+**Success Criteria** (what must be TRUE):
+  1. Open the app → entire UI renders in Pascal's neutral grays; zero `#7c5bf0` purple visible anywhere in the chrome (purple reserved for non-existent charts)
+  2. Every button, card, input, panel section shows ~10px rounded corners (Safari/WebKit also gets the squircle treatment via `corner-shape: squircle` progressive enhancement)
+  3. Toggle theme via `useTheme()` → smooth swap to light mode; every surface adapts cleanly with no `obsidian-*` artifacts
+  4. UI text uses Barlow (display) and Geist Sans (body) plus Geist Mono only where monospaced data is appropriate; IBM Plex Mono is gone from the chrome
+  5. Existing 800+ test suite passes after the token swap, plus the 4 v1.17 carry-over tests get their contracts updated (snapshot v6 assertion, removed wallpaper "MY TEXTURES" tab, WallMesh cutaway ghost-spread audit, contextMenuActionCounts pollution)
+**Plans:** 7/7 plans complete
+**UI hint:** yes
+
+#### Phase 72: Primitives Shelf (PRIMITIVES-SHELF)
+
+**Goal:** Jessica clicks anywhere in the app and feels the new vocabulary — every button looks and animates the same; dialogs share one blur + spring entrance; tabs share one active-pill treatment; panel sections share one spring expand/collapse with chevron rotation. The primitives become the only way to author chrome from this phase forward.
+**Depends on:** Phase 71 (tokens must exist before primitives consume them); Phase 33 (`useReducedMotion()` hook reused for animation guards per D-39); Phase 33 `CollapsibleSection` (replaced by new PanelSection primitive); Phase 33 `LibraryCard` / `CategoryTabs` (continue working but slated for incremental migration in Phase 75)
+**Requirements:** PRIMITIVES-SHELF (no GH issue — internal v1.18 milestone requirement)
+**Success Criteria** (what must be TRUE):
+  1. Click any button across the app → consistent variant family (default / destructive / outline / secondary / ghost / link) and size scale (default / sm / lg / icon / icon-sm / icon-lg) — no inline-styled one-offs in the migrated sites
+  2. Open any dialog → unified backdrop blur + spring entry animation (no abrupt mount); reduced-motion users get instant snap
+  3. Click a Tab → muted-background pill active state (no neon glow, no hard accent ring)
+  4. Expand any panel section → spring-animated height transition with chevron rotation; collapsed/expanded state persists per section
+  5. ~30 existing button sites + ~5 tab sites + ~5 panel sites migrated to the new primitives in this phase; remaining sites continue to work with their inline styles until touched in Phases 73-76
+**Plans:** TBD
+**UI hint:** yes
+
+#### Phase 73: Sidebar Restyle (SIDEBAR-RESTYLE)
+
+**Goal:** Jessica looks at the left sidebar and sees Pascal's tree — a faint vertical spine line with horizontal branch lines connecting room nodes. When nothing is selected, the right side of the editor is empty canvas (more room to work). When she clicks a wall, product, ceiling, or custom-element, a properties panel slides in from the right with spring animation showing only the relevant controls.
+**Depends on:** Phase 72 (primitives — PanelSection drives properties section accordions); Phase 46 (rooms tree data + click-to-focus + per-node visibility cascade); Phase 47 (display modes consume sidebar real estate); Phase 48 (saved-camera Save/Clear UI lives in the contextual right panel); Phase 53 (context-menu exit closes the right panel cleanly); Phase 68 (MaterialPicker mounted within PropertiesPanel must un-mount cleanly with the sidebar)
+**Requirements:** SIDEBAR-RESTYLE (no GH issue — internal v1.18 milestone requirement)
+**Success Criteria** (what must be TRUE):
+  1. Open the app → left sidebar shows the rooms tree with a 1px gray vertical spine at left:21px and horizontal branch lines at 21px-32px (matches Pascal's `bg-border/50` pattern)
+  2. Hover any tree row → soft `bg-accent/30` highlight; active rows render with `bg-accent`; double-click camera-focus (Phase 46) and per-node eye-icon visibility (Phase 47) preserved
+  3. Click empty canvas → right sidebar disappears with spring exit animation; canvas fills the freed space
+  4. Click a wall / product / ceiling / custom-element / opening / stair → right sidebar slides in with spring entry showing the relevant PropertiesPanel sections
+  5. Re-click empty canvas → sidebar collapses again with no driver registration loss (Phase 68 lesson: drivers live in `src/test-utils/*Drivers.ts`, survive component un-mount cleanly)
+**Plans:** TBD
+**UI hint:** yes
+
+#### Phase 74: Toolbar Rework — Floating Action Menu (TOOLBAR-REWORK)
+
+**Goal:** Jessica's biggest "Pascal-feeling" moment — the top-left vertical toolbar is gone. In its place, a floating glass pill sits at the bottom-center of the canvas with two rows: top row of chunky building-block icons (Wall / Floor / Ceiling / Door / Window / Wall Art / Wainscoting / Crown / Stair / Custom Element) and bottom row of flat manipulation tools (Select / Pan / Zoom / Undo / Redo / Grid / Display Mode / View Mode). Existing keyboard shortcuts and tool-state behavior unchanged.
+**Depends on:** Phase 72 (primitives — Button + SegmentedControl + Tooltip drive the menu); Phase 71 (glass-pill tokens — `bg-background/90` + `backdrop-blur-md`); Phase 33 D-33 icon policy (drops Material Symbols entirely — Toolbar.tsx + Toolbar.WallCutoutsDropdown.tsx must lose their `material-symbols-outlined` imports); Phase 47 (display modes folded into the bottom row as a SegmentedControl); existing tool activation flows in `src/canvas/tools/` and keyboard shortcuts in `src/lib/shortcuts.ts` (Phase 52) untouched
+**Requirements:** TOOLBAR-REWORK (no GH issue — internal v1.18 milestone requirement)
+**Success Criteria** (what must be TRUE):
+  1. Open the app → no left vertical toolbar; floating glass pill at canvas-bottom-center holds the two rows of tools (`fixed bottom-6 left-1/2 -translate-x-1/2 rounded-2xl border bg-background/90 shadow-2xl backdrop-blur-md`)
+  2. Top row shows chunky lucide-react icons at 1.5x size (no Material Symbols anywhere in the codebase); bottom row shows flat lucide icons at default size; hover any icon → tooltip pops with the tool name + shortcut
+  3. Click a building-block icon → tool activates and canvas cursor switches; existing keyboard shortcuts (V / W / D / N / etc. from `src/lib/shortcuts.ts`) all still work
+  4. Active tool gets a darker fill ring; switching to a different tool runs the existing tool-cleanup pattern (`toolCleanupRef` from CLAUDE.md tool architecture) with zero leaks
+  5. Display Mode (NORMAL/SOLO/EXPLODE) and View Mode (2D/3D/Split) render as SegmentedControl primitive instances in the bottom row; Save/Open project UI relocates to a top-bar or floating top-right element (decided during plan-phase research)
+**Plans:** TBD
+**UI hint:** yes
+
+#### Phase 75: Properties + Library Restyle (PROPERTIES-LIBRARY-RESTYLE)
+
+**Goal:** Jessica opens the MaterialPicker, ProductLibrary, RoomSettings, PropertiesPanel, and any upload modal — every surface uses the new primitives, the new spring animations, and the new typography. The familiar shapes are still there (material grid, product cards, room-config inputs) but everything reads as one coherent visual language.
+**Depends on:** Phase 72 (primitives — Dialog / PanelSection / Tab / Input drive every surface in scope); Phase 73 (PropertiesPanel must already mount/un-mount contextually before its internals are restyled); Phase 67 (Material upload form preserves validation + dedup); Phase 68 (unified MaterialPicker grid responsiveness preserved; `applySurfaceMaterial` + `*NoHistory` single-undo apply pattern preserved); Phase 58 (GLTF Box badge top-LEFT slot continues to render — restyle it but keep the slot wiring); Phase 33 `CategoryTabs` (replaced by new Tab primitive)
+**Requirements:** PROPERTIES-LIBRARY-RESTYLE (no GH issue — internal v1.18 milestone requirement)
+**Success Criteria** (what must be TRUE):
+  1. Click any upload button → Pascal-style Dialog primitive (rounded, blurred backdrop, spring entry with reduced-motion guard)
+  2. Open the MaterialPicker → grid of material thumbnails on the new neutral background; hover shows soft accent fill; click applies the material (single Ctrl+Z still reverts per Phase 68 contract)
+  3. Open the ProductLibrary → cards use Pascal's pattern with Barlow names + Geist Sans metadata; GLTF Box badge top-LEFT survives the restyle
+  4. RoomSettings collapsible sections use the new PanelSection primitive (spring expand/collapse, chevron rotation); inputs use the new Input primitive
+  5. Custom CSS classes `glass-panel` / `accent-glow` / `cad-grid-bg` / `ghost-border` removed from MaterialPicker / ProductLibrary / RoomSettings / PropertiesPanel / WallSurfacePanel / AddProductModal / UploadTextureModal / UploadMaterialModal / MyTexturesList / LibraryCard
+**Plans:** TBD
+**UI hint:** yes
+
+#### Phase 76: Modals + WelcomeScreen + Final (MODALS-WELCOME-FINAL)
+
+**Goal:** Jessica opens the app on a fresh device and lands on a marketing-feeling light-mode WelcomeScreen — Barlow heading, neutral cream background, dark body text. Click "Continue to editor" → smooth transition to the dark editor. Open ProjectManager → also light mode. Help modal, delete confirmation, error toasts all use the unified primitives. Final QA passes show zero `obsidian-*` references anywhere in `src/`.
+**Depends on:** Phase 71 (light + dark dual-mode tokens must be in place); Phase 72 (Dialog primitive drives every modal); Phase 75 (editor surfaces fully restyled — light-mode flip happens against a finished dark mode); Phase 33 `InlineEditableText` (preserved); Phase 52 keyboard shortcuts overlay (HelpModal restyled); existing test driver registration pattern (`src/test-utils/*Drivers.ts` per Phase 68 lesson)
+**Requirements:** MODALS-WELCOME-FINAL (no GH issue — internal v1.18 milestone requirement)
+**Success Criteria** (what must be TRUE):
+  1. Fresh-device load → WelcomeScreen renders in light mode (`oklch(0.998 0 0)` background, dark Barlow heading, dark body); clicking "Continue to editor" smoothly transitions to dark editor (theme class swap on `<html>`)
+  2. Open ProjectManager → also renders in light mode and feels consistent with the WelcomeScreen
+  3. Open HelpModal, ConfirmDialog, ErrorBoundary fallback → all use the unified Dialog primitive; existing keyboard-shortcut overlay (Phase 52) preserves its 26 shortcut entries
+  4. Final grep audit returns zero matches for `obsidian-` / `text-text-` / `accent-glow` / `cad-grid-bg` / `glass-panel` / `material-symbols-outlined` across `src/`
+  5. The 4 v1.17 carry-over tests verified passing on the new chrome (snapshot v6 assertion, removed wallpaper "MY TEXTURES" tab, WallMesh cutaway ghost-spread audit, contextMenuActionCounts pollution); existing 800+ test suite still green
+**Plans:** TBD
+**UI hint:** yes
+
+---
+
+## v1.17 Library + Material Engine (closed early — partial-shipped)
 
 **Goal:** Jessica picks real materials (marble, fabric, tile, paint, flooring) with real-world metadata (brand, SKU, cost, lead time) and applies them to walls, floors, ceilings, and objects. Her library finally feels organized — Materials, Assemblies, and Products as separate top-level sections. **First milestone since v1.2 to introduce a new core data system.** Source: [#24](https://github.com/micahbank2/room-cad-renderer/issues/24), [#25](https://github.com/micahbank2/room-cad-renderer/issues/25), [#26](https://github.com/micahbank2/room-cad-renderer/issues/26), [#27](https://github.com/micahbank2/room-cad-renderer/issues/27).
 
@@ -200,10 +306,12 @@
 - [x] 68-07-PLAN.md — Test drivers (`__driveApplyMaterial`, `__getResolvedMaterial`) + e2e Wave 0 spec GREEN + HUMAN-UAT.md + Jessica checkpoint
 **UI hint:** yes
 
-#### Phase 69: Product–Material Linking (MAT-LINK-01)
+#### Phase 69: Product–Material Linking (MAT-LINK-01) — DEFERRED to v1.19
+
+> **Status: Deferred to v1.19.** Closed early during v1.17 scoping so the finish-slot UI ships in the v1.18 Pascal Visual Parity chrome rather than be designed twice. Goal + success criteria preserved below for when v1.19 picks it up.
 
 **Goal:** Jessica swaps the finish material on a placed product (couch fabric, faucet finish, cabinet color) without re-placing or re-uploading the object. Products carry an optional finish slot referencing a Material from the library.
-**Depends on:** Phase 67 (Material entity), Phase 68 (Material picker UI), Phase 31 (placement-instance state per D-02), Phase 56/58 (GLTF PBR material slot handling)
+**Depends on:** Phase 67 (Material entity), Phase 68 (Material picker UI), Phase 31 (placement-instance state per D-02), Phase 56/58 (GLTF PBR material slot handling), v1.18 primitives (Phases 71-76) for the finish picker chrome
 **Requirements:** [MAT-LINK-01](https://github.com/micahbank2/room-cad-renderer/issues/26)
 **Success Criteria** (what must be TRUE):
   1. User selects a placed product → PropertiesPanel shows a "Finish" picker → picks a Material from the library
@@ -211,13 +319,15 @@
   3. Single Ctrl+Z reverts the finish change
   4. Finish persists across save/load (`PlacedProduct.finishMaterialId` round-trips through the snapshot)
   5. Products placed without an explicit finish continue to render with the catalog default (today's behavior unchanged)
-**Plans:** TBD
+**Plans:** TBD (v1.19)
 **UI hint:** yes
 
-#### Phase 70: Library Rebuild (LIB-REBUILD-01)
+#### Phase 70: Library Rebuild (LIB-REBUILD-01) — DEFERRED to v1.19
+
+> **Status: Deferred to v1.19.** Closed early during v1.17 scoping so the library-rebuild UI ships in the v1.18 Pascal Visual Parity chrome rather than be designed twice. Goal + success criteria preserved below for when v1.19 picks it up.
 
 **Goal:** Sidebar library reorganizes around a top-level Materials / Assemblies / Products toggle. Each tab has its own category sub-tabs (Materials: Flooring, Wall coverings, Countertops, Paint; Products: Furniture, Plumbing fixtures, Appliances, Lighting, Curtains & blinds, Decor; Assemblies: empty placeholder).
-**Depends on:** Phase 67 (Materials live in their own store), Phase 33 (CategoryTabs primitive), Phase 14 (custom-element library precedent)
+**Depends on:** Phase 67 (Materials live in their own store), Phase 33 (CategoryTabs precedent — superseded by v1.18 Tab primitive), Phase 14 (custom-element library precedent), v1.18 primitives (Phases 71-76) for the new tab + library chrome
 **Requirements:** [LIB-REBUILD-01](https://github.com/micahbank2/room-cad-renderer/issues/24)
 **Success Criteria** (what must be TRUE):
   1. Sidebar library shows a 3-way Materials / Assemblies / Products toggle at the top; switching tabs swaps the visible content cleanly
@@ -225,7 +335,7 @@
   3. Products tab shows category sub-tabs (Furniture / Plumbing fixtures / Appliances / Lighting / Curtains & blinds / Decor); existing products migrate to the right category (or "Uncategorized" if metadata is missing)
   4. Assemblies tab shows a clear empty-state placeholder ("Coming soon — pre-built combos like kitchen cabinetry"), not broken UI
   5. Upload buttons are context-aware: in Materials tab → "Upload Material"; in Products tab → "Add Product"; existing upload + place flows continue to work end-to-end
-**Plans:** TBD
+**Plans:** TBD (v1.19)
 **UI hint:** yes
 
 ## Progress
@@ -269,8 +379,14 @@
 | 66. Per-Surface Tile-Size UI | 1/1 | Complete    | 2026-05-06 |
 | 67. Material Engine Foundation | 1/1 | Complete    | 2026-05-07 |
 | 68. Material Application System | 7/7 | Complete   | 2026-05-07 |
-| 69. Product–Material Linking | 0/0 | Not started   | — |
-| 70. Library Rebuild | 0/0 | Not started   | — |
+| 69. Product–Material Linking | 0/0 | Deferred to v1.19   | — |
+| 70. Library Rebuild | 0/0 | Deferred to v1.19   | — |
+| 71. Token Foundation | 7/7 | Complete   | 2026-05-07 |
+| 72. Primitives Shelf | 0/0 | Not started   | — |
+| 73. Sidebar Restyle | 0/0 | Not started   | — |
+| 74. Toolbar Rework | 0/0 | Not started   | — |
+| 75. Properties + Library Restyle | 0/0 | Not started   | — |
+| 76. Modals + Welcome + Final | 0/0 | Not started   | — |
 
 ## Backlog
 

@@ -33,7 +33,7 @@ const PASSTHROUGH_FILL = "rgba(124,91,240,0.10)";
 const PASSTHROUGH_STROKE = "#484554";
 const NICHE_FILL = "rgba(124,91,240,0.08)";
 const NICHE_STROKE = "#484554";
-const NICHE_HATCH = "rgba(147,142,160,0.3)"; // text-text-dim @ 30%
+const NICHE_HATCH = "rgba(147,142,160,0.3)"; // text-muted-foreground/80 @ 30%
 
 /** Per-symbol shared options to attach the data payload + selection-eventing. */
 function dataOpts(ctx: SymbolContext) {
@@ -163,7 +163,7 @@ export function buildPassthroughSymbol(quad: Quad, ctx: SymbolContext): fabric.G
 }
 
 /**
- * Niche 2D symbol: rectangle outline + 4 diagonal hatch lines (text-text-dim
+ * Niche 2D symbol: rectangle outline + 4 diagonal hatch lines (text-muted-foreground/80
  * at 30% opacity) signaling "recessed, not through".
  */
 export function buildNicheSymbol(quad: Quad, ctx: SymbolContext): fabric.Group {

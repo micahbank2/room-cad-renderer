@@ -34,19 +34,6 @@ vi.mock("@/stores/uiStore", () => ({
   ),
 }));
 
-vi.mock("@/stores/cadStore", () => ({
-  useCADStore: vi.fn(),
-  getActiveRoomDoc: () => ({
-    id: "room_1",
-    name: "Test",
-    room: { width: 20, length: 16, wallHeight: 8 },
-    walls: {},
-    placedProducts: {},
-    ceilings: {},
-    placedCustomElements: {},
-  }),
-}));
-
 // Provide a mock for cadStore.getState
 const mockCadStoreState = {
   removeWall: vi.fn(),

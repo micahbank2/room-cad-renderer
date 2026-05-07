@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box } from "lucide-react";
+import { Box, Package } from "lucide-react";
 import type { Product } from "@/types/product";
 import { PRODUCT_CATEGORIES } from "@/types/product";
 import { useUIStore } from "@/stores/uiStore";
@@ -78,21 +78,21 @@ export function ProductLibrary({
       <div className="p-6 pb-4 shrink-0">
         <div className="flex items-start justify-between mb-1">
           <div>
-            <span className="font-mono text-[10px] text-text-ghost tracking-widest block mb-1">
+            <span className="font-sans text-[10px] text-muted-foreground/60 tracking-widest block mb-1">
               YOUR LIBRARY
             </span>
-            <h1 className="font-display font-bold text-2xl text-text-primary tracking-tight">
+            <h1 className="font-sans font-bold text-2xl text-foreground tracking-tight">
               PRODUCT REGISTRY
             </h1>
           </div>
           <button
             onClick={onOpenAddModal}
-            className="font-mono text-[10px] tracking-widest px-4 py-2 bg-accent text-white rounded-sm hover:opacity-90 active:scale-95 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
+            className="font-sans text-[10px] tracking-widest px-4 py-2 bg-primary text-primary-foreground rounded-smooth-md hover:opacity-90 active:scale-95 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
           >
             + ADD PRODUCT
           </button>
         </div>
-        <span className="font-mono text-sm text-accent-light">
+        <span className="font-sans text-sm text-foreground">
           {filtered.length} ITEMS
         </span>
       </div>
@@ -101,7 +101,7 @@ export function ProductLibrary({
           Phase 70 will lift this into a top-level Materials/Assemblies/Products
           toggle; for now it's a sub-section of ProductLibrary per D-06. */}
       <MaterialsSection />
-      <div className="border-t border-outline-variant/20 my-2 mx-6" />
+      <div className="border-t border-border/50 my-2 mx-6" />
 
       {/* Filters */}
       <div className="px-6 pb-3 shrink-0 space-y-3">
@@ -123,15 +123,13 @@ export function ProductLibrary({
       <div className="flex-1 overflow-y-auto px-6 pb-6">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full">
-            <span className="material-symbols-outlined text-4xl text-text-ghost mb-3">
-              inventory_2
-            </span>
-            <span className="font-mono text-[10px] text-text-ghost tracking-widest">
+            <Package size={36} className="text-muted-foreground/60 mb-3" /> {/* D-15: substitute for material-symbols 'inventory_2' */}
+            <span className="font-sans text-[10px] text-muted-foreground/60 tracking-widest">
               NO ITEMS FOUND
             </span>
             <button
               onClick={onOpenAddModal}
-              className="mt-3 font-mono text-[10px] tracking-widest px-4 py-1.5 text-accent border border-accent/30 rounded-sm hover:bg-accent/10 transition-colors"
+              className="mt-3 font-sans text-[10px] tracking-widest px-4 py-1.5 text-foreground border border-ring rounded-smooth-md hover:bg-accent/10 transition-colors"
             >
               + ADD PRODUCT
             </button>
@@ -151,7 +149,7 @@ export function ProductLibrary({
                   p.gltfId ? (
                     <Box
                       size={12}
-                      className="text-text-dim"
+                      className="text-muted-foreground/80"
                       data-testid="gltf-badge"
                     />
                   ) : undefined

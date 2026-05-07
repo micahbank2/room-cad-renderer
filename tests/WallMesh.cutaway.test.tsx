@@ -64,11 +64,14 @@ describe("Phase 59 — WallMesh material-site spread audit", () => {
     // Subtract self-closing-or-block-opening detection: count {...ghost} occurrences.
     const ghostMatches = src.match(/\{\.\.\.ghost\}/g) ?? [];
     expect(openMatches.length).toBeGreaterThan(0);
-    // 13 actual sites; comment text mentioning "meshStandardMaterial" doesn't
-    // match the regex \w boundary because the next char in comments is a space
-    // or a period, not a letter.
-    expect(openMatches.length).toBe(13);
-    expect(ghostMatches.length).toBe(13);
+    // 15 actual sites as of Phase 68 MAT-APPLY-01 (added resolved-Material sites
+    // for framed wall art + surface material overlays). Comment text mentioning
+    // "meshStandardMaterial" doesn't match the regex \w boundary because the next
+    // char in comments is a space or a period, not a letter.
+    // Ghost-spread propagation to resolved-Material sites is LOCKED YES per D-12
+    // (researcher recommendation: ghosting must hide materialized walls too).
+    expect(openMatches.length).toBe(15);
+    expect(ghostMatches.length).toBe(15);
   });
 
   it("WallMesh ghostMaterialProps helper exists and is named correctly", () => {

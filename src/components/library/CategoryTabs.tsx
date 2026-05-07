@@ -14,17 +14,17 @@ export interface CategoryTabsProps {
  * Shared category tab primitive (Phase 33 GH #89).
  *
  * Horizontal tab row with active underline and optional "(count)" badge.
- * Uses canonical spacing tokens (gap-4, pb-1) and font-mono text-sm.
+ * Uses canonical spacing tokens (gap-4, pb-1) and font-sans text-sm.
  */
 export function CategoryTabs({ tabs, activeId, onChange }: CategoryTabsProps) {
   return (
-    <div className="flex items-end gap-4 border-b border-outline-variant/20">
+    <div className="flex items-end gap-4 border-b border-border/50">
       {tabs.map((tab) => {
         const isActive = tab.id === activeId;
-        const baseClasses = "pb-1 font-mono text-sm transition-colors";
+        const baseClasses = "pb-1 font-sans text-sm transition-colors";
         const stateClasses = isActive
-          ? "text-text-primary font-medium border-b border-accent -mb-px"
-          : "text-text-dim hover:text-text-muted";
+          ? "text-foreground font-medium border-b border-accent -mb-px"
+          : "text-muted-foreground/80 hover:text-muted-foreground";
         return (
           <button
             key={tab.id}
@@ -34,7 +34,7 @@ export function CategoryTabs({ tabs, activeId, onChange }: CategoryTabsProps) {
           >
             {tab.label}
             {typeof tab.count === "number" ? (
-              <span className="ml-1 text-text-ghost font-mono text-sm">
+              <span className="ml-1 text-muted-foreground/60 font-sans text-sm">
                 ({tab.count})
               </span>
             ) : null}

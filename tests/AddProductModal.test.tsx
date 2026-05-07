@@ -3,9 +3,9 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import AddProductModal from "@/components/AddProductModal";
 
 describe("AddProductModal Skip Dimensions (LIB-04)", () => {
-  it("renders SKIP_DIMENSIONS checkbox", () => {
+  it("renders Skip dimensions checkbox", () => {
     render(<AddProductModal onAdd={vi.fn()} onClose={vi.fn()} />);
-    expect(screen.getByText("SKIP_DIMENSIONS")).toBeTruthy();
+    expect(screen.getByText("Skip dimensions")).toBeTruthy();
   });
 
   it("toggling Skip greys out dimension inputs", () => {
@@ -20,7 +20,7 @@ describe("AddProductModal Skip Dimensions (LIB-04)", () => {
     render(<AddProductModal onAdd={onAdd} onClose={vi.fn()} />);
     fireEvent.change(screen.getByPlaceholderText(/EAMES/i), { target: { value: "Test" } });
     fireEvent.click(screen.getByRole("checkbox"));
-    fireEvent.click(screen.getByText("ADD_TO_REGISTRY"));
+    fireEvent.click(screen.getByText("Add to registry"));
     expect(onAdd).toHaveBeenCalledWith(expect.objectContaining({
       width: null, depth: null, height: null, name: "Test",
     }));
@@ -36,7 +36,7 @@ describe("AddProductModal Skip Dimensions (LIB-04)", () => {
     fireEvent.change(numberInputs[0], { target: { value: "4" } });
     fireEvent.change(numberInputs[1], { target: { value: "2.5" } });
     fireEvent.change(numberInputs[2], { target: { value: "3" } });
-    fireEvent.click(screen.getByText("ADD_TO_REGISTRY"));
+    fireEvent.click(screen.getByText("Add to registry"));
     expect(onAdd).toHaveBeenCalledWith(expect.objectContaining({
       width: 4, depth: 2.5, height: 3,
     }));

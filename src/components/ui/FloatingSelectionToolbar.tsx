@@ -9,7 +9,7 @@ import { useReducedMotion } from "@/hooks/useReducedMotion";
 /**
  * Phase 33 GH #85 — Floating Selection Toolbar (D-10, D-11, D-12, D-13, D-14).
  *
- * Renders a glass-panel mini-toolbar above the current selection's bounding box
+ * Renders a flat-card mini-toolbar above the current selection's bounding box
  * in the 2D Fabric canvas. Offers Duplicate (lucide Copy) and Delete (lucide
  * Trash2). Hides during active drag via `uiStore.isDragging` (set by selectTool).
  *
@@ -133,13 +133,13 @@ export function FloatingSelectionToolbar({ fc, wrapperRef }: Props) {
           ? "none"
           : "opacity 150ms ease-out, transform 150ms ease-out",
       }}
-      className="glass-panel rounded-lg px-2 py-1 flex items-center gap-2 z-20"
+      className="bg-card border border-border rounded-lg px-2 py-1 flex items-center gap-2 z-20"
       data-testid="floating-selection-toolbar"
     >
       <button
         type="button"
         onClick={handleDuplicate}
-        className="p-1 rounded-sm text-text-muted hover:bg-accent/20 hover:text-accent-light"
+        className="p-1 rounded-smooth-md text-muted-foreground hover:bg-accent/20 hover:text-foreground"
         aria-label="Duplicate"
       >
         <Copy size={14} />
@@ -147,7 +147,7 @@ export function FloatingSelectionToolbar({ fc, wrapperRef }: Props) {
       <button
         type="button"
         onClick={handleDelete}
-        className="p-1 rounded-sm text-text-muted hover:bg-error/20 hover:text-error"
+        className="p-1 rounded-smooth-md text-muted-foreground hover:bg-error/20 hover:text-error"
         aria-label="Delete"
       >
         <Trash2 size={14} />

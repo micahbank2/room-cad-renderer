@@ -39,11 +39,12 @@ describe("Phase 61 — PropertiesPanel OpeningsSection (C1-C3)", () => {
     // Depth input is rendered with kind-specific test id.
     expect(screen.getByTestId("opening-depth-op1")).toBeTruthy();
     // Width / Height / Sill / Offset rows also present.
-    expect(screen.getByText("WIDTH")).toBeTruthy();
-    expect(screen.getByText("HEIGHT")).toBeTruthy();
-    expect(screen.getByText("SILL")).toBeTruthy();
-    expect(screen.getByText("OFFSET")).toBeTruthy();
-    expect(screen.getByText("DEPTH")).toBeTruthy();
+    // Phase 71 D-09: labels are mixed-case ("Width" not "WIDTH")
+    expect(screen.getByText("Width")).toBeTruthy();
+    expect(screen.getByText("Height")).toBeTruthy();
+    expect(screen.getByText("Sill")).toBeTruthy();
+    expect(screen.getByText("Offset")).toBeTruthy();
+    expect(screen.getByText("Depth")).toBeTruthy();
   });
 
   it("C2: passthrough row shows wall-height placeholder on the Height input", () => {
@@ -76,7 +77,8 @@ describe("Phase 61 — PropertiesPanel OpeningsSection (C1-C3)", () => {
     render(<OpeningsSection wall={wall} />);
     fireEvent.click(screen.getByTestId("opening-row-op3"));
     // Depth label must NOT be in the DOM.
-    expect(screen.queryByText("DEPTH")).toBeNull();
+    // Phase 71 D-09: label is mixed-case ("Depth" not "DEPTH")
+    expect(screen.queryByText("Depth")).toBeNull();
     // No Depth input either.
     expect(screen.queryByTestId("opening-depth-op3")).toBeNull();
   });

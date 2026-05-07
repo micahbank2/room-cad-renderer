@@ -92,7 +92,7 @@ export function InlineEditableText({
       }}
       onBlur={commit}
       className={
-        "bg-transparent outline-none border-b border-transparent focus:border-accent cursor-text " +
+        "bg-transparent outline-none border-b border-transparent focus:border-ring cursor-text " +
         (className ?? "")
       }
     />

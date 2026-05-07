@@ -33,10 +33,10 @@ function CollapsibleSection({
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between mb-2 py-1"
       >
-        <h3 className="font-mono text-base font-medium text-text-muted">
+        <h3 className="font-sans text-base font-medium text-muted-foreground">
           {label}
         </h3>
-        <span className="font-mono text-sm text-text-ghost">
+        <span className="font-sans text-sm text-muted-foreground/60">
           {open ? "\u2212" : "+"}
         </span>
       </button>
@@ -58,13 +58,13 @@ export default function Sidebar({ productLibrary }: Props) {
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
 
   return (
-    <aside className="w-64 shrink-0 bg-obsidian-low flex flex-col overflow-hidden">
+    <aside className="w-64 shrink-0 bg-card flex flex-col overflow-hidden">
       {/* Sidebar header with collapse button */}
       <div className="flex items-center justify-between px-4 pt-2 pb-2">
-        <span className="font-mono text-sm font-medium text-text-muted">Panels</span>
+        <span className="font-sans text-sm font-medium text-muted-foreground">Panels</span>
         <button
           onClick={toggleSidebar}
-          className="font-mono text-base text-text-ghost hover:text-text-primary px-1"
+          className="font-sans text-base text-muted-foreground/60 hover:text-foreground px-1"
           title="Collapse sidebar"
         >
           &#x25C0;
@@ -81,18 +81,18 @@ export default function Sidebar({ productLibrary }: Props) {
         <CollapsibleSection label="System stats" defaultOpen={false}>
           <div className="space-y-1.5">
             <div className="flex justify-between">
-              <span className="font-mono text-[10px] text-text-dim">AREA</span>
-              <span className="font-mono text-[10px] text-accent-light">
+              <span className="font-sans text-[10px] text-muted-foreground/80">Area</span>
+              <span className="font-sans text-[10px] text-foreground">
                 {(room.width * room.length).toFixed(0)} SQ FT
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="font-mono text-[10px] text-text-dim">WALLS</span>
-              <span className="font-mono text-[10px] text-accent-light">{wallCount}</span>
+              <span className="font-sans text-[10px] text-muted-foreground/80">Walls</span>
+              <span className="font-sans text-[10px] text-foreground">{wallCount}</span>
             </div>
             <div className="flex justify-between">
-              <span className="font-mono text-[10px] text-text-dim">PRODUCTS</span>
-              <span className="font-mono text-[10px] text-accent-light">{productCount}</span>
+              <span className="font-sans text-[10px] text-muted-foreground/80">Products</span>
+              <span className="font-sans text-[10px] text-foreground">{productCount}</span>
             </div>
           </div>
         </CollapsibleSection>
@@ -106,7 +106,7 @@ export default function Sidebar({ productLibrary }: Props) {
                 onChange={toggleGrid}
                 className="w-3 h-3 accent-accent rounded-none"
               />
-              <span className="font-mono text-[10px] text-text-dim">GRID</span>
+              <span className="font-sans text-[10px] text-muted-foreground/80">Grid</span>
             </label>
           </div>
         </CollapsibleSection>
@@ -118,10 +118,10 @@ export default function Sidebar({ productLibrary }: Props) {
             onChange={(e) => setGridSnap(+e.target.value)}
             className="w-full px-2 py-1 text-[10px]"
           >
-            <option value={0}>OFF</option>
-            <option value={0.25}>3 INCH</option>
-            <option value={0.5}>6 INCH</option>
-            <option value={1}>1 FOOT</option>
+            <option value={0}>Off</option>
+            <option value={0.25}>3 inch</option>
+            <option value={0.5}>6 inch</option>
+            <option value={1}>1 foot</option>
           </select>
         </CollapsibleSection>
 

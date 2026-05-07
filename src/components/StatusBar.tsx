@@ -18,30 +18,30 @@ export default function StatusBar() {
   const cameraMode = useUIStore((s) => s.cameraMode);
 
   return (
-    <div className="h-8 bg-obsidian-deepest flex items-center px-4 ghost-border border-0 border-t shrink-0">
+    <div className="h-8 bg-background flex items-center px-4 border border-border/50 border-0 border-t shrink-0">
       <div className="flex items-center gap-1.5">
         <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-        <span className="font-mono text-[9px] text-text-ghost tracking-widest">
+        <span className="font-mono text-[9px] text-muted-foreground/60 tracking-widest">
           {activeTool.toUpperCase()} TOOL
         </span>
-        <span className="font-mono text-[9px] text-text-ghost mx-2">·</span>
-        <span className="font-mono text-[9px] text-text-dim tracking-wider">
+        <span className="font-mono text-[9px] text-muted-foreground/60 mx-2">·</span>
+        <span className="font-mono text-[9px] text-muted-foreground/80 tracking-wider">
           {STATUS_MESSAGES[activeTool] ?? ""}
         </span>
       </div>
       <div className="flex-1" />
       <div className="flex items-center gap-4">
-        <span className="font-mono text-[9px] text-text-ghost tracking-wider">
-          WALLS: <span className="text-accent-light">{wallCount}</span>
+        <span className="font-mono text-[9px] text-muted-foreground/60 tracking-wider">
+          WALLS: <span className="text-foreground">{wallCount}</span>
         </span>
-        <span className="font-mono text-[9px] text-text-ghost tracking-wider">
-          GRID: <span className="text-accent-light">{gridSnap > 0 ? `${gridSnap * 12}"` : "OFF"}</span>
+        <span className="font-mono text-[9px] text-muted-foreground/60 tracking-wider">
+          GRID: <span className="text-foreground">{gridSnap > 0 ? `${gridSnap * 12}"` : "OFF"}</span>
         </span>
-        <span className="font-mono text-[9px] text-text-ghost tracking-wider">
-          SCALE: <span className="text-accent-light">1:50</span>
+        <span className="font-mono text-[9px] text-muted-foreground/60 tracking-wider">
+          SCALE: <span className="text-foreground">1:50</span>
         </span>
-        <span className="font-mono text-[9px] text-text-ghost tracking-wider">
-          CAM: <span className="text-accent-light">{cameraMode === "walk" ? "WALK MODE" : "ORBIT MODE"}</span>
+        <span className="font-mono text-[9px] text-muted-foreground/60 tracking-wider">
+          CAM: <span className="text-foreground">{cameraMode === "walk" ? "WALK MODE" : "ORBIT MODE"}</span>
         </span>
       </div>
     </div>

@@ -45,6 +45,9 @@ export const useProductStore = create<ProductState>()((setState, getState) => ({
   },
 
   addProduct: (p) => {
+    // Guard: don't persist before the initial load resolves; writing an empty
+    // products array would overwrite the user's stored library (LIB-03).
+    if (!getState().loaded) return;
     setState(
       produce((s: ProductState) => {
         s.products.push(p);

@@ -78,10 +78,10 @@ function PanelSection({
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between mb-2 py-1"
       >
-        <h3 className="font-mono text-base font-medium text-text-muted">
+        <h3 className="font-sans text-base font-medium text-muted-foreground">
           {label}
         </h3>
-        <span className="font-mono text-sm text-text-ghost">
+        <span className="font-sans text-sm text-muted-foreground/60">
           {open ? "\u2212" : "+"}
         </span>
       </button>

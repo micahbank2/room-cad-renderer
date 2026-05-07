@@ -178,53 +178,64 @@ Zustand store keeps `past[]` and `future[]` arrays of `CADSnapshot` objects (roo
 
 ---
 
-## Design System (Phase 33 — v1.7.5)
+## Design System (Phase 71 — v1.18)
 
-### Icon Policy (D-33)
+### Icon Policy (D-33, updated Phase 71)
 
-Two icon libraries coexist:
+**lucide-react only across the chrome.** The Phase 33 Material Symbols allowlist (10 files) was deleted in Phase 71 (v1.18 TOKEN-FOUNDATION) per D-15.
 
-- **lucide-react** — ALL new UI chrome icons (chevrons, Copy, Trash2, X, Check, etc.). Stroke-based, tree-shaken. Introduced Phase 33.
-- **Material Symbols** — RESERVED for the 10 existing files using CAD-domain glyphs:
-  - `src/components/Toolbar.tsx` (grid_view, directions_walk, undo, redo, door_front, window, roofing, stairs, zoom_in/out, fit_screen)
-  - `src/components/Toolbar.WallCutoutsDropdown.tsx` (Phase 61 — `arch` glyph for archway; no lucide equivalent)
-  - `src/components/WelcomeScreen.tsx`
-  - `src/components/TemplatePickerDialog.tsx`
-  - `src/components/HelpModal.tsx`
-  - `src/components/AddProductModal.tsx`
-  - `src/components/HelpSearch.tsx`
-  - `src/components/ProductLibrary.tsx`
-  - `src/components/RoomsTreePanel/TreeRow.tsx` (Phase 60 — `stairs` glyph for stair leaf rows; lucide-react has no Stairs export)
-  - `src/index.css`
+Where lucide-react lacks an exact match for a CAD-domain glyph (`stairs`, `arch`, `roofing`), use the closest visual lucide icon and add a one-line comment marking the substitution: `// D-15: substitute for material-symbols 'stairs'`. Acceptable substitutes: stairs → Footprints, arch → Squircle, roofing → Triangle or Home, window → RectangleVertical.
 
-Do NOT add new `material-symbols-outlined` imports outside the allowlist. Do NOT migrate existing Material Symbols sites — they're CAD-specific glyphs that lucide doesn't have equivalents for.
+Do NOT add `material-symbols-outlined` imports anywhere. Do NOT re-introduce the Material Symbols `<link>` in `index.html`.
 
-### Canonical Spacing + Radius (D-34)
+### Canonical Spacing + Radius (D-34, updated Phase 71)
 
-Defined in `src/index.css` `@theme {}` block:
+Pascal-aligned spacing scale, defined in `src/index.css` `@theme {}` block:
 
 | Token | Value | Tailwind utility |
 |-------|-------|------------------|
-| `--spacing-xs` | 4px | `p-1` / `gap-1` |
-| `--spacing-sm` | 8px | `p-2` / `gap-2` |
-| `--spacing-lg` | 16px | `p-4` / `gap-4` |
-| `--spacing-xl` | 24px | `p-6` / `gap-6` |
-| `--spacing-2xl` | 32px | `p-8` / `gap-8` |
-| `--radius-sm` | 2px | `rounded-sm` |
-| `--radius-md` | 4px | `rounded-md` |
-| `--radius-lg` | 8px | `rounded-lg` |
+| `--spacing-xs` | 8px | `p-1` (under new scale) / `gap-1` |
+| `--spacing-sm` | 12px | `p-2` (under new scale) / `gap-2` |
+| `--spacing-md` | 16px | `p-3` / `p-4` / `gap-3` / `gap-4` |
+| `--spacing-lg` | 24px | `p-6` / `gap-6` |
+| `--spacing-xl` | 32px | `p-8` / `gap-8` |
+| `--radius` | 0.625rem (10px) | base; `--radius-lg` resolves to this |
+| `--radius-sm` | calc(var(--radius) - 4px) (6px) | `rounded-sm` |
+| `--radius-md` | calc(var(--radius) - 2px) (8px) | `rounded-md` |
+| `--radius-lg` | var(--radius) (10px) | `rounded-lg` |
+| `--radius-xl` | calc(var(--radius) + 4px) (14px) | `rounded-xl` |
 
-**NOTE:** 12px spacing (`p-3`, `m-3`, `gap-3`) is NOT in the canonical scale. Per-file rule: in `Toolbar.tsx`, `Sidebar.tsx`, `PropertiesPanel.tsx`, `RoomSettings.tsx`, zero `p-[Npx]`/`m-[Npx]`/`gap-[Npx]`/`rounded-[Npx]` arbitrary values should exist. Other files may use Tailwind default spacing (`p-3` compiles to 12px, acceptable outside the 4 target files).
+Phase 71 dropped the old 4px spacing tier; `p-1` now resolves to 8px. Component files that used `p-1` for tight density may need explicit review (most should remain `p-1` under the new scale; some may want `p-0.5` if Tailwind's stop is desired — verify visually).
 
-### Typography (D-03)
+**Squircle utilities (D-13):** `.rounded-smooth` / `.rounded-smooth-md` / `.rounded-smooth-lg` / `.rounded-smooth-xl` apply `corner-shape: squircle` (Safari/WebKit progressive enhancement; Chrome/Firefox fall back to `border-radius`). Apply to cards, modals, dropdowns, buttons, tab containers, inputs. Do NOT apply to Fabric canvas, Three.js viewport, or dimension labels (sharp by design).
 
-5-tier ramp, 3 CSS tokens, 2 weights:
+### Typography (D-03, updated Phase 71)
 
-- `--font-size-display: 28px` (Space Grotesk 500 — hero)
-- `--font-size-base: 13px` (Inter 400 body / IBM Plex Mono 500 h1)
-- `--font-size-sm: 11px` (IBM Plex Mono 500 h2 / 400 label / 400 value)
+Pascal-aligned font stack:
 
-UPPERCASE preserved for: dynamic CAD identifiers, status strings, unit value labels, tool mode labels, brand. Mixed-case for: section headers, panel headers, button labels, tab labels.
+- `--font-sans: 'Barlow', 'Geist Sans', system-ui, sans-serif` — chrome (`font-sans` Tailwind utility)
+- `--font-mono: 'Geist Mono', ui-monospace, ...` — data sites only (`font-mono` Tailwind utility)
+
+Sources:
+- Barlow loaded from Google Fonts in `index.html`
+- Geist Sans + Geist Mono loaded from Google Fonts in `index.html` (note: the `geist` npm package is Next.js-only and not compatible with Vite)
+
+The Phase 33 Space Grotesk display tier was dropped — Barlow handles all chrome typography (large headings via `text-display: 28px`, body via `text-base: 13px`, captions via `text-sm: 11px`). IBM Plex Mono was replaced by Geist Mono for data sites.
+
+**font-mono dual semantics:** UI chrome uses `font-sans` (Barlow). Data labels — wall IDs, status strings (`SAVED`, `BUILDING_SCENE...`), `.toUpperCase()` product/element names rendered in 2D Fabric overlay, dynamic CAD identifiers — keep `font-mono` (Geist Mono).
+
+### Theme System (Phase 71 — v1.18)
+
+Light + dark dual mode via Tailwind v4 class-based dark mode. `.dark` class on `<html>` flips all token values.
+
+- **Hook:** `src/hooks/useTheme.ts` — returns `{ theme, resolved, setTheme }`.
+  - `theme`: user choice (`"light" | "dark" | "system"`, default `"system"`)
+  - `resolved`: actual rendering mode (`"light" | "dark"`)
+  - `setTheme`: persists to `localStorage` under key `room-cad-theme` and applies `<html class="dark">` via effect
+- **Boot bridge:** Inline `<script>` in `index.html` reads localStorage and applies `dark` class BEFORE React mounts (prevents flash of light mode).
+- **Test driver:** `window.__driveTheme(theme)` exposed via `installThemeDrivers()` in `src/test-utils/themeDrivers.ts`. Gated by `import.meta.env.MODE === "test"`. StrictMode-safe via identity-check cleanup (see §"StrictMode-safe useEffect cleanup" pattern).
+- **No visible toggle UI** in this phase — Phase 76 lands the toggle alongside StatusBar / Settings rework.
+- **WelcomeScreen + ProjectManager + scene-list pages** remain dark-rendering until Phase 76 (D-06).
 
 ### Reduced Motion (D-39)
 
@@ -328,30 +339,30 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 - Openings: `op_` prefix — `op_${uid()}`
 - Products: `prod_` prefix — `prod_${uid()}`
 - Projects: `proj_` prefix — `proj_${uid()}`
-## UI Label Convention (Obsidian CAD Theme)
-- Section headers: `ROOM_CONFIG`, `SYSTEM_STATS`, `LAYERS`, `SNAP`
-- Tool labels: `SELECT`, `WALL`, `DOOR`, `WINDOW`
-- View labels: `2D_PLAN`, `3D_VIEW`, `LIBRARY`, `SPLIT`
-- Property names: `LENGTH`, `THICKNESS`, `HEIGHT`, `WIDTH_FT`, `MATERIAL_FINISH`
-- Status strings: `SYSTEM_STATUS: READY`, `SAVED`, `BUILDING_SCENE...`
-- Dynamic identifiers: `WALL_SEGMENT_{id}`, `{PRODUCT_NAME_UPPERCASED}`
-- Product names displayed: `.toUpperCase().replace(/\s/g, "_")`
+## UI Label Convention (D-09, updated Phase 71)
+
+Mixed-case for chrome (sentence case or Title Case as appropriate):
+- Section headers: `Room config`, `System stats`, `Layers`, `Snap`
+- Tool labels: `Select`, `Wall`, `Door`, `Window`
+- View labels: `2D Plan`, `3D View`, `Library`, `Split`
+- Property labels: `Length`, `Thickness`, `Height`, `Width (ft)`, `Material Finish`
+
+UPPERCASE preserved (D-10) for dynamic CAD identifiers (data, not chrome):
+- `WALL_SEGMENT_{id}` — wall IDs in 2D overlay
+- `{PRODUCT_NAME_UPPERCASED}` — product/element labels rendered via `.toUpperCase()`
+- Status string values: `READY`, `SAVED`, `BUILDING_SCENE...`, `SAVING`, `SAVE_FAILED` (the dynamic value; the surrounding `System Status:` label is mixed case)
 ## Component Structure
 - `export function ToolPalette()` lives in `src/components/Toolbar.tsx`
-## Styling Approach
-- Backgrounds: `bg-obsidian-deepest`, `bg-obsidian-base`, `bg-obsidian-low`, `bg-obsidian-mid`, `bg-obsidian-high`, `bg-obsidian-highest`, `bg-obsidian-bright`
-- Text: `text-text-primary`, `text-text-muted`, `text-text-dim`, `text-text-ghost`
-- Accent: `text-accent`, `text-accent-light`, `bg-accent`, `bg-accent/10`, `bg-accent/20`, `border-accent/30`
-- Semantic: `text-success`, `text-warning`, `text-error`, `text-info`
-- Borders: `border-outline-variant/20`, `ghost-border` (custom CSS class)
-- `glass-panel` — glassmorphism surface: `rgba(31, 30, 42, 0.8)` background, `backdrop-filter: blur(12px)`
-- `ghost-border` — subtle 15% opacity border
-- `cad-grid-bg` — radial dot grid background pattern
-- `accent-glow` — purple glow box-shadow
-- `cursor-crosshair` / `cursor-grab` — canvas cursor overrides
-- `font-mono` — IBM Plex Mono — used for ALL labels, values, identifiers, and UI chrome
-- `font-display` — Space Grotesk — used for large hero headings (`DESIGN_YOUR_SPACE`, brand name)
-- `font-body` (default, via CSS) — Inter — used for descriptive prose paragraphs
+## Styling Approach (Phase 71 — Pascal token system)
+- Backgrounds: `bg-background`, `bg-card`, `bg-muted`, `bg-popover` — Pascal oklch semantic tokens
+- Text: `text-foreground`, `text-muted-foreground`, `text-card-foreground`
+- Accent (interactive): `bg-accent`, `bg-accent/10`, `bg-accent/20`, `border-ring` — accent purple preserved for interactive highlights; NO `text-accent` in static chrome
+- Semantic: `text-destructive`, `bg-destructive`, `bg-primary`, `text-primary-foreground`
+- Borders: `border-border`, `border-border/50`, `border-ring`
+- `font-sans` — Barlow — used for ALL chrome labels, buttons, section headers
+- `font-mono` — Geist Mono — used for data identifiers, status strings, CAD overlays only
+- `cursor-crosshair` / `cursor-grab` — canvas cursor overrides (unchanged)
+- REMOVED (Phase 71): `bg-obsidian-*`, `text-text-*`, `glass-panel`, `ghost-border`, `cad-grid-bg`, `accent-glow`, `font-display` (Space Grotesk), `font-body` (Inter), `IBM Plex Mono`
 ## Design System Tokens (Obsidian CAD Theme)
 | Token | Value | Usage |
 |-------|-------|-------|

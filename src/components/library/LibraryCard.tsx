@@ -26,7 +26,7 @@ export interface LibraryCardProps {
  * Shared library card primitive (Phase 33 GH #89).
  *
  * Root element includes `data-testid="library-card"` for count-regression tests.
- * Styling uses canonical Plan 01/03 tokens (rounded-md, rounded-sm, p-2, gap-4).
+ * Styling uses canonical Plan 01/03 tokens (rounded-md, rounded-smooth-md, p-2, gap-4).
  *
  * Phase 58: optional top-LEFT badge slot for capability indicators (e.g. lucide
  * Box icon for products with a real GLTF model). The slot is always-visible and
@@ -42,10 +42,10 @@ export function LibraryCard({
   badge,
 }: LibraryCardProps) {
   const baseClasses =
-    "group relative ghost-border rounded-md cursor-pointer transition-colors";
+    "group relative border border-border/50 rounded-md cursor-pointer transition-colors";
   const stateClasses = selected
     ? "border-accent/60 bg-accent/10"
-    : "bg-obsidian-low hover:bg-obsidian-high";
+    : "bg-card hover:bg-accent";
 
   const handleRemoveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -59,7 +59,7 @@ export function LibraryCard({
         className={`${baseClasses} ${stateClasses} flex items-center gap-2 p-2`}
         onClick={onClick}
       >
-        <div className="w-8 h-8 rounded-sm bg-obsidian-high overflow-hidden shrink-0 relative">
+        <div className="w-8 h-8 rounded-smooth-md bg-accent overflow-hidden shrink-0 relative">
           {thumbnail ? (
             <img
               src={thumbnail}
@@ -76,7 +76,7 @@ export function LibraryCard({
             </div>
           ) : null}
         </div>
-        <span className="font-mono text-sm text-text-muted truncate flex-1">
+        <span className="font-sans text-sm text-muted-foreground truncate flex-1">
           {label}
         </span>
         {onRemove ? (
@@ -84,7 +84,7 @@ export function LibraryCard({
             type="button"
             onClick={handleRemoveClick}
             aria-label="Remove"
-            className="opacity-0 group-hover:opacity-100 text-text-ghost hover:text-error transition-opacity shrink-0"
+            className="opacity-0 group-hover:opacity-100 text-muted-foreground/60 hover:text-error transition-opacity shrink-0"
           >
             <X size={12} />
           </button>
@@ -105,7 +105,7 @@ export function LibraryCard({
           type="button"
           onClick={handleRemoveClick}
           aria-label="Remove"
-          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-text-ghost hover:text-error transition-opacity z-10"
+          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-muted-foreground/60 hover:text-error transition-opacity z-10"
         >
           <X size={12} />
         </button>
@@ -118,7 +118,7 @@ export function LibraryCard({
           {badge}
         </div>
       ) : null}
-      <div className="aspect-square rounded-sm bg-obsidian-high overflow-hidden">
+      <div className="aspect-square rounded-smooth-md bg-accent overflow-hidden">
         {thumbnail ? (
           <img
             src={thumbnail}
@@ -127,7 +127,7 @@ export function LibraryCard({
           />
         ) : null}
       </div>
-      <span className="font-mono text-sm text-text-muted truncate mt-2">
+      <span className="font-sans text-sm text-muted-foreground truncate mt-2">
         {label}
       </span>
     </div>

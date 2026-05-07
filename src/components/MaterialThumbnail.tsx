@@ -57,10 +57,10 @@ export function MaterialThumbnail({ materialId, fallbackColor }: Props) {
   }, [materialId, dataURL, cached]);
 
   return (
-    <div className="relative w-full aspect-square rounded-sm overflow-hidden">
+    <div className="relative w-full aspect-square rounded-smooth-md overflow-hidden">
       {/* Placeholder — always present, never unmounts (D-06: no empty-tile flash). */}
       <div
-        className="absolute inset-0 rounded-sm"
+        className="absolute inset-0 rounded-smooth-md"
         style={{ backgroundColor: fallbackColor }}
       />
       {/* Thumbnail — crossfades in via opacity toggle. Omitted on "fallback" sentinel (D-07). */}
@@ -69,7 +69,7 @@ export function MaterialThumbnail({ materialId, fallbackColor }: Props) {
           src={dataURL}
           alt=""
           className={[
-            "absolute inset-0 w-full h-full object-cover rounded-sm",
+            "absolute inset-0 w-full h-full object-cover rounded-smooth-md",
             "transition-opacity",
             reducedMotion ? "duration-0" : "duration-150",
             "opacity-100",

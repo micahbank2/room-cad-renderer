@@ -66,10 +66,10 @@ function RotationPresetChips({
             onClick={() => onSelect(preset)}
             data-rotation-preset={preset}
             className={
-              "px-2 py-0.5 rounded-sm font-mono text-sm border transition-colors " +
+              "px-2 py-0.5 rounded-smooth-md font-sans text-sm border transition-colors " +
               (isActive
-                ? "bg-accent/20 text-accent-light border-accent/30"
-                : "bg-obsidian-high text-text-dim border-outline-variant/20 hover:bg-obsidian-highest")
+                ? "bg-accent/20 text-foreground border-ring"
+                : "bg-accent text-muted-foreground/80 border-border/50 hover:bg-secondary")
             }
           >
             {label}
@@ -151,10 +151,10 @@ function SavedCameraButtons({
         aria-label="Save camera"
         title={saveTitle}
         className={
-          "px-2 py-1 rounded-sm font-mono text-sm border flex items-center gap-1 transition-colors " +
+          "px-2 py-1 rounded-smooth-md font-sans text-sm border flex items-center gap-1 transition-colors " +
           (disabled
-            ? "bg-obsidian-high text-text-ghost border-outline-variant/20 cursor-not-allowed"
-            : "bg-obsidian-high text-text-dim border-outline-variant/20 hover:bg-obsidian-highest hover:text-accent-light")
+            ? "bg-accent text-muted-foreground/60 border-border/50 cursor-not-allowed"
+            : "bg-accent text-muted-foreground/80 border-border/50 hover:bg-secondary hover:text-foreground")
         }
       >
         <Camera className="w-3.5 h-3.5" />
@@ -167,7 +167,7 @@ function SavedCameraButtons({
           data-testid="clear-camera-btn"
           aria-label="Clear saved camera"
           title="Remove saved camera angle"
-          className="px-2 py-1 rounded-sm font-mono text-sm border flex items-center gap-1 transition-colors bg-obsidian-high text-text-dim border-outline-variant/20 hover:bg-obsidian-highest hover:text-accent-light"
+          className="px-2 py-1 rounded-smooth-md font-sans text-sm border flex items-center gap-1 transition-colors bg-accent text-muted-foreground/80 border-border/50 hover:bg-secondary hover:text-foreground"
         >
           <CameraOff className="w-3.5 h-3.5" />
           <span>Clear</span>
@@ -229,18 +229,18 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
     const totalCount = selectedIds.length;
 
     return (
-      <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto glass-panel rounded-sm p-4 space-y-3">
-        <h3 id="bulk-actions" className="font-mono text-base font-medium text-text-muted">
+      <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto bg-card border border-border rounded-smooth-md p-4 space-y-3">
+        <h3 id="bulk-actions" className="font-sans text-base font-medium text-muted-foreground">
           Bulk actions
         </h3>
-        <div className="font-mono text-[11px] text-accent-light">
+        <div className="font-sans text-[11px] text-foreground">
           {totalCount} ITEMS SELECTED
           {wallIds.length > 0 && ` (${wallIds.length} WALLS)`}
         </div>
 
         {wallIds.length > 0 && (
-          <div className="space-y-2 border-t border-outline-variant/20 pt-2">
-            <div id="paint-walls" className="font-mono text-sm font-medium text-text-muted">Paint all walls</div>
+          <div className="space-y-2 border-t border-border/50 pt-2">
+            <div id="paint-walls" className="font-sans text-sm font-medium text-muted-foreground">Paint all walls</div>
             <div className="flex items-center gap-2">
               <input
                 type="color"
@@ -252,9 +252,9 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
                     useCADStore.getState().setWallpaper(wId, "B", { kind: "color", color });
                   }
                 }}
-                className="w-8 h-7 bg-transparent border border-outline-variant/30 rounded-sm cursor-pointer"
+                className="w-8 h-7 bg-transparent border border-border/60 rounded-smooth-md cursor-pointer"
               />
-              <span className="font-mono text-[11px] text-text-ghost">
+              <span className="font-sans text-[11px] text-muted-foreground/60">
                 APPLIES TO BOTH SIDES
               </span>
             </div>
@@ -263,7 +263,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
 
         <button
           onClick={handleDelete}
-          className="w-full font-mono text-sm font-normal text-error tracking-widest py-1 border border-error/30 rounded-sm hover:bg-error/10"
+          className="w-full font-sans text-sm font-normal text-error tracking-widest py-1 border border-error/30 rounded-smooth-md hover:bg-error/10"
         >
           Delete all ({totalCount})
         </button>
@@ -283,24 +283,24 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
     const areaSqFt = polygonArea(wallList);
     return (
       <div
-        className="absolute right-3 top-3 z-10 w-64 glass-panel rounded-sm p-4 space-y-3"
+        className="absolute right-3 top-3 z-10 w-64 bg-card border border-border rounded-smooth-md p-4 space-y-3"
         aria-label="Properties (room)"
       >
-        <h3 className="font-mono text-base font-medium text-text-muted">
+        <h3 className="font-sans text-base font-medium text-muted-foreground">
           Properties
         </h3>
-        <div className="font-mono text-xs text-accent-light">
+        <div className="font-sans text-xs text-foreground">
           {(activeDoc?.name ?? "ROOM").toUpperCase()}
         </div>
         <CollapsibleSection id="dimensions" label="Dimensions">
           <div className="space-y-1.5">
-            <Row label="WIDTH" value={`${activeDoc?.room.width ?? 0} FT`} />
-            <Row label="LENGTH" value={`${activeDoc?.room.length ?? 0} FT`} />
-            <Row label="HEIGHT" value={`${activeDoc?.room.wallHeight ?? 0} FT`} />
-            {areaSqFt > 0 && <Row label="AREA" value={`${Math.round(areaSqFt)} SQ FT`} />}
+            <Row label="Width" value={`${activeDoc?.room.width ?? 0} FT`} />
+            <Row label="Length" value={`${activeDoc?.room.length ?? 0} FT`} />
+            <Row label="Height" value={`${activeDoc?.room.wallHeight ?? 0} FT`} />
+            {areaSqFt > 0 && <Row label="Area" value={`${Math.round(areaSqFt)} SQ FT`} />}
           </div>
         </CollapsibleSection>
-        <p className="font-mono text-sm text-text-dim leading-snug">
+        <p className="font-sans text-sm text-muted-foreground/80 leading-snug">
           Select a wall, product, or ceiling to edit its properties.
         </p>
       </div>
@@ -308,14 +308,14 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
   }
 
   return (
-    <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto glass-panel rounded-sm p-4 space-y-3">
-      <h3 id="properties" aria-label="Properties" className="font-mono text-base font-medium text-text-muted">
+    <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto bg-card border border-border rounded-smooth-md p-4 space-y-3">
+      <h3 id="properties" aria-label="Properties" className="font-sans text-base font-medium text-muted-foreground">
         Properties
       </h3>
 
       {ceiling && (
         <div className="space-y-2">
-          <div className="font-mono text-xs text-accent-light">
+          <div className="font-sans text-xs text-foreground">
             CEILING {ceiling.id.slice(-4).toUpperCase()}
           </div>
           <CollapsibleSection id="dimensions" label="Dimensions">
@@ -326,15 +326,15 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
               <CeilingDimInput
                 ceiling={ceiling}
                 axis="width"
-                label="WIDTH"
+                label="Width"
               />
               <CeilingDimInput
                 ceiling={ceiling}
                 axis="depth"
-                label="DEPTH"
+                label="Depth"
               />
-              <Row label="HEIGHT" value={`${ceiling.height.toFixed(1)} FT`} />
-              <Row label="VERTICES" value={String(ceiling.points.length)} />
+              <Row label="Height" value={`${ceiling.height.toFixed(1)} FT`} />
+              <Row label="Vertices" value={String(ceiling.points.length)} />
             </div>
           </CollapsibleSection>
           {(ceiling.widthFtOverride !== undefined ||
@@ -344,7 +344,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
             <button
               type="button"
               onClick={() => useCADStore.getState().clearCeilingOverrides(ceiling.id)}
-              className="w-full font-mono text-sm font-normal text-accent hover:text-accent-light tracking-wider py-1 border border-accent/30 rounded-sm"
+              className="w-full font-sans text-sm font-normal text-foreground hover:text-foreground tracking-wider py-1 border border-ring rounded-smooth-md"
             >
               Reset size
             </button>
@@ -368,13 +368,13 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
 
       {wall && (
         <div className="space-y-2">
-          <div className="font-mono text-xs text-accent-light">
+          <div className="font-sans text-xs text-foreground">
             WALL SEGMENT {wall.id.slice(-4).toUpperCase()}
           </div>
           <CollapsibleSection id="dimensions" label="Dimensions">
             <div className="space-y-1.5">
               <EditableRow
-                label="LENGTH"
+                label="Length"
                 value={wallLength(wall)}
                 suffix="FT"
                 onCommit={(v) => resizeWallByLabel(wall.id, v)}
@@ -382,7 +382,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
                 parser={validateInput}
               />
               <EditableRow
-                label="THICKNESS"
+                label="Thickness"
                 value={wall.thickness}
                 suffix="FT"
                 onCommit={(v) => updateWall(wall.id, { thickness: v })}
@@ -390,7 +390,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
                 step={0.1}
               />
               <EditableRow
-                label="HEIGHT"
+                label="Height"
                 value={wall.height}
                 suffix="FT"
                 onCommit={(v) => updateWall(wall.id, { height: v })}
@@ -401,11 +401,11 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
           <CollapsibleSection id="position" label="Position">
             <div className="space-y-1.5">
               <Row
-                label="START"
+                label="Start"
                 value={`${wall.start.x.toFixed(1)}, ${wall.start.y.toFixed(1)}`}
               />
               <Row
-                label="END"
+                label="End"
                 value={`${wall.end.x.toFixed(1)}, ${wall.end.y.toFixed(1)}`}
               />
             </div>
@@ -429,7 +429,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
         const libProduct = storeProducts.find((p) => p.id === pp.productId) ?? product;
         return (
           <div className="space-y-2">
-            <div className="font-mono text-xs text-accent-light">
+            <div className="font-sans text-xs text-foreground">
               {product?.name?.toUpperCase() ?? "PRODUCT"}
             </div>
             {product && (
@@ -438,20 +438,20 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
                   <div className="space-y-1.5">
                     {hasDimensions(product) ? (
                       <>
-                        <Row label="WIDTH" value={`${product.width} FT`} />
-                        <Row label="DEPTH" value={`${product.depth} FT`} />
-                        <Row label="HEIGHT" value={`${product.height} FT`} />
+                        <Row label="Width" value={`${product.width} FT`} />
+                        <Row label="Depth" value={`${product.depth} FT`} />
+                        <Row label="Height" value={`${product.height} FT`} />
                       </>
                     ) : (
-                      <Row label="SIZE" value="UNSET" />
+                      <Row label="Size" value="Unset" />
                     )}
                   </div>
                 </CollapsibleSection>
                 <CollapsibleSection id="material" label="Material">
                   <div className="space-y-1.5">
-                    <Row label="CATEGORY" value={product.category.toUpperCase()} />
+                    <Row label="Category" value={product.category.toUpperCase()} />
                     {product.material && (
-                      <Row label="MATERIAL" value={product.material.toUpperCase()} />
+                      <Row label="Material" value={product.material.toUpperCase()} />
                     )}
                   </div>
                 </CollapsibleSection>
@@ -460,7 +460,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
             <CollapsibleSection id="position" label="Position">
               <div className="space-y-1.5">
                 <Row
-                  label="POSITION"
+                  label="Position"
                   value={`${pp.position.x.toFixed(1)}, ${pp.position.y.toFixed(1)}`}
                 />
               </div>
@@ -468,7 +468,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
             <CollapsibleSection id="rotation" label="Rotation">
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between gap-2">
-                  <Row label="ROTATION" value={`${pp.rotation.toFixed(0)}°`} />
+                  <Row label="Rotation" value={`${pp.rotation.toFixed(0)}°`} />
                 </div>
                 <RotationPresetChips
                   currentRotation={pp.rotation}
@@ -479,9 +479,9 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
               </div>
             </CollapsibleSection>
             {libProduct && !hasDimensions(libProduct) && (
-              <div className="space-y-1.5 pt-2 border-t border-outline-variant/20">
-                <span className="font-mono text-[11px] text-text-ghost tracking-wider">
-                  SET DIMENSIONS (FT)
+              <div className="space-y-1.5 pt-2 border-t border-border/50">
+                <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">
+                  Set dimensions (ft)
                 </span>
                 <div className="grid grid-cols-3 gap-1">
                   {(["width", "depth", "height"] as const).map((axis) => (
@@ -496,7 +496,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
                         const v = parseFloat(e.target.value);
                         if (v > 0) updateProduct(libProduct.id, { [axis]: v });
                       }}
-                      className="w-full px-1.5 py-1 text-[11px] font-mono bg-obsidian-deepest border border-outline-variant/30"
+                      className="w-full px-1.5 py-1 text-[11px] font-sans bg-background border border-border/60"
                     />
                   ))}
                 </div>
@@ -516,20 +516,20 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
 
       {pce && ce && (
         <div className="space-y-2">
-          <div className="font-mono text-xs text-accent-light">
+          <div className="font-sans text-xs text-foreground">
             {ce.name.toUpperCase()}
           </div>
           <CollapsibleSection id="dimensions" label="Dimensions">
             <div className="space-y-1.5">
-              <Row label="WIDTH" value={`${ce.width} FT`} />
-              <Row label="DEPTH" value={`${ce.depth} FT`} />
-              <Row label="HEIGHT" value={`${ce.height} FT`} />
+              <Row label="Width" value={`${ce.width} FT`} />
+              <Row label="Depth" value={`${ce.depth} FT`} />
+              <Row label="Height" value={`${ce.height} FT`} />
             </div>
           </CollapsibleSection>
           <CollapsibleSection id="position" label="Position">
             <div className="space-y-1.5">
               <Row
-                label="POSITION"
+                label="Position"
                 value={`${pce.position.x.toFixed(1)}, ${pce.position.y.toFixed(1)}`}
               />
             </div>
@@ -537,7 +537,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
           <CollapsibleSection id="rotation" label="Rotation">
             <div className="space-y-1.5">
               <div className="flex items-center justify-between gap-2">
-                <Row label="ROTATION" value={`${pce.rotation.toFixed(0)}°`} />
+                <Row label="Rotation" value={`${pce.rotation.toFixed(0)}°`} />
               </div>
               <RotationPresetChips
                 currentRotation={pce.rotation}
@@ -555,14 +555,14 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
             <button
               type="button"
               onClick={() => clearCustomElementOverrides(pce.id)}
-              className="w-full font-mono text-sm font-normal text-accent hover:text-accent-light tracking-wider py-1 border border-accent/30 rounded-sm"
+              className="w-full font-sans text-sm font-normal text-foreground hover:text-foreground tracking-wider py-1 border border-ring rounded-smooth-md"
             >
               Reset size
             </button>
           )}
           {/* Phase 68 D-07: per-face Material picker. */}
-          <section className="flex flex-col gap-2 p-4 bg-obsidian-low rounded-md">
-            <header className="font-mono text-[--font-size-sm] text-text-muted uppercase">
+          <section className="flex flex-col gap-2 p-4 bg-card rounded-md">
+            <header className="font-sans text-[--font-size-sm] text-muted-foreground uppercase">
               Face
             </header>
             <div className="grid grid-cols-3 gap-1">
@@ -580,10 +580,10 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
                   key={f}
                   type="button"
                   onClick={() => setActiveFace(f)}
-                  className={`font-mono text-[--font-size-sm] uppercase p-1 rounded-sm ${
+                  className={`font-sans text-[--font-size-sm] uppercase p-1 rounded-smooth-md ${
                     activeFace === f
-                      ? "bg-accent text-text-primary"
-                      : "bg-obsidian-mid text-text-muted hover:bg-obsidian-high"
+                      ? "bg-accent text-foreground"
+                      : "bg-popover text-muted-foreground hover:bg-accent"
                   }`}
                 >
                   {f}
@@ -616,7 +616,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
           <button
             type="button"
             onClick={() => clearProductOverrides(pp.id)}
-            className="w-full font-mono text-sm font-normal text-accent hover:text-accent-light tracking-wider py-1 border border-accent/30 rounded-sm"
+            className="w-full font-sans text-sm font-normal text-foreground hover:text-foreground tracking-wider py-1 border border-ring rounded-smooth-md"
           >
             Reset size
           </button>
@@ -639,7 +639,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
 
       <button
         onClick={handleDelete}
-        className="w-full py-1.5 rounded-sm font-mono text-sm font-normal bg-red-900/30 text-red-400 border border-red-900/40 hover:bg-red-900/50 transition-colors"
+        className="w-full py-1.5 rounded-smooth-md font-sans text-sm font-normal bg-red-900/30 text-red-400 border border-red-900/40 hover:bg-red-900/50 transition-colors"
       >
         Delete element
       </button>
@@ -752,7 +752,7 @@ function LabelOverrideInput({
 
   return (
     <div className="flex flex-col gap-1">
-      <label className="font-mono text-[11px] text-text-ghost tracking-wider">
+      <label className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">
         LABEL_OVERRIDE
       </label>
       <input
@@ -777,7 +777,7 @@ function LabelOverrideInput({
           }
         }}
         onBlur={commit}
-        className="px-2 py-1 font-mono text-[11px] text-text-primary bg-obsidian-deepest border border-outline-variant/30 rounded-sm"
+        className="px-2 py-1 font-sans text-[11px] text-foreground bg-background border border-border/60 rounded-smooth-md"
       />
     </div>
   );
@@ -841,7 +841,7 @@ function CeilingDimInput({
   return (
     <div className="flex justify-between items-center">
       <label
-        className="font-mono text-[11px] text-text-ghost tracking-wider"
+        className="font-sans text-[11px] text-muted-foreground/60 tracking-wider"
         htmlFor={`ceiling-dim-${axis}-${ceiling.id}`}
       >
         {label}
@@ -867,7 +867,7 @@ function CeilingDimInput({
           }
         }}
         onBlur={commit}
-        className="w-20 px-1 py-0.5 text-right font-mono text-[11px] text-accent-light bg-obsidian-deepest border border-accent/30 rounded-sm outline-none"
+        className="w-20 px-1 py-0.5 text-right font-sans text-[11px] text-foreground bg-background border border-ring rounded-smooth-md outline-none"
       />
     </div>
   );
@@ -876,8 +876,8 @@ function CeilingDimInput({
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-center">
-      <span className="font-mono text-[11px] text-text-ghost tracking-wider">{label}</span>
-      <span className="font-mono text-[11px] text-accent-light">{value}</span>
+      <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">{label}</span>
+      <span className="font-sans text-[11px] text-foreground">{value}</span>
     </div>
   );
 }
@@ -931,7 +931,7 @@ function EditableRow({
   if (editing) {
     return (
       <div className="flex justify-between items-center">
-        <span className="font-mono text-[11px] text-text-ghost tracking-wider">{label}</span>
+        <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">{label}</span>
         <input
           autoFocus
           type={parser ? "text" : "number"}
@@ -944,7 +944,7 @@ function EditableRow({
             if (e.key === "Enter") commit();
             if (e.key === "Escape") setEditing(false);
           }}
-          className="w-20 px-1 py-0.5 text-right font-mono text-[11px] text-accent-light bg-obsidian-deepest border border-accent/30 rounded-sm outline-none"
+          className="w-20 px-1 py-0.5 text-right font-sans text-[11px] text-foreground bg-background border border-ring rounded-smooth-md outline-none"
         />
       </div>
     );
@@ -952,9 +952,9 @@ function EditableRow({
 
   return (
     <div className="flex justify-between items-center group cursor-pointer" onClick={startEdit}>
-      <span className="font-mono text-[11px] text-text-ghost tracking-wider">{label}</span>
-      <span className="font-mono text-[11px] text-accent-light group-hover:underline">
-        {formatFeet(value)} {suffix && <span className="text-text-ghost">{suffix}</span>}
+      <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">{label}</span>
+      <span className="font-sans text-[11px] text-foreground group-hover:underline">
+        {formatFeet(value)} {suffix && <span className="text-muted-foreground/60">{suffix}</span>}
       </span>
     </div>
   );

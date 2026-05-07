@@ -57,7 +57,7 @@ function openEditForLabel(label: string): HTMLInputElement {
   return input;
 }
 
-describe("PropertiesPanel LENGTH row (D-05 parser prop)", () => {
+describe("PropertiesPanel Length row (D-05 parser prop)", () => {
   beforeEach(() => {
     seedOneWallAndSelect(10);
   });
@@ -66,7 +66,7 @@ describe("PropertiesPanel LENGTH row (D-05 parser prop)", () => {
     render(<PropertiesPanel productLibrary={[]} />);
     let input!: HTMLInputElement;
     await act(async () => {
-      input = openEditForLabel("LENGTH");
+      input = openEditForLabel("Length");
     });
     expect(input).toBeTruthy();
     await act(async () => {
@@ -82,7 +82,7 @@ describe("PropertiesPanel LENGTH row (D-05 parser prop)", () => {
     render(<PropertiesPanel productLibrary={[]} />);
     let input!: HTMLInputElement;
     await act(async () => {
-      input = openEditForLabel("LENGTH");
+      input = openEditForLabel("Length");
     });
     await act(async () => {
       fireEvent.change(input, { target: { value: "12 6" } });
@@ -99,7 +99,7 @@ describe("PropertiesPanel LENGTH row (D-05 parser prop)", () => {
     // Commit a plain decimal via THICKNESS — must still work.
     let input!: HTMLInputElement;
     await act(async () => {
-      input = openEditForLabel("THICKNESS");
+      input = openEditForLabel("Thickness");
     });
     await act(async () => {
       fireEvent.change(input, { target: { value: "0.75" } });
@@ -112,7 +112,7 @@ describe("PropertiesPanel LENGTH row (D-05 parser prop)", () => {
     // would yield 0, which is below THICKNESS min=0.1). D-05a regression lock:
     // only LENGTH receives the feet+inches parser prop.
     await act(async () => {
-      input = openEditForLabel("THICKNESS");
+      input = openEditForLabel("Thickness");
     });
     await act(async () => {
       fireEvent.change(input, { target: { value: "0'9\"" } });
@@ -128,7 +128,7 @@ describe("PropertiesPanel LENGTH row (D-05 parser prop)", () => {
     const priorPast = useCADStore.getState().past.length;
     let input!: HTMLInputElement;
     await act(async () => {
-      input = openEditForLabel("LENGTH");
+      input = openEditForLabel("Length");
     });
     // Don't change the value — just commit
     await act(async () => {

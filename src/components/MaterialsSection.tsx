@@ -47,7 +47,7 @@ export function MaterialsSection(): JSX.Element {
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="flex items-center gap-2 text-text-primary hover:text-accent-light transition-colors"
+          className="flex items-center gap-2 text-foreground hover:text-foreground transition-colors"
           aria-expanded={expanded}
         >
           {expanded ? (
@@ -55,17 +55,17 @@ export function MaterialsSection(): JSX.Element {
           ) : (
             <ChevronRight className="size-4" />
           )}
-          <span className="font-mono text-sm font-medium uppercase tracking-widest">
+          <span className="font-sans text-sm font-medium uppercase tracking-widest">
             MATERIALS
           </span>
-          <span className="font-mono text-sm text-text-ghost">
+          <span className="font-sans text-sm text-muted-foreground/60">
             ({materials.length})
           </span>
         </button>
         <button
           type="button"
           onClick={() => setUploadOpen(true)}
-          className="font-mono text-sm tracking-widest px-2 py-1 text-accent border border-accent/30 rounded-sm hover:bg-accent/10 transition-colors"
+          className="font-sans text-sm tracking-widest px-2 py-1 text-foreground border border-ring rounded-smooth-md hover:bg-accent/10 transition-colors"
         >
           + UPLOAD_MATERIAL
         </button>
@@ -75,7 +75,7 @@ export function MaterialsSection(): JSX.Element {
       {expanded && (
         <div className="flex flex-col gap-2">
           {materials.length === 0 ? (
-            <p className="font-body text-sm text-text-muted px-2 py-4">
+            <p className="font-body text-sm text-muted-foreground px-2 py-4">
               No materials yet — upload one to get started.
             </p>
           ) : (

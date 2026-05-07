@@ -45,24 +45,24 @@ export function CollapsibleSection({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center gap-2 py-1 text-text-muted hover:text-text-primary"
+        className="w-full flex items-center gap-2 py-1 text-muted-foreground hover:text-foreground"
         aria-expanded={open}
         aria-label={label}
       >
         {open ? (
           <ChevronDown
             size={12}
-            className="text-text-ghost group-hover:text-accent"
+            className="text-muted-foreground/60 group-hover:text-accent"
             style={{ transition: chevronTransition }}
           />
         ) : (
           <ChevronRight
             size={12}
-            className="text-text-ghost group-hover:text-accent"
+            className="text-muted-foreground/60 group-hover:text-accent"
             style={{ transition: chevronTransition }}
           />
         )}
-        <span className="font-mono text-sm font-medium">{label}</span>
+        <span className="font-sans text-sm font-medium">{label}</span>
       </button>
       <div
         style={{

@@ -78,7 +78,7 @@ export default function ProductForm({ onAdd }: Props) {
           onChange={(e) => setSkipDims(e.target.checked)}
           className="w-3 h-3 accent-accent"
         />
-        <span className="font-mono text-[8px] text-text-ghost tracking-wider">
+        <span className="font-sans text-[8px] text-muted-foreground/60 tracking-wider">
           SKIP DIMENSIONS
         </span>
       </label>

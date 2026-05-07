@@ -83,20 +83,20 @@ export function MaterialPicker({
     <section
       data-testid="material-picker"
       data-surface={surface}
-      className="flex flex-col gap-2 p-4 bg-obsidian-low rounded-md"
+      className="flex flex-col gap-2 p-4 bg-card rounded-md"
     >
-      <header className="font-mono text-[--font-size-sm] text-text-muted uppercase">
+      <header className="font-sans text-[--font-size-sm] text-muted-foreground uppercase">
         Material
       </header>
 
       {filtered.length === 0 ? (
         <div className="flex flex-col gap-2 items-center p-4">
-          <p className="font-mono text-[--font-size-sm] text-text-dim">
+          <p className="font-sans text-[--font-size-sm] text-muted-foreground/80">
             No materials uploaded yet
           </p>
           <button
             type="button"
-            className="font-mono text-[--font-size-sm] text-accent hover:text-accent-light"
+            className="font-sans text-[--font-size-sm] text-foreground hover:text-foreground"
             onClick={() => {
               if (typeof window !== "undefined") {
                 window.dispatchEvent(
@@ -138,7 +138,7 @@ export function MaterialPicker({
 
       {selected && (
         <div className="flex flex-col gap-2 mt-2">
-          <label className="font-mono text-[--font-size-sm] text-text-dim uppercase">
+          <label className="font-sans text-[--font-size-sm] text-muted-foreground/80 uppercase">
             Tile size (override)
           </label>
           <div className="flex gap-2 items-center">
@@ -146,7 +146,7 @@ export function MaterialPicker({
               type="number"
               step="0.1"
               min="0.05"
-              className="font-mono text-[--font-size-sm] bg-obsidian-mid p-1 rounded-sm w-20"
+              className="font-sans text-[--font-size-sm] bg-popover p-1 rounded-smooth-md w-20"
               placeholder={selected.tileSizeFt.toString()}
               value={tileSizeOverride ?? ""}
               onChange={(e) => {
@@ -159,13 +159,13 @@ export function MaterialPicker({
                 if (!Number.isNaN(parsed)) setTileSize(parsed);
               }}
             />
-            <span className="font-mono text-[--font-size-sm] text-text-ghost">
+            <span className="font-sans text-[--font-size-sm] text-muted-foreground/60">
               FT
             </span>
             {tileSizeOverride !== undefined && (
               <button
                 type="button"
-                className="font-mono text-[--font-size-sm] text-text-dim hover:text-accent"
+                className="font-sans text-[--font-size-sm] text-muted-foreground/80 hover:text-accent"
                 onClick={() => setTileSize(undefined)}
               >
                 use default
@@ -179,7 +179,7 @@ export function MaterialPicker({
         <button
           type="button"
           onClick={() => apply(undefined)}
-          className="flex items-center gap-1 font-mono text-[--font-size-sm] text-text-dim hover:text-error mt-2"
+          className="flex items-center gap-1 font-sans text-[--font-size-sm] text-muted-foreground/80 hover:text-error mt-2"
         >
           <X className="w-3 h-3" /> Clear material
         </button>

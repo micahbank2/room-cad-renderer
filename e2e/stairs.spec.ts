@@ -252,11 +252,13 @@ test.describe("Phase 60 — Stairs (STAIRS-01)", () => {
       ).__drivePlaceStair("room_main", { x: 5, y: 5 });
     });
 
-    // Sidebar tree renders stair leaf rows with a Material Symbols `stairs`
-    // span. Locate by data attribute set in TreeRow.tsx.
+    // Sidebar tree renders stair leaf rows with a Footprints lucide icon
+    // (D-15: lucide substitute for material-symbols 'stairs').
+    // Locate by data attribute set in TreeRow.tsx — Footprints renders the
+    // data-stair-icon attribute directly on the <svg> element.
     const stairIcons = page.locator("[data-stair-icon]");
     await expect(stairIcons).toHaveCount(1);
-    const text = await stairIcons.first().textContent();
-    expect(text?.trim()).toBe("stairs");
+    // The icon IS the SVG (data-stair-icon is on the <svg> element itself)
+    await expect(stairIcons.first()).toBeVisible();
   });
 });

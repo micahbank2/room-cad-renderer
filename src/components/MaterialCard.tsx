@@ -88,7 +88,7 @@ export function MaterialCard({
   return (
     <div
       data-testid={`material-card-${material.id}`}
-      className="group relative ghost-border rounded-md cursor-pointer transition-colors flex flex-col p-2 bg-obsidian-low hover:bg-obsidian-high"
+      className="group relative border border-border/50 rounded-md cursor-pointer transition-colors flex flex-col p-2 bg-card hover:bg-accent"
       onClick={onClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
@@ -99,7 +99,7 @@ export function MaterialCard({
           type="button"
           aria-label="Material options"
           onClick={handleMoreClick}
-          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity text-text-ghost hover:text-text-primary z-10"
+          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground/60 hover:text-foreground z-10"
           style={{ minHeight: 44, minWidth: 44, padding: 4 }}
         >
           <MoreHorizontal className="size-4" />
@@ -111,7 +111,7 @@ export function MaterialCard({
           opacity toggles on hover. */}
       <div
         role="tooltip"
-        className={`absolute bottom-full left-0 mb-1 z-20 bg-obsidian-highest border border-outline-variant/20 rounded-sm px-2 py-1 font-mono text-sm text-text-muted truncate max-w-xs pointer-events-none shadow-lg transition-opacity ${
+        className={`absolute bottom-full left-0 mb-1 z-20 bg-secondary border border-border/50 rounded-smooth-md px-2 py-1 font-sans text-sm text-muted-foreground truncate max-w-xs pointer-events-none shadow-lg transition-opacity ${
           hover ? "opacity-100" : "opacity-0"
         }`}
       >
@@ -119,7 +119,7 @@ export function MaterialCard({
       </div>
 
       {/* Thumbnail */}
-      <div className="aspect-square rounded-sm bg-obsidian-high overflow-hidden">
+      <div className="aspect-square rounded-smooth-md bg-accent overflow-hidden">
         {thumbnailUrl ? (
           <img
             src={thumbnailUrl}
@@ -129,7 +129,7 @@ export function MaterialCard({
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             {orphan && (
-              <span className="font-mono text-sm text-text-ghost px-2 text-center">
+              <span className="font-sans text-sm text-muted-foreground/60 px-2 text-center">
                 {ORPHAN_WARNING}
               </span>
             )}
@@ -139,10 +139,10 @@ export function MaterialCard({
 
       {/* Name + tile size */}
       <div className="mt-2 flex flex-col gap-1">
-        <span className="font-mono text-sm font-medium uppercase text-text-primary truncate">
+        <span className="font-sans text-sm font-medium uppercase text-foreground truncate">
           {material.name.toUpperCase()}
         </span>
-        <span className="font-mono text-sm text-accent-light">
+        <span className="font-sans text-sm text-foreground">
           {formatFeet(material.tileSizeFt)}
         </span>
       </div>

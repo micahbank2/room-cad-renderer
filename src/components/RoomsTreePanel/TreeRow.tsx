@@ -2,7 +2,7 @@
 // Phase 46: Single tree row matching UI-SPEC § Per-Row Anatomy verbatim.
 
 import React from "react";
-import { ChevronRight, ChevronDown, Eye, EyeOff, Camera } from "lucide-react";
+import { ChevronRight, ChevronDown, Eye, EyeOff, Camera, Footprints } from "lucide-react";
 import type { TreeNode } from "@/lib/buildRoomTree";
 import { isHiddenInTree } from "@/lib/isHiddenInTree";
 
@@ -66,12 +66,12 @@ export function TreeRow(props: TreeRowProps) {
   // Row container classes — h-6 (24px) per UI-SPEC § Row height contract
   // ---------------------------------------------------------------------------
   const rowBase = [
-    "group flex items-center h-6 pr-2 rounded-sm cursor-pointer",
+    "group flex items-center h-6 pr-2 rounded-smooth-md cursor-pointer",
     INDENT[depth],
-    "hover:bg-obsidian-high",
+    "hover:bg-accent",
     "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent",
   ];
-  if (selected) rowBase.push("bg-obsidian-highest border-l-2 border-accent");
+  if (selected) rowBase.push("bg-secondary border-l-2 border-accent");
   if (parentOnlyHidden) rowBase.push("opacity-50");
   const rowClass = rowBase.join(" ");
 
@@ -84,13 +84,13 @@ export function TreeRow(props: TreeRowProps) {
     "text-sm";
 
   const labelColor =
-    selected || isActiveRoom ? "text-accent-light" :
-    parentOnlyHidden ? "text-text-ghost italic" :
-    selfHidden ? "text-text-ghost" :
-    "text-text-primary";
+    selected || isActiveRoom ? "text-foreground" :
+    parentOnlyHidden ? "text-muted-foreground/60 italic" :
+    selfHidden ? "text-muted-foreground/60" :
+    "text-foreground";
 
   const labelClass = [
-    "flex-1 text-left font-mono truncate overflow-hidden text-ellipsis whitespace-nowrap",
+    "flex-1 text-left font-sans truncate overflow-hidden text-ellipsis whitespace-nowrap",
     labelSize,
     labelColor,
   ].join(" ");
@@ -99,9 +99,9 @@ export function TreeRow(props: TreeRowProps) {
   // Eye icon color tokens — UI-SPEC § Color visibility-state table
   // ---------------------------------------------------------------------------
   const eyeColor =
-    parentOnlyHidden ? "text-text-ghost opacity-50" :
-    selfHidden ? "text-text-muted" :
-    "text-text-dim hover:text-accent";
+    parentOnlyHidden ? "text-muted-foreground/60 opacity-50" :
+    selfHidden ? "text-muted-foreground" :
+    "text-muted-foreground/80 hover:text-accent";
 
   // ---------------------------------------------------------------------------
   // aria-labels — VERBATIM per UI-SPEC § Copywriting Contract
@@ -141,7 +141,7 @@ export function TreeRow(props: TreeRowProps) {
             data-tree-chevron
             aria-label={chevronAria}
             aria-expanded={isOpen}
-            className="text-text-ghost hover:text-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+            className="text-muted-foreground/60 hover:text-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
             onClick={(e) => {
               e.stopPropagation();
               props.onToggleExpand(node.id);
@@ -160,19 +160,15 @@ export function TreeRow(props: TreeRowProps) {
         {/* 4px gap between chevron/spacer and label */}
         <span className="w-1" aria-hidden="true" />
 
-        {/* Phase 60 STAIRS-01: per-kind icon for stair leaf nodes.
-            Phase 33 D-33 exception — CAD-domain glyph; lucide-react has
-            no Stairs export. CLAUDE.md Material Symbols allowlist updated
-            to include this file. */}
+        {/* Phase 71 D-15: stair leaf icon — Footprints substitute for material-symbols 'stairs' */}
         {node.kind === "stair" && (
-          <span
-            className="material-symbols-outlined text-text-dim mr-1"
-            style={{ fontSize: 14 }}
+          <Footprints
+            size={14}
+            className="text-muted-foreground/80 mr-1"
             aria-hidden="true"
             data-stair-icon
-          >
-            stairs
-          </span>
+          />
+          // D-15: substitute for material-symbols 'stairs'
         )}
 
         {/* Label button — data-tree-row for test driver targeting */}
@@ -196,7 +192,7 @@ export function TreeRow(props: TreeRowProps) {
           <span
             title="Has saved camera angle"
             aria-hidden="true"
-            className="text-accent-light flex items-center justify-center"
+            className="text-foreground flex items-center justify-center"
             data-saved-camera-indicator
           >
             <Camera className="w-3.5 h-3.5" />
@@ -243,9 +239,9 @@ export function TreeRow(props: TreeRowProps) {
         ))
       }
 
-      {/* Empty-state rows — UI-SPEC § Empty States VERBATIM (italic, text-text-ghost, pl-6, h-6) */}
+      {/* Empty-state rows — UI-SPEC § Empty States VERBATIM (italic, text-muted-foreground/60, pl-6, h-6) */}
       {isGroup && node.children && node.children.length === 0 && (
-        <div className="flex items-center h-6 pl-6 pr-2 italic text-text-ghost font-mono text-sm">
+        <div className="flex items-center h-6 pl-6 pr-2 italic text-muted-foreground/60 font-sans text-sm">
           {node.groupKey === "walls" && "No walls yet"}
           {node.groupKey === "products" && "No products placed"}
           {node.groupKey === "custom" && "No custom elements placed"}

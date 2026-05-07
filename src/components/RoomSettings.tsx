@@ -18,7 +18,7 @@ export default function RoomSettings() {
     <div className="space-y-2">
       <div className="grid grid-cols-2 gap-2">
         <label className="space-y-1">
-          <span className="font-mono text-[9px] text-text-ghost tracking-wider">WIDTH FT</span>
+          <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">Width (ft)</span>
           <input
             type="number"
             min={4}
@@ -26,11 +26,11 @@ export default function RoomSettings() {
             step={0.5}
             value={room.width}
             onChange={(e) => setRoom({ width: Math.max(4, +e.target.value) })}
-            className="w-full px-2 py-1.5 text-xs text-accent-light"
+            className="w-full px-2 py-1.5 text-xs text-foreground"
           />
         </label>
         <label className="space-y-1">
-          <span className="font-mono text-[9px] text-text-ghost tracking-wider">LENGTH FT</span>
+          <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">Length (ft)</span>
           <input
             type="number"
             min={4}
@@ -38,12 +38,12 @@ export default function RoomSettings() {
             step={0.5}
             value={room.length}
             onChange={(e) => setRoom({ length: Math.max(4, +e.target.value) })}
-            className="w-full px-2 py-1.5 text-xs text-accent-light"
+            className="w-full px-2 py-1.5 text-xs text-foreground"
           />
         </label>
       </div>
       <label className="space-y-1 block">
-        <span className="font-mono text-[9px] text-text-ghost tracking-wider">HEIGHT FT</span>
+        <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">Height (ft)</span>
         <input
           type="number"
           min={6}
@@ -51,7 +51,7 @@ export default function RoomSettings() {
           step={0.5}
           value={room.wallHeight}
           onChange={(e) => setRoom({ wallHeight: Math.max(6, +e.target.value) })}
-          className="w-full px-2 py-1.5 text-xs text-accent-light"
+          className="w-full px-2 py-1.5 text-xs text-foreground"
         />
       </label>
 

@@ -30,25 +30,25 @@ export default function FramedArtLibrary() {
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <h3 className="font-mono text-[10px] text-text-ghost tracking-widest uppercase">
+        <h3 className="font-sans text-[10px] text-muted-foreground/60 tracking-widest uppercase">
           ART LIBRARY
         </h3>
         <button
           onClick={() => setCreating((v) => !v)}
-          className="font-mono text-[9px] text-accent-light hover:text-accent tracking-widest"
+          className="font-sans text-[9px] text-foreground hover:text-accent tracking-widest"
         >
           {creating ? "CANCEL" : "+ NEW"}
         </button>
       </div>
 
       {creating && (
-        <div className="space-y-1.5 bg-obsidian-high rounded-sm p-2 mb-2">
+        <div className="space-y-1.5 bg-accent rounded-smooth-md p-2 mb-2">
           <input
             type="text"
             placeholder="NAME..."
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full font-mono text-[10px] bg-obsidian-base text-text-primary border border-outline-variant/30 px-2 py-1 rounded-sm placeholder:text-text-ghost"
+            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-smooth-md placeholder:text-muted-foreground/60"
           />
           <input
             ref={fileInputRef}
@@ -62,19 +62,19 @@ export default function FramedArtLibrary() {
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full font-mono text-[9px] tracking-widest py-1 bg-obsidian-base text-text-dim border border-outline-variant/30 rounded-sm hover:text-text-primary"
+            className="w-full font-sans text-[9px] tracking-widest py-1 bg-background text-muted-foreground/80 border border-border/60 rounded-smooth-md hover:text-foreground"
           >
             {imageUrl ? "CHANGE IMAGE" : "+ UPLOAD IMAGE"}
           </button>
           {imageUrl && (
-            <div className="w-full aspect-video bg-obsidian-base rounded-sm border border-outline-variant/30 overflow-hidden">
+            <div className="w-full aspect-video bg-background rounded-smooth-md border border-border/60 overflow-hidden">
               <img src={imageUrl} alt="preview" className="w-full h-full object-contain" />
             </div>
           )}
           <select
             value={frameStyle}
             onChange={(e) => setFrameStyle(e.target.value as FrameStyle)}
-            className="w-full font-mono text-[10px] bg-obsidian-base text-accent-light border border-outline-variant/30 px-2 py-1 rounded-sm"
+            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-smooth-md"
           >
             {FRAME_STYLES.map((s) => (
               <option key={s} value={s}>
@@ -85,7 +85,7 @@ export default function FramedArtLibrary() {
           <button
             onClick={handleCreate}
             disabled={!name.trim() || !imageUrl}
-            className="w-full font-mono text-[10px] tracking-widest py-1 bg-accent text-white rounded-sm hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-full font-sans text-[10px] tracking-widest py-1 bg-primary text-primary-foreground rounded-smooth-md hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             SAVE TO LIBRARY
           </button>
@@ -93,7 +93,7 @@ export default function FramedArtLibrary() {
       )}
 
       {items.length === 0 ? (
-        <div className="font-mono text-[9px] text-text-ghost text-center py-2">
+        <div className="font-sans text-[9px] text-muted-foreground/60 text-center py-2">
           NO ART YET
         </div>
       ) : (
@@ -103,20 +103,20 @@ export default function FramedArtLibrary() {
             return (
               <li
                 key={it.id}
-                className="flex items-center justify-between bg-obsidian-high rounded-sm px-2 py-1.5"
+                className="flex items-center justify-between bg-accent rounded-smooth-md px-2 py-1.5"
               >
                 <div className="flex items-center gap-2 min-w-0 flex-1">
                   <div
-                    className="w-6 h-6 rounded-sm overflow-hidden shrink-0 border"
+                    className="w-6 h-6 rounded-smooth-md overflow-hidden shrink-0 border"
                     style={{ borderColor: preset.color, borderWidth: Math.max(1, preset.width * 8) }}
                   >
                     <img src={it.imageUrl} alt={it.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="font-mono text-[10px] text-text-primary truncate">
+                    <div className="font-sans text-[10px] text-foreground truncate">
                       {it.name.toUpperCase()}
                     </div>
-                    <div className="font-mono text-[8px] text-text-ghost">
+                    <div className="font-sans text-[8px] text-muted-foreground/60">
                       {preset.label}
                     </div>
                   </div>
@@ -124,7 +124,7 @@ export default function FramedArtLibrary() {
                 <button
                   onClick={() => removeItem(it.id)}
                   title="Delete from library"
-                  className="font-mono text-[9px] text-text-ghost hover:text-text-primary px-1 shrink-0"
+                  className="font-sans text-[9px] text-muted-foreground/60 hover:text-foreground px-1 shrink-0"
                 >
                   ✕
                 </button>

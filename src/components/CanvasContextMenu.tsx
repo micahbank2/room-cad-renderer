@@ -85,7 +85,7 @@ export function getActionsForKind(kind: ContextMenuKind, nodeId: string | null, 
 
   const baseActions: ContextAction[] = [
     { id: "focus",    label: "Focus camera",    icon: <Camera size={14} />,                                    handler: focusCamera },
-    { id: "save-cam", label: "Save camera here", icon: <Camera size={14} className="text-accent" />,           handler: saveCameraHere },
+    { id: "save-cam", label: "Save camera here", icon: <Camera size={14} className="text-foreground" />,           handler: saveCameraHere },
     { id: "hide-show", label: isHidden ? "Show" : "Hide", icon: isHidden ? <Eye size={14} /> : <EyeOff size={14} />, handler: hideShow },
   ];
 
@@ -196,7 +196,7 @@ export function getActionsForKind(kind: ContextMenuKind, nodeId: string | null, 
     };
     return [
       { id: "focus",    label: "Focus camera",    icon: <Camera size={14} />,                                    handler: focusOpening },
-      { id: "save-cam", label: "Save camera here", icon: <Camera size={14} className="text-accent" />,           handler: saveCameraForOpening },
+      { id: "save-cam", label: "Save camera here", icon: <Camera size={14} className="text-foreground" />,           handler: saveCameraForOpening },
       { id: "hide-show", label: isHidden ? "Show" : "Hide", icon: isHidden ? <Eye size={14} /> : <EyeOff size={14} />, handler: hideShow },
       { id: "delete", label: "Delete", icon: <Trash2 size={14} />, handler: () => { if (wallId && nodeId) store.removeOpening(wallId, nodeId); }, destructive: true },
     ];
@@ -302,7 +302,7 @@ export function CanvasContextMenu() {
       ref={menuRef}
       data-testid="context-menu"
       style={{ position: "fixed", left: adjustedPos.x, top: adjustedPos.y, zIndex: 9999 }}
-      className="bg-obsidian-mid border border-outline-variant/20 rounded-sm py-1 min-w-[160px] shadow-lg"
+      className="bg-popover border border-border/50 rounded-smooth-md py-1 min-w-[160px] shadow-lg"
       onContextMenu={(e) => e.preventDefault()}
     >
       {actions.map((action) => (
@@ -312,10 +312,10 @@ export function CanvasContextMenu() {
           data-action-id={action.id}
           className={[
             "w-full flex items-center gap-2 px-3 h-6",
-            "font-mono text-sm",
+            "font-sans text-sm",
             action.destructive
-              ? "text-error hover:bg-obsidian-high"
-              : "text-text-primary hover:bg-obsidian-high",
+              ? "text-error hover:bg-accent"
+              : "text-foreground hover:bg-accent",
           ].join(" ")}
           onClick={() => {
             // D-05 close path 3: item click

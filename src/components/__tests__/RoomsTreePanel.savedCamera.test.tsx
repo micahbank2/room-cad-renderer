@@ -77,13 +77,14 @@ describe("RoomsTreePanel — Phase 48 savedCamera indicator + double-click (D-02
     vi.clearAllMocks();
   });
 
-  it("leaf row WITH savedCameraPos renders Camera icon (title='Has saved camera angle', text-accent-light, w-3.5 h-3.5)", () => {
+  it("leaf row WITH savedCameraPos renders Camera icon (title='Has saved camera angle')", () => {
     render(<RoomsTreePanel productLibrary={[]} />);
     const row = document.querySelector('[data-tree-node="wall_with_cam"]') as HTMLElement | null;
     expect(row).not.toBeNull();
     const icon = row?.querySelector('[title="Has saved camera angle"]') as HTMLElement | null;
     expect(icon).not.toBeNull();
-    expect(icon?.className).toMatch(/text-accent-light/);
+    // Phase 71 TOKEN-FOUNDATION: text-accent-light → text-foreground (Pascal token sweep)
+    expect(icon?.className).toMatch(/text-foreground/);
     const svg = icon?.querySelector("svg");
     expect(svg).not.toBeNull();
   });

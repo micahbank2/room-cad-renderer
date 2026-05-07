@@ -3,7 +3,8 @@ import { render, screen } from "@testing-library/react";
 import { RoomsTreePanel } from "@/components/RoomsTreePanel";
 
 describe("RoomsTreePanel — empty states (UI-SPEC § Empty States)", () => {
-  it("renders 'No walls yet' (italic, text-text-ghost, pl-6, h-6) when room has zero walls", () => {
+  it("renders 'No walls yet' (italic, text-muted-foreground, pl-6, h-6) when room has zero walls", () => {
+    // Phase 71 Pascal tokens: muted-foreground for empty state text. Copy must be VERBATIM per UI-SPEC.
     // Copy must be VERBATIM per UI-SPEC.
   });
   it("renders 'No products placed' under empty Products group", () => {

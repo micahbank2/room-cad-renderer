@@ -38,14 +38,14 @@ export function GestureChip({ mode }: { mode: "2d" | "3d" }) {
 
   return (
     <div
-      className="glass-panel rounded-lg px-2 py-1 flex items-center gap-2 text-text-dim font-mono text-sm absolute bottom-2 left-2 z-10 pointer-events-auto"
+      className="bg-card border border-border rounded-lg px-2 py-1 flex items-center gap-2 text-muted-foreground/80 font-sans text-sm absolute bottom-2 left-2 z-10 pointer-events-auto"
       data-gesture-chip-mode={mode}
     >
       <span>{text}</span>
       <button
         type="button"
         onClick={handleDismiss}
-        className="text-text-ghost hover:text-text-muted"
+        className="text-muted-foreground/60 hover:text-muted-foreground"
         aria-label="Dismiss gesture hint"
       >
         <X size={10} />

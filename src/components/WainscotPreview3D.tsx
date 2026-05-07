@@ -16,7 +16,7 @@ export default function WainscotPreview3D({ item }: Props) {
   const halfH = height / 2;
 
   return (
-    <div className="w-full aspect-video bg-obsidian-base rounded-sm border border-outline-variant/30 overflow-hidden">
+    <div className="w-full aspect-video bg-background rounded-smooth-md border border-border/60 overflow-hidden">
       <Canvas
         shadows
         camera={{ position: [4, 1.5, 5], fov: 45 }}
