@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import type { ToolType } from "@/types/cad";
+import { useTheme } from "@/hooks/useTheme";
+import { registerThemeSetter } from "@/test-utils/themeDrivers";
 import { buildRegistry } from "@/lib/shortcuts";
 import { useUIStore } from "@/stores/uiStore";
 import {
@@ -37,6 +39,12 @@ const ThreeViewport = lazy(() => import("@/three/ThreeViewport"));
 type ViewMode = "2d" | "3d" | "split" | "library";
 
 export default function App() {
+  // Phase 71: theme system — applies .dark class to <html>; wires test driver.
+  // useEffect returns the identity-checked cleanup directly (Phase 64 acc2 pattern,
+  // CLAUDE.md #7) so StrictMode double-mount does not clobber the live registration.
+  const { setTheme } = useTheme();
+  useEffect(() => registerThemeSetter(setTheme), [setTheme]);
+
   const [viewMode, setViewMode] = useState<ViewMode>("2d");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAddRoomDialog, setShowAddRoomDialog] = useState(false);

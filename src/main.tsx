@@ -14,6 +14,7 @@ import { installOpeningDrivers } from "./test-utils/openingDrivers";
 import { installMeasureDrivers } from "./test-utils/measureDrivers";
 import { installCeilingDrivers } from "./test-utils/ceilingDrivers";
 import { installTextureDrivers } from "./test-utils/textureDrivers";
+import { installThemeDrivers } from "./test-utils/themeDrivers";
 
 // Phase 46: install tree test drivers (gated by MODE==="test", production no-op)
 installTreeDrivers();
@@ -38,6 +39,8 @@ installCeilingDrivers();
 // Phase 68 follow-up: install texture-upload test driver (gated by MODE==="test", production no-op).
 // Decoupled from UploadTextureModal so the driver survives Phase 68's MyTexturesList tab removal.
 installTextureDrivers();
+// Phase 71: install theme test driver (gated by MODE==="test", production no-op)
+installThemeDrivers();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
