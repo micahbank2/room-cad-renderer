@@ -15,7 +15,8 @@ import {
 import { useUIStore } from "@/stores/uiStore";
 import { drawGrid } from "./grid";
 import { drawRoomDimensions } from "./dimensions";
-import { renderWalls, renderProducts, renderCeilings, renderCustomElements, renderStairs, renderMeasureLines, renderAnnotations, renderRoomAreaOverlay, setLabelLookupCanvas } from "./fabricSync";
+import { renderWalls, renderProducts, renderCeilings, renderCustomElements, renderStairs, renderMeasureLines, renderAnnotations, renderRoomAreaOverlay, renderFloor, setLabelLookupCanvas } from "./fabricSync";
+import { useMaterials } from "@/hooks/useMaterials";
 import { activateWallTool } from "./tools/wallTool";
 import {
   activateSelectTool,
@@ -118,6 +119,9 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const measureLines = activeDoc?.measureLines ?? {};
   const annotations = activeDoc?.annotations ?? {};
   const hiddenIds = useUIStore((s) => s.hiddenIds);
+  // Phase 68 Plan 05 — Material catalog feeds renderFloor + renderWalls
+  // for D-03 surface-material resolution (paint colorHex / textured Pattern).
+  const { materials } = useMaterials();
   const activeTool = useUIStore((s) => s.activeTool);
   const editingAnnotationId = useUIStore((s) => s.editingAnnotationId);
   const selectedIds = useUIStore((s) => s.selectedIds);
@@ -207,8 +211,13 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // 2. Room dimension labels
     drawRoomDimensions(fc, room.width, room.length, scale, origin);
 
-    // 3. Walls
-    renderWalls(fc, walls, scale, origin, selectedIds);
+    // 3a. Phase 68 Plan 05 — Floor surface (when room.floorMaterialId set).
+    //     Rendered before walls so the wall polygons layer above.
+    renderFloor(fc, activeDoc, scale, origin, materials);
+
+    // 3. Walls — Phase 68 Plan 05 passes materials + pixelsPerFoot for D-03
+    //    per-side Material resolution (paint colorHex / textured Pattern).
+    renderWalls(fc, walls, scale, origin, selectedIds, materials, scale);
 
     // 4. Products — onAssetReady bumps the tick so this redraw re-runs once
     // an async asset (image cache OR Phase 57 GLTF silhouette compute)
@@ -252,7 +261,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // Hotfix #2 — record the tool we just activated so the next redraw can
     // tell whether activeTool changed (affects the drag short-circuit above).
     prevActiveToolRef.current = activeTool as ToolType;
-  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog, productImageTick, stairs, hiddenIds, measureLines, annotations, editingAnnotationId]);
+  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog, productImageTick, stairs, hiddenIds, measureLines, annotations, editingAnnotationId, materials, activeDoc]);
 
   // Init canvas
   useEffect(() => {
