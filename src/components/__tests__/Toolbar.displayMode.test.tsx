@@ -48,15 +48,17 @@ describe("Toolbar — Phase 47 display-mode segmented control (D-01, D-09)", () 
     expect(spy).toHaveBeenCalledWith("solo");
   });
 
-  it("active button has aria-pressed='true' AND D-09 active-state classes (bg-accent/10, text-accent, border-accent/30)", () => {
+  it("active button has aria-pressed='true' AND Phase 71 active-state classes (bg-accent/10, text-foreground, border-ring)", () => {
     useUIStore.getState().setDisplayMode("solo");
     renderToolbarWithViewMode("3d");
     const soloBtn = screen.getByTestId("display-mode-solo");
     expect(soloBtn).toHaveAttribute("aria-pressed", "true");
     const cls = soloBtn.className;
+    // Phase 71 TOKEN-FOUNDATION: Obsidian accent tokens → Pascal tokens
+    // bg-accent/10 preserved; text-accent → text-foreground; border-accent/30 → border-ring
     expect(cls).toMatch(/bg-accent\/10/);
-    expect(cls).toMatch(/text-accent\b/);
-    expect(cls).toMatch(/border-accent\/30/);
+    expect(cls).toMatch(/text-foreground/);
+    expect(cls).toMatch(/border-ring/);
   });
 
   it("inactive buttons have aria-pressed='false' AND no bg-accent/10 token", () => {

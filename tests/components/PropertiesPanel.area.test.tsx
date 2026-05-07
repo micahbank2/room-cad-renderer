@@ -49,7 +49,8 @@ describe("Phase 62 PropertiesPanel — Room properties branch", () => {
     render(<PropertiesPanel productLibrary={[]} viewMode={"2d" as never} />);
     // The label and value are rendered as separate spans (Row component); use
     // a regex matcher to find the value cell.
-    expect(screen.getByText(/AREA/)).toBeTruthy();
+    // Phase 71 D-09: "AREA" → "Area" (chrome label mixed-case sweep)
+    expect(screen.getByText(/Area/i)).toBeTruthy();
     expect(screen.getByText(/100 SQ FT/)).toBeTruthy();
   });
 

@@ -111,7 +111,8 @@ describe("MyTexturesList — loading + empty + populated", () => {
     render(<MyTexturesList onSelect={() => {}} />);
     expect(screen.getByText("OAK FLOOR")).toBeInTheDocument();
     expect(screen.getByText("CONCRETE WALL")).toBeInTheDocument();
-    expect(screen.getByText("UPLOAD")).toBeInTheDocument();
+    // Phase 71 D-09: "UPLOAD" → "Upload" (chrome label mixed-case sweep)
+    expect(screen.getByText("Upload")).toBeInTheDocument();
   });
 });
 
@@ -131,9 +132,10 @@ describe("MyTexturesList — interactions", () => {
     expect(onSelect).toHaveBeenCalledWith("utex_a", 2.5);
   });
 
-  it("clicking UPLOAD tile opens UploadTextureModal in create mode", () => {
+  it("clicking Upload tile opens UploadTextureModal in create mode", () => {
     render(<MyTexturesList onSelect={() => {}} />);
-    fireEvent.click(screen.getByText("UPLOAD"));
+    // Phase 71 D-09: tile label is "Upload" (mixed case)
+    fireEvent.click(screen.getByText("Upload"));
     // UploadTextureModal renders "UPLOAD TEXTURE" heading when mounted open+create.
     expect(screen.getByText("UPLOAD TEXTURE")).toBeInTheDocument();
   });

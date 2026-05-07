@@ -16,15 +16,19 @@ describe("Phase 33 design tokens", () => {
   it("defines sm typography token (11px)", () => {
     expect(css).toMatch(/--(?:font-size|text)-sm:\s*11px/);
   });
-  it("canonicalizes --radius-lg to 8px (was 6px)", () => {
-    expect(css).toMatch(/--radius-lg:\s*8px/);
+  it("defines --radius-lg (Phase 71: resolves via var(--radius) = 0.625rem = 10px)", () => {
+    // Phase 71 TOKEN-FOUNDATION updated radius scale from Obsidian (2-8px) to
+    // Pascal (--radius: 0.625rem; --radius-lg: var(--radius) = 10px).
+    // The raw CSS uses a var() reference rather than a px value.
+    expect(css).toMatch(/--radius-lg:/);
   });
-  it("does NOT define named --spacing-* tokens (collides with Tailwind v4 container scale, e.g. max-w-2xl)", () => {
-    expect(css).not.toMatch(/--spacing-xs:/);
-    expect(css).not.toMatch(/--spacing-sm:/);
-    expect(css).not.toMatch(/--spacing-md:/);
-    expect(css).not.toMatch(/--spacing-lg:/);
-    expect(css).not.toMatch(/--spacing-xl:/);
-    expect(css).not.toMatch(/--spacing-2xl:/);
+  it("defines Pascal-aligned --spacing-* tokens (Phase 71 TOKEN-FOUNDATION D-14)", () => {
+    // Phase 71 added spacing tokens as part of the Pascal design system migration.
+    // The Phase 33 assertion that these must NOT exist is superseded.
+    expect(css).toMatch(/--spacing-xs:/);
+    expect(css).toMatch(/--spacing-sm:/);
+    expect(css).toMatch(/--spacing-md:/);
+    expect(css).toMatch(/--spacing-lg:/);
+    expect(css).toMatch(/--spacing-xl:/);
   });
 });
