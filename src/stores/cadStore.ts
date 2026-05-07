@@ -1934,6 +1934,26 @@ if (typeof window !== "undefined" && import.meta.env.MODE === "test") {
     };
   };
 
+  // Phase 68 — synthetic paint Material seeder. Saves a colorHex-only Material
+  // directly (no file processing) so the e2e spec can apply a Material in
+  // sub-millisecond time without needing a JPEG fixture or async pattern load.
+  // Returns the new Material id.
+  (window as unknown as {
+    __driveSeedPaintMaterial?: (
+      colorHex: string,
+      name?: string,
+      tileSizeFt?: number,
+    ) => Promise<string>;
+  }).__driveSeedPaintMaterial = async (colorHex, name, tileSizeFt) => {
+    const { saveMaterialDirect } = await import("@/lib/materialStore");
+    const mat = await saveMaterialDirect({
+      name: name ?? `Test Paint ${colorHex}`,
+      tileSizeFt: tileSizeFt ?? 1,
+      colorHex,
+    });
+    return mat.id;
+  };
+
   // Phase 68 — convenience seed helper. Lets the e2e spec drop a fully-formed
   // wall into the active room without going through the wallTool drag flow.
   // Mirrors Phase 36 specs that seed via __cadStore.loadSnapshot, but the
