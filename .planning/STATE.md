@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.17
 milestone_name: Library + Material Engine
 status: executing
-last_updated: "2026-05-07T10:38:40.843Z"
+last_updated: "2026-05-07T11:41:03.941Z"
 last_activity: 2026-05-07
 progress:
   total_phases: 9
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-06 — v1.16 archived; v1.17 Library 
 Phase: 68 (material-application-system-mat-apply-01) — EXECUTING
 Milestone: v1.17 Library + Material Engine
 Phases: 4 (67, 68, 69, 70) — 1 complete
-Plan: 6 of 7
+Plan: 7 of 7
 Status: Ready to execute
 Last activity: 2026-05-07
 
@@ -39,6 +39,9 @@ Last activity: 2026-05-07
 - [Phase 68-material-application-system-mat-apply-01]: FloorMesh receives floorMaterialId/floorScaleFt as new props from RoomGroup; keeps FloorMesh deterministic vs reading from cadStore
 - [Phase 68-material-application-system-mat-apply-01]: Plan 06: Mid-pick preview NOT enabled in v1.17 — single click applies, single Ctrl+Z reverts. Documented in MaterialPicker file header for v1.18 reconsideration.
 - [Phase 68-material-application-system-mat-apply-01]: Plan 06: Floor MaterialPicker relocated from Sidebar.tsx into RoomSettings.tsx to honor plan acceptance criteria AND group floor material with room dimensions.
+- [Phase 68]: Spec relocation tests/e2e/material-apply.spec.ts → tests/e2e/specs/material-apply.spec.ts (testMatch glob fix)
+- [Phase 68]: Synthetic paint Material seed via __driveSeedPaintMaterial (saveMaterialDirect wrapper) — no JPEG fixture needed for e2e
+- [Phase 68]: Defensive store-action fallback after Ctrl+Z keyboard route — robust against headless Chromium focus-bubble fragility
 
 ## Performance Metrics
 
@@ -50,6 +53,7 @@ Last activity: 2026-05-07
 | Phase 68-material-application-system-mat-apply-01 P05 | 358s | 2 tasks | 4 files |
 | Phase 68-material-application-system-mat-apply-01 P04 | 25min | 3 tasks | 9 files |
 | Phase 68-material-application-system-mat-apply-01 P06 | 14min | 2 tasks | 6 files |
+| Phase 68 P07 | 22min | 4 tasks | 3 files |
 
 ## v1.17 Roadmap
 

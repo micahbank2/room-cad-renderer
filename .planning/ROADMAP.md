@@ -158,7 +158,7 @@
 ### Phases
 
 - [x] **Phase 67: Material Engine Foundation** — Material entity + texture-map upload + IDB persistence, mirroring Phase 32 user-texture pipeline (completed 2026-05-07)
-- [ ] **Phase 68: Material Application System** — Unified surface-material picker replacing split paint / wallpaper / floor-material flows
+- [x] **Phase 68: Material Application System** — Unified surface-material picker replacing split paint / wallpaper / floor-material flows (completed 2026-05-07)
 - [ ] **Phase 69: Product–Material Linking** — Finish slot on placed products, swap fabric/finish without re-placing
 - [ ] **Phase 70: Library Rebuild** — Materials / Assemblies / Products top-level toggle with category tabs
 
@@ -190,14 +190,14 @@
   3. Applying a material is a single undo entry (Ctrl+Z reverts the apply)
   4. Existing paint colors, wallpaper assignments, and floor-material assignments auto-migrate at load time (snapshot v5→v6, idempotent — D-01)
   5. Snapshot serialization preserves `surface.materialId` and round-trips cleanly through save/load
-**Plans:** 6/7 plans executed
+**Plans:** 7/7 plans complete
 - [x] 68-01-PLAN.md — Wave 0 RED test scaffolding (6 failing tests pin the contract)
 - [x] 68-02-PLAN.md — Type extensions (Material.colorHex, FaceDirection, materialIdA/B, floorMaterialId, ceiling.materialId, faceMaterials, snapshot v5→v6) + resolveSurfaceMaterial / resolveSurfaceTileSize
 - [x] 68-03-PLAN.md — migrateV5ToV6 async pre-pass (paint→Material, wallpaper→Material, floor→Material, ceiling→Material, idempotent) + applySurfaceMaterial / *NoHistory + applySurfaceTileSize / *NoHistory store actions
 - [x] 68-04-PLAN.md — useResolvedMaterial R3F hook + priority-1 materialId branch in WallMesh / FloorMesh / CeilingMesh / per-face material array on CustomElementMesh
 - [x] 68-05-PLAN.md — materialPatternCache (async fabric.Pattern loader) + fabricSync wall fill materialId branch + new renderFloor 2D top-down floor render
 - [x] 68-06-PLAN.md — Unified MaterialPicker (replaces 4 legacy pickers) + mount in PropertiesPanel / WallSurfacePanel / RoomSettings (legacy picker files kept on disk per D-01 safety net)
-- [ ] 68-07-PLAN.md — Test drivers (`__driveApplyMaterial`, `__getResolvedMaterial`) + e2e Wave 0 spec GREEN + HUMAN-UAT.md + Jessica checkpoint
+- [x] 68-07-PLAN.md — Test drivers (`__driveApplyMaterial`, `__getResolvedMaterial`) + e2e Wave 0 spec GREEN + HUMAN-UAT.md + Jessica checkpoint
 **UI hint:** yes
 
 #### Phase 69: Product–Material Linking (MAT-LINK-01)
@@ -268,7 +268,7 @@
 | 65. Ceiling Resize Handles | 1/1 | Complete    | 2026-05-06 |
 | 66. Per-Surface Tile-Size UI | 1/1 | Complete    | 2026-05-06 |
 | 67. Material Engine Foundation | 1/1 | Complete    | 2026-05-07 |
-| 68. Material Application System | 6/7 | In Progress|  |
+| 68. Material Application System | 7/7 | Complete   | 2026-05-07 |
 | 69. Product–Material Linking | 0/0 | Not started   | — |
 | 70. Library Rebuild | 0/0 | Not started   | — |
 
