@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.17
 milestone_name: Library + Material Engine
 status: executing
-last_updated: "2026-05-07T10:24:57.224Z"
+last_updated: "2026-05-07T10:38:40.843Z"
 last_activity: 2026-05-07
 progress:
   total_phases: 9
   completed_phases: 1
   total_plans: 8
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-06 — v1.16 archived; v1.17 Library 
 Phase: 68 (material-application-system-mat-apply-01) — EXECUTING
 Milestone: v1.17 Library + Material Engine
 Phases: 4 (67, 68, 69, 70) — 1 complete
-Plan: 4 of 7
+Plan: 6 of 7
 Status: Ready to execute
 Last activity: 2026-05-07
 
@@ -37,6 +37,8 @@ Last activity: 2026-05-07
 - [Phase 68-material-application-system-mat-apply-01]: Plan 05: Ceiling 2D fabric fill intentionally deferred — ceilings remain outlines in top-down view per RESEARCH Q5.
 - [Phase 68-material-application-system-mat-apply-01]: FACE_ORDER physically-correct mapping ([+X=east, -X=west, +Y=top, -Y=bottom, +Z=north, -Z=south]) over material.ts JSDoc that had +Z=top — material.ts comment cleanup deferred
 - [Phase 68-material-application-system-mat-apply-01]: FloorMesh receives floorMaterialId/floorScaleFt as new props from RoomGroup; keeps FloorMesh deterministic vs reading from cadStore
+- [Phase 68-material-application-system-mat-apply-01]: Plan 06: Mid-pick preview NOT enabled in v1.17 — single click applies, single Ctrl+Z reverts. Documented in MaterialPicker file header for v1.18 reconsideration.
+- [Phase 68-material-application-system-mat-apply-01]: Plan 06: Floor MaterialPicker relocated from Sidebar.tsx into RoomSettings.tsx to honor plan acceptance criteria AND group floor material with room dimensions.
 
 ## Performance Metrics
 
@@ -47,6 +49,7 @@ Last activity: 2026-05-07
 | Phase 68-material-application-system-mat-apply-01 P03 | 10m | 2 tasks | 4 files |
 | Phase 68-material-application-system-mat-apply-01 P05 | 358s | 2 tasks | 4 files |
 | Phase 68-material-application-system-mat-apply-01 P04 | 25min | 3 tasks | 9 files |
+| Phase 68-material-application-system-mat-apply-01 P06 | 14min | 2 tasks | 6 files |
 
 ## v1.17 Roadmap
 
