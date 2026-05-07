@@ -245,7 +245,7 @@ One person. Non-technical. Interior design enthusiast, not a professional. Comfo
 
 **v1.17 Library + Material Engine — 4 requirements scoped:**
 
-- ⏳ **MAT-ENGINE-01** (Phase 67) — User can upload a material with texture maps (color / roughness / reflection) + real-world tile size + brand/SKU/cost/lead-time metadata; persisted to IndexedDB with SHA-256 dedup. Closes [#25](https://github.com/micahbank2/room-cad-renderer/issues/25).
+- ✅ **MAT-ENGINE-01** (Phase 67) — User can upload a material with texture maps (color / roughness / reflection) + real-world tile size + brand/SKU/cost/lead-time metadata; persisted to IndexedDB via wrapper architecture (D-09: Material wraps existing UserTexture references). Closes [#25](https://github.com/micahbank2/room-cad-renderer/issues/25). _Validated in Phase 67._
 - ⏳ **MAT-APPLY-01** (Phase 68) — User can apply any material from the library to any surface (walls, floors, ceilings, custom-element faces) through one unified picker, replacing today's split paint/wallpaper/floor-material flows. Closes [#27](https://github.com/micahbank2/room-cad-renderer/issues/27).
 - ⏳ **MAT-LINK-01** (Phase 69) — User can swap a placed product's finish material without re-placing the object (product carries a finish slot referencing a material). Closes [#26](https://github.com/micahbank2/room-cad-renderer/issues/26).
 - ⏳ **LIB-REBUILD-01** (Phase 70) — Sidebar library has top-level Materials / Assemblies / Products toggle with proper category tabs (Flooring, Wall coverings, Furniture, Lighting, etc.). Closes [#24](https://github.com/micahbank2/room-cad-renderer/issues/24).
@@ -329,4 +329,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-06 — v1.17 Library + Material Engine scoped (Phases 67–70: material engine, application, product linking, library rebuild)*
+*Last updated: 2026-05-07 — Phase 67 (MAT-ENGINE-01) complete; v1.17 progress 1/4*
