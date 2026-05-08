@@ -26,12 +26,6 @@ interface TreeRowProps {
   onDoubleClickRow?: (node: TreeNode) => void;
 }
 
-const INDENT: Record<0 | 1 | 2, string> = {
-  0: "pl-2",
-  1: "pl-4",
-  2: "pl-6",
-};
-
 export function TreeRow(props: TreeRowProps) {
   const {
     node,
@@ -66,12 +60,12 @@ export function TreeRow(props: TreeRowProps) {
   // Row container classes — h-6 (24px) per UI-SPEC § Row height contract
   // ---------------------------------------------------------------------------
   const rowBase = [
-    "group flex items-center h-6 pr-2 rounded-smooth-md cursor-pointer",
-    INDENT[depth],
-    "hover:bg-accent",
+    "group relative flex items-center h-6 pr-2 pl-8 rounded-smooth-md cursor-pointer",
+    "hover:bg-accent/30",
     "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent",
   ];
-  if (selected) rowBase.push("bg-secondary border-l-2 border-accent");
+  if (selected) rowBase.push("bg-accent/20 text-accent-foreground");
+  if (isActiveRoom) rowBase.push("bg-accent text-accent-foreground");
   if (parentOnlyHidden) rowBase.push("opacity-50");
   const rowClass = rowBase.join(" ");
 
@@ -129,12 +123,17 @@ export function TreeRow(props: TreeRowProps) {
           if (isGroup) return;
           props.onClickRow(node);
         }}
+
         onDoubleClick={() => {
           // Phase 48 D-02: groups ignored (matches single-click NO-OP semantics).
           if (isGroup) return;
           props.onDoubleClickRow?.(node);
         }}
       >
+        {/* D-01: Pascal spine — 1px vertical line at left:21px */}
+        <div className="absolute top-0 bottom-0 left-[21px] w-px bg-border/50 pointer-events-none" />
+        {/* D-02: Pascal branch — horizontal tick from left:21px spanning 11px */}
+        <div className="absolute top-1/2 left-[21px] h-px w-[11px] bg-border/50 pointer-events-none" />
         {/* Chevron — ROOM ROWS ONLY per UI-SPEC § Per-Row Anatomy */}
         {isRoom ? (
           <button
