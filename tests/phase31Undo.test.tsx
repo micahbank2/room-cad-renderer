@@ -40,6 +40,7 @@ vi.mock("@/lib/serialization", () => ({
 }));
 
 import App from "@/App";
+import { TooltipProvider } from "@/components/ui";
 import { useCADStore, resetCADStoreForTests } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 
@@ -144,7 +145,11 @@ describe("Phase 31 — EDIT-24 single-undo regression", () => {
   });
 
   it("EDIT-24 corner drag: past.length grows by exactly 1", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForResizeDriver();
     const before = useCADStore.getState().past.length;
     await act(async () => {
@@ -157,7 +162,11 @@ describe("Phase 31 — EDIT-24 single-undo regression", () => {
   });
 
   it("EDIT-24 edge-product drag: past.length grows by exactly 1", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForResizeDriver();
     const before = useCADStore.getState().past.length;
     await act(async () => {
@@ -171,7 +180,11 @@ describe("Phase 31 — EDIT-24 single-undo regression", () => {
 
   it("EDIT-24 edge-customElement drag: past.length grows by exactly 1", async () => {
     useUIStore.setState({ activeTool: "select", selectedIds: [PCE_ID] } as any);
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForResizeDriver();
     const before = useCADStore.getState().past.length;
     await act(async () => {
@@ -184,7 +197,11 @@ describe("Phase 31 — EDIT-24 single-undo regression", () => {
   });
 
   it("EDIT-24 wall-endpoint drag: past.length grows by exactly 1", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForWallDriver();
     const before = useCADStore.getState().past.length;
     await act(async () => {
@@ -198,7 +215,11 @@ describe("Phase 31 — EDIT-24 single-undo regression", () => {
 
   it("CUSTOM-06 label-override edit session (Enter commit): past.length grows by exactly 1", async () => {
     useUIStore.setState({ activeTool: "select", selectedIds: [PCE_ID] } as any);
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForLabelDriver();
     const before = useCADStore.getState().past.length;
     await act(async () => {
@@ -209,7 +230,11 @@ describe("Phase 31 — EDIT-24 single-undo regression", () => {
 
   it("CUSTOM-06 label-override edit session (blur commit): past.length grows by exactly 1", async () => {
     useUIStore.setState({ activeTool: "select", selectedIds: [PCE_ID] } as any);
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForLabelDriver();
     const before = useCADStore.getState().past.length;
     await act(async () => {
@@ -219,7 +244,11 @@ describe("Phase 31 — EDIT-24 single-undo regression", () => {
   });
 
   it("EDIT-24 undo fully restores pre-drag state (corner resize)", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForResizeDriver();
     const before = activeDoc().placedProducts[PP_ID];
     const preScale = before.sizeScale;
