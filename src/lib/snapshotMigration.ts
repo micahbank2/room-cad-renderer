@@ -23,7 +23,7 @@ export function defaultSnapshot(): CADSnapshot {
     annotations: {},
   };
   return {
-    version: 6,
+    version: 7,
     rooms: { room_main: mainRoom },
     activeRoomId: "room_main",
   };
@@ -507,5 +507,18 @@ export async function migrateV5ToV6(snap: CADSnapshot): Promise<CADSnapshot> {
   }
 
   (snap as { version: number }).version = 6;
+  return snap;
+}
+
+/* ----------------------------------------------------------------- *
+ * Phase 69 MAT-LINK-01 — v6 → v7. Trivial passthrough: adds optional
+ * PlacedProduct.finishMaterialId. Old snapshots that lack the field
+ * render with catalog default (correct legacy behavior).
+ * Mirrors the Phase 62 v4→v5 template — pure version bump, no per-room
+ * seeding required.
+ * ----------------------------------------------------------------- */
+export function migrateV6ToV7(snap: CADSnapshot): CADSnapshot {
+  if ((snap as { version: number }).version >= 7) return snap;
+  (snap as { version: number }).version = 7;
   return snap;
 }

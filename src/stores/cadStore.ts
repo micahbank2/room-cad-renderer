@@ -28,6 +28,7 @@ import {
   migrateV3ToV4,
   migrateV4ToV5,
   migrateV5ToV6,
+  migrateV6ToV7,
 } from "@/lib/snapshotMigration";
 import type { SurfaceTarget } from "@/lib/surfaceMaterial";
 import type { PaintColor } from "@/types/paint";
@@ -216,7 +217,7 @@ function snapshot(state: CADState): CADSnapshot {
   const root = state as any;
   const t0 = import.meta.env.DEV ? performance.now() : 0;
   const snap: CADSnapshot = {
-    version: 6,
+    version: 7,
     rooms: structuredClone(toPlain(state.rooms)),
     activeRoomId: state.activeRoomId,
     ...(root.customElements
@@ -1489,13 +1490,14 @@ export const useCADStore = create<CADState>()((set) => ({
     const migratedV4 = migrateV3ToV4(migratedV3);    // sync: v3→v4 stair seed (Phase 60)
     const migratedV5 = migrateV4ToV5(migratedV4);    // sync: v4→v5 measure/annotation seed (Phase 62)
     const migrated = await migrateV5ToV6(migratedV5); // async: v5→v6 surface Material migration (Phase 68)
+    const migratedV7 = migrateV6ToV7(migrated); // sync: v6→v7 finishMaterialId passthrough (Phase 69)
     set(
       produce((s: CADState) => {
-        s.rooms = migrated.rooms;
-        s.activeRoomId = migrated.activeRoomId;
-        (s as any).customElements = (migrated as any).customElements ?? {};
-        (s as any).customPaints = (migrated as any).customPaints ?? [];
-        (s as any).recentPaints = (migrated as any).recentPaints ?? [];
+        s.rooms = migratedV7.rooms;
+        s.activeRoomId = migratedV7.activeRoomId;
+        (s as any).customElements = (migratedV7 as any).customElements ?? {};
+        (s as any).customPaints = (migratedV7 as any).customPaints ?? [];
+        (s as any).recentPaints = (migratedV7 as any).recentPaints ?? [];
         s.past = [];
         s.future = [];
       })
