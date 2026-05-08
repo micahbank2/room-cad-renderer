@@ -10,9 +10,17 @@ This is a single-user personal tool. Not a SaaS, not a professional CAD app, not
 
 **Jessica can see her future room with her actual furniture before spending money.** The magic moment: she uploads a photo of a couch she found, places it in a room with real dimensions, switches to walk mode, and feels whether it works.
 
-## Current Milestone Goals — v1.18 Pascal Visual Parity
+## Current Milestone Goals — v1.20 Surface Depth & Architectural Expansion
 
-After v1.17 shipped the unified Material engine (Phases 67-68), v1.18 turns to the visual layer. Goal: make Room CAD Renderer **look extremely similar to Pascal Editor** while keeping every existing behavior, store, snapshot version, hotkey, and test driver functioning unchanged. The Obsidian CAD theme — dark blue cyberpunk, monospace UI chrome, sharp 2px corners, saturated purple accent — gets retired in favor of Pascal's neutral grays, soft 10px squircle radius, Barlow + Geist Sans, and floating action menu.
+After v1.19 completed the material linking and library rebuild story, v1.20 goes deeper on two fronts: **richer surfaces** (PBR maps for dramatically more realistic material rendering) and **architectural elements** (window presets for fast wall openings, parametric numeric controls for precision sizing, and columns/levels/platforms for multi-level room design).
+
+**Target features:**
+- **PBR maps** — upload AO, displacement, and emissive maps on materials; 3D mesh rendering uses all maps for realistic depth and shadowing
+- **Window presets** — drop standard window sizes into walls in one click (no manual sizing each time)
+- **Parametric controls** — type exact feet/inches values to position or size any object, not just drag handles
+- **Columns / levels / platforms** — pillars, raised floors, and stairs for multi-level room layouts
+
+**Continues from Phase 77. New phases start at 78.**
 
 **Approach:** chrome-only rewrite. Every Zustand store, snapshot v6, Three.js mesh, Fabric.js renderer, and `__drive*` test driver continues to work. The 800+ existing test suite catches regressions. This is `src/index.css` token swap + per-component className/markup migration.
 

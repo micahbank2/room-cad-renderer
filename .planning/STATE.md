@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.19
-milestone_name: Material Linking & Library Rebuild
-status: Complete
-last_updated: "2026-05-08T20:30:00.000Z"
-last_activity: 2026-05-08 — v1.19 shipped (all 3 phases complete)
+milestone: v1.20
+milestone_name: Surface Depth & Architectural Expansion
+status: Defining requirements
+last_updated: "2026-05-08T21:00:00.000Z"
+last_activity: 2026-05-08 — Milestone v1.20 started
 progress:
   total_phases: 16
   completed_phases: 13
@@ -23,12 +23,12 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 
 ## Current Position
 
-Phase: —
+Phase: Not started (defining requirements)
 Plan: —
-Milestone: v1.19 Material Linking & Library Rebuild — **COMPLETE**
-Phases: 3 (69 ✅, 70 ✅, 77 ✅) — all complete
-Status: Complete
-Last activity: 2026-05-08 — Phase 70 (Library Rebuild) merged, v1.19 milestone closed
+Milestone: v1.20 Surface Depth & Architectural Expansion
+Phases: TBD (starts at Phase 78)
+Status: Defining requirements
+Last activity: 2026-05-08 — Milestone v1.20 started
 
 ## Decisions
 
@@ -76,4 +76,4 @@ Last activity: 2026-05-08 — Phase 70 (Library Rebuild) merged, v1.19 milestone
 
 ## Next Step
 
-v1.19 is complete. Run `/gsd:new-milestone` to define v1.20.
+Run `/gsd:plan-phase 78` to plan the first phase of v1.20. ROADMAP.md Phase 78 section has the full success criteria.
