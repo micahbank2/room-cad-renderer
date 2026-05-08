@@ -113,17 +113,20 @@ See `.planning/ROADMAP.md` for links to each milestone archive.
 </details>
 
 
-## Current Milestone: v1.18 Pascal Visual Parity
+## Current Milestone: v1.19 Material Linking & Library Rebuild
 
-**Goal:** Make Room CAD Renderer look extremely similar to Pascal Editor. Adopt Pascal's design tokens, font stack, radius scale, layout patterns, and floating action menu. Every existing behavior, store, snapshot, hotkey, and test driver continues unchanged — this is a chrome-only rewrite.
+**Goal:** Complete the material engine story — Jessica can swap the finish on a placed product without re-placing it, and the sidebar library reorganizes into a proper Materials / Products / Assemblies three-tab structure.
 
-**Target features (6 phases, Phases 71-76):**
-- **Phase 71 / TOKEN-FOUNDATION** — Pascal oklch token system (16 semantic tokens), 10px squircle radius scale, Barlow + Geist Sans + Geist Mono fonts, light + dark dual-mode
-- **Phase 72 / PRIMITIVES-SHELF** — Component primitives via `cva`: Button, Tab, PanelSection (collapsible spring accordion), SegmentedControl, Switch, Slider, Tooltip, Dialog. Adopt `motion/react` for layout/spring transitions
-- **Phase 73 / SIDEBAR-RESTYLE** — Restyle Phase 46 rooms tree with Pascal's spine-and-branches geometry; convert right sidebar to **contextual** (only mounts when something selected)
-- **Phase 74 / TOOLBAR-REWORK** — **Floating two-row action menu replaces top-left toolbar entirely.** Lucide-icon fallback at 1.5x size for the chunky top row (commission isometric PNGs later if look is flat); flat tools on bottom row
-- **Phase 75 / PROPERTIES-LIBRARY-RESTYLE** — MaterialPicker, ProductLibrary, RoomSettings, PropertiesPanel adopt new tokens, primitives, and contextual mount pattern
-- **Phase 76 / MODALS-WELCOME-FINAL** — Modal/Dialog primitives, WelcomeScreen + ProjectManager adopt **light mode** (Pascal pattern: editor dark, marketing/empty light), final QA pass + carry-over test cleanup from v1.17
+**Target features (3 phases, Phases 69-70, 77):**
+- **Phase 69 / MAT-LINK-01** — Select a placed product → "Finish" picker in PropertiesPanel → pick any Material from the library → 3D updates live. Single Ctrl+Z reverts; finish persists across save/load via `PlacedProduct.finishMaterialId`.
+- **Phase 70 / LIB-REBUILD-01** — Sidebar library gets a 3-way top toggle: Materials / Products / Assemblies. Each tab has category sub-tabs. Upload buttons are context-aware per active tab.
+- **Phase 77 / TEST-CLEANUP-01** — Fix v1.18 carry-over test failures: TooltipProvider wrapper (#163), Switch role query (#164).
+
+**Deferred to v1.19+ / v1.20:**
+- PBR maps extension (#81 — AO + displacement + emissive)
+- Parametric object controls (#28)
+- Window presets (#20) + columns/levels (#19)
+- R3F v9 / React 19 upgrade (#56)
 
 **Sequencing intent:** Tokens before primitives before sidebar before toolbar before properties before final. Each phase visibly progresses the look without breaking the previous. Phase 71 alone makes the app monochrome-soft; Phase 72 alone replaces every button click feel; Phase 73 alone reshapes the sidebar; Phase 74 alone is the biggest "Pascal-feeling" leap; Phase 75 alone polishes the properties surface; Phase 76 alone closes the loop with light-mode marketing surfaces.
 
