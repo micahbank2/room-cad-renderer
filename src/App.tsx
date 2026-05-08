@@ -20,8 +20,8 @@ import { useProjectStore } from "@/stores/projectStore";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { useHelpRouteSync } from "@/hooks/useHelpRouteSync";
 import { getLastProjectId, loadProject } from "@/lib/serialization";
-import Toolbar from "@/components/Toolbar";
-import { ToolPalette } from "@/components/Toolbar";
+import { TopBar } from "@/components/TopBar";
+import { FloatingToolbar } from "@/components/FloatingToolbar";
 import Sidebar from "@/components/Sidebar";
 import StatusBar from "@/components/StatusBar";
 import PropertiesPanel from "@/components/PropertiesPanel";
@@ -183,14 +183,14 @@ export default function App() {
 
   return (
     <div className="h-full flex flex-col bg-background">
-      <Toolbar
+      <TopBar
         viewMode={viewMode}
         onViewChange={setViewMode}
         onHome={() => setHasStarted(false)}
         onFloorPlanClick={() => setShowTemplatePicker(true)}
       />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden pt-10">
         {/* Left sidebar — only on canvas views */}
         {isCanvas && showSidebar && (
           <Sidebar productLibrary={productLibrary} />
@@ -260,7 +260,7 @@ export default function App() {
               <div className={`${viewMode === "split" ? "w-1/2" : "flex-1"} h-full relative flex`}>
                 <div className="flex-1 h-full relative">
                   <FabricCanvas productLibrary={productLibrary} />
-                  <ToolPalette />
+                  <FloatingToolbar viewMode={viewMode} onViewChange={setViewMode} />
                 </div>
                 <AnimatePresence>
                   {selectedIds.length > 0 && (

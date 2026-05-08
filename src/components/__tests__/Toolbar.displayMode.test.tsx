@@ -1,17 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Toolbar } from "@/components/Toolbar";
+import { FloatingToolbar } from "@/components/FloatingToolbar";
 import { useUIStore } from "@/stores/uiStore";
 
-// Minimal no-op props for Toolbar — only viewMode varies between tests.
+// Minimal no-op props for FloatingToolbar — only viewMode varies between tests.
 const baseProps = {
   onViewChange: vi.fn(),
-  onHome: vi.fn(),
-  onFloorPlanClick: vi.fn(),
 };
 
 function renderToolbarWithViewMode(viewMode: "2d" | "3d" | "split" | "library") {
-  return render(<Toolbar viewMode={viewMode} {...baseProps} />);
+  return render(<FloatingToolbar viewMode={viewMode} {...baseProps} />);
 }
 
 describe("Toolbar — Phase 47 display-mode segmented control (D-01, D-09)", () => {
