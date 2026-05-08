@@ -240,6 +240,7 @@ export function TopBar({ viewMode, onViewChange }: TopBarProps): JSX.Element {
               onClick={() => onViewChange("library")}
               variant="ghost"
               size="icon-sm"
+              data-testid="view-mode-library"
               aria-label="Product library"
               active={viewMode === "library"}
             >
