@@ -451,6 +451,23 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
                     )}
                   </div>
                 </PanelSection>
+                {/* Phase 69 MAT-LINK-01: per-placement finish picker. */}
+                <PanelSection id="finish" label="Finish">
+                  <div className="space-y-1.5">
+                    {product.gltfId && (
+                      <p className="font-sans text-[11px] text-muted-foreground/60 italic mt-1">
+                        GLTF products use their built-in materials. Finish picker has no visual effect on this product (deferred to v1.20).
+                      </p>
+                    )}
+                    <MaterialPicker
+                      surface="customElementFace"
+                      value={pp.finishMaterialId}
+                      onChange={(materialId) =>
+                        useCADStore.getState().applyProductFinish(pp.id, materialId)
+                      }
+                    />
+                  </div>
+                </PanelSection>
               </>
             )}
             <PanelSection id="position" label="Position">
