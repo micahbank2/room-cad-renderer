@@ -92,6 +92,9 @@ interface CADState {
   // surface, with the standard history / NoHistory pair (mid-pick preview).
   applySurfaceMaterial: (target: SurfaceTarget, materialId: string | undefined) => void;
   applySurfaceMaterialNoHistory: (target: SurfaceTarget, materialId: string | undefined) => void;
+  // Phase 69 MAT-LINK-01: per-placement finish Material for box-mode products.
+  applyProductFinish: (placedId: string, materialId: string | undefined) => void;
+  applyProductFinishNoHistory: (placedId: string, materialId: string | undefined) => void;
   applySurfaceTileSize: (target: SurfaceTarget, scaleFt: number | undefined) => void;
   applySurfaceTileSizeNoHistory: (target: SurfaceTarget, scaleFt: number | undefined) => void;
   toggleWainscoting: (wallId: string, side: WallSide, enabled: boolean, heightFt?: number, color?: string, styleItemId?: string) => void;
@@ -850,6 +853,39 @@ export const useCADStore = create<CADState>()((set) => ({
         const doc = activeDoc(s);
         if (!doc) return;
         applySurfaceTileSizeMut(doc, target, scaleFt);
+      })
+    ),
+
+  // Phase 69 MAT-LINK-01: product finish assignment. Mirrors the
+  // applySurfaceMaterial pair exactly — single pushHistory in the
+  // history variant, no-history variant for mid-pick preview if needed.
+  applyProductFinish: (placedId, materialId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const placed = doc.placedProducts[placedId];
+        if (!placed) return; // silent no-op on unknown id
+        pushHistory(s);
+        if (materialId === undefined) {
+          delete placed.finishMaterialId;
+        } else {
+          placed.finishMaterialId = materialId;
+        }
+      })
+    ),
+  applyProductFinishNoHistory: (placedId, materialId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const placed = doc.placedProducts[placedId];
+        if (!placed) return;
+        if (materialId === undefined) {
+          delete placed.finishMaterialId;
+        } else {
+          placed.finishMaterialId = materialId;
+        }
       })
     ),
 

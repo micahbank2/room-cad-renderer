@@ -59,6 +59,24 @@ function migrateWallsPerSide(rooms: Record<string, RoomDoc> | undefined): void {
 }
 
 export function migrateSnapshot(raw: unknown): CADSnapshot {
+  // Phase 69 MAT-LINK-01: v7 passthrough (handed to migrateV6ToV7 in cadStore pipeline — already at v7).
+  if (
+    raw &&
+    typeof raw === "object" &&
+    (raw as { version?: number }).version === 7 &&
+    (raw as CADSnapshot).rooms
+  ) {
+    return raw as CADSnapshot;
+  }
+  // Phase 68 MAT-APPLY-01: v6 passthrough (handed to migrateV5ToV6 / migrateV6ToV7 in cadStore pipeline).
+  if (
+    raw &&
+    typeof raw === "object" &&
+    (raw as { version?: number }).version === 6 &&
+    (raw as CADSnapshot).rooms
+  ) {
+    return raw as CADSnapshot;
+  }
   // Phase 62 MEASURE-01 (D-02): v5 passthrough.
   if (
     raw &&
