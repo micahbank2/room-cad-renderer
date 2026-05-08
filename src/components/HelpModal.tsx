@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { X, RotateCcw } from "lucide-react";
+import { X, RotateCcw, ExternalLink } from "lucide-react";
 import { useUIStore } from "@/stores/uiStore";
 import type { HelpSectionId } from "@/stores/uiStore";
 import {
@@ -122,9 +122,20 @@ export default function HelpModal() {
                 <RotateCcw size={14} /> {/* D-15: substitute for material-symbols 'replay' */}
                 REPLAY TOUR
               </button>
-              <span className="font-sans text-[9px] text-muted-foreground/60 tracking-widest">
-                ESC TO CLOSE
-              </span>
+              <div className="flex items-center gap-3">
+                <a
+                  href="/help-center"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-sans text-[10px] tracking-widest text-muted-foreground/60 hover:text-foreground transition-colors flex items-center gap-1"
+                >
+                  <ExternalLink size={12} />
+                  OPEN HELP CENTER
+                </a>
+                <span className="font-sans text-[9px] text-muted-foreground/60 tracking-widest">
+                  ESC TO CLOSE
+                </span>
+              </div>
             </div>
           </div>
         </div>

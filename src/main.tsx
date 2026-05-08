@@ -1,7 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "./App";
+import HelpPage from "./components/HelpPage";
 import "./index.css";
 import { installTreeDrivers } from "./test-utils/treeDrivers";
 import { installDisplayModeDrivers } from "./test-utils/displayModeDrivers";
@@ -45,7 +46,12 @@ installThemeDrivers();
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <Routes>
+        {/* Standalone bookmarkable help center — /help-center */}
+        <Route path="/help-center" element={<HelpPage />} />
+        {/* Main app — handles all other paths (including /help/* modal sync) */}
+        <Route path="/*" element={<App />} />
+      </Routes>
     </BrowserRouter>
   </React.StrictMode>
 );
