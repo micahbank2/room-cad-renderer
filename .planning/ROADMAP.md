@@ -160,7 +160,7 @@
 
 - [x] **Phase 71: Token Foundation (TOKEN-FOUNDATION)** — Replace Obsidian palette with Pascal's oklch tokens; Barlow + Geist fonts; 10px squircle radius; light + dark dual-mode (completed 2026-05-07)
 - [x] **Phase 72: Primitives Shelf (PRIMITIVES-SHELF)** — `cva`-driven primitives (Button / Tab / PanelSection / SegmentedControl / Switch / Slider / Tooltip / Dialog / Input / Popover) with `motion/react` animations (completed 2026-05-07)
-- [ ] **Phase 73: Sidebar Restyle (SIDEBAR-RESTYLE)** — Pascal spine-and-branches rooms tree; right sidebar becomes contextual (mounts only when something is selected)
+- [x] **Phase 73: Sidebar Restyle (SIDEBAR-RESTYLE)** — Pascal spine-and-branches rooms tree; right sidebar becomes contextual (mounts only when something is selected) (completed 2026-05-08)
 - [ ] **Phase 74: Toolbar Rework (TOOLBAR-REWORK)** — Floating two-row action menu at canvas-bottom-center replaces the top-left toolbar entirely
 - [ ] **Phase 75: Properties + Library Restyle (PROPERTIES-LIBRARY-RESTYLE)** — MaterialPicker / ProductLibrary / RoomSettings / PropertiesPanel / Add+UploadModals adopt new tokens, primitives, and contextual mount pattern
 - [ ] **Phase 76: Modals + Welcome + Final (MODALS-WELCOME-FINAL)** — Modal/Dialog primitives finalized; WelcomeScreen + ProjectManager adopt light mode; carry-over v1.17 test cleanup; final audit pass
@@ -213,8 +213,8 @@
   3. Click empty canvas → right sidebar disappears with spring exit animation; canvas fills the freed space
   4. Click a wall / product / ceiling / custom-element / opening / stair → right sidebar slides in with spring entry showing the relevant PropertiesPanel sections
   5. Re-click empty canvas → sidebar collapses again with no driver registration loss (Phase 68 lesson: drivers live in `src/test-utils/*Drivers.ts`, survive component un-mount cleanly)
-**Plans:** 1/2 plans executed
-- [ ] 73-01-PLAN.md — Tree spine restyle (TreeRow.tsx) + Sidebar CollapsibleSection→PanelSection
+**Plans:** 2/2 plans complete
+- [x] 73-01-PLAN.md — Tree spine restyle (TreeRow.tsx) + Sidebar CollapsibleSection→PanelSection
 - [x] 73-02-PLAN.md — Contextual right panel with AnimatePresence spring slide (App.tsx)
 **UI hint:** yes
 
@@ -413,7 +413,7 @@
 | 70. Library Rebuild | 0/0 | Deferred to v1.19   | — |
 | 71. Token Foundation | 7/7 | Complete   | 2026-05-07 |
 | 72. Primitives Shelf | 3/9 | In Progress|  |
-| 73. Sidebar Restyle | 1/2 | In Progress|  |
+| 73. Sidebar Restyle | 2/2 | Complete   | 2026-05-08 |
 | 74. Toolbar Rework | 0/0 | Not started   | — |
 | 75. Properties + Library Restyle | 0/0 | Not started   | — |
 | 76. Modals + Welcome + Final | 0/0 | Not started   | — |
