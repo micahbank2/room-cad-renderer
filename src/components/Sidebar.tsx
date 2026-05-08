@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { PanelSection } from "@/components/ui";
 import type { Product } from "@/types/product";
 import {
   useActiveRoom,
@@ -17,33 +17,6 @@ interface Props {
   productLibrary: Product[];
 }
 
-function CollapsibleSection({
-  label,
-  defaultOpen = true,
-  children,
-}: {
-  label: string;
-  defaultOpen?: boolean;
-  children: React.ReactNode;
-}) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div>
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between mb-2 py-1"
-      >
-        <h3 className="font-sans text-base font-medium text-muted-foreground">
-          {label}
-        </h3>
-        <span className="font-sans text-sm text-muted-foreground/60">
-          {open ? "\u2212" : "+"}
-        </span>
-      </button>
-      {open && children}
-    </div>
-  );
-}
 
 export default function Sidebar({ productLibrary }: Props) {
   const room = useActiveRoom() ?? { width: 20, length: 16, wallHeight: 8 };
@@ -74,11 +47,11 @@ export default function Sidebar({ productLibrary }: Props) {
       {/* Scrollable content */}
       <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
         <RoomsTreePanel productLibrary={productLibrary} />
-        <CollapsibleSection label="Room config">
+        <PanelSection id="sidebar-room-config" label="Room config">
           <RoomSettings />
-        </CollapsibleSection>
+        </PanelSection>
 
-        <CollapsibleSection label="System stats" defaultOpen={false}>
+        <PanelSection id="sidebar-system-stats" label="System stats" defaultOpen={false}>
           <div className="space-y-1.5">
             <div className="flex justify-between">
               <span className="font-sans text-[10px] text-muted-foreground/80">Area</span>
@@ -95,9 +68,9 @@ export default function Sidebar({ productLibrary }: Props) {
               <span className="font-sans text-[10px] text-foreground">{productCount}</span>
             </div>
           </div>
-        </CollapsibleSection>
+        </PanelSection>
 
-        <CollapsibleSection label="Layers" defaultOpen={false}>
+        <PanelSection id="sidebar-layers" label="Layers" defaultOpen={false}>
           <div className="space-y-1.5">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -109,10 +82,10 @@ export default function Sidebar({ productLibrary }: Props) {
               <span className="font-sans text-[10px] text-muted-foreground/80">Grid</span>
             </label>
           </div>
-        </CollapsibleSection>
+        </PanelSection>
 
 
-        <CollapsibleSection label="Snap" defaultOpen={false}>
+        <PanelSection id="sidebar-snap" label="Snap" defaultOpen={false}>
           <select
             value={gridSnap}
             onChange={(e) => setGridSnap(+e.target.value)}
@@ -123,7 +96,7 @@ export default function Sidebar({ productLibrary }: Props) {
             <option value={0.5}>6 inch</option>
             <option value={1}>1 foot</option>
           </select>
-        </CollapsibleSection>
+        </PanelSection>
 
         {/* Custom Elements (Phase 14) — has its own internal header */}
         <CustomElementsPanel />
@@ -134,9 +107,9 @@ export default function Sidebar({ productLibrary }: Props) {
         {/* Wainscoting Style Library (Phase 16) — has its own internal header */}
         <WainscotLibrary />
 
-        <CollapsibleSection label="Product library">
+        <PanelSection id="sidebar-product-library" label="Product library">
           <SidebarProductPicker />
-        </CollapsibleSection>
+        </PanelSection>
       </div>
     </aside>
   );
