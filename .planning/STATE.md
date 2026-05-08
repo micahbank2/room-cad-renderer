@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.18
 milestone_name: Pascal Visual Parity
-status: verifying
-last_updated: "2026-05-07T22:52:42.427Z"
-last_activity: 2026-05-07
+status: executing
+last_updated: "2026-05-08T22:41:20.973Z"
+last_activity: 2026-05-08 -- Phase 78 execution started
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 16
-  completed_plans: 10
+  total_plans: 19
+  completed_plans: 12
 ---
 
 # Project State
@@ -19,16 +19,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-07 — v1.17 partial-shipped 67+68; v1.18 Pascal Visual Parity opened; Phases 69+70 deferred to v1.19)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 71 — Token Foundation
+**Current focus:** Phase 78 — pbr-maps-pbr-maps-01-v1-20-active
 
 ## Current Position
 
-Phase: 71 (Token Foundation) — EXECUTING
+Phase: 78 (pbr-maps-pbr-maps-01-v1-20-active) — EXECUTING
 Milestone: v1.18 Pascal Visual Parity
 Phases: 6 (71, 72, 73, 74, 75, 76) — 0 complete
-Plan: 7 of 7
-Status: Phase complete — ready for verification
-Last activity: 2026-05-07
+Plan: 1 of 4
+Status: Executing Phase 78
+Last activity: 2026-05-08 -- Phase 78 execution started
 
 ## Decisions
 
@@ -69,6 +69,10 @@ Last activity: 2026-05-07
 | 74 | TOOLBAR-REWORK | Floating two-row action menu replaces top-left toolbar | Pending |
 | 75 | PROPERTIES-LIBRARY-RESTYLE | MaterialPicker / ProductLibrary / RoomSettings restyle | Pending |
 | 76 | MODALS-WELCOME-FINAL | Modal primitives + light-mode Welcome/ProjectManager + carry-over test cleanup | Pending |
+| 78 | PBR-01..04 | AO + displacement map upload; 3D rendering; material card indicators | Planned |
+| 79 | WIN-01..02 | Window preset size picker; preset editable in PropertiesPanel | Planned |
+| 80 | PARAM-01..03 | Exact width/depth/X/Y inputs for placed products; single-undo | Planned |
+| 81 | COL-01..03 | Column placement; 2D footprint + 3D pillar; select/move/delete | Planned |
 | Phase 71 P00 | 6 | 2 tasks | 2 files |
 | Phase 71 P01 | 218 | 3 tasks | 6 files |
 | Phase 71 P02 | 461 | 1 tasks | 55 files |

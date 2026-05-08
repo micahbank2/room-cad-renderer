@@ -22,6 +22,7 @@
 - ✅ **v1.16 Maintenance Pass** — Phases 63–66 (shipped 2026-05-06)
 - ✅ **v1.17 Library + Material Engine** — Phases 67–68 (partial-shipped 2026-05-07; Phases 69 MAT-LINK-01 + 70 LIB-REBUILD-01 deferred to v1.19)
 - 🚧 **v1.18 Pascal Visual Parity** — Phases 71–76 (in progress) — chrome-only rewrite to emulate pascalorg/editor
+- ⏳ **v1.20 Surface Depth & Architectural Expansion** — Phases 78–81 (planned) — PBR maps, window presets, parametric product controls, columns & pillars
 
 ---
 
@@ -422,6 +423,76 @@
 | 74. Toolbar Rework | 0/0 | Not started   | — |
 | 75. Properties + Library Restyle | 0/0 | Not started   | — |
 | 76. Modals + Welcome + Final | 0/0 | Not started   | — |
+| 78. PBR Maps | 0/0 | Not started | — |
+| 79. Window Presets | 0/0 | Not started | — |
+| 80. Parametric Product Controls | 0/0 | Not started | — |
+| 81. Columns & Pillars | 0/0 | Not started | — |
+
+## v1.20 Surface Depth & Architectural Expansion (planned)
+
+**Goal:** Deepen realism and precision for Jessica as she moves from "does this fit" to "does this feel real." PBR maps (AO + displacement) make materials feel tactile instead of flat. Window presets give openings real-world sizing without guesswork. Parametric controls let her type exact dimensions and positions for placed furniture. Columns give her structural elements to plan around load-bearing pillars and archways in her actual home.
+
+**Sequencing rationale:** PBR maps first (extends the existing Material type + Three.js rendering pipeline — tightly coupled, ship together). Window presets second (small focused phase, builds on the existing Opening model). Parametric controls third (pure UI over already-existing data fields — fast phase, zero schema changes). Columns last (new entity type, largest scope — new store actions, 2D rendering, 3D rendering, PropertiesPanel wiring).
+
+**Source issues:** [#81](https://github.com/micahbank2/room-cad-renderer/issues/81) (PBR maps), [#20](https://github.com/micahbank2/room-cad-renderer/issues/20) (window presets), [#28](https://github.com/micahbank2/room-cad-renderer/issues/28) (parametric controls), [#19](https://github.com/micahbank2/room-cad-renderer/issues/19) (columns).
+
+### Phases
+
+- [ ] **Phase 78: PBR Maps (PBR-01 through PBR-04)** — AO + displacement map upload on materials; 3D rendering applies both maps; material card shows map-presence indicators
+- [ ] **Phase 79: Window Presets (WIN-01 through WIN-02)** — Preset size picker when placing a window; preset visible/editable in PropertiesPanel after placement
+- [ ] **Phase 80: Parametric Product Controls (PARAM-01 through PARAM-03)** — Type exact width/depth and X/Y position for placed products in PropertiesPanel; each edit is single-undo
+- [ ] **Phase 81: Columns & Pillars (COL-01 through COL-03)** — Place round or rectangular column; 2D footprint + 3D extruded pillar; selectable/movable/deletable with PropertiesPanel editing
+
+### Phase Details
+
+#### Phase 78: PBR Maps
+
+**Goal:** Jessica uploads a marble tile material and it actually looks like marble — subtle surface variation from the AO map, micro-depth from the displacement map. The material card in the library shows small badges so she can tell at a glance which maps are present without opening the upload form again.
+**Depends on:** Phase 67 (Material type with `colorMapId`/`roughnessMapId`/`reflectionMapId` — PBR-01/02 adds `aoMapId` + `displacementMapId` to the same pattern); Phase 68 (Three.js mesh materials already receive roughness map — PBR-03 adds `aoMap` + `displacementMap` props in WallMesh/FloorMesh/CeilingMesh/ProductMesh); Phase 67 UploadMaterialModal (PBR-01/02 extends existing multi-map upload UI)
+**Requirements:** PBR-01, PBR-02, PBR-03, PBR-04
+**Success Criteria** (what must be TRUE):
+  1. Jessica opens the Upload Material modal → sees two new optional upload slots labeled "AO Map" and "Displacement Map" alongside the existing Color, Roughness, and Reflection slots
+  2. After saving, re-opening the material's edit view shows the uploaded AO and displacement maps still attached
+  3. Applying a material with AO + displacement maps to a wall, floor, or ceiling in 3D renders visibly different from the same material without those maps — surface occlusion is visible in corners and displacement creates micro-texture depth
+  4. The material card in the library shows small indicator badges (e.g., "AO", "DISP") when those maps are present, so Jessica can distinguish a basic color-map material from a fully-specified PBR material at a glance
+**Plans:** TBD
+**UI hint:** yes
+
+#### Phase 79: Window Presets
+
+**Goal:** Jessica places a window on a wall and immediately sees a size picker — 2×3 ft, 3×4 ft, 4×5 ft, or custom — instead of having to remember to resize it afterward. After placement, she can still change the preset in the properties panel.
+**Depends on:** Phase 61 (`Opening` type with `type`, `widthFt`, `heightFt` — window openings already exist; WIN-01/02 adds a preset picker UI to the window tool and PropertiesPanel without changing the data model); Phase 33 / v1.18 PropertiesPanel (opening properties already surface in PropertiesPanel — WIN-02 adds preset dropdown alongside the existing numeric inputs)
+**Requirements:** WIN-01, WIN-02
+**Success Criteria** (what must be TRUE):
+  1. Activating the Window tool and clicking on a wall shows a small preset picker (2×3 / 3×4 / 4×5 / Custom) before the window is committed to the canvas
+  2. The placed window reflects the chosen preset dimensions in both the 2D floor plan and 3D rendering
+  3. Selecting an existing window in PropertiesPanel shows the same preset picker — choosing a preset updates the window dimensions with a single undo entry; choosing Custom enables free numeric input
+**Plans:** TBD
+**UI hint:** yes
+
+#### Phase 80: Parametric Product Controls
+
+**Goal:** Jessica selects a couch and types "102" into the Width field — it snaps to exactly 102 inches (8.5 ft) instead of her needing to drag a handle to approximately the right size. She can also type an exact X/Y position to align pieces precisely. Each numeric edit is a single undo.
+**Depends on:** Phase 31 (`PlacedProduct.widthFtOverride` and `depthFtOverride` already exist — PARAM-01 just needs PropertiesPanel numeric inputs that write these fields; `resolveEffectiveDims` resolver already consumes them); Phase 31 single-undo pattern (`updatePlacedProductNoHistory` already exists — PARAM-03 reuses the same history-push-then-NoHistory contract); PropertiesPanel (v1.18 restyled — PARAM-01/02 add new input sections)
+**Requirements:** PARAM-01, PARAM-02, PARAM-03
+**Success Criteria** (what must be TRUE):
+  1. Selecting a placed product in PropertiesPanel shows two numeric inputs — "Width (ft)" and "Depth (ft)" — pre-filled with the current effective dimensions; typing a new value and pressing Enter resizes the product to that exact size in both 2D and 3D
+  2. Selecting a placed product shows two numeric inputs — "X position" and "Y position" (in feet from room origin) — pre-filled with the current position; typing a new value teleports the product to that exact position
+  3. Each width, depth, X, or Y edit produces exactly one undo entry — Ctrl+Z reverts to the value before the input was focused
+**Plans:** TBD
+**UI hint:** yes
+
+#### Phase 81: Columns & Pillars
+
+**Goal:** Jessica has a load-bearing column in her living room. She places a round column in the floor plan at the right position and size, and in 3D it extrudes as a pillar at the full wall height. She can click it to select it, move it, resize it in PropertiesPanel, or delete it — just like any other element.
+**Depends on:** Phase 60 (`Stair` as precedent for a new top-level entity — COL-01 follows the same pattern: new `Column` type in `cad.ts`, new store actions, snapshot version bump); Phase 62 (measurement tool canvas layer — column footprint rendering in 2D follows the same fabric object approach); Phase 68 (material assignment in 3D — columns can accept surface materials via the same `applySurfaceMaterial` action); Phase 53 (right-click context menus — column needs `ContextMenuKind` extension, following Phase 61's D-11' lesson about non-auto-inherit wiring)
+**Requirements:** COL-01, COL-02, COL-03
+**Success Criteria** (what must be TRUE):
+  1. A "Column" tool (or placement flow) lets Jessica specify round vs rectangular, diameter or width/depth, and click to place it on the canvas
+  2. The placed column appears in 2D as its footprint shape (filled circle or rectangle) and in 3D as an extruded pillar at room wall height, rendered with the room's default surface material
+  3. Clicking the column in 2D or 3D selects it; PropertiesPanel shows shape, size, and position fields that can be edited; the column can be moved by dragging and deleted with the Delete key — all with single-undo
+**Plans:** TBD
+**UI hint:** yes
 
 ## Backlog
 
