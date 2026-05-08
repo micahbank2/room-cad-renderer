@@ -229,14 +229,10 @@
   3. Click a building-block icon → tool activates and canvas cursor switches; existing keyboard shortcuts (V / W / D / N / etc. from `src/lib/shortcuts.ts`) all still work
   4. Active tool gets a darker fill ring; switching to a different tool runs the existing tool-cleanup pattern (`toolCleanupRef` from CLAUDE.md tool architecture) with zero leaks
   5. Display Mode (NORMAL/SOLO/EXPLODE) and View Mode (2D/3D/Split) render as SegmentedControl primitive instances in the bottom row; Save/Open project UI relocates to a top-bar or floating top-right element (decided during plan-phase research)
-**Plans:** 7 plans
-- [ ] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
-- [ ] 72-02-PLAN.md — Button primitive + tests
-- [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
-- [ ] 72-04-PLAN.md — Dialog primitive + tests
-- [ ] 72-05-PLAN.md — Remaining primitives (Tabs, SegmentedControl, Switch, Slider, Tooltip, Input, Popover)
-- [ ] 72-06-PLAN.md — Toolbar button migration (~20 sites)
-- [ ] 72-07-PLAN.md — PropertiesPanel CollapsibleSection migration (11 sites) + cleanup
+**Plans:** 3 plans
+- [ ] 74-01-PLAN.md — FloatingToolbar glass pill (two-row tool palette)
+- [ ] 74-02-PLAN.md — TopBar fixed header (project name, save status, camera presets, utilities)
+- [ ] 74-03-PLAN.md — App.tsx swap + Toolbar.tsx deletion
 **UI hint:** yes
 
 #### Phase 75: Properties + Library Restyle (PROPERTIES-LIBRARY-RESTYLE)
