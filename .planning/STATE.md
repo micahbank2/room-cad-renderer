@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: Defining requirements
-last_updated: "2026-05-08T22:50:53.234Z"
+last_updated: "2026-05-08T22:48:59.157Z"
 last_activity: 2026-05-08 — Milestone v1.20 started
 progress:
   total_phases: 20
@@ -43,8 +43,7 @@ Last activity: 2026-05-08 — Milestone v1.20 started
 - **[Phase 71-76 decisions preserved]** — see v1.18 SUMMARY/VERIFICATION docs for v1.18 chrome decisions.
 - [Phase 69]: Snapshot v6→v7 is trivial passthrough; GLTF finish deferred to v1.20; MaterialPicker customElementFace surface type reused for product finish
 - [Phase 70]: Default library tab is Materials (not Products) — puts newest feature front and center
-- [Phase 78]: PBR-03 scope: wall/floor/ceiling/custom-element in scope; ProductMesh+ProductBox out of scope (legacy useProductTexture)
-- [Phase 78]: displacementScale=0.05 prevents geometry explosion in foot-coordinate world
+- [Phase 78]: MapBadge uses text-[10px] arbitrary value for sub-text indicator (smallest Pascal token text-sm=11px is too tall)
 
 ## Performance Metrics
 
@@ -57,7 +56,7 @@ Last activity: 2026-05-08 — Milestone v1.20 started
 | 69 | MAT-LINK-01 | Finish slot on placed products — swap material without re-placing | ✅ Complete |
 | 70 | LIB-REBUILD-01 | Library 3-tab rebuild: Materials / Products / Assemblies | ✅ Complete |
 | 77 | TEST-CLEANUP-01 | Fix v1.18 carry-over test failures (TooltipProvider, Switch role) | ✅ Complete |
-| Phase 78 P03 | 35 | 2 tasks | 7 files |
+| Phase 78 P04 | 8 | 1 tasks | 3 files |
 
 ## v1.20 Roadmap
 

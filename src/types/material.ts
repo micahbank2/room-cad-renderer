@@ -77,9 +77,9 @@ export interface Material {
   roughnessMapId?: string;
   /** Optional reference into userTextureIdbStore. */
   reflectionMapId?: string;
-  /** Optional reference into userTextureIdbStore. Phase 78 PBR-01. */
+  /** Optional reference into userTextureIdbStore. Phase 78 PBR-01 — ambient occlusion map. */
   aoMapId?: string;
-  /** Optional reference into userTextureIdbStore. Phase 78 PBR-02. */
+  /** Optional reference into userTextureIdbStore. Phase 78 PBR-01 — displacement/height map. */
   displacementMapId?: string;
 
   /** Optional metadata (D-03). Free-text. */
