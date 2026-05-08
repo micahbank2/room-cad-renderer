@@ -4,6 +4,22 @@
  * Task 2 (intermediate): ProductBox extraction with <group> wrapping.
  * Task 4 (final): GLTF branching + Suspense + ErrorBoundary added below.
  */
+/**
+ * Phase 78 PBR-MAPS-01 (PBR-03) audit:
+ * ProductMesh is OUT OF SCOPE for aoMap/displacementMap binding. Products do NOT
+ * consume the Material catalog — this component branches on `product.gltfId`
+ * between <GltfProduct /> (model carries its own materials) and <ProductBox />
+ * (uses useProductTexture() with a single legacy product-image URL). Neither
+ * branch reads `finishMaterialId` or calls `useResolvedMaterial`, so there is
+ * no `resolved.aoMap` / `resolved.displacementMap` to bind here.
+ *
+ * PBR-03's effective Phase 78 scope is therefore: WallMesh, FloorMesh,
+ * CeilingMesh, CustomElementMesh — the four sites already wired into the
+ * Material catalog (Phase 67-69). When a future phase wires
+ * `finishMaterialId` onto products (analogous to walls), mirror the WallMesh
+ * priority-1 pattern: uv2 setAttribute + aoMap + displacementMap props with
+ * displacementScale=0.05.
+ */
 import type { ThreeEvent } from "@react-three/fiber";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
