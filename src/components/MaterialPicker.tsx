@@ -21,6 +21,7 @@ import { useMaterials } from "@/hooks/useMaterials";
 import { materialsForSurface } from "@/data/surfaceMaterials";
 import { MaterialCard } from "@/components/MaterialCard";
 import type { SurfaceTarget } from "@/lib/surfaceMaterial";
+import { Input } from "@/components/ui";
 
 export type MaterialPickerSurface =
   | "wallSide"
@@ -126,8 +127,8 @@ export function MaterialPicker({
               }}
               className={
                 m.id === value
-                  ? "ring-1 ring-accent rounded-md"
-                  : "rounded-md"
+                  ? "ring-2 ring-ring rounded-md cursor-pointer hover:bg-accent/10 transition-colors"
+                  : "rounded-md cursor-pointer hover:bg-accent/10 transition-colors"
               }
             >
               <MaterialCard material={m} onClick={() => apply(m.id)} />
@@ -142,11 +143,11 @@ export function MaterialPicker({
             Tile size (override)
           </label>
           <div className="flex gap-2 items-center">
-            <input
+            <Input
               type="number"
               step="0.1"
               min="0.05"
-              className="font-sans text-[--font-size-sm] bg-popover p-1 rounded-smooth-md w-20"
+              className="w-20"
               placeholder={selected.tileSizeFt.toString()}
               value={tileSizeOverride ?? ""}
               onChange={(e) => {

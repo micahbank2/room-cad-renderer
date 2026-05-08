@@ -4,8 +4,9 @@ import type { Product } from "@/types/product";
 import { PRODUCT_CATEGORIES } from "@/types/product";
 import { useUIStore } from "@/stores/uiStore";
 import { setPendingProduct } from "@/canvas/tools/productTool";
-import { LibraryCard, CategoryTabs } from "@/components/library";
+import { LibraryCard } from "@/components/library";
 import type { CategoryTab } from "@/components/library";
+import { Tabs, TabsList, TabsTrigger, Input } from "@/components/ui";
 import { getCachedGltfThumbnail } from "@/three/gltfThumbnailGenerator";
 import { MaterialsSection } from "./MaterialsSection";
 
@@ -105,18 +106,27 @@ export function ProductLibrary({
 
       {/* Filters */}
       <div className="px-6 pb-3 shrink-0 space-y-3">
-        <input
+        <Input
           type="text"
           placeholder="SEARCH ASSETS..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-64 px-3 py-1.5 text-xs"
+          className="w-64"
         />
-        <CategoryTabs
-          tabs={tabList}
-          activeId={activeCategory}
-          onChange={setActiveCategory}
-        />
+        <Tabs value={activeCategory} onValueChange={setActiveCategory}>
+          <TabsList className="flex-wrap gap-1">
+            {tabList.map((tab) => (
+              <TabsTrigger key={tab.id} value={tab.id}>
+                {tab.label}
+                {tab.count > 0 && (
+                  <span className="ml-1 font-mono text-[9px] text-muted-foreground/60">
+                    {tab.count}
+                  </span>
+                )}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* Product Grid */}

@@ -24,6 +24,7 @@ import { useEffect, useRef, useState } from "react";
 import { useCADStore } from "@/stores/cadStore";
 import type { Stair } from "@/types/cad";
 import { DEFAULT_STAIR_WIDTH_FT } from "@/types/cad";
+import { Input } from "@/components/ui/Input";
 
 interface StairSectionProps {
   stair: Stair;
@@ -237,7 +238,7 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
           >
             Label
           </label>
-          <input
+          <Input
             id={`stair-label-${stair.id}`}
             type="text"
             value={labelDraft}
@@ -262,7 +263,7 @@ export function StairSection({ stair, roomId }: StairSectionProps) {
                 labelOverride: v.trim() === "" ? undefined : v.slice(0, LABEL_MAX),
               });
             }}
-            className="px-2 py-1 font-sans text-sm text-foreground bg-background border border-border/60 rounded-smooth-md"
+            className="h-7 text-xs"
           />
         </div>
       </div>
@@ -304,7 +305,7 @@ function NumberRow({
         {label}
       </label>
       <div className="flex items-center gap-1">
-        <input
+        <Input
           id={`stair-input-${ariaLabel}`}
           type="number"
           aria-label={ariaLabel}
@@ -325,7 +326,7 @@ function NumberRow({
             }
             onCommit();
           }}
-          className="flex-1 px-2 py-1 font-sans text-sm text-foreground bg-background border border-border/60 rounded-smooth-md"
+          className="flex-1 h-7 text-xs"
         />
         {suffix && (
           <span className="font-sans text-sm text-muted-foreground/60">{suffix}</span>

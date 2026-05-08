@@ -15,6 +15,7 @@ import { useState } from "react";
 import type { WallSegment, Opening } from "@/types/cad";
 import { clampNicheDepth } from "@/types/cad";
 import { useCADStore } from "@/stores/cadStore";
+import { Input } from "@/components/ui/Input";
 
 interface Props {
   wall: WallSegment;
@@ -147,7 +148,7 @@ function NumericRow({
         {label}
       </span>
       <div className="flex items-center gap-1">
-        <input
+        <Input
           type="number"
           step="0.1"
           data-testid={dataTestId}
@@ -177,7 +178,7 @@ function NumericRow({
               (e.target as HTMLInputElement).blur();
             }
           }}
-          className="w-16 font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-smooth-md text-right"
+          className="w-16 h-7 text-xs text-right bg-accent"
         />
         <span className="font-sans text-[10px] text-muted-foreground/60">{unit}</span>
       </div>

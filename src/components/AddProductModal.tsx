@@ -1,9 +1,20 @@
 import { useState, useRef } from "react";
-import { X, Upload } from "lucide-react";
+import { X } from "lucide-react";
 import { uid } from "@/lib/geometry";
 import type { Product } from "@/types/product";
 import { PRODUCT_CATEGORIES } from "@/types/product";
 import { saveGltfWithDedup } from "@/lib/gltfStore";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui";
+import { Button } from "@/components/ui";
+import { Input } from "@/components/ui";
+import { Switch } from "@/components/ui";
+import { Upload } from "lucide-react";
 
 interface Props {
   onAdd: (product: Product) => void;
@@ -73,29 +84,13 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-        onClick={onClose}
-      />
+    <Dialog open={true} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent className="w-[600px] max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle>ADD PRODUCT</DialogTitle>
+        </DialogHeader>
 
-      {/* Modal */}
-      <div className="relative w-[600px] bg-popover/90 backdrop-blur-xl border border-border/50 rounded-smooth-md shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between p-5 pb-4">
-          <h2 className="font-sans text-sm text-foreground tracking-widest">
-            ADD PRODUCT
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-muted-foreground/60 hover:text-foreground transition-colors"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="px-5 pb-5 space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex gap-5">
             {/* Left: image upload */}
             <div className="w-48 shrink-0">
@@ -151,12 +146,11 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                 <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">
                   PRODUCT NAME
                 </span>
-                <input
+                <Input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="E.G. 'EAMES CHAIR L.01'"
-                  className="w-full px-3 py-2 text-xs"
                   required
                 />
               </label>
@@ -168,7 +162,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3 py-2 text-xs"
+                  className="h-9 w-full rounded-smooth-md border border-border bg-background px-3 py-1 text-sm font-sans text-foreground"
                 >
                   {PRODUCT_CATEGORIES.map((c) => (
                     <option key={c} value={c}>
@@ -183,53 +177,47 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                   <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider block">
                     DIMENSIONS (W / D / H)
                   </span>
-                  <label className="flex items-center gap-1.5 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={skipDims}
-                      onChange={(e) => setSkipDims(e.target.checked)}
-                      className="w-3 h-3 accent-accent"
-                    />
-                    <span className="font-sans text-[8px] text-muted-foreground/60 tracking-wider">
-                      Skip dimensions
-                    </span>
-                  </label>
+                  <Switch
+                    checked={skipDims}
+                    onCheckedChange={setSkipDims}
+                    label="Skip dimensions"
+                  />
                 </div>
                 <div className={`grid grid-cols-3 gap-2 ${skipDims ? "opacity-40 pointer-events-none" : ""}`}>
                   <div className="relative">
-                    <input
+                    <Input
                       type="number"
                       min={0.25}
                       step={0.25}
                       value={width}
                       onChange={(e) => setWidth(+e.target.value)}
-                      className="w-full px-3 py-2 text-xs pr-8"
+                      className="pr-8"
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 font-sans text-[8px] text-muted-foreground/60">
                       FT
                     </span>
                   </div>
                   <div className="relative">
-                    <input
+                    <Input
                       type="number"
                       min={0.25}
                       step={0.25}
                       value={depth}
                       onChange={(e) => setDepth(+e.target.value)}
-                      className="w-full px-3 py-2 text-xs pr-8"
+                      className="pr-8"
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 font-sans text-[8px] text-muted-foreground/60">
                       FT
                     </span>
                   </div>
                   <div className="relative">
-                    <input
+                    <Input
                       type="number"
                       min={0.25}
                       step={0.25}
                       value={height}
                       onChange={(e) => setHeight(+e.target.value)}
-                      className="w-full px-3 py-2 text-xs pr-8"
+                      className="pr-8"
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 font-sans text-[8px] text-muted-foreground/60">
                       FT
@@ -242,12 +230,11 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                 <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">
                   MATERIAL FINISH
                 </span>
-                <input
+                <Input
                   type="text"
                   value={material}
                   onChange={(e) => setMaterial(e.target.value)}
                   placeholder="E.G. BRUSHED STEEL"
-                  className="w-full px-3 py-2 text-xs"
                 />
               </label>
 
@@ -257,13 +244,14 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
                   3D MODEL (OPTIONAL)
                 </span>
                 <div className="flex items-center gap-2">
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     type="button"
                     onClick={() => gltfRef.current?.click()}
-                    className="font-sans text-[9px] px-3 py-1.5 border border-border/60 rounded-smooth-md text-muted-foreground/80 hover:text-foreground hover:border-accent/40 transition-colors"
                   >
                     {gltfFile ? gltfFile.name.toUpperCase() : "CHOOSE .GLTF / .GLB"}
-                  </button>
+                  </Button>
                   {gltfFile && (
                     <button
                       type="button"
@@ -296,25 +284,16 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="flex justify-end gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="font-sans text-[10px] tracking-widest px-4 py-2 text-muted-foreground/80 hover:text-foreground transition-colors"
-            >
+          <DialogFooter>
+            <Button variant="ghost" type="button" onClick={onClose}>
               CANCEL
-            </button>
-            <button
-              type="submit"
-              disabled={!name}
-              className="font-sans text-[10px] tracking-widest px-5 py-2 bg-accent text-white rounded-smooth-md hover:opacity-90 active:scale-95 disabled:opacity-30 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
-            >
+            </Button>
+            <Button type="submit" disabled={!name}>
               Add to registry
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
