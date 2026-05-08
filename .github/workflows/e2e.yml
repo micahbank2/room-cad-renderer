@@ -22,7 +22,7 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 40
     strategy:
       # Don't cancel the other shard if one fails — we want to see both projects' results.
       fail-fast: false
