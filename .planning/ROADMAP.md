@@ -213,14 +213,9 @@
   3. Click empty canvas → right sidebar disappears with spring exit animation; canvas fills the freed space
   4. Click a wall / product / ceiling / custom-element / opening / stair → right sidebar slides in with spring entry showing the relevant PropertiesPanel sections
   5. Re-click empty canvas → sidebar collapses again with no driver registration loss (Phase 68 lesson: drivers live in `src/test-utils/*Drivers.ts`, survive component un-mount cleanly)
-**Plans:** 7 plans
-- [x] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
-- [x] 72-02-PLAN.md — Button primitive + tests
-- [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
-- [ ] 72-04-PLAN.md — Dialog primitive + tests
-- [ ] 72-05-PLAN.md — Remaining primitives (Tabs, SegmentedControl, Switch, Slider, Tooltip, Input, Popover)
-- [ ] 72-06-PLAN.md — Toolbar button migration (~20 sites)
-- [ ] 72-07-PLAN.md — PropertiesPanel CollapsibleSection migration (11 sites) + cleanup
+**Plans:** 2 plans
+- [ ] 73-01-PLAN.md — Tree spine restyle (TreeRow.tsx) + Sidebar CollapsibleSection→PanelSection
+- [ ] 73-02-PLAN.md — Contextual right panel with AnimatePresence spring slide (App.tsx)
 **UI hint:** yes
 
 #### Phase 74: Toolbar Rework — Floating Action Menu (TOOLBAR-REWORK)
