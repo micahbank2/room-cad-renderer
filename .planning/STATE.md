@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.20
-milestone_name: Surface Depth & Architectural Expansion
+milestone: v1.19
+milestone_name: Material Linking & Library Rebuild
 status: Defining requirements
-last_updated: "2026-05-08T21:00:00.000Z"
+last_updated: "2026-05-08T22:45:03.242Z"
 last_activity: 2026-05-08 — Milestone v1.20 started
 progress:
-  total_phases: 16
-  completed_phases: 13
-  total_plans: 38
-  completed_plans: 38
+  total_phases: 20
+  completed_phases: 10
+  total_plans: 42
+  completed_plans: 36
 ---
 
 # Project State
@@ -43,6 +43,7 @@ Last activity: 2026-05-08 — Milestone v1.20 started
 - **[Phase 71-76 decisions preserved]** — see v1.18 SUMMARY/VERIFICATION docs for v1.18 chrome decisions.
 - [Phase 69]: Snapshot v6→v7 is trivial passthrough; GLTF finish deferred to v1.20; MaterialPicker customElementFace surface type reused for product finish
 - [Phase 70]: Default library tab is Materials (not Products) — puts newest feature front and center
+- [Phase 78]: Used type cast for aoFile/displacementFile on save() in Plan 02 (parallel to Plan 01 which adds fields to SaveMaterialInput) — self-documenting with eslint-disable comment
 
 ## Performance Metrics
 
@@ -55,6 +56,7 @@ Last activity: 2026-05-08 — Milestone v1.20 started
 | 69 | MAT-LINK-01 | Finish slot on placed products — swap material without re-placing | ✅ Complete |
 | 70 | LIB-REBUILD-01 | Library 3-tab rebuild: Materials / Products / Assemblies | ✅ Complete |
 | 77 | TEST-CLEANUP-01 | Fix v1.18 carry-over test failures (TooltipProvider, Switch role) | ✅ Complete |
+| Phase 78 P02 | 8 | 1 tasks | 2 files |
 
 ## v1.20 Roadmap
 

@@ -48,6 +48,8 @@ const COPY = {
   colorLabel: "COLOR_MAP",
   roughnessLabel: "ROUGHNESS_MAP",
   reflectionLabel: "REFLECTION_MAP",
+  aoLabel: "AO_MAP",
+  displacementLabel: "DISPLACEMENT_MAP",
   optionalTag: "OPTIONAL",
   dropInvite: "Drag and drop a photo, or click to browse.",
   tileLabel: "TILE_SIZE",
@@ -120,10 +122,14 @@ export function UploadMaterialModal(
   const [colorMap, setColorMap] = useState<ProcessedMap | null>(null);
   const [roughnessMap, setRoughnessMap] = useState<ProcessedMap | null>(null);
   const [reflectionMap, setReflectionMap] = useState<ProcessedMap | null>(null);
+  const [aoMap, setAoMap] = useState<ProcessedMap | null>(null);
+  const [displacementMap, setDisplacementMap] = useState<ProcessedMap | null>(null);
 
   const [colorError, setColorError] = useState<string | null>(null);
   const [roughnessError, setRoughnessError] = useState<string | null>(null);
   const [reflectionError, setReflectionError] = useState<string | null>(null);
+  const [aoError, setAoError] = useState<string | null>(null);
+  const [displacementError, setDisplacementError] = useState<string | null>(null);
 
   const [processing, setProcessing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -131,6 +137,8 @@ export function UploadMaterialModal(
   const colorInputRef = useRef<HTMLInputElement | null>(null);
   const roughnessInputRef = useRef<HTMLInputElement | null>(null);
   const reflectionInputRef = useRef<HTMLInputElement | null>(null);
+  const aoInputRef = useRef<HTMLInputElement | null>(null);
+  const displacementInputRef = useRef<HTMLInputElement | null>(null);
   const nameRef = useRef<HTMLInputElement | null>(null);
 
   // Reset transient state when the modal opens.
@@ -148,6 +156,8 @@ export function UploadMaterialModal(
     setColorError(null);
     setRoughnessError(null);
     setReflectionError(null);
+    setAoError(null);
+    setDisplacementError(null);
     setProcessing(false);
     setSaving(false);
 
@@ -161,6 +171,14 @@ export function UploadMaterialModal(
       return null;
     });
     setReflectionMap((prev) => {
+      if (prev) URL.revokeObjectURL(prev.previewUrl);
+      return null;
+    });
+    setAoMap((prev) => {
+      if (prev) URL.revokeObjectURL(prev.previewUrl);
+      return null;
+    });
+    setDisplacementMap((prev) => {
       if (prev) URL.revokeObjectURL(prev.previewUrl);
       return null;
     });
@@ -187,7 +205,7 @@ export function UploadMaterialModal(
   // Revoke preview object URLs on unmount.
   useEffect(
     () => () => {
-      [colorMap, roughnessMap, reflectionMap].forEach((m) => {
+      [colorMap, roughnessMap, reflectionMap, aoMap, displacementMap].forEach((m) => {
         if (m) URL.revokeObjectURL(m.previewUrl);
       });
     },
@@ -258,6 +276,14 @@ export function UploadMaterialModal(
     (f: File) => processZone(f, setReflectionError, setReflectionMap, reflectionMap),
     [processZone, reflectionMap],
   );
+  const handleAoFile = useCallback(
+    (f: File) => processZone(f, setAoError, setAoMap, aoMap),
+    [processZone, aoMap],
+  );
+  const handleDisplacementFile = useCallback(
+    (f: File) => processZone(f, setDisplacementError, setDisplacementMap, displacementMap),
+    [processZone, displacementMap],
+  );
 
   // ---- Submit ------------------------------------------------------------
   const handleTileSizeBlur = useCallback(() => {
@@ -282,7 +308,8 @@ export function UploadMaterialModal(
       if (!colorMap) return;
       setSaving(true);
       try {
-        const result = await save({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const result = await (save as (input: any) => Promise<{ id: string; deduped: boolean }>)({
           name: nameTrimmed,
           tileSizeFt: tileFt,
           brand: brand.trim() || undefined,
@@ -293,6 +320,8 @@ export function UploadMaterialModal(
           colorFile: colorMap.file,
           roughnessFile: roughnessMap?.file,
           reflectionFile: reflectionMap?.file,
+          aoFile: aoMap?.file,
+          displacementFile: displacementMap?.file,
         });
         toastSuccess(result.deduped ? COPY.toastDeduped : COPY.toastSaved);
         onSaved?.(result.id);
@@ -327,6 +356,8 @@ export function UploadMaterialModal(
     colorMap,
     roughnessMap,
     reflectionMap,
+    aoMap,
+    displacementMap,
     brand,
     sku,
     cost,
@@ -408,6 +439,24 @@ export function UploadMaterialModal(
                 error={reflectionError}
                 onFile={handleReflectionFile}
                 inputProps={{ "data-zone": "reflection" }}
+              />
+              <DropZone
+                label={COPY.aoLabel}
+                optional
+                inputRef={aoInputRef}
+                processed={aoMap}
+                error={aoError}
+                onFile={handleAoFile}
+                inputProps={{ "data-zone": "ao" }}
+              />
+              <DropZone
+                label={COPY.displacementLabel}
+                optional
+                inputRef={displacementInputRef}
+                processed={displacementMap}
+                error={displacementError}
+                onFile={handleDisplacementFile}
+                inputProps={{ "data-zone": "displacement" }}
               />
             </div>
           )}
