@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.18
 milestone_name: Pascal Visual Parity
-status: in_progress
-last_updated: "2026-05-08T00:29:00.000Z"
+status: completed
+last_updated: "2026-05-08T01:35:42.062Z"
 last_activity: 2026-05-08
 progress:
   total_phases: 6
-  completed_phases: 3
-  total_plans: 20
+  completed_phases: 2
+  total_plans: 21
   completed_plans: 17
 ---
 
@@ -53,6 +53,7 @@ Last activity: 2026-05-08
 - [Phase 72-01]: Import type Transition from motion/react (no runtime side-effects)
 - [Phase 72-primitives-shelf]: Tabs uses useId() for stable layoutId namespacing to prevent cross-instance pill animation leakage
 - [Phase 72-primitives-shelf]: Slider uses native accentColor CSS property instead of appearance-none custom thumb for simplicity
+- [Phase 74-toolbar-rework-floating-action-menu-toolbar-rework]: viewMode accepted as prop since App.tsx owns viewMode state
 
 ## Performance Metrics
 
@@ -78,6 +79,7 @@ Last activity: 2026-05-08
 | Phase 72-primitives-shelf P01 | 110 | 2 tasks | 6 files |
 | Phase 72-primitives-shelf P05 | 12 | 2 tasks | 9 files |
 | Phase 73-sidebar-restyle-sidebar-restyle P01 | 5 | 2 tasks | 2 files |
+| Phase 74-toolbar-rework-floating-action-menu-toolbar-rework P01 | 12 | 2 tasks | 2 files |
 
 ## Recent Milestones
 
