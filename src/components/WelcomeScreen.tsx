@@ -52,7 +52,7 @@ export default function WelcomeScreen({ onStart }: Props) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-background">
+    <div className="light h-full flex flex-col bg-background">
       {/* Minimal top bar — just the brand */}
       <header className="h-14 bg-background flex items-center px-6 border border-border/50 border-0 border-b">
         <span className="font-sans font-bold text-foreground text-sm tracking-[0.1em]">
