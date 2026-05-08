@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const TARGET_FILES = [
-  "src/components/Toolbar.tsx",
+  "src/components/FloatingToolbar.tsx",
   "src/components/Sidebar.tsx",
   "src/components/PropertiesPanel.tsx",
   "src/components/RoomSettings.tsx",

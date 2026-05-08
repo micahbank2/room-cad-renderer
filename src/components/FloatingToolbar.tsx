@@ -50,9 +50,9 @@ interface Props {
 // ─── Display mode config ───────────────────────────────────────────────────
 
 const DISPLAY_MODES = [
-  { id: "normal" as const, Icon: LayoutGrid, tooltip: "All rooms render together", testId: "display-mode-normal" },
-  { id: "solo" as const, Icon: Square, tooltip: "Only the active room renders", testId: "display-mode-solo" },
-  { id: "explode" as const, Icon: Move3d, tooltip: "Rooms separated along X-axis", testId: "display-mode-explode" },
+  { id: "normal" as const, label: "Normal", Icon: LayoutGrid, tooltip: "All rooms render together", testId: "display-mode-normal" },
+  { id: "solo" as const, label: "Solo", Icon: Square, tooltip: "Only the active room renders", testId: "display-mode-solo" },
+  { id: "explode" as const, label: "Explode", Icon: Move3d, tooltip: "Rooms separated along X-axis", testId: "display-mode-explode" },
 ];
 
 const VIEW_MODES = [
@@ -387,31 +387,37 @@ export function FloatingToolbar({ viewMode, onViewChange }: Props): JSX.Element 
 
           <Divider />
 
-          {/* Display Mode buttons */}
-          <div
-            role="group"
-            aria-label="Display mode"
-            data-testid="display-mode-segmented"
-            className="flex items-center gap-0.5"
-          >
-            {DISPLAY_MODES.map(({ id, Icon, tooltip, testId }) => (
-              <Tooltip key={id}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    data-testid={testId}
-                    active={displayMode === id}
-                    className={toolClass(displayMode === id)}
-                    onClick={() => setDisplayMode(id)}
-                  >
-                    <Icon size={16} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">{tooltip}</TooltipContent>
-              </Tooltip>
-            ))}
-          </div>
+          {/* Display Mode buttons — only in 3D/split where display modes are meaningful */}
+          {(viewMode === "3d" || viewMode === "split") && (
+            <div
+              role="group"
+              aria-label="Display mode"
+              data-testid="display-mode-segmented"
+              className="flex items-center gap-0.5"
+            >
+              {DISPLAY_MODES.map(({ id, label, Icon, tooltip, testId }) => (
+                <Tooltip key={id}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      data-testid={testId}
+                      aria-label={label}
+                      aria-pressed={displayMode === id}
+                      title={tooltip}
+                      active={displayMode === id}
+                      className={toolClass(displayMode === id)}
+                      onClick={() => setDisplayMode(id)}
+                    >
+                      <Icon size={16} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">{tooltip}</TooltipContent>
+                </Tooltip>
+              ))}
+            </div>
+          )}
+          {(viewMode === "3d" || viewMode === "split") && <Divider />}
 
           <Divider />
 
