@@ -13,7 +13,7 @@
 
 - [ ] **PBR-01**: User can upload an AO (ambient occlusion) map alongside a material's color map in the material upload / edit form
 - [ ] **PBR-02**: User can upload a displacement map on a material in the same upload / edit form
-- [ ] **PBR-03**: 3D mesh rendering applies AO and displacement maps in addition to existing color and roughness — surfaces look noticeably more detailed and textured
+- [x] **PBR-03**: 3D mesh rendering applies AO and displacement maps in addition to existing color and roughness — surfaces look noticeably more detailed and textured
 - [ ] **PBR-04**: Material card shows small map-presence indicators so Jessica can see which maps are loaded (color, roughness, AO, displacement) at a glance
 
 ### Window Presets (WIN)

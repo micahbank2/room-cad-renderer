@@ -400,7 +400,7 @@
   2. Uploaded AO map appears on `material.aoMapId`; displacement map on `material.displacementMapId` — both persist across reload
   3. 3D mesh surfaces that use the material render with `aoMap` and `displacementMap` props — surfaces look noticeably more detailed
   4. Material card shows small icons/dots indicating which of the 4 maps (color, roughness, AO, displacement) are loaded
-**Plans:** TBD (v1.20)
+**Plans:** 1/4 plans executed
 **UI hint:** yes
 
 #### Phase 79: Window Presets (WIN-PRESETS-01) — v1.20 ACTIVE
@@ -492,7 +492,7 @@
 | 75. Properties + Library Restyle | 3/3 | Complete   | 2026-05-08 |
 | 76. Modals + Welcome + Final | 3/3 | Complete    | 2026-05-08 |
 | 77. Test Suite Cleanup | 1/1 | Complete   | 2026-05-08 |
-| 78. PBR Maps | TBD | v1.20 active   | — |
+| 78. PBR Maps | 1/4 | In Progress|  |
 | 79. Window Presets | TBD | v1.20 active   | — |
 | 80. Parametric Product Controls | TBD | v1.20 active   | — |
 | 81. Columns & Pillars | TBD | v1.20 active   | — |
