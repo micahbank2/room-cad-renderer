@@ -18,7 +18,7 @@
 
 ### Library Rebuild (LIB-REBUILD)
 
-- [ ] **LIB-REBUILD-01**: Sidebar library shows a 3-way toggle at the top — Materials / Products / Assemblies — switching tabs swaps the visible content cleanly
+- [x] **LIB-REBUILD-01**: Sidebar library shows a 3-way toggle at the top — Materials / Products / Assemblies — switching tabs swaps the visible content cleanly
 - [ ] **LIB-REBUILD-02**: Materials tab shows category sub-tabs (Flooring / Wall coverings / Countertops / Paint) and filters the Phase 67 material library by category
 - [ ] **LIB-REBUILD-03**: Products tab shows category sub-tabs (Furniture / Plumbing fixtures / Appliances / Lighting / Curtains & blinds / Decor); existing products land in the right category or "Uncategorized"
 - [ ] **LIB-REBUILD-04**: Assemblies tab shows a clear empty-state placeholder — not broken UI
