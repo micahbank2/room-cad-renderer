@@ -31,6 +31,10 @@ export interface ResolvedSurfaceMaterial {
   roughnessMapId?: string;
   /** UserTexture id for reflection map. */
   reflectionMapId?: string;
+  /** UserTexture id for AO map. Phase 78 PBR-03. */
+  aoMapId?: string;
+  /** UserTexture id for displacement map. Phase 78 PBR-03. */
+  displacementMapId?: string;
   /** Real-world tile size in feet (post D-04 resolution). */
   tileSizeFt: number;
   /** D-08 fallback: 0.8 when roughnessMapId absent, 1.0 when present. */
@@ -92,6 +96,8 @@ export function resolveSurfaceMaterial(
     colorMapId: m.colorMapId,
     roughnessMapId: m.roughnessMapId,
     reflectionMapId: m.reflectionMapId,
+    aoMapId: m.aoMapId,
+    displacementMapId: m.displacementMapId,
     tileSizeFt,
     roughness,
     metalness,
