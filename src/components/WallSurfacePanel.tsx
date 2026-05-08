@@ -7,6 +7,7 @@ import { useWainscotStyleStore } from "@/stores/wainscotStyleStore";
 import { FRAME_PRESETS } from "@/types/framedArt";
 import { STYLE_META } from "@/types/wainscotStyle";
 import { MaterialPicker } from "./MaterialPicker";
+import { Input, Switch } from "@/components/ui";
 
 /** Appears in PropertiesPanel when exactly one wall is selected. */
 export default function WallSurfacePanel() {
@@ -154,24 +155,20 @@ export default function WallSurfacePanel() {
 
       {/* Wainscoting — pick from library (Phase 16) */}
       <div>
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={wains?.enabled ?? false}
-            onChange={(e) =>
-              toggleWainscoting(
-                wall.id,
-                activeSide,
-                e.target.checked,
-                wains?.heightFt,
-                wains?.color,
-                wains?.styleItemId
-              )
-            }
-            className="w-3 h-3 accent-accent rounded-none"
-          />
-          <span className="font-sans text-[11px] text-muted-foreground/80 tracking-wider">Wainscoting</span>
-        </label>
+        <Switch
+          checked={wains?.enabled ?? false}
+          onCheckedChange={(checked) =>
+            toggleWainscoting(
+              wall.id,
+              activeSide,
+              checked,
+              wains?.heightFt,
+              wains?.color,
+              wains?.styleItemId
+            )
+          }
+          label="Wainscoting"
+        />
         {wains?.enabled && (
           <div className="ml-5 mt-1 space-y-1">
             {wainscotStyles.length === 0 ? (
@@ -209,29 +206,25 @@ export default function WallSurfacePanel() {
 
       {/* Crown molding */}
       <div>
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={crown?.enabled ?? false}
-            onChange={(e) =>
-              toggleCrownMolding(wall.id, activeSide, e.target.checked, crown?.heightFt, crown?.color)
-            }
-            className="w-3 h-3 accent-accent rounded-none"
-          />
-          <span className="font-sans text-[11px] text-muted-foreground/80 tracking-wider">CROWN MOLDING</span>
-        </label>
+        <Switch
+          checked={crown?.enabled ?? false}
+          onCheckedChange={(checked) =>
+            toggleCrownMolding(wall.id, activeSide, checked, crown?.heightFt, crown?.color)
+          }
+          label="CROWN MOLDING"
+        />
         {crown?.enabled && (
           <div className="ml-5 mt-1 flex items-center gap-2">
-            <input
+            <Input
               type="number"
-              step="0.08"
-              min="0.17"
-              max="1"
+              step={0.08}
+              min={0.17}
+              max={1}
               value={crown.heightFt}
               onChange={(e) =>
                 toggleCrownMolding(wall.id, activeSide, true, parseFloat(e.target.value) || 0.33, crown.color)
               }
-              className="w-16 font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-smooth-md"
+              className="w-16"
             />
             <span className="font-sans text-[8px] text-muted-foreground/60">FT</span>
             <input
