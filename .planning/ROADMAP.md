@@ -263,7 +263,7 @@
   3. Open HelpModal, ConfirmDialog, ErrorBoundary fallback → all use the unified Dialog primitive; existing keyboard-shortcut overlay (Phase 52) preserves its 26 shortcut entries
   4. Final grep audit returns zero matches for `obsidian-` / `text-text-` / `accent-glow` / `cad-grid-bg` / `glass-panel` / `material-symbols-outlined` across `src/`
   5. The 4 v1.17 carry-over tests verified passing on the new chrome (snapshot v6 assertion, removed wallpaper "MY TEXTURES" tab, WallMesh cutaway ghost-spread audit, contextMenuActionCounts pollution); existing 800+ test suite still green
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 - [ ] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
 - [ ] 72-02-PLAN.md — Button primitive + tests
 - [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
@@ -408,7 +408,7 @@
 | 73. Sidebar Restyle | 2/2 | Complete   | 2026-05-08 |
 | 74. Toolbar Rework | 3/3 | Complete   | 2026-05-08 |
 | 75. Properties + Library Restyle | 0/0 | Not started   | — |
-| 76. Modals + Welcome + Final | 1/3 | In Progress|  |
+| 76. Modals + Welcome + Final | 2/3 | In Progress|  |
 
 ## Backlog
 

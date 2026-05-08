@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.18
 milestone_name: Pascal Visual Parity
 status: executing
-last_updated: "2026-05-08T13:19:45.641Z"
+last_updated: "2026-05-08T13:22:44.847Z"
 last_activity: 2026-05-08
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 27
-  completed_plans: 22
+  completed_plans: 23
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-05-07 — v1.17 partial-shipped 67+68; v
 ## Current Position
 
 Phase: 76 (Modals + WelcomeScreen + Final) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Milestone: v1.18 Pascal Visual Parity
 Phases: 6 (71, 72, 73, 74, 75, 76) — 5 complete (71, 72, 73, 74, 75)
 Status: Ready to execute
@@ -56,6 +56,7 @@ Last activity: 2026-05-08
 - [Phase 72-primitives-shelf]: Slider uses native accentColor CSS property instead of appearance-none custom thumb for simplicity
 - [Phase 74-toolbar-rework-floating-action-menu-toolbar-rework]: viewMode accepted as prop since App.tsx owns viewMode state
 - [Phase 76-01]: D-A4 implemented: .light CSS class overrides .dark ancestor for WelcomeScreen + ProjectManager light-mode surfaces
+- [Phase 76]: HelpModal: Dialog open prop controls visibility — early-return guard removed; Radix handles ARIA
 
 ## Performance Metrics
 
@@ -83,6 +84,7 @@ Last activity: 2026-05-08
 | Phase 73-sidebar-restyle-sidebar-restyle P01 | 5 | 2 tasks | 2 files |
 | Phase 74-toolbar-rework-floating-action-menu-toolbar-rework P01 | 12 | 2 tasks | 2 files |
 | Phase 76-modals-welcomescreen-final-modals-welcome-final P01 | 5 | 3 tasks | 3 files |
+| Phase 76 P02 | 5 | 2 tasks | 2 files |
 
 ## Recent Milestones
 
