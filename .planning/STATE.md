@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
-status: planning
-last_updated: "2026-05-08T00:00:00.000Z"
-last_activity: 2026-05-08
+status: Defining requirements
+last_updated: "2026-05-08T18:40:21.488Z"
+last_activity: 2026-05-08 — Milestone v1.19 started
 progress:
-  total_phases: 3
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_phases: 16
+  completed_phases: 9
+  total_plans: 37
+  completed_plans: 34
 ---
 
 # Project State
@@ -41,6 +41,7 @@ Last activity: 2026-05-08 — Milestone v1.19 started
 - **D-A7 (user-confirmed):** Right sidebar becomes **contextual** — appears only when something is selected.
 - **D-A8 (carry-over):** Phase 69 (MAT-LINK-01) + Phase 70 (LIB-REBUILD-01) deferred from v1.17 to v1.19 to ship in v1.18 Pascal chrome.
 - **[Phase 71-76 decisions preserved]** — see v1.18 SUMMARY/VERIFICATION docs for v1.18 chrome decisions.
+- [Phase 69]: Snapshot v6→v7 is trivial passthrough; GLTF finish deferred to v1.20; MaterialPicker customElementFace surface type reused for product finish
 
 ## Performance Metrics
 

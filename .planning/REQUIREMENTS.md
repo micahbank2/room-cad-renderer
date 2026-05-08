@@ -11,7 +11,7 @@
 
 ### Material Linking (MAT-LINK)
 
-- [ ] **MAT-LINK-01**: User selects a placed product → PropertiesPanel shows a "Finish" picker → user picks a Material from the library → product's 3D rendering updates to use that material's color and roughness
+- [x] **MAT-LINK-01**: User selects a placed product → PropertiesPanel shows a "Finish" picker → user picks a Material from the library → product's 3D rendering updates to use that material's color and roughness
 - [ ] **MAT-LINK-02**: Finish change is undoable with a single Ctrl+Z
 - [ ] **MAT-LINK-03**: Finish selection persists across save and load (`PlacedProduct.finishMaterialId` round-trips through the snapshot)
 - [ ] **MAT-LINK-04**: Products placed without an explicit finish continue to render with their catalog default (today's behavior unchanged)
@@ -26,8 +26,8 @@
 
 ### Test Suite Cleanup (TEST-CLEANUP)
 
-- [ ] **TEST-CLEANUP-01**: All Phase-31-era test files that render PropertiesPanel or FloatingToolbar are wrapped in `<TooltipProvider>` (fixes GH #163 — 5 files)
-- [ ] **TEST-CLEANUP-02**: AddProductModal tests query `role="switch"` instead of `role="checkbox"` after v1.18 Switch primitive migration (fixes GH #164)
+- [x] **TEST-CLEANUP-01**: All Phase-31-era test files that render PropertiesPanel or FloatingToolbar are wrapped in `<TooltipProvider>` (fixes GH #163 — 5 files)
+- [x] **TEST-CLEANUP-02**: AddProductModal tests query `role="switch"` instead of `role="checkbox"` after v1.18 Switch primitive migration (fixes GH #164)
 
 ---
 
