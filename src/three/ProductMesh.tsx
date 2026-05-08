@@ -55,6 +55,10 @@ export default function ProductMesh({ placed, product, isSelected }: Props) {
 
   // GLTF product path (D-08)
   if (product?.gltfId) {
+    // Phase 69 MAT-LINK-01 (deferred): GLTF products use embedded PBR
+    // materials. The finishMaterialId field is intentionally NOT forwarded
+    // to the GLTF fallback ProductBox — finishing GLTF surfaces requires
+    // glTF material substitution, which is out of scope for v1.19.
     return (
       <group
         position={[placed.position.x, 0, placed.position.y]}
@@ -111,6 +115,8 @@ export default function ProductMesh({ placed, product, isSelected }: Props) {
   }
 
   // Image-only / placeholder path — unchanged behavior (D-12 regression guard)
+  // Phase 69 MAT-LINK-01: forward finishMaterialId so ProductBox can resolve
+  // the Material finish for box-mode products.
   return (
     <group
       position={[placed.position.x, 0, placed.position.y]}
@@ -124,6 +130,7 @@ export default function ProductMesh({ placed, product, isSelected }: Props) {
         isSelected={isSelected}
         isPlaceholder={isPlaceholder}
         textureUrl={textureUrl}
+        finishMaterialId={placed.finishMaterialId}
       />
     </group>
   );
