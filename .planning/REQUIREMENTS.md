@@ -1,53 +1,59 @@
-# Requirements — v1.19 Material Linking & Library Rebuild
+# Requirements — v1.20 Surface Depth & Architectural Expansion
 
 > Generated: 2026-05-08
-> Milestone goal: Complete the material engine story. Jessica can swap the finish on a placed product without re-placing it, and the sidebar library reorganizes into a Materials / Products / Assemblies three-tab structure.
+> Milestone goal: Deepen material realism with PBR maps (AO + displacement), speed up window placement with standard-size presets, enable precise numeric sizing of placed products, and add columns/pillars as a new architectural element type.
 >
-> Continues phase numbering from 76. Phase 69 + 70 (deferred from v1.17) + Phase 77 (new test cleanup).
+> Continues phase numbering from 77. Phases start at 78.
 
 ---
 
 ## Active Requirements
 
-### Material Linking (MAT-LINK)
+### PBR Maps (PBR)
 
-- [x] **MAT-LINK-01**: User selects a placed product → PropertiesPanel shows a "Finish" picker → user picks a Material from the library → product's 3D rendering updates to use that material's color and roughness
-- [ ] **MAT-LINK-02**: Finish change is undoable with a single Ctrl+Z
-- [ ] **MAT-LINK-03**: Finish selection persists across save and load (`PlacedProduct.finishMaterialId` round-trips through the snapshot)
-- [ ] **MAT-LINK-04**: Products placed without an explicit finish continue to render with their catalog default (today's behavior unchanged)
+- [ ] **PBR-01**: User can upload an AO (ambient occlusion) map alongside a material's color map in the material upload / edit form
+- [ ] **PBR-02**: User can upload a displacement map on a material in the same upload / edit form
+- [ ] **PBR-03**: 3D mesh rendering applies AO and displacement maps in addition to existing color and roughness — surfaces look noticeably more detailed and textured
+- [ ] **PBR-04**: Material card shows small map-presence indicators so Jessica can see which maps are loaded (color, roughness, AO, displacement) at a glance
 
-### Library Rebuild (LIB-REBUILD)
+### Window Presets (WIN)
 
-- [x] **LIB-REBUILD-01**: Sidebar library shows a 3-way toggle at the top — Materials / Products / Assemblies — switching tabs swaps the visible content cleanly
-- [ ] **LIB-REBUILD-02**: Materials tab shows category sub-tabs (Flooring / Wall coverings / Countertops / Paint) and filters the Phase 67 material library by category
-- [ ] **LIB-REBUILD-03**: Products tab shows category sub-tabs (Furniture / Plumbing fixtures / Appliances / Lighting / Curtains & blinds / Decor); existing products land in the right category or "Uncategorized"
-- [ ] **LIB-REBUILD-04**: Assemblies tab shows a clear empty-state placeholder — not broken UI
-- [ ] **LIB-REBUILD-05**: Upload buttons are context-aware: Materials tab → "Upload Material"; Products tab → "Add Product"; existing upload + place flows continue to work end-to-end
+- [ ] **WIN-01**: When placing a window opening, user can choose from a preset size list (e.g. 2×3 ft, 3×4 ft, 4×5 ft, custom) rather than always typing dimensions manually
+- [ ] **WIN-02**: The selected preset size is visible and editable in PropertiesPanel after placement — switching to "custom" allows free-form dimension input
 
-### Test Suite Cleanup (TEST-CLEANUP)
+### Parametric Controls (PARAM)
 
-- [x] **TEST-CLEANUP-01**: All Phase-31-era test files that render PropertiesPanel or FloatingToolbar are wrapped in `<TooltipProvider>` (fixes GH #163 — 5 files)
-- [x] **TEST-CLEANUP-02**: AddProductModal tests query `role="switch"` instead of `role="checkbox"` after v1.18 Switch primitive migration (fixes GH #164)
+- [ ] **PARAM-01**: User can type exact width and depth values (feet) for any placed product in PropertiesPanel — updates the product's override dimensions immediately without requiring a drag
+- [ ] **PARAM-02**: User can type exact X and Y position (feet from room origin) for any placed product in PropertiesPanel
+- [ ] **PARAM-03**: Each parametric edit (size or position) is a single undo entry (Ctrl+Z reverts to previous value)
+
+### Columns & Pillars (COL)
+
+- [ ] **COL-01**: User can place a column/pillar in a room — choose round or rectangular cross-section, with configurable diameter/width and height (defaults to room ceiling height)
+- [ ] **COL-02**: Column renders correctly in 2D (footprint outline at correct position and scale) and 3D (extruded pillar with a material finish slot)
+- [ ] **COL-03**: Column is selectable, movable, and deletable via the standard select tool; PropertiesPanel shows its dimensions and finish material
 
 ---
 
 ## Future Requirements (Deferred)
 
-These were considered for v1.19 and explicitly deferred:
+These were considered for v1.20 and explicitly deferred:
 
-- **PBR maps extension** (AO + displacement + emissive, GH #81) — defer to v1.20. Requires new upload UX and 3D pipeline changes beyond the material linking story.
-- **Parametric object controls** (GH #28) — defer to v1.20. Different feature arc; doesn't depend on v1.19.
-- **Window presets** (GH #20) + **columns/levels/platforms** (GH #19) — defer to v1.20. Architectural element work, separate from material story.
-- **R3F v9 / React 19 upgrade** (GH #56) — tracked separately; no dep on v1.19.
+- **Emissive map** — glowing surfaces (LED strips, backlit panels). Defer to v1.21 — AO + displacement have more everyday impact for Jessica's room planning use cases.
+- **Window styles** (single-hung, casement, sliding, picture) — affects 2D/3D appearance. Defer to v1.21 — standard sizes cover the placement friction; visual style is secondary.
+- **Window sill height preset** — auto-position window at 30"/36"/44" sill. Defer to v1.21 with styles.
+- **Raised platforms / sunken floors** — elevated floor sections. Defer to v1.21 — columns are the simpler starting point for architectural depth.
+- **Parametric controls for walls and custom elements** — extend PARAM to wall endpoints and custom element sizes. Defer to v1.21 — products are the highest-value target first.
+- **R3F v9 / React 19 upgrade** — tracked separately; no dep on v1.20.
 
 ---
 
-## Out of Scope (v1.19)
+## Out of Scope (v1.20)
 
-- **Assemblies tab content** — placeholder only; building pre-made combos (kitchen cabinetry etc.) is a future milestone
-- **Material categories as user-editable** — categories are fixed enum for now; custom category creation deferred
-- **GLTF PBR material slot override** — Phase 69 swaps finish at the mesh level; per-slot GLTF sub-mesh override deferred pending PBR maps extension
-- **Snapshot migration testing beyond snapshot v7** — Phase 69 bumps to v7; no further version bumps in v1.19
+- **PBR normal maps** — not selected; AO + displacement cover the visible depth story for this milestone.
+- **GLTF per-slot PBR override** — applying uploaded PBR maps to GLTF product sub-meshes. Still deferred from v1.19.
+- **Assemblies tab content** — placeholder from v1.19; building pre-made combos deferred.
+- **Multi-room levels** — true floor-to-floor multi-story layouts. Separate feature arc from column placement.
 
 ---
 
@@ -55,14 +61,15 @@ These were considered for v1.19 and explicitly deferred:
 
 | Requirement | Phase | Plan | Status |
 |-------------|-------|------|--------|
-| MAT-LINK-01 | 69 | TBD | Not started |
-| MAT-LINK-02 | 69 | TBD | Not started |
-| MAT-LINK-03 | 69 | TBD | Not started |
-| MAT-LINK-04 | 69 | TBD | Not started |
-| LIB-REBUILD-01 | 70 | TBD | Not started |
-| LIB-REBUILD-02 | 70 | TBD | Not started |
-| LIB-REBUILD-03 | 70 | TBD | Not started |
-| LIB-REBUILD-04 | 70 | TBD | Not started |
-| LIB-REBUILD-05 | 70 | TBD | Not started |
-| TEST-CLEANUP-01 | 77 | TBD | Not started |
-| TEST-CLEANUP-02 | 77 | TBD | Not started |
+| PBR-01 | TBD | TBD | Not started |
+| PBR-02 | TBD | TBD | Not started |
+| PBR-03 | TBD | TBD | Not started |
+| PBR-04 | TBD | TBD | Not started |
+| WIN-01 | TBD | TBD | Not started |
+| WIN-02 | TBD | TBD | Not started |
+| PARAM-01 | TBD | TBD | Not started |
+| PARAM-02 | TBD | TBD | Not started |
+| PARAM-03 | TBD | TBD | Not started |
+| COL-01 | TBD | TBD | Not started |
+| COL-02 | TBD | TBD | Not started |
+| COL-03 | TBD | TBD | Not started |
