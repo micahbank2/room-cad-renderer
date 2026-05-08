@@ -246,14 +246,10 @@
   3. Open the ProductLibrary → cards use Pascal's pattern with Barlow names + Geist Sans metadata; GLTF Box badge top-LEFT survives the restyle
   4. RoomSettings collapsible sections use the new PanelSection primitive (spring expand/collapse, chevron rotation); inputs use the new Input primitive
   5. Custom CSS classes `glass-panel` / `accent-glow` / `cad-grid-bg` / `ghost-border` removed from MaterialPicker / ProductLibrary / RoomSettings / PropertiesPanel / WallSurfacePanel / AddProductModal / UploadTextureModal / UploadMaterialModal / MyTexturesList / LibraryCard
-**Plans:** 7 plans
-- [ ] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
-- [ ] 72-02-PLAN.md — Button primitive + tests
-- [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
-- [ ] 72-04-PLAN.md — Dialog primitive + tests
-- [ ] 72-05-PLAN.md — Remaining primitives (Tabs, SegmentedControl, Switch, Slider, Tooltip, Input, Popover)
-- [ ] 72-06-PLAN.md — Toolbar button migration (~20 sites)
-- [ ] 72-07-PLAN.md — PropertiesPanel CollapsibleSection migration (11 sites) + cleanup
+**Plans:** 3 plans
+- [ ] 75-01-PLAN.md — AddProductModal Dialog wrapping + RoomSettings Input + MaterialPicker tokens
+- [ ] 75-02-PLAN.md — ProductLibrary Tabs migration + WallSurfacePanel Switch/Input
+- [ ] 75-03-PLAN.md — PropertiesPanel + sub-components Input migration + full-phase grep audit
 **UI hint:** yes
 
 #### Phase 76: Modals + WelcomeScreen + Final (MODALS-WELCOME-FINAL)
@@ -267,7 +263,7 @@
   3. Open HelpModal, ConfirmDialog, ErrorBoundary fallback → all use the unified Dialog primitive; existing keyboard-shortcut overlay (Phase 52) preserves its 26 shortcut entries
   4. Final grep audit returns zero matches for `obsidian-` / `text-text-` / `accent-glow` / `cad-grid-bg` / `glass-panel` / `material-symbols-outlined` across `src/`
   5. The 4 v1.17 carry-over tests verified passing on the new chrome (snapshot v6 assertion, removed wallpaper "MY TEXTURES" tab, WallMesh cutaway ghost-spread audit, contextMenuActionCounts pollution); existing 800+ test suite still green
-**Plans:** 7 plans
+**Plans:** 3 plans
 - [ ] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
 - [ ] 72-02-PLAN.md — Button primitive + tests
 - [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
