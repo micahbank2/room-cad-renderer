@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { X, RotateCcw } from "lucide-react";
+import { X, RotateCcw, ExternalLink } from "lucide-react";
 import { useUIStore } from "@/stores/uiStore";
 import type { HelpSectionId } from "@/stores/uiStore";
 import {
@@ -8,6 +8,7 @@ import {
 } from "@/components/help/helpContent";
 import HelpSearch from "@/components/help/HelpSearch";
 import { useOnboardingStore } from "@/stores/onboardingStore";
+import { Dialog, DialogContent } from "@/components/ui";
 
 export default function HelpModal() {
   const showHelp = useUIStore((s) => s.showHelp);
@@ -48,20 +49,10 @@ export default function HelpModal() {
     if (!showHelp) setQuery("");
   }, [showHelp]);
 
-  if (!showHelp) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-        onClick={closeHelp}
-      />
-
-      {/* Modal */}
-      <div
-        className="relative w-[900px] h-[640px] max-w-[95vw] max-h-[90vh] bg-popover border border-border/60 rounded-smooth-md shadow-2xl flex flex-col overflow-hidden"
-        role="dialog"
+    <Dialog open={showHelp} onOpenChange={(open) => { if (!open) closeHelp(); }}>
+      <DialogContent
+        className="p-0 w-[900px] max-w-[95vw] h-[640px] max-h-[90vh] flex flex-col overflow-hidden"
         aria-label="Help and documentation"
       >
         {/* Header */}
@@ -131,14 +122,25 @@ export default function HelpModal() {
                 <RotateCcw size={14} /> {/* D-15: substitute for material-symbols 'replay' */}
                 REPLAY TOUR
               </button>
-              <span className="font-sans text-[9px] text-muted-foreground/60 tracking-widest">
-                ESC TO CLOSE
-              </span>
+              <div className="flex items-center gap-3">
+                <a
+                  href="/help-center"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-sans text-[10px] tracking-widest text-muted-foreground/60 hover:text-foreground transition-colors flex items-center gap-1"
+                >
+                  <ExternalLink size={12} />
+                  OPEN HELP CENTER
+                </a>
+                <span className="font-sans text-[9px] text-muted-foreground/60 tracking-widest">
+                  ESC TO CLOSE
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

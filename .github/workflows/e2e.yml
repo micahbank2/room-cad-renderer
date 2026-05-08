@@ -13,18 +13,30 @@
 # Each Playwright project (chromium-dev + chromium-preview) runs in its own
 # parallel job via matrix. Halves wall-clock for the regression sweep —
 # previous 35-min single-job runs now finish in ~10-12 min per shard.
+#
+# v1.18 POST-MERGE GATE (post-Phase 76, suite > 115 tests):
+# E2E no longer runs on pull_request — the suite takes 45-60 min serially
+# (workers:1 required by texture-cache singletons) and cannot reliably fit
+# in any GitHub Actions job timeout. PRs are gated by vitest (800+ unit tests)
+# which runs in ~30s. E2E runs on push to main as a post-merge safety net.
+#
+# If E2E fails on main after a merge: create a fix branch immediately and
+# treat it as a P1 regression (the verifier agent + vitest should have caught
+# most issues before merge, but texture/3D pipeline regressions need E2E).
 
 name: E2E Regression Harness
 
 on:
-  pull_request:
+  push:
+    branches:
+      - main
 
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 60
     strategy:
-      # Don't cancel the other shard if one fails — we want to see both projects' results.
+      # Don't cancel the other shard if one fails — we want to see both results.
       fail-fast: false
       matrix:
         project: [chromium-dev, chromium-preview]

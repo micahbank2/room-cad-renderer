@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, within, fireEvent } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Product } from "@/types/product";
 
@@ -45,6 +45,12 @@ function makeProduct(overrides: Partial<Product> = {}): Product {
   };
 }
 
+/** Phase 70: ProductLibrary now defaults to the Materials tab.
+ *  Click the Products tab to make LibraryCards visible. */
+function switchToProductsTab() {
+  fireEvent.click(screen.getByRole("tab", { name: "Products" }));
+}
+
 beforeEach(() => {
   mockedGetCached.mockReset();
 });
@@ -63,6 +69,7 @@ describe("ProductLibrary × GLTF (Phase 58)", () => {
         onOpenAddModal={() => {}}
       />,
     );
+    switchToProductsTab();
     const card = screen.getByTestId("library-card");
     expect(within(card).getByTestId("library-card-badge")).toBeInTheDocument();
   });
@@ -76,6 +83,7 @@ describe("ProductLibrary × GLTF (Phase 58)", () => {
         onOpenAddModal={() => {}}
       />,
     );
+    switchToProductsTab();
     const card = screen.getByTestId("library-card");
     expect(
       within(card).queryByTestId("library-card-badge"),
@@ -96,6 +104,7 @@ describe("ProductLibrary × GLTF (Phase 58)", () => {
         onOpenAddModal={() => {}}
       />,
     );
+    switchToProductsTab();
     const card = screen.getByTestId("library-card");
     const img = card.querySelector("img");
     expect(img?.getAttribute("src")).toBe("data:image/png;base64,XXX");
@@ -112,6 +121,7 @@ describe("ProductLibrary × GLTF (Phase 58)", () => {
         onOpenAddModal={() => {}}
       />,
     );
+    switchToProductsTab();
     expect(mockedGetCached).toHaveBeenCalledWith(
       "gltf_abc",
       expect.any(Function),
@@ -130,6 +140,7 @@ describe("ProductLibrary × GLTF (Phase 58)", () => {
         onOpenAddModal={() => {}}
       />,
     );
+    switchToProductsTab();
     const card = screen.getByTestId("library-card");
     expect(card.querySelector("img")).toBeNull();
   });
@@ -144,6 +155,7 @@ describe("ProductLibrary × GLTF (Phase 58)", () => {
         onOpenAddModal={() => {}}
       />,
     );
+    switchToProductsTab();
     const card = screen.getByTestId("library-card");
     expect(card.querySelector("img")).toBeNull();
   });

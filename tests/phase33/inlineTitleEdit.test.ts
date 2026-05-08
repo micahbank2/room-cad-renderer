@@ -22,8 +22,8 @@ describe("InlineEditableText (GH #88) — reuses Phase 31 LabelOverrideInput pat
     const src = fs.readFileSync(path.resolve("src/stores/cadStore.ts"), "utf-8");
     expect(src).toMatch(/renameRoomNoHistory/);
   });
-  it("Toolbar renders the InlineEditableText for project name (relocated from ProjectManager per research recommendation)", () => {
-    const src = fs.readFileSync(path.resolve("src/components/Toolbar.tsx"), "utf-8");
+  it("TopBar renders the InlineEditableText for project name (relocated to TopBar per Phase 74 TOOLBAR-REWORK)", () => {
+    const src = fs.readFileSync(path.resolve("src/components/TopBar.tsx"), "utf-8");
     expect(src).toMatch(/InlineEditableText/);
   });
 });

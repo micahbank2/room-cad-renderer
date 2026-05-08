@@ -42,9 +42,15 @@ export interface SaveMaterialInput {
   sku?: string;
   cost?: string;
   leadTime?: string;
+  /** Phase 70: optional category for library sub-tab filtering. */
+  category?: string;
   colorFile: File;
   roughnessFile?: File;
   reflectionFile?: File;
+  /** Phase 78 PBR-01: optional AO map. Persisted via persistOptionalMap. */
+  aoFile?: File;
+  /** Phase 78 PBR-02: optional displacement map. Persisted via persistOptionalMap. */
+  displacementFile?: File;
 }
 
 /**
@@ -97,6 +103,12 @@ export async function saveMaterialWithDedup(
         input.tileSizeFt,
       )
     : undefined;
+  const aoMapId = input.aoFile
+    ? await persistOptionalMap(input.aoFile, `${input.name} (ao)`, input.tileSizeFt)
+    : undefined;
+  const displacementMapId = input.displacementFile
+    ? await persistOptionalMap(input.displacementFile, `${input.name} (displacement)`, input.tileSizeFt)
+    : undefined;
 
   // (5) Write Material record. No blob — just metadata + utex_ refs.
   const id = `${MATERIAL_ID_PREFIX}${uid()}`;
@@ -108,10 +120,13 @@ export async function saveMaterialWithDedup(
     colorSha256: color.sha256,
     roughnessMapId,
     reflectionMapId,
+    aoMapId,
+    displacementMapId,
     brand: input.brand?.trim() || undefined,
     sku: input.sku?.trim() || undefined,
     cost: input.cost?.trim() || undefined,
     leadTime: input.leadTime?.trim() || undefined,
+    category: input.category?.trim() || undefined,
     createdAt: Date.now(),
   };
   await set(id, mat, materialIdbStore);
@@ -205,7 +220,7 @@ export async function deleteMaterial(id: string): Promise<void> {
 export async function updateMaterialMetadata(
   id: string,
   changes: Partial<
-    Pick<Material, "name" | "tileSizeFt" | "brand" | "sku" | "cost" | "leadTime">
+    Pick<Material, "name" | "tileSizeFt" | "brand" | "sku" | "cost" | "leadTime" | "category">
   >,
 ): Promise<void> {
   const existing = await getMaterial(id);

@@ -1,4 +1,7 @@
 import { useState, useEffect, useMemo, lazy, Suspense } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { springTransition } from "@/lib/motion";
 import type { ToolType } from "@/types/cad";
 import { useTheme } from "@/hooks/useTheme";
 import { registerThemeSetter } from "@/test-utils/themeDrivers";
@@ -17,8 +20,8 @@ import { useProjectStore } from "@/stores/projectStore";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { useHelpRouteSync } from "@/hooks/useHelpRouteSync";
 import { getLastProjectId, loadProject } from "@/lib/serialization";
-import Toolbar from "@/components/Toolbar";
-import { ToolPalette } from "@/components/Toolbar";
+import { TopBar } from "@/components/TopBar";
+import { FloatingToolbar } from "@/components/FloatingToolbar";
 import Sidebar from "@/components/Sidebar";
 import StatusBar from "@/components/StatusBar";
 import PropertiesPanel from "@/components/PropertiesPanel";
@@ -53,6 +56,8 @@ export default function App() {
   const setTool = useUIStore((s) => s.setTool);
   const showSidebar = useUIStore((s) => s.showSidebar);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
+  const selectedIds = useUIStore((s) => s.selectedIds);
+  const reduced = useReducedMotion();
   const activeWalls = useActiveWalls();
   const wallCount = Object.keys(activeWalls).length;
   // Phase 31 Plan 03 Rule 2: comment in auto-detect effect says "walls or
@@ -178,14 +183,14 @@ export default function App() {
 
   return (
     <div className="h-full flex flex-col bg-background">
-      <Toolbar
+      <TopBar
         viewMode={viewMode}
         onViewChange={setViewMode}
         onHome={() => setHasStarted(false)}
         onFloorPlanClick={() => setShowTemplatePicker(true)}
       />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden pt-10">
         {/* Left sidebar — only on canvas views */}
         {isCanvas && showSidebar && (
           <Sidebar productLibrary={productLibrary} />
@@ -252,10 +257,25 @@ export default function App() {
             {isCanvas && <RoomTabs onAddClick={() => setShowAddRoomDialog(true)} />}
             <div className="flex flex-1 overflow-hidden">
             {(viewMode === "2d" || viewMode === "split") && (
-              <div className={`${viewMode === "split" ? "w-1/2" : "flex-1"} h-full relative`}>
-                <FabricCanvas productLibrary={productLibrary} />
-                <ToolPalette />
-                <PropertiesPanel productLibrary={productLibrary} viewMode={viewMode} />
+              <div className={`${viewMode === "split" ? "w-1/2" : "flex-1"} h-full relative flex`}>
+                <div className="flex-1 h-full relative">
+                  <FabricCanvas productLibrary={productLibrary} />
+                  <FloatingToolbar viewMode={viewMode} onViewChange={setViewMode} />
+                </div>
+                <AnimatePresence>
+                  {selectedIds.length > 0 && (
+                    <motion.div
+                      key="properties-panel"
+                      className="w-72 h-full shrink-0 overflow-y-auto bg-card border-l border-border"
+                      initial={{ x: 288, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: 288, opacity: 0 }}
+                      transition={springTransition(reduced)}
+                    >
+                      <PropertiesPanel productLibrary={productLibrary} viewMode={viewMode} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             )}
             {viewMode === "split" && (
@@ -274,9 +294,20 @@ export default function App() {
                 >
                   <ThreeViewport productLibrary={productLibrary} />
                 </Suspense>
-                {viewMode === "3d" && (
-                  <PropertiesPanel productLibrary={productLibrary} viewMode={viewMode} />
-                )}
+                <AnimatePresence>
+                  {viewMode === "3d" && selectedIds.length > 0 && (
+                    <motion.div
+                      key="properties-panel-3d"
+                      className="w-72 h-full shrink-0 overflow-y-auto bg-card border-l border-border"
+                      initial={{ x: 288, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: 288, opacity: 0 }}
+                      transition={springTransition(reduced)}
+                    >
+                      <PropertiesPanel productLibrary={productLibrary} viewMode={viewMode} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             )}
             </div>

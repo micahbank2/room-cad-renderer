@@ -77,6 +77,10 @@ export interface Material {
   roughnessMapId?: string;
   /** Optional reference into userTextureIdbStore. */
   reflectionMapId?: string;
+  /** Optional reference into userTextureIdbStore. Phase 78 PBR-01. */
+  aoMapId?: string;
+  /** Optional reference into userTextureIdbStore. Phase 78 PBR-02. */
+  displacementMapId?: string;
 
   /** Optional metadata (D-03). Free-text. */
   brand?: string;
@@ -89,4 +93,19 @@ export interface Material {
 
   /** Upload timestamp (Date.now()). Drives listMaterials sort order. */
   createdAt: number;
+
+  /**
+   * Phase 70 LIB-REBUILD-01 — optional category for library sub-tab filtering.
+   * Previously-saved Materials without a category appear under "All" only.
+   */
+  category?: string;
 }
+
+export const MATERIAL_CATEGORIES = [
+  "Flooring",
+  "Wall coverings",
+  "Countertops",
+  "Paint",
+] as const;
+
+export type MaterialCategory = (typeof MATERIAL_CATEGORIES)[number];

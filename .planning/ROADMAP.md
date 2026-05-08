@@ -21,8 +21,8 @@
 - ✅ **v1.15 Architectural Toolbar Expansion** — Phases 59–62 (shipped 2026-05-06)
 - ✅ **v1.16 Maintenance Pass** — Phases 63–66 (shipped 2026-05-06)
 - ✅ **v1.17 Library + Material Engine** — Phases 67–68 (partial-shipped 2026-05-07; Phases 69 MAT-LINK-01 + 70 LIB-REBUILD-01 deferred to v1.19)
-- 🚧 **v1.18 Pascal Visual Parity** — Phases 71–76 (in progress) — chrome-only rewrite to emulate pascalorg/editor
-- ⏳ **v1.20 Surface Depth & Architectural Expansion** — Phases 78–81 (planned) — PBR maps, window presets, parametric product controls, columns & pillars
+- ✅ **v1.18 Pascal Visual Parity** — Phases 71–76 (shipped 2026-05-08) — chrome-only rewrite to emulate pascalorg/editor
+- 🚧 **v1.19 Material Linking & Library Rebuild** — Phases 69, 70, 77 (in progress) — finish slots on placed products + 3-tab library rebuild
 
 ---
 
@@ -161,10 +161,10 @@
 
 - [x] **Phase 71: Token Foundation (TOKEN-FOUNDATION)** — Replace Obsidian palette with Pascal's oklch tokens; Barlow + Geist fonts; 10px squircle radius; light + dark dual-mode (completed 2026-05-07)
 - [x] **Phase 72: Primitives Shelf (PRIMITIVES-SHELF)** — `cva`-driven primitives (Button / Tab / PanelSection / SegmentedControl / Switch / Slider / Tooltip / Dialog / Input / Popover) with `motion/react` animations (completed 2026-05-07)
-- [ ] **Phase 73: Sidebar Restyle (SIDEBAR-RESTYLE)** — Pascal spine-and-branches rooms tree; right sidebar becomes contextual (mounts only when something is selected)
-- [ ] **Phase 74: Toolbar Rework (TOOLBAR-REWORK)** — Floating two-row action menu at canvas-bottom-center replaces the top-left toolbar entirely
+- [x] **Phase 73: Sidebar Restyle (SIDEBAR-RESTYLE)** — Pascal spine-and-branches rooms tree; right sidebar becomes contextual (mounts only when something is selected) (completed 2026-05-08)
+- [x] **Phase 74: Toolbar Rework (TOOLBAR-REWORK)** — Floating two-row action menu at canvas-bottom-center replaces the top-left toolbar entirely (completed 2026-05-08)
 - [ ] **Phase 75: Properties + Library Restyle (PROPERTIES-LIBRARY-RESTYLE)** — MaterialPicker / ProductLibrary / RoomSettings / PropertiesPanel / Add+UploadModals adopt new tokens, primitives, and contextual mount pattern
-- [ ] **Phase 76: Modals + Welcome + Final (MODALS-WELCOME-FINAL)** — Modal/Dialog primitives finalized; WelcomeScreen + ProjectManager adopt light mode; carry-over v1.17 test cleanup; final audit pass
+- [x] **Phase 76: Modals + Welcome + Final (MODALS-WELCOME-FINAL)** — Modal/Dialog primitives finalized; WelcomeScreen + ProjectManager adopt light mode; carry-over v1.17 test cleanup; final audit pass (completed 2026-05-08)
 
 ### Phase Details
 
@@ -214,14 +214,9 @@
   3. Click empty canvas → right sidebar disappears with spring exit animation; canvas fills the freed space
   4. Click a wall / product / ceiling / custom-element / opening / stair → right sidebar slides in with spring entry showing the relevant PropertiesPanel sections
   5. Re-click empty canvas → sidebar collapses again with no driver registration loss (Phase 68 lesson: drivers live in `src/test-utils/*Drivers.ts`, survive component un-mount cleanly)
-**Plans:** 7 plans
-- [x] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
-- [x] 72-02-PLAN.md — Button primitive + tests
-- [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
-- [ ] 72-04-PLAN.md — Dialog primitive + tests
-- [ ] 72-05-PLAN.md — Remaining primitives (Tabs, SegmentedControl, Switch, Slider, Tooltip, Input, Popover)
-- [ ] 72-06-PLAN.md — Toolbar button migration (~20 sites)
-- [ ] 72-07-PLAN.md — PropertiesPanel CollapsibleSection migration (11 sites) + cleanup
+**Plans:** 2/2 plans complete
+- [x] 73-01-PLAN.md — Tree spine restyle (TreeRow.tsx) + Sidebar CollapsibleSection→PanelSection
+- [x] 73-02-PLAN.md — Contextual right panel with AnimatePresence spring slide (App.tsx)
 **UI hint:** yes
 
 #### Phase 74: Toolbar Rework — Floating Action Menu (TOOLBAR-REWORK)
@@ -235,14 +230,10 @@
   3. Click a building-block icon → tool activates and canvas cursor switches; existing keyboard shortcuts (V / W / D / N / etc. from `src/lib/shortcuts.ts`) all still work
   4. Active tool gets a darker fill ring; switching to a different tool runs the existing tool-cleanup pattern (`toolCleanupRef` from CLAUDE.md tool architecture) with zero leaks
   5. Display Mode (NORMAL/SOLO/EXPLODE) and View Mode (2D/3D/Split) render as SegmentedControl primitive instances in the bottom row; Save/Open project UI relocates to a top-bar or floating top-right element (decided during plan-phase research)
-**Plans:** 7 plans
-- [ ] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
-- [ ] 72-02-PLAN.md — Button primitive + tests
-- [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
-- [ ] 72-04-PLAN.md — Dialog primitive + tests
-- [ ] 72-05-PLAN.md — Remaining primitives (Tabs, SegmentedControl, Switch, Slider, Tooltip, Input, Popover)
-- [ ] 72-06-PLAN.md — Toolbar button migration (~20 sites)
-- [ ] 72-07-PLAN.md — PropertiesPanel CollapsibleSection migration (11 sites) + cleanup
+**Plans:** 3/3 plans complete
+- [x] 74-01-PLAN.md — FloatingToolbar glass pill (two-row tool palette)
+- [x] 74-02-PLAN.md — TopBar fixed header (project name, save status, camera presets, utilities)
+- [x] 74-03-PLAN.md — App.tsx swap + Toolbar.tsx deletion
 **UI hint:** yes
 
 #### Phase 75: Properties + Library Restyle (PROPERTIES-LIBRARY-RESTYLE)
@@ -256,14 +247,10 @@
   3. Open the ProductLibrary → cards use Pascal's pattern with Barlow names + Geist Sans metadata; GLTF Box badge top-LEFT survives the restyle
   4. RoomSettings collapsible sections use the new PanelSection primitive (spring expand/collapse, chevron rotation); inputs use the new Input primitive
   5. Custom CSS classes `glass-panel` / `accent-glow` / `cad-grid-bg` / `ghost-border` removed from MaterialPicker / ProductLibrary / RoomSettings / PropertiesPanel / WallSurfacePanel / AddProductModal / UploadTextureModal / UploadMaterialModal / MyTexturesList / LibraryCard
-**Plans:** 7 plans
-- [ ] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
-- [ ] 72-02-PLAN.md — Button primitive + tests
-- [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
-- [ ] 72-04-PLAN.md — Dialog primitive + tests
-- [ ] 72-05-PLAN.md — Remaining primitives (Tabs, SegmentedControl, Switch, Slider, Tooltip, Input, Popover)
-- [ ] 72-06-PLAN.md — Toolbar button migration (~20 sites)
-- [ ] 72-07-PLAN.md — PropertiesPanel CollapsibleSection migration (11 sites) + cleanup
+**Plans:** 3 plans
+- [ ] 75-01-PLAN.md — AddProductModal Dialog wrapping + RoomSettings Input + MaterialPicker tokens
+- [ ] 75-02-PLAN.md — ProductLibrary Tabs migration + WallSurfacePanel Switch/Input
+- [ ] 75-03-PLAN.md — PropertiesPanel + sub-components Input migration + full-phase grep audit
 **UI hint:** yes
 
 #### Phase 76: Modals + WelcomeScreen + Final (MODALS-WELCOME-FINAL)
@@ -277,7 +264,7 @@
   3. Open HelpModal, ConfirmDialog, ErrorBoundary fallback → all use the unified Dialog primitive; existing keyboard-shortcut overlay (Phase 52) preserves its 26 shortcut entries
   4. Final grep audit returns zero matches for `obsidian-` / `text-text-` / `accent-glow` / `cad-grid-bg` / `glass-panel` / `material-symbols-outlined` across `src/`
   5. The 4 v1.17 carry-over tests verified passing on the new chrome (snapshot v6 assertion, removed wallpaper "MY TEXTURES" tab, WallMesh cutaway ghost-spread audit, contextMenuActionCounts pollution); existing 800+ test suite still green
-**Plans:** 7 plans
+**Plans:** 3/3 plans complete
 - [ ] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
 - [ ] 72-02-PLAN.md — Button primitive + tests
 - [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
@@ -342,9 +329,9 @@
 - [x] 68-07-PLAN.md — Test drivers (`__driveApplyMaterial`, `__getResolvedMaterial`) + e2e Wave 0 spec GREEN + HUMAN-UAT.md + Jessica checkpoint
 **UI hint:** yes
 
-#### Phase 69: Product–Material Linking (MAT-LINK-01) — DEFERRED to v1.19
+#### Phase 69: Product–Material Linking (MAT-LINK-01) — v1.19 ACTIVE
 
-> **Status: Deferred to v1.19.** Closed early during v1.17 scoping so the finish-slot UI ships in the v1.18 Pascal Visual Parity chrome rather than be designed twice. Goal + success criteria preserved below for when v1.19 picks it up.
+> **Status: Active in v1.19.** Was deferred from v1.17 so the finish-slot UI could ship in v1.18 Pascal Visual Parity chrome. v1.18 complete — this phase is now the first target of v1.19.
 
 **Goal:** Jessica swaps the finish material on a placed product (couch fabric, faucet finish, cabinet color) without re-placing or re-uploading the object. Products carry an optional finish slot referencing a Material from the library.
 **Depends on:** Phase 67 (Material entity), Phase 68 (Material picker UI), Phase 31 (placement-instance state per D-02), Phase 56/58 (GLTF PBR material slot handling), v1.18 primitives (Phases 71-76) for the finish picker chrome
@@ -358,9 +345,9 @@
 **Plans:** TBD (v1.19)
 **UI hint:** yes
 
-#### Phase 70: Library Rebuild (LIB-REBUILD-01) — DEFERRED to v1.19
+#### Phase 70: Library Rebuild (LIB-REBUILD-01) — v1.19 ACTIVE
 
-> **Status: Deferred to v1.19.** Closed early during v1.17 scoping so the library-rebuild UI ships in the v1.18 Pascal Visual Parity chrome rather than be designed twice. Goal + success criteria preserved below for when v1.19 picks it up.
+> **Status: Active in v1.19.** Was deferred from v1.17 so the library-rebuild UI could ship in v1.18 Pascal Visual Parity chrome. v1.18 complete — this phase follows Phase 69 in v1.19.
 
 **Goal:** Sidebar library reorganizes around a top-level Materials / Assemblies / Products toggle. Each tab has its own category sub-tabs (Materials: Flooring, Wall coverings, Countertops, Paint; Products: Furniture, Plumbing fixtures, Appliances, Lighting, Curtains & blinds, Decor; Assemblies: empty placeholder).
 **Depends on:** Phase 67 (Materials live in their own store), Phase 33 (CategoryTabs precedent — superseded by v1.18 Tab primitive), Phase 14 (custom-element library precedent), v1.18 primitives (Phases 71-76) for the new tab + library chrome
@@ -372,6 +359,87 @@
   4. Assemblies tab shows a clear empty-state placeholder ("Coming soon — pre-built combos like kitchen cabinetry"), not broken UI
   5. Upload buttons are context-aware: in Materials tab → "Upload Material"; in Products tab → "Add Product"; existing upload + place flows continue to work end-to-end
 **Plans:** TBD (v1.19)
+**UI hint:** yes
+
+#### Phase 77: Test Suite Cleanup (TEST-CLEANUP-01) — v1.19 ACTIVE
+
+**Goal:** Fix v1.18 carry-over test failures that block a clean CI baseline for v1.19 execution.
+**Depends on:** v1.18 Phases 72 (Switch primitive), 73/74 (Tooltip/FloatingToolbar)
+**Requirements:** [TEST-CLEANUP-01](https://github.com/micahbank2/room-cad-renderer/issues/163), [TEST-CLEANUP-02](https://github.com/micahbank2/room-cad-renderer/issues/164)
+**Success Criteria** (what must be TRUE):
+  1. All 5 Phase-31-era test files that render PropertiesPanel or FloatingToolbar wrap their renders in `<TooltipProvider>` — the 34-test wall/snap failures from GH #163 are gone
+  2. AddProductModal tests query `getByRole("switch")` instead of `getByRole("checkbox")` — the Switch migration from v1.18 Phase 76 no longer breaks these 3 tests (GH #164)
+  3. `npm run test` passes with zero failures in the migrated test files
+**Plans:** 1/1 plans complete
+**UI hint:** no
+
+---
+
+## v1.20 — Surface Depth & Architectural Expansion 🚧
+
+**Goal:** Deepen material realism with PBR maps (AO + displacement), speed up window placement with standard-size presets, enable precise numeric sizing of placed products, and add columns/pillars as a new architectural element type.
+
+**Sequencing rationale:** PBR (tightly coupled to existing Material pipeline — all 4 requirements ship together) → Window presets (small, isolated Opening UI change) → Parametric controls (zero schema changes, pure PropertiesPanel UI over Phase 31 fields) → Columns (largest scope — new entity type mirroring Phase 60 Stair pattern, snapshot bump expected).
+
+### Phases
+
+- [ ] **Phase 78: PBR Maps (PBR-MAPS-01)** — AO + displacement map upload on Materials; 3D rendering applies all maps; Material card shows map-presence indicators
+- [ ] **Phase 79: Window Presets (WIN-PRESETS-01)** — Preset size picker when placing windows; PropertiesPanel shows selected preset post-placement
+- [ ] **Phase 80: Parametric Product Controls (PARAM-01)** — Type exact width/depth/position for placed products in PropertiesPanel; single-undo per edit
+- [ ] **Phase 81: Columns & Pillars (COL-01)** — New Column entity; round/rectangular cross-section; renders in 2D + 3D; selectable/movable/deletable
+
+### Phase Details
+
+#### Phase 78: PBR Maps (PBR-MAPS-01) — v1.20 ACTIVE
+
+**Goal:** Jessica uploads AO and displacement maps on a Material and sees dramatically richer, more tactile surfaces in 3D — grout lines pop, fabric has depth, stone looks real.
+**Depends on:** Phase 67 (Material entity with existing map slots), Phase 32 (user-texture IDB pipeline — SHA-256 dedup, downscale, upload)
+**Requirements:** PBR-01, PBR-02, PBR-03, PBR-04
+**Success Criteria** (what must be TRUE):
+  1. UploadMaterialModal / edit form has AO map and displacement map upload slots alongside the existing roughness/reflection slots
+  2. Uploaded AO map appears on `material.aoMapId`; displacement map on `material.displacementMapId` — both persist across reload
+  3. 3D mesh surfaces that use the material render with `aoMap` and `displacementMap` props — surfaces look noticeably more detailed
+  4. Material card shows small icons/dots indicating which of the 4 maps (color, roughness, AO, displacement) are loaded
+**Plans:** 1/4 plans executed
+**UI hint:** yes
+
+#### Phase 79: Window Presets (WIN-PRESETS-01) — v1.20 ACTIVE
+
+**Goal:** Placing a window is a single pick from a size list, not a manual dimension-typing exercise every time.
+**Depends on:** Phase 15 (Opening entity with widthFt/heightFt fields), Phase 30/31 (window tool + PropertiesPanel)
+**Requirements:** WIN-01, WIN-02
+**Success Criteria** (what must be TRUE):
+  1. Window tool shows a preset picker (2×3 ft, 3×4 ft, 4×5 ft, custom) before or during placement
+  2. Selecting a preset auto-fills widthFt/heightFt on the Opening — no manual typing required
+  3. After placement, PropertiesPanel shows the active preset label and allows switching to another preset or "custom"
+  4. Existing manual window placement (typing custom dimensions) continues to work unchanged
+**Plans:** TBD (v1.20)
+**UI hint:** yes
+
+#### Phase 80: Parametric Product Controls (PARAM-01) — v1.20 ACTIVE
+
+**Goal:** Jessica can type "3.5 ft wide" for a sofa and it snaps to exactly that width — no guessing from drag handles.
+**Depends on:** Phase 31 (PlacedProduct.widthFtOverride / depthFtOverride fields + applyProductOverride actions), v1.18 primitives (Input component)
+**Requirements:** PARAM-01, PARAM-02, PARAM-03
+**Success Criteria** (what must be TRUE):
+  1. PropertiesPanel for a selected placed product shows numeric inputs for Width (ft), Depth (ft), X position (ft), Y position (ft)
+  2. Typing a value and pressing Enter/blur updates the product immediately — same as drag-resizing but with an exact number
+  3. Each field edit is a single undo entry (Ctrl+Z)
+  4. Values reflect current state: if product was drag-resized, the input shows the override value; if untouched, shows the catalog default
+**Plans:** TBD (v1.20)
+**UI hint:** yes
+
+#### Phase 81: Columns & Pillars (COL-01) — v1.20 ACTIVE
+
+**Goal:** Jessica places a structural column in a room, sees it in both 2D floor plan and 3D walk-through, and can resize/reposition it like any other element.
+**Depends on:** Phase 60 (Stair entity pattern — new top-level entity, store actions, 2D + 3D rendering), Phase 67/68 (material finish slot pattern from PlacedProduct), snapshot migration pattern (v7→v8 expected)
+**Requirements:** COL-01, COL-02, COL-03
+**Success Criteria** (what must be TRUE):
+  1. Column tool in the toolbar lets Jessica place a round or rectangular column; default size matches room ceiling height; configurable diameter/width
+  2. 2D canvas shows the column footprint (circle or rectangle outline) at the correct position and scale
+  3. 3D viewport shows the column as an extruded pillar from floor to ceiling height
+  4. Column is selectable via the select tool; PropertiesPanel shows its cross-section type, diameter/width, height, and material finish; Delete key removes it
+**Plans:** TBD (v1.20)
 **UI hint:** yes
 
 ## Progress
@@ -415,84 +483,19 @@
 | 66. Per-Surface Tile-Size UI | 1/1 | Complete    | 2026-05-06 |
 | 67. Material Engine Foundation | 1/1 | Complete    | 2026-05-07 |
 | 68. Material Application System | 7/7 | Complete   | 2026-05-07 |
-| 69. Product–Material Linking | 0/0 | Deferred to v1.19   | — |
-| 70. Library Rebuild | 0/0 | Deferred to v1.19   | — |
+| 69. Product–Material Linking | 1/1 | Complete   | 2026-05-08 |
+| 70. Library Rebuild | 1/1 | Complete   | 2026-05-08 |
 | 71. Token Foundation | 7/7 | Complete   | 2026-05-07 |
-| 72. Primitives Shelf | 3/9 | In Progress|  |
-| 73. Sidebar Restyle | 0/0 | Not started   | — |
-| 74. Toolbar Rework | 0/0 | Not started   | — |
-| 75. Properties + Library Restyle | 0/0 | Not started   | — |
-| 76. Modals + Welcome + Final | 0/0 | Not started   | — |
-| 78. PBR Maps | 0/0 | Not started | — |
-| 79. Window Presets | 0/0 | Not started | — |
-| 80. Parametric Product Controls | 0/0 | Not started | — |
-| 81. Columns & Pillars | 0/0 | Not started | — |
-
-## v1.20 Surface Depth & Architectural Expansion (planned)
-
-**Goal:** Deepen realism and precision for Jessica as she moves from "does this fit" to "does this feel real." PBR maps (AO + displacement) make materials feel tactile instead of flat. Window presets give openings real-world sizing without guesswork. Parametric controls let her type exact dimensions and positions for placed furniture. Columns give her structural elements to plan around load-bearing pillars and archways in her actual home.
-
-**Sequencing rationale:** PBR maps first (extends the existing Material type + Three.js rendering pipeline — tightly coupled, ship together). Window presets second (small focused phase, builds on the existing Opening model). Parametric controls third (pure UI over already-existing data fields — fast phase, zero schema changes). Columns last (new entity type, largest scope — new store actions, 2D rendering, 3D rendering, PropertiesPanel wiring).
-
-**Source issues:** [#81](https://github.com/micahbank2/room-cad-renderer/issues/81) (PBR maps), [#20](https://github.com/micahbank2/room-cad-renderer/issues/20) (window presets), [#28](https://github.com/micahbank2/room-cad-renderer/issues/28) (parametric controls), [#19](https://github.com/micahbank2/room-cad-renderer/issues/19) (columns).
-
-### Phases
-
-- [ ] **Phase 78: PBR Maps (PBR-01 through PBR-04)** — AO + displacement map upload on materials; 3D rendering applies both maps; material card shows map-presence indicators
-- [ ] **Phase 79: Window Presets (WIN-01 through WIN-02)** — Preset size picker when placing a window; preset visible/editable in PropertiesPanel after placement
-- [ ] **Phase 80: Parametric Product Controls (PARAM-01 through PARAM-03)** — Type exact width/depth and X/Y position for placed products in PropertiesPanel; each edit is single-undo
-- [ ] **Phase 81: Columns & Pillars (COL-01 through COL-03)** — Place round or rectangular column; 2D footprint + 3D extruded pillar; selectable/movable/deletable with PropertiesPanel editing
-
-### Phase Details
-
-#### Phase 78: PBR Maps
-
-**Goal:** Jessica uploads a marble tile material and it actually looks like marble — subtle surface variation from the AO map, micro-depth from the displacement map. The material card in the library shows small badges so she can tell at a glance which maps are present without opening the upload form again.
-**Depends on:** Phase 67 (Material type with `colorMapId`/`roughnessMapId`/`reflectionMapId` — PBR-01/02 adds `aoMapId` + `displacementMapId` to the same pattern); Phase 68 (Three.js mesh materials already receive roughness map — PBR-03 adds `aoMap` + `displacementMap` props in WallMesh/FloorMesh/CeilingMesh/ProductMesh); Phase 67 UploadMaterialModal (PBR-01/02 extends existing multi-map upload UI)
-**Requirements:** PBR-01, PBR-02, PBR-03, PBR-04
-**Success Criteria** (what must be TRUE):
-  1. Jessica opens the Upload Material modal → sees two new optional upload slots labeled "AO Map" and "Displacement Map" alongside the existing Color, Roughness, and Reflection slots
-  2. After saving, re-opening the material's edit view shows the uploaded AO and displacement maps still attached
-  3. Applying a material with AO + displacement maps to a wall, floor, or ceiling in 3D renders visibly different from the same material without those maps — surface occlusion is visible in corners and displacement creates micro-texture depth
-  4. The material card in the library shows small indicator badges (e.g., "AO", "DISP") when those maps are present, so Jessica can distinguish a basic color-map material from a fully-specified PBR material at a glance
-**Plans:** TBD
-**UI hint:** yes
-
-#### Phase 79: Window Presets
-
-**Goal:** Jessica places a window on a wall and immediately sees a size picker — 2×3 ft, 3×4 ft, 4×5 ft, or custom — instead of having to remember to resize it afterward. After placement, she can still change the preset in the properties panel.
-**Depends on:** Phase 61 (`Opening` type with `type`, `widthFt`, `heightFt` — window openings already exist; WIN-01/02 adds a preset picker UI to the window tool and PropertiesPanel without changing the data model); Phase 33 / v1.18 PropertiesPanel (opening properties already surface in PropertiesPanel — WIN-02 adds preset dropdown alongside the existing numeric inputs)
-**Requirements:** WIN-01, WIN-02
-**Success Criteria** (what must be TRUE):
-  1. Activating the Window tool and clicking on a wall shows a small preset picker (2×3 / 3×4 / 4×5 / Custom) before the window is committed to the canvas
-  2. The placed window reflects the chosen preset dimensions in both the 2D floor plan and 3D rendering
-  3. Selecting an existing window in PropertiesPanel shows the same preset picker — choosing a preset updates the window dimensions with a single undo entry; choosing Custom enables free numeric input
-**Plans:** TBD
-**UI hint:** yes
-
-#### Phase 80: Parametric Product Controls
-
-**Goal:** Jessica selects a couch and types "102" into the Width field — it snaps to exactly 102 inches (8.5 ft) instead of her needing to drag a handle to approximately the right size. She can also type an exact X/Y position to align pieces precisely. Each numeric edit is a single undo.
-**Depends on:** Phase 31 (`PlacedProduct.widthFtOverride` and `depthFtOverride` already exist — PARAM-01 just needs PropertiesPanel numeric inputs that write these fields; `resolveEffectiveDims` resolver already consumes them); Phase 31 single-undo pattern (`updatePlacedProductNoHistory` already exists — PARAM-03 reuses the same history-push-then-NoHistory contract); PropertiesPanel (v1.18 restyled — PARAM-01/02 add new input sections)
-**Requirements:** PARAM-01, PARAM-02, PARAM-03
-**Success Criteria** (what must be TRUE):
-  1. Selecting a placed product in PropertiesPanel shows two numeric inputs — "Width (ft)" and "Depth (ft)" — pre-filled with the current effective dimensions; typing a new value and pressing Enter resizes the product to that exact size in both 2D and 3D
-  2. Selecting a placed product shows two numeric inputs — "X position" and "Y position" (in feet from room origin) — pre-filled with the current position; typing a new value teleports the product to that exact position
-  3. Each width, depth, X, or Y edit produces exactly one undo entry — Ctrl+Z reverts to the value before the input was focused
-**Plans:** TBD
-**UI hint:** yes
-
-#### Phase 81: Columns & Pillars
-
-**Goal:** Jessica has a load-bearing column in her living room. She places a round column in the floor plan at the right position and size, and in 3D it extrudes as a pillar at the full wall height. She can click it to select it, move it, resize it in PropertiesPanel, or delete it — just like any other element.
-**Depends on:** Phase 60 (`Stair` as precedent for a new top-level entity — COL-01 follows the same pattern: new `Column` type in `cad.ts`, new store actions, snapshot version bump); Phase 62 (measurement tool canvas layer — column footprint rendering in 2D follows the same fabric object approach); Phase 68 (material assignment in 3D — columns can accept surface materials via the same `applySurfaceMaterial` action); Phase 53 (right-click context menus — column needs `ContextMenuKind` extension, following Phase 61's D-11' lesson about non-auto-inherit wiring)
-**Requirements:** COL-01, COL-02, COL-03
-**Success Criteria** (what must be TRUE):
-  1. A "Column" tool (or placement flow) lets Jessica specify round vs rectangular, diameter or width/depth, and click to place it on the canvas
-  2. The placed column appears in 2D as its footprint shape (filled circle or rectangle) and in 3D as an extruded pillar at room wall height, rendered with the room's default surface material
-  3. Clicking the column in 2D or 3D selects it; PropertiesPanel shows shape, size, and position fields that can be edited; the column can be moved by dragging and deleted with the Delete key — all with single-undo
-**Plans:** TBD
-**UI hint:** yes
+| 72. Primitives Shelf | 3/9 | Complete   | 2026-05-08 |
+| 73. Sidebar Restyle | 2/2 | Complete   | 2026-05-08 |
+| 74. Toolbar Rework | 3/3 | Complete   | 2026-05-08 |
+| 75. Properties + Library Restyle | 3/3 | Complete   | 2026-05-08 |
+| 76. Modals + Welcome + Final | 3/3 | Complete    | 2026-05-08 |
+| 77. Test Suite Cleanup | 1/1 | Complete   | 2026-05-08 |
+| 78. PBR Maps | 1/4 | In Progress|  |
+| 79. Window Presets | TBD | v1.20 active   | — |
+| 80. Parametric Product Controls | TBD | v1.20 active   | — |
+| 81. Columns & Pillars | TBD | v1.20 active   | — |
 
 ## Backlog
 

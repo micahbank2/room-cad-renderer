@@ -28,6 +28,7 @@ import {
   migrateV3ToV4,
   migrateV4ToV5,
   migrateV5ToV6,
+  migrateV6ToV7,
 } from "@/lib/snapshotMigration";
 import type { SurfaceTarget } from "@/lib/surfaceMaterial";
 import type { PaintColor } from "@/types/paint";
@@ -91,6 +92,9 @@ interface CADState {
   // surface, with the standard history / NoHistory pair (mid-pick preview).
   applySurfaceMaterial: (target: SurfaceTarget, materialId: string | undefined) => void;
   applySurfaceMaterialNoHistory: (target: SurfaceTarget, materialId: string | undefined) => void;
+  // Phase 69 MAT-LINK-01: per-placement finish Material for box-mode products.
+  applyProductFinish: (placedId: string, materialId: string | undefined) => void;
+  applyProductFinishNoHistory: (placedId: string, materialId: string | undefined) => void;
   applySurfaceTileSize: (target: SurfaceTarget, scaleFt: number | undefined) => void;
   applySurfaceTileSizeNoHistory: (target: SurfaceTarget, scaleFt: number | undefined) => void;
   toggleWainscoting: (wallId: string, side: WallSide, enabled: boolean, heightFt?: number, color?: string, styleItemId?: string) => void;
@@ -216,7 +220,7 @@ function snapshot(state: CADState): CADSnapshot {
   const root = state as any;
   const t0 = import.meta.env.DEV ? performance.now() : 0;
   const snap: CADSnapshot = {
-    version: 6,
+    version: 7,
     rooms: structuredClone(toPlain(state.rooms)),
     activeRoomId: state.activeRoomId,
     ...(root.customElements
@@ -849,6 +853,39 @@ export const useCADStore = create<CADState>()((set) => ({
         const doc = activeDoc(s);
         if (!doc) return;
         applySurfaceTileSizeMut(doc, target, scaleFt);
+      })
+    ),
+
+  // Phase 69 MAT-LINK-01: product finish assignment. Mirrors the
+  // applySurfaceMaterial pair exactly — single pushHistory in the
+  // history variant, no-history variant for mid-pick preview if needed.
+  applyProductFinish: (placedId, materialId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const placed = doc.placedProducts[placedId];
+        if (!placed) return; // silent no-op on unknown id
+        pushHistory(s);
+        if (materialId === undefined) {
+          delete placed.finishMaterialId;
+        } else {
+          placed.finishMaterialId = materialId;
+        }
+      })
+    ),
+  applyProductFinishNoHistory: (placedId, materialId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const placed = doc.placedProducts[placedId];
+        if (!placed) return;
+        if (materialId === undefined) {
+          delete placed.finishMaterialId;
+        } else {
+          placed.finishMaterialId = materialId;
+        }
       })
     ),
 
@@ -1489,13 +1526,14 @@ export const useCADStore = create<CADState>()((set) => ({
     const migratedV4 = migrateV3ToV4(migratedV3);    // sync: v3→v4 stair seed (Phase 60)
     const migratedV5 = migrateV4ToV5(migratedV4);    // sync: v4→v5 measure/annotation seed (Phase 62)
     const migrated = await migrateV5ToV6(migratedV5); // async: v5→v6 surface Material migration (Phase 68)
+    const migratedV7 = migrateV6ToV7(migrated); // sync: v6→v7 finishMaterialId passthrough (Phase 69)
     set(
       produce((s: CADState) => {
-        s.rooms = migrated.rooms;
-        s.activeRoomId = migrated.activeRoomId;
-        (s as any).customElements = (migrated as any).customElements ?? {};
-        (s as any).customPaints = (migrated as any).customPaints ?? [];
-        (s as any).recentPaints = (migrated as any).recentPaints ?? [];
+        s.rooms = migratedV7.rooms;
+        s.activeRoomId = migratedV7.activeRoomId;
+        (s as any).customElements = (migratedV7 as any).customElements ?? {};
+        (s as any).customPaints = (migratedV7 as any).customPaints ?? [];
+        (s as any).recentPaints = (migratedV7 as any).recentPaints ?? [];
         s.past = [];
         s.future = [];
       })

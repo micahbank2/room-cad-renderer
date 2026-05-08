@@ -1,7 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "./App";
+import HelpPage from "./components/HelpPage";
 import "./index.css";
 import { installTreeDrivers } from "./test-utils/treeDrivers";
 import { installDisplayModeDrivers } from "./test-utils/displayModeDrivers";
@@ -15,6 +16,7 @@ import { installMeasureDrivers } from "./test-utils/measureDrivers";
 import { installCeilingDrivers } from "./test-utils/ceilingDrivers";
 import { installTextureDrivers } from "./test-utils/textureDrivers";
 import { installThemeDrivers } from "./test-utils/themeDrivers";
+import { installProductFinishDrivers } from "./test-utils/productFinishDrivers";
 
 // Phase 46: install tree test drivers (gated by MODE==="test", production no-op)
 installTreeDrivers();
@@ -41,11 +43,18 @@ installCeilingDrivers();
 installTextureDrivers();
 // Phase 71: install theme test driver (gated by MODE==="test", production no-op)
 installThemeDrivers();
+// Phase 69: install product finish test driver (gated by MODE==="test", production no-op)
+installProductFinishDrivers();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <Routes>
+        {/* Standalone bookmarkable help center — /help-center */}
+        <Route path="/help-center" element={<HelpPage />} />
+        {/* Main app — handles all other paths (including /help/* modal sync) */}
+        <Route path="/*" element={<App />} />
+      </Routes>
     </BrowserRouter>
   </React.StrictMode>
 );

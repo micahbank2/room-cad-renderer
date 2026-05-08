@@ -22,6 +22,7 @@ import WallSurfacePanel from "./WallSurfacePanel";
 import { MaterialPicker } from "./MaterialPicker";
 import { PanelSection } from "@/components/ui/PanelSection";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { Camera, CameraOff } from "lucide-react";
 import { OpeningsSection } from "@/components/PropertiesPanel.OpeningSection";
 
@@ -450,6 +451,23 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
                     )}
                   </div>
                 </PanelSection>
+                {/* Phase 69 MAT-LINK-01: per-placement finish picker. */}
+                <PanelSection id="finish" label="Finish">
+                  <div className="space-y-1.5">
+                    {product.gltfId && (
+                      <p className="font-sans text-[11px] text-muted-foreground/60 italic mt-1">
+                        GLTF products use their built-in materials. Finish picker has no visual effect on this product (deferred to v1.20).
+                      </p>
+                    )}
+                    <MaterialPicker
+                      surface="customElementFace"
+                      value={pp.finishMaterialId}
+                      onChange={(materialId) =>
+                        useCADStore.getState().applyProductFinish(pp.id, materialId)
+                      }
+                    />
+                  </div>
+                </PanelSection>
               </>
             )}
             <PanelSection id="position" label="Position">
@@ -480,7 +498,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
                 </span>
                 <div className="grid grid-cols-3 gap-1">
                   {(["width", "depth", "height"] as const).map((axis) => (
-                    <input
+                    <Input
                       key={axis}
                       type="number"
                       step={0.25}
@@ -491,7 +509,7 @@ export default function PropertiesPanel({ productLibrary, viewMode }: Props) {
                         const v = parseFloat(e.target.value);
                         if (v > 0) updateProduct(libProduct.id, { [axis]: v });
                       }}
-                      className="w-full px-1.5 py-1 text-[11px] font-sans bg-background border border-border/60"
+                      className="h-7 text-xs px-1.5"
                     />
                   ))}
                 </div>
@@ -752,7 +770,7 @@ function LabelOverrideInput({
       <label className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">
         LABEL_OVERRIDE
       </label>
-      <input
+      <Input
         ref={inputRef}
         type="text"
         value={draft}
@@ -774,7 +792,7 @@ function LabelOverrideInput({
           }
         }}
         onBlur={commit}
-        className="px-2 py-1 font-sans text-[11px] text-foreground bg-background border border-border/60 rounded-smooth-md"
+        className="h-7 text-xs"
       />
     </div>
   );
@@ -843,7 +861,7 @@ function CeilingDimInput({
       >
         {label}
       </label>
-      <input
+      <Input
         id={`ceiling-dim-${axis}-${ceiling.id}`}
         type="text"
         aria-label={label}
@@ -864,7 +882,7 @@ function CeilingDimInput({
           }
         }}
         onBlur={commit}
-        className="w-20 px-1 py-0.5 text-right font-sans text-[11px] text-foreground bg-background border border-ring rounded-smooth-md outline-none"
+        className="w-20 h-7 text-xs text-right"
       />
     </div>
   );
@@ -929,7 +947,7 @@ function EditableRow({
     return (
       <div className="flex justify-between items-center">
         <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">{label}</span>
-        <input
+        <Input
           autoFocus
           type={parser ? "text" : "number"}
           step={step}
@@ -941,7 +959,7 @@ function EditableRow({
             if (e.key === "Enter") commit();
             if (e.key === "Escape") setEditing(false);
           }}
-          className="w-20 px-1 py-0.5 text-right font-sans text-[11px] text-foreground bg-background border border-ring rounded-smooth-md outline-none"
+          className="w-20 h-7 text-xs text-right"
         />
       </div>
     );

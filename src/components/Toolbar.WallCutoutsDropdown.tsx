@@ -15,6 +15,8 @@ interface Props {
   anchorRef: RefObject<HTMLButtonElement>;
   onClose: () => void;
   onPick: (kind: "archway" | "passthrough" | "niche") => void;
+  /** direction="up" opens the dropdown upward from the anchor (for bottom-of-screen triggers). Default "down". */
+  direction?: "up" | "down";
 }
 
 const ITEMS: Array<{
@@ -27,19 +29,23 @@ const ITEMS: Array<{
   { kind: "niche", label: "Niche", icon: "lucide-frame" },
 ];
 
-export function WallCutoutsDropdown({ anchorRef, onClose, onPick }: Props) {
+export function WallCutoutsDropdown({ anchorRef, onClose, onPick, direction = "down" }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
   const [opacity, setOpacity] = useState(0);
   const reducedMotion = useReducedMotion();
 
-  // Position immediately below the anchor button.
+  // Position relative to the anchor button. direction="up" grows upward.
   useLayoutEffect(() => {
     const el = anchorRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
-    setPos({ top: rect.bottom + 4, left: rect.left });
-  }, [anchorRef]);
+    if (direction === "up") {
+      setPos({ top: rect.top - 4, left: rect.left });
+    } else {
+      setPos({ top: rect.bottom + 4, left: rect.left });
+    }
+  }, [anchorRef, direction]);
 
   // Fade-in animation, snap if reduced-motion.
   useEffect(() => {
@@ -93,6 +99,7 @@ export function WallCutoutsDropdown({ anchorRef, onClose, onPick }: Props) {
         opacity,
         transition: reducedMotion ? "none" : "opacity 80ms ease-out",
         zIndex: 9999,
+        transform: direction === "up" ? "translateY(-100%)" : undefined,
       }}
       onKeyDown={(e) => {
         if (e.key === "Escape") {

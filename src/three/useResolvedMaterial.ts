@@ -24,7 +24,7 @@ import { useUserTexture } from "@/hooks/useUserTexture";
 export interface ResolvedSurfaceMaterialWithTextures
   extends Omit<
     ResolvedSurfaceMaterial,
-    "colorMapId" | "roughnessMapId" | "reflectionMapId"
+    "colorMapId" | "roughnessMapId" | "reflectionMapId" | "aoMapId" | "displacementMapId"
   > {
   /** Resolved THREE.Texture for the color map (null while loading or orphan). */
   colorMap?: THREE.Texture | null;
@@ -32,6 +32,10 @@ export interface ResolvedSurfaceMaterialWithTextures
   roughnessMap?: THREE.Texture | null;
   /** Resolved THREE.Texture for the reflection map (null while loading or orphan). */
   reflectionMap?: THREE.Texture | null;
+  /** Resolved THREE.Texture for the AO map (null while loading or orphan). Phase 78 PBR-03. */
+  aoMap?: THREE.Texture | null;
+  /** Resolved THREE.Texture for the displacement map (null while loading or orphan). Phase 78 PBR-03. */
+  displacementMap?: THREE.Texture | null;
 }
 
 /**
@@ -64,6 +68,8 @@ export function useResolvedMaterial(
   const colorMap = useUserTexture(resolved?.colorMapId);
   const roughnessMap = useUserTexture(resolved?.roughnessMapId);
   const reflectionMap = useUserTexture(resolved?.reflectionMapId);
+  const aoMap = useUserTexture(resolved?.aoMapId);
+  const displacementMap = useUserTexture(resolved?.displacementMapId);
 
   // Apply tile-size repeat once textures resolve. Effect re-runs whenever the
   // texture instance changes (e.g. orphan → resolved) or the surface dims do.
@@ -93,11 +99,25 @@ export function useResolvedMaterial(
       reflectionMap.repeat.set(repeatX, repeatY);
       reflectionMap.needsUpdate = true;
     }
+    if (aoMap) {
+      aoMap.wrapS = THREE.RepeatWrapping;
+      aoMap.wrapT = THREE.RepeatWrapping;
+      aoMap.repeat.set(repeatX, repeatY);
+      aoMap.needsUpdate = true;
+    }
+    if (displacementMap) {
+      displacementMap.wrapS = THREE.RepeatWrapping;
+      displacementMap.wrapT = THREE.RepeatWrapping;
+      displacementMap.repeat.set(repeatX, repeatY);
+      displacementMap.needsUpdate = true;
+    }
   }, [
     resolved,
     colorMap,
     roughnessMap,
     reflectionMap,
+    aoMap,
+    displacementMap,
     surfaceWidthFt,
     surfaceHeightFt,
     tileSizeFt,
@@ -116,5 +136,7 @@ export function useResolvedMaterial(
     colorMap,
     roughnessMap,
     reflectionMap,
+    aoMap,
+    displacementMap,
   };
 }
