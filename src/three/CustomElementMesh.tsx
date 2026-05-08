@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import type { ThreeEvent } from "@react-three/fiber";
 import type { CustomElement, PlacedCustomElement } from "@/types/cad";
 import type { FaceDirection } from "@/types/material";
@@ -82,6 +83,9 @@ function FaceMaterial({
     );
   }
   if (resolved?.colorMap) {
+    // Phase 78 PBR-03: aoMap + displacementMap props on per-face material.
+    // uv2 is set on the shared boxGeometry via ref callback in CustomElementMesh.
+    // displacementScale=0.05 prevents geometry explosion (RESEARCH Pitfall 2).
     return (
       <meshStandardMaterial
         attach={attach}
@@ -91,6 +95,10 @@ function FaceMaterial({
         map={resolved.colorMap}
         roughnessMap={resolved.roughnessMap ?? undefined}
         metalnessMap={resolved.reflectionMap ?? undefined}
+        aoMap={resolved.aoMap ?? undefined}
+        aoMapIntensity={1}
+        displacementMap={resolved.displacementMap ?? undefined}
+        displacementScale={0.05}
       />
     );
   }
@@ -157,7 +165,18 @@ export default function CustomElementMesh({ placed, element, isSelected }: Props
       onPointerUp={handlePointerUp}
       onContextMenu={handleContextMenu}
     >
-      <boxGeometry args={[w, h, d]} />
+      {/* Phase 78 PBR-03: uv2 setAttribute for aoMap sampler — Three.js reads
+          aoMap from uv2 channel, not uv (RESEARCH Pitfall 1). Guard prevents
+          double-write. Per-face FaceMaterial components bind aoMap/displacementMap. */}
+      <boxGeometry
+        ref={(geo) => {
+          if (geo && !geo.attributes.uv2) {
+            const uv = geo.attributes.uv as THREE.BufferAttribute | undefined;
+            if (uv) geo.setAttribute('uv2', new THREE.BufferAttribute(uv.array.slice(), 2));
+          }
+        }}
+        args={[w, h, d]}
+      />
       {FACE_ORDER.map((face, idx) => (
         <FaceMaterial
           key={face}
