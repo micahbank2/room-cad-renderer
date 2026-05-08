@@ -48,13 +48,22 @@ Last activity: 2026-05-08 — Milestone v1.20 started
 
 (v1.19 — pending first phase execution)
 
-## v1.19 Roadmap
+## v1.19 Roadmap (Complete)
 
 | Phase | Requirement | Goal | Status |
 |-------|-------------|------|--------|
 | 69 | MAT-LINK-01 | Finish slot on placed products — swap material without re-placing | ✅ Complete |
 | 70 | LIB-REBUILD-01 | Library 3-tab rebuild: Materials / Products / Assemblies | ✅ Complete |
 | 77 | TEST-CLEANUP-01 | Fix v1.18 carry-over test failures (TooltipProvider, Switch role) | ✅ Complete |
+
+## v1.20 Roadmap
+
+| Phase | Requirement | Goal | Status |
+|-------|-------------|------|--------|
+| 78 | PBR-01–04 | AO + displacement map upload; 3D rendering; card indicators | Pending |
+| 79 | WIN-01–02 | Window preset size picker; PropertiesPanel post-placement | Pending |
+| 80 | PARAM-01–03 | Type exact width/depth/position for placed products | Pending |
+| 81 | COL-01–03 | Columns & pillars — new entity, 2D + 3D, select/edit | Pending |
 
 ## Recent Milestones
 
