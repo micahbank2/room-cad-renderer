@@ -40,7 +40,7 @@ export interface UseMaterialsResult {
   update: (
     id: string,
     changes: Partial<
-      Pick<Material, "name" | "tileSizeFt" | "brand" | "sku" | "cost" | "leadTime">
+      Pick<Material, "name" | "tileSizeFt" | "brand" | "sku" | "cost" | "leadTime" | "category">
     >,
   ) => Promise<void>;
   /** Hard-delete a Material entry. UserTexture refs are NOT cascade-deleted

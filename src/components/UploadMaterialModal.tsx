@@ -34,6 +34,7 @@ import {
   ProcessTextureError,
 } from "@/lib/processTextureFile";
 import type { Material } from "@/types/material";
+import { MATERIAL_CATEGORIES } from "@/types/material";
 
 // ---- Locked copy (UI-SPEC §1 Material Copywriting Contract — D-07/D-08/D-39) --
 const COPY = {
@@ -114,6 +115,7 @@ export function UploadMaterialModal(
   const [sku, setSku] = useState(() => existing?.sku ?? "");
   const [cost, setCost] = useState(() => existing?.cost ?? "");
   const [leadTime, setLeadTime] = useState(() => existing?.leadTime ?? "");
+  const [category, setCategory] = useState(() => existing?.category ?? "");
 
   const [colorMap, setColorMap] = useState<ProcessedMap | null>(null);
   const [roughnessMap, setRoughnessMap] = useState<ProcessedMap | null>(null);
@@ -140,6 +142,7 @@ export function UploadMaterialModal(
     setSku(existing?.sku ?? "");
     setCost(existing?.cost ?? "");
     setLeadTime(existing?.leadTime ?? "");
+    setCategory(existing?.category ?? "");
     setNameError(null);
     setTileSizeError(null);
     setColorError(null);
@@ -286,6 +289,7 @@ export function UploadMaterialModal(
           sku: sku.trim() || undefined,
           cost: cost.trim() || undefined,
           leadTime: leadTime.trim() || undefined,
+          category: category.trim() || undefined,
           colorFile: colorMap.file,
           roughnessFile: roughnessMap?.file,
           reflectionFile: reflectionMap?.file,
@@ -307,6 +311,7 @@ export function UploadMaterialModal(
           sku: sku.trim() || undefined,
           cost: cost.trim() || undefined,
           leadTime: leadTime.trim() || undefined,
+          category: category.trim() || undefined,
         });
         toastSuccess(COPY.toastSaved);
         onSaved?.(existing.id);
@@ -326,6 +331,7 @@ export function UploadMaterialModal(
     sku,
     cost,
     leadTime,
+    category,
     save,
     update,
     onSaved,
@@ -430,6 +436,32 @@ export function UploadMaterialModal(
             {nameError && (
               <p className="font-sans text-sm text-error">{nameError}</p>
             )}
+          </div>
+
+          {/* CATEGORY (optional) */}
+          <div className="flex flex-col gap-1">
+            <label
+              htmlFor="mat-category"
+              className="font-sans text-sm font-medium uppercase tracking-wide text-muted-foreground/80"
+            >
+              CATEGORY
+              <span className="ml-2 font-sans text-sm text-muted-foreground/60 tracking-widest normal-case">
+                optional
+              </span>
+            </label>
+            <select
+              id="mat-category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="bg-card border border-border/50 rounded-smooth-md px-2 py-1 text-sm font-sans text-foreground w-full"
+            >
+              <option value="">No category</option>
+              {MATERIAL_CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* TILE_SIZE */}
