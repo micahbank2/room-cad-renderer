@@ -2,33 +2,33 @@
 gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
-status: Defining requirements
-last_updated: "2026-05-08T19:43:52.346Z"
-last_activity: 2026-05-08 — Milestone v1.19 started
+status: Complete
+last_updated: "2026-05-08T20:30:00.000Z"
+last_activity: 2026-05-08 — v1.19 shipped (all 3 phases complete)
 progress:
   total_phases: 16
-  completed_phases: 10
+  completed_phases: 13
   total_plans: 38
-  completed_plans: 35
+  completed_plans: 38
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-08 — v1.18 Pascal Visual Parity complete; v1.19 Material Linking & Library Rebuild opened; Phases 69+70+77)
+See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Library Rebuild complete; Phases 69+70+77 all shipped)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** v1.19 — planning Phase 69 (finish swapping on placed products)
+**Current focus:** v1.19 complete — ready for v1.20
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: —
 Plan: —
-Milestone: v1.19 Material Linking & Library Rebuild
-Phases: 3 (69, 70, 77) — 0 complete
-Status: Defining requirements
-Last activity: 2026-05-08 — Milestone v1.19 started
+Milestone: v1.19 Material Linking & Library Rebuild — **COMPLETE**
+Phases: 3 (69 ✅, 70 ✅, 77 ✅) — all complete
+Status: Complete
+Last activity: 2026-05-08 — Phase 70 (Library Rebuild) merged, v1.19 milestone closed
 
 ## Decisions
 
@@ -52,12 +52,13 @@ Last activity: 2026-05-08 — Milestone v1.19 started
 
 | Phase | Requirement | Goal | Status |
 |-------|-------------|------|--------|
-| 69 | MAT-LINK-01 | Finish slot on placed products — swap material without re-placing | Pending |
-| 70 | LIB-REBUILD-01 | Library 3-tab rebuild: Materials / Products / Assemblies | Pending |
-| 77 | TEST-CLEANUP-01 | Fix v1.18 carry-over test failures (TooltipProvider, Switch role) | Pending |
+| 69 | MAT-LINK-01 | Finish slot on placed products — swap material without re-placing | ✅ Complete |
+| 70 | LIB-REBUILD-01 | Library 3-tab rebuild: Materials / Products / Assemblies | ✅ Complete |
+| 77 | TEST-CLEANUP-01 | Fix v1.18 carry-over test failures (TooltipProvider, Switch role) | ✅ Complete |
 
 ## Recent Milestones
 
+- **v1.19 Material Linking & Library Rebuild** — shipped 2026-05-08 (3 phases: 69+70+77, all complete)
 - **v1.18 Pascal Visual Parity** — shipped 2026-05-08 (6 phases: 71-76, audit `passed`)
 - **v1.17 Library + Material Engine** — partial-shipped 2026-05-07 (2/4 phases — 67+68; 69+70 deferred to v1.19)
 - **v1.16 Maintenance Pass** — shipped 2026-05-06 (4 phases, audit `passed-with-notes`)
@@ -75,4 +76,4 @@ Last activity: 2026-05-08 — Milestone v1.19 started
 
 ## Next Step
 
-Run `/gsd:plan-phase 69` to plan MAT-LINK-01. ROADMAP.md Phase 69 section has the full success criteria. No separate research pass needed — Phase 67+68 context + this STATE.md are sufficient.
+v1.19 is complete. Run `/gsd:new-milestone` to define v1.20.
