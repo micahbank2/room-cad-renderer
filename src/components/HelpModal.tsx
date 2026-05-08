@@ -8,6 +8,7 @@ import {
 } from "@/components/help/helpContent";
 import HelpSearch from "@/components/help/HelpSearch";
 import { useOnboardingStore } from "@/stores/onboardingStore";
+import { Dialog, DialogContent } from "@/components/ui";
 
 export default function HelpModal() {
   const showHelp = useUIStore((s) => s.showHelp);
@@ -48,20 +49,10 @@ export default function HelpModal() {
     if (!showHelp) setQuery("");
   }, [showHelp]);
 
-  if (!showHelp) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-        onClick={closeHelp}
-      />
-
-      {/* Modal */}
-      <div
-        className="relative w-[900px] h-[640px] max-w-[95vw] max-h-[90vh] bg-popover border border-border/60 rounded-smooth-md shadow-2xl flex flex-col overflow-hidden"
-        role="dialog"
+    <Dialog open={showHelp} onOpenChange={(open) => { if (!open) closeHelp(); }}>
+      <DialogContent
+        className="p-0 w-[900px] max-w-[95vw] h-[640px] max-h-[90vh] flex flex-col overflow-hidden"
         aria-label="Help and documentation"
       >
         {/* Header */}
@@ -137,8 +128,8 @@ export default function HelpModal() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
