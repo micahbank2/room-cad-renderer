@@ -163,7 +163,7 @@
 - [x] **Phase 73: Sidebar Restyle (SIDEBAR-RESTYLE)** — Pascal spine-and-branches rooms tree; right sidebar becomes contextual (mounts only when something is selected) (completed 2026-05-08)
 - [x] **Phase 74: Toolbar Rework (TOOLBAR-REWORK)** — Floating two-row action menu at canvas-bottom-center replaces the top-left toolbar entirely (completed 2026-05-08)
 - [ ] **Phase 75: Properties + Library Restyle (PROPERTIES-LIBRARY-RESTYLE)** — MaterialPicker / ProductLibrary / RoomSettings / PropertiesPanel / Add+UploadModals adopt new tokens, primitives, and contextual mount pattern
-- [ ] **Phase 76: Modals + Welcome + Final (MODALS-WELCOME-FINAL)** — Modal/Dialog primitives finalized; WelcomeScreen + ProjectManager adopt light mode; carry-over v1.17 test cleanup; final audit pass
+- [x] **Phase 76: Modals + Welcome + Final (MODALS-WELCOME-FINAL)** — Modal/Dialog primitives finalized; WelcomeScreen + ProjectManager adopt light mode; carry-over v1.17 test cleanup; final audit pass (completed 2026-05-08)
 
 ### Phase Details
 
@@ -263,7 +263,7 @@
   3. Open HelpModal, ConfirmDialog, ErrorBoundary fallback → all use the unified Dialog primitive; existing keyboard-shortcut overlay (Phase 52) preserves its 26 shortcut entries
   4. Final grep audit returns zero matches for `obsidian-` / `text-text-` / `accent-glow` / `cad-grid-bg` / `glass-panel` / `material-symbols-outlined` across `src/`
   5. The 4 v1.17 carry-over tests verified passing on the new chrome (snapshot v6 assertion, removed wallpaper "MY TEXTURES" tab, WallMesh cutaway ghost-spread audit, contextMenuActionCounts pollution); existing 800+ test suite still green
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 - [ ] 72-01-PLAN.md — Install deps + cn.ts + motion.ts + barrel skeleton
 - [ ] 72-02-PLAN.md — Button primitive + tests
 - [ ] 72-03-PLAN.md — PanelSection primitive + test driver + tests
@@ -408,7 +408,7 @@
 | 73. Sidebar Restyle | 2/2 | Complete   | 2026-05-08 |
 | 74. Toolbar Rework | 3/3 | Complete   | 2026-05-08 |
 | 75. Properties + Library Restyle | 0/0 | Not started   | — |
-| 76. Modals + Welcome + Final | 0/0 | Not started   | — |
+| 76. Modals + Welcome + Final | 2/3 | Complete    | 2026-05-08 |
 
 ## Backlog
 

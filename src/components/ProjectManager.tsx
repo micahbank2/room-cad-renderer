@@ -64,7 +64,7 @@ export default function ProjectManager() {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="light space-y-3">
       <h3 className="font-sans text-base font-medium text-muted-foreground">
         Project
       </h3>
@@ -81,13 +81,13 @@ export default function ProjectManager() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex-1 py-1.5 rounded bg-cad-accent text-white text-xs font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="flex-1 py-1.5 rounded bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {saving ? "Saving..." : "Save"}
         </button>
         <button
           onClick={handleNew}
-          className="px-3 py-1.5 rounded bg-gray-100 text-gray-600 text-xs font-medium hover:bg-gray-200 transition-colors"
+          className="px-3 py-1.5 rounded bg-muted text-muted-foreground text-xs font-medium hover:bg-muted/80 transition-colors"
         >
           New
         </button>
@@ -100,28 +100,28 @@ export default function ProjectManager() {
               key={p.id}
               className={`flex items-center justify-between p-1.5 rounded text-xs border transition-colors ${
                 currentId === p.id
-                  ? "border-cad-accent bg-blue-50"
-                  : "border-gray-100 hover:border-gray-200"
+                  ? "border-ring bg-accent/10"
+                  : "border-border hover:border-border/60"
               }`}
             >
               <div className="min-w-0 flex-1">
-                <div className="font-medium text-gray-700 truncate">
+                <div className="font-sans font-medium text-foreground truncate">
                   {p.name}
                 </div>
-                <div className="text-[10px] text-gray-400">
+                <div className="font-sans text-[10px] text-muted-foreground">
                   {new Date(p.updatedAt).toLocaleDateString()}
                 </div>
               </div>
               <div className="flex gap-1 ml-2">
                 <button
                   onClick={() => handleLoad(p.id)}
-                  className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 hover:bg-gray-200 text-[10px]"
+                  className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground hover:bg-muted/80 text-[10px]"
                 >
                   Load
                 </button>
                 <button
                   onClick={() => handleDelete(p.id)}
-                  className="px-1.5 py-0.5 rounded bg-red-50 text-red-500 hover:bg-red-100 text-[10px]"
+                  className="px-1.5 py-0.5 rounded bg-destructive/10 text-destructive hover:bg-destructive/20 text-[10px]"
                 >
                   ×
                 </button>

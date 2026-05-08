@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.18
 milestone_name: Pascal Visual Parity
-status: completed
-last_updated: "2026-05-08T03:43:59.407Z"
+status: executing
+last_updated: "2026-05-08T13:26:43.588Z"
 last_activity: 2026-05-08
 progress:
   total_phases: 6
@@ -19,14 +19,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-07 — v1.17 partial-shipped 67+68; v1.18 Pascal Visual Parity opened; Phases 69+70 deferred to v1.19)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 71 — Token Foundation
+**Current focus:** Phase 76 — Modals + WelcomeScreen + Final
 
 ## Current Position
 
-Phase: 76 (Modals + Welcome + Final) — NEXT
+Phase: 76
+Plan: Not started
 Milestone: v1.18 Pascal Visual Parity
 Phases: 6 (71, 72, 73, 74, 75, 76) — 5 complete (71, 72, 73, 74, 75)
-Status: Phase 75 complete — ready for Phase 76
+Status: Ready to execute
 Last activity: 2026-05-08
 
 ## Decisions
@@ -54,6 +55,8 @@ Last activity: 2026-05-08
 - [Phase 72-primitives-shelf]: Tabs uses useId() for stable layoutId namespacing to prevent cross-instance pill animation leakage
 - [Phase 72-primitives-shelf]: Slider uses native accentColor CSS property instead of appearance-none custom thumb for simplicity
 - [Phase 74-toolbar-rework-floating-action-menu-toolbar-rework]: viewMode accepted as prop since App.tsx owns viewMode state
+- [Phase 76-01]: D-A4 implemented: .light CSS class overrides .dark ancestor for WelcomeScreen + ProjectManager light-mode surfaces
+- [Phase 76]: HelpModal: Dialog open prop controls visibility — early-return guard removed; Radix handles ARIA
 
 ## Performance Metrics
 
@@ -80,6 +83,8 @@ Last activity: 2026-05-08
 | Phase 72-primitives-shelf P05 | 12 | 2 tasks | 9 files |
 | Phase 73-sidebar-restyle-sidebar-restyle P01 | 5 | 2 tasks | 2 files |
 | Phase 74-toolbar-rework-floating-action-menu-toolbar-rework P01 | 12 | 2 tasks | 2 files |
+| Phase 76-modals-welcomescreen-final-modals-welcome-final P01 | 5 | 3 tasks | 3 files |
+| Phase 76 P02 | 5 | 2 tasks | 2 files |
 
 ## Recent Milestones
 

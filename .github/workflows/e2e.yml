@@ -14,17 +14,19 @@
 # parallel job via matrix. Halves wall-clock for the regression sweep —
 # previous 35-min single-job runs now finish in ~10-12 min per shard.
 #
-# v1.18 SHARD SPLIT (post-Phase 75, suite > 115 tests):
-# pull_request: chromium-dev only (no build step, ~12-15 min, fits in timeout)
-# push to main: both shards (full regression including preview build)
-# chromium-preview requires a full `vite build` before the test run, which adds
-# 3-5 min on top of serial test execution and pushes PRs past the timeout ceiling.
-# Running it only on main-merges catches regressions without blocking PR iteration.
+# v1.18 POST-MERGE GATE (post-Phase 76, suite > 115 tests):
+# E2E no longer runs on pull_request — the suite takes 45-60 min serially
+# (workers:1 required by texture-cache singletons) and cannot reliably fit
+# in any GitHub Actions job timeout. PRs are gated by vitest (800+ unit tests)
+# which runs in ~30s. E2E runs on push to main as a post-merge safety net.
+#
+# If E2E fails on main after a merge: create a fix branch immediately and
+# treat it as a P1 regression (the verifier agent + vitest should have caught
+# most issues before merge, but texture/3D pipeline regressions need E2E).
 
 name: E2E Regression Harness
 
 on:
-  pull_request:
   push:
     branches:
       - main
@@ -32,14 +34,12 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
     strategy:
-      # Don't cancel the other shard if one fails — we want to see both projects' results.
+      # Don't cancel the other shard if one fails — we want to see both results.
       fail-fast: false
       matrix:
-        # On pull_request: only chromium-dev (fast, no build required).
-        # On push to main: both shards for full regression coverage.
-        project: ${{ github.event_name == 'push' && fromJSON('["chromium-dev", "chromium-preview"]') || fromJSON('["chromium-dev"]') }}
+        project: [chromium-dev, chromium-preview]
     name: e2e (${{ matrix.project }})
     steps:
       - uses: actions/checkout@v4
