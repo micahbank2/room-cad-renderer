@@ -46,6 +46,7 @@ vi.mock("@/lib/serialization", () => ({
 }));
 
 import App from "@/App";
+import { TooltipProvider } from "@/components/ui";
 import { useCADStore, resetCADStoreForTests } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 
@@ -110,7 +111,11 @@ describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
   beforeEach(() => seed());
 
   it("renders an input with placeholder = uppercase catalog name (D-11) and maxLength=40 (D-12)", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     // Use placeholder lookup — Plan 31-03 input uses placeholder = "FRIDGE"
     const input = await screen.findByPlaceholderText(/FRIDGE/i);
     expect(input).toBeDefined();
@@ -118,7 +123,11 @@ describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
   });
 
   it("D-09 live preview: each keystroke updates labelOverride immediately (no debounce)", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     const input = await screen.findByPlaceholderText(/FRIDGE/i);
     const user = userEvent.setup();
 
@@ -130,7 +139,11 @@ describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
   });
 
   it("D-09 live preview does NOT push history per keystroke", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     const input = await screen.findByPlaceholderText(/FRIDGE/i);
     const before = useCADStore.getState().past.length;
     const user = userEvent.setup();
@@ -140,7 +153,11 @@ describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
   });
 
   it("D-10 commit on Enter writes exactly 1 history entry over the session", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await vi.waitFor(() => expect(window.__driveLabelOverride).toBeDefined(), { timeout: 2000 });
     const before = useCADStore.getState().past.length;
     await act(async () => {
@@ -151,7 +168,11 @@ describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
   });
 
   it("D-10 commit on blur writes exactly 1 history entry over the session", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await vi.waitFor(() => expect(window.__driveLabelOverride).toBeDefined(), { timeout: 2000 });
     const before = useCADStore.getState().past.length;
     await act(async () => {
@@ -162,7 +183,11 @@ describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
 
   it("D-11 empty string commit reverts labelOverride to undefined (catalog name shown)", async () => {
     seed({ labelOverride: "Old" });
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await vi.waitFor(() => expect(window.__driveLabelOverride).toBeDefined(), { timeout: 2000 });
     await act(async () => {
       window.__driveLabelOverride!.typeAndCommit(PCE_ID, "", "enter");
@@ -172,7 +197,11 @@ describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
 
   it("Escape cancels live-preview, reverts to pre-edit value (mirror Phase 29)", async () => {
     seed({ labelOverride: "Original" });
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     const input = await screen.findByPlaceholderText(/FRIDGE/i);
     const user = userEvent.setup();
     await user.clear(input);
@@ -183,7 +212,11 @@ describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
 
   it("D-14 fabricSync renders override?.toUpperCase() at the label site", async () => {
     seed({ labelOverride: "Mini Fridge" });
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await vi.waitFor(() => expect(window.__getCustomElementLabel).toBeDefined(), { timeout: 2000 });
     const labelText = window.__getCustomElementLabel!(PCE_ID);
     expect(labelText).toBe("MINI FRIDGE");

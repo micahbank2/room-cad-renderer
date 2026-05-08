@@ -16,6 +16,7 @@ import { installMeasureDrivers } from "./test-utils/measureDrivers";
 import { installCeilingDrivers } from "./test-utils/ceilingDrivers";
 import { installTextureDrivers } from "./test-utils/textureDrivers";
 import { installThemeDrivers } from "./test-utils/themeDrivers";
+import { installProductFinishDrivers } from "./test-utils/productFinishDrivers";
 
 // Phase 46: install tree test drivers (gated by MODE==="test", production no-op)
 installTreeDrivers();
@@ -42,6 +43,8 @@ installCeilingDrivers();
 installTextureDrivers();
 // Phase 71: install theme test driver (gated by MODE==="test", production no-op)
 installThemeDrivers();
+// Phase 69: install product finish test driver (gated by MODE==="test", production no-op)
+installProductFinishDrivers();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

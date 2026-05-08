@@ -21,7 +21,8 @@
 - ✅ **v1.15 Architectural Toolbar Expansion** — Phases 59–62 (shipped 2026-05-06)
 - ✅ **v1.16 Maintenance Pass** — Phases 63–66 (shipped 2026-05-06)
 - ✅ **v1.17 Library + Material Engine** — Phases 67–68 (partial-shipped 2026-05-07; Phases 69 MAT-LINK-01 + 70 LIB-REBUILD-01 deferred to v1.19)
-- 🚧 **v1.18 Pascal Visual Parity** — Phases 71–76 (in progress) — chrome-only rewrite to emulate pascalorg/editor
+- ✅ **v1.18 Pascal Visual Parity** — Phases 71–76 (shipped 2026-05-08) — chrome-only rewrite to emulate pascalorg/editor
+- 🚧 **v1.19 Material Linking & Library Rebuild** — Phases 69, 70, 77 (in progress) — finish slots on placed products + 3-tab library rebuild
 
 ---
 
@@ -328,9 +329,9 @@
 - [x] 68-07-PLAN.md — Test drivers (`__driveApplyMaterial`, `__getResolvedMaterial`) + e2e Wave 0 spec GREEN + HUMAN-UAT.md + Jessica checkpoint
 **UI hint:** yes
 
-#### Phase 69: Product–Material Linking (MAT-LINK-01) — DEFERRED to v1.19
+#### Phase 69: Product–Material Linking (MAT-LINK-01) — v1.19 ACTIVE
 
-> **Status: Deferred to v1.19.** Closed early during v1.17 scoping so the finish-slot UI ships in the v1.18 Pascal Visual Parity chrome rather than be designed twice. Goal + success criteria preserved below for when v1.19 picks it up.
+> **Status: Active in v1.19.** Was deferred from v1.17 so the finish-slot UI could ship in v1.18 Pascal Visual Parity chrome. v1.18 complete — this phase is now the first target of v1.19.
 
 **Goal:** Jessica swaps the finish material on a placed product (couch fabric, faucet finish, cabinet color) without re-placing or re-uploading the object. Products carry an optional finish slot referencing a Material from the library.
 **Depends on:** Phase 67 (Material entity), Phase 68 (Material picker UI), Phase 31 (placement-instance state per D-02), Phase 56/58 (GLTF PBR material slot handling), v1.18 primitives (Phases 71-76) for the finish picker chrome
@@ -344,9 +345,9 @@
 **Plans:** TBD (v1.19)
 **UI hint:** yes
 
-#### Phase 70: Library Rebuild (LIB-REBUILD-01) — DEFERRED to v1.19
+#### Phase 70: Library Rebuild (LIB-REBUILD-01) — v1.19 ACTIVE
 
-> **Status: Deferred to v1.19.** Closed early during v1.17 scoping so the library-rebuild UI ships in the v1.18 Pascal Visual Parity chrome rather than be designed twice. Goal + success criteria preserved below for when v1.19 picks it up.
+> **Status: Active in v1.19.** Was deferred from v1.17 so the library-rebuild UI could ship in v1.18 Pascal Visual Parity chrome. v1.18 complete — this phase follows Phase 69 in v1.19.
 
 **Goal:** Sidebar library reorganizes around a top-level Materials / Assemblies / Products toggle. Each tab has its own category sub-tabs (Materials: Flooring, Wall coverings, Countertops, Paint; Products: Furniture, Plumbing fixtures, Appliances, Lighting, Curtains & blinds, Decor; Assemblies: empty placeholder).
 **Depends on:** Phase 67 (Materials live in their own store), Phase 33 (CategoryTabs precedent — superseded by v1.18 Tab primitive), Phase 14 (custom-element library precedent), v1.18 primitives (Phases 71-76) for the new tab + library chrome
@@ -359,6 +360,18 @@
   5. Upload buttons are context-aware: in Materials tab → "Upload Material"; in Products tab → "Add Product"; existing upload + place flows continue to work end-to-end
 **Plans:** TBD (v1.19)
 **UI hint:** yes
+
+#### Phase 77: Test Suite Cleanup (TEST-CLEANUP-01) — v1.19 ACTIVE
+
+**Goal:** Fix v1.18 carry-over test failures that block a clean CI baseline for v1.19 execution.
+**Depends on:** v1.18 Phases 72 (Switch primitive), 73/74 (Tooltip/FloatingToolbar)
+**Requirements:** [TEST-CLEANUP-01](https://github.com/micahbank2/room-cad-renderer/issues/163), [TEST-CLEANUP-02](https://github.com/micahbank2/room-cad-renderer/issues/164)
+**Success Criteria** (what must be TRUE):
+  1. All 5 Phase-31-era test files that render PropertiesPanel or FloatingToolbar wrap their renders in `<TooltipProvider>` — the 34-test wall/snap failures from GH #163 are gone
+  2. AddProductModal tests query `getByRole("switch")` instead of `getByRole("checkbox")` — the Switch migration from v1.18 Phase 76 no longer breaks these 3 tests (GH #164)
+  3. `npm run test` passes with zero failures in the migrated test files
+**Plans:** TBD (v1.19)
+**UI hint:** no
 
 ## Progress
 
@@ -401,14 +414,15 @@
 | 66. Per-Surface Tile-Size UI | 1/1 | Complete    | 2026-05-06 |
 | 67. Material Engine Foundation | 1/1 | Complete    | 2026-05-07 |
 | 68. Material Application System | 7/7 | Complete   | 2026-05-07 |
-| 69. Product–Material Linking | 0/0 | Deferred to v1.19   | — |
-| 70. Library Rebuild | 0/0 | Deferred to v1.19   | — |
+| 69. Product–Material Linking | 0/0 | v1.19 active   | — |
+| 70. Library Rebuild | 0/0 | v1.19 active   | — |
 | 71. Token Foundation | 7/7 | Complete   | 2026-05-07 |
-| 72. Primitives Shelf | 3/9 | In Progress|  |
+| 72. Primitives Shelf | 3/9 | Complete   | 2026-05-08 |
 | 73. Sidebar Restyle | 2/2 | Complete   | 2026-05-08 |
 | 74. Toolbar Rework | 3/3 | Complete   | 2026-05-08 |
-| 75. Properties + Library Restyle | 0/0 | Not started   | — |
-| 76. Modals + Welcome + Final | 2/3 | Complete    | 2026-05-08 |
+| 75. Properties + Library Restyle | 3/3 | Complete   | 2026-05-08 |
+| 76. Modals + Welcome + Final | 3/3 | Complete    | 2026-05-08 |
+| 77. Test Suite Cleanup | 0/0 | v1.19 active   | — |
 
 ## Backlog
 

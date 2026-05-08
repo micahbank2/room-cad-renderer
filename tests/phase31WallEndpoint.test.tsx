@@ -45,6 +45,7 @@ vi.mock("@/lib/serialization", () => ({
 }));
 
 import App from "@/App";
+import { TooltipProvider } from "@/components/ui";
 import { useCADStore, resetCADStoreForTests } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 
@@ -121,7 +122,11 @@ describe("Phase 31 — wall-endpoint smart-snap (EDIT-23)", () => {
   });
 
   it("D-05 snap to other wall endpoint within tolerance", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForDriver();
     await act(async () => {
       window.__driveWallEndpoint!.start("w1", "end");
@@ -134,7 +139,11 @@ describe("Phase 31 — wall-endpoint smart-snap (EDIT-23)", () => {
   });
 
   it("D-05 snap to wall midpoint (w2 midpoint at (15,5))", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForDriver();
     await act(async () => {
       window.__driveWallEndpoint!.start("w1", "end");
@@ -147,7 +156,11 @@ describe("Phase 31 — wall-endpoint smart-snap (EDIT-23)", () => {
   });
 
   it("D-06 shift-orthogonal locks axis; horizontal wall stays horizontal", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForDriver();
     await act(async () => {
       window.__driveWallEndpoint!.start("w1", "end");
@@ -161,7 +174,11 @@ describe("Phase 31 — wall-endpoint smart-snap (EDIT-23)", () => {
 
   it("D-07 alt disables smart-snap; grid-snap still applies", async () => {
     useUIStore.setState({ gridSnap: 1.0 } as any);
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForDriver();
     let guideCount = -1;
     await act(async () => {
@@ -181,7 +198,11 @@ describe("Phase 31 — wall-endpoint smart-snap (EDIT-23)", () => {
   it("D-05 negative: walls do NOT snap to product bboxes", async () => {
     seedTwoWalls({ withProductAt: { x: 14.8, y: 0.2 } });
     useUIStore.setState({ activeTool: "select", gridSnap: 0.5 } as any);
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForDriver();
     await act(async () => {
       window.__driveWallEndpoint!.start("w1", "end");
@@ -198,7 +219,11 @@ describe("Phase 31 — wall-endpoint smart-snap (EDIT-23)", () => {
   });
 
   it("guides clear after drag end", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForDriver();
     await act(async () => {
       window.__driveWallEndpoint!.start("w1", "end");

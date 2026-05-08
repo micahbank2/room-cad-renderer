@@ -29,7 +29,8 @@ describe("migrateSnapshot", () => {
     const d = migrateSnapshot(null);
     // Phase 62 MEASURE-01 (D-02): defaultSnapshot() returns version 5 (from Phase 60).
     // Phase 68 MAT-APPLY-01 bumped to version 6 (resolved Materials on surfaces).
-    expect(d.version).toBe(6);
+    // Phase 69 MAT-LINK-01 bumped to version 7 (adds optional PlacedProduct.finishMaterialId).
+    expect(d.version).toBe(7);
     expect(Object.keys(d.rooms)).toEqual(["room_main"]);
     expect(d.activeRoomId).toBe("room_main");
     expect(defaultSnapshot().rooms.room_main.room).toEqual({ width: 20, length: 16, wallHeight: 8 });

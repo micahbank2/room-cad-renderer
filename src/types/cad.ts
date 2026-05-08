@@ -122,6 +122,11 @@ export interface PlacedProduct {
   savedCameraPos?: [number, number, number];
   /** Phase 48 CAM-04 (D-03). */
   savedCameraTarget?: [number, number, number];
+  /** Phase 69 MAT-LINK-01: per-placement finish Material reference. When set,
+   *  ProductBox renders the Material's colorHex/colorMapId + roughness instead
+   *  of the product.imageUrl texture. Box-mode products only; GLTF products
+   *  ignore this field (deferred — embedded PBR materials own their surfaces). */
+  finishMaterialId?: string;
 }
 
 export interface Room {
@@ -343,8 +348,12 @@ export interface CADSnapshot {
   /** Phase 68 MAT-APPLY-01 (D-03): bumped from 5 to 6 — new surface Material
    *  reference fields (Wall.materialIdA/B, RoomDoc.floorMaterialId,
    *  Ceiling.materialId, PlacedCustomElement.faceMaterials). v5 snapshots
-   *  migrate via migrateV5ToV6 (Plan 03). */
-  version: 6;
+   *  migrate via migrateV5ToV6 (Plan 03).
+   *
+   *  Phase 69 MAT-LINK-01: bumped from 6 to 7 — adds optional
+   *  `PlacedProduct.finishMaterialId`. Migration is a trivial passthrough
+   *  (the field is optional, so absence is the correct legacy behavior). */
+  version: 7;
   rooms: Record<string, RoomDoc>;
   activeRoomId: string | null;
   /** Per-project catalog of custom elements (reusable across rooms). */

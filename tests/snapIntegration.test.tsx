@@ -60,6 +60,7 @@ vi.mock("@/lib/serialization", () => ({
 }));
 
 import App from "@/App";
+import { TooltipProvider } from "@/components/ui";
 import { useCADStore, resetCADStoreForTests } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 
@@ -167,7 +168,11 @@ describe("productTool placement (Phase 30 integration)", () => {
   });
 
   it("placement near wall edge snaps Y to the wall face and shows a snap-guide during the gesture", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await act(async () => {
       useUIStore.getState().setTool("product");
     });
@@ -200,7 +205,11 @@ describe("selectTool drag (Phase 30 integration)", () => {
   });
 
   it("dragging an existing product near the wall renders a snap-guide during drag, zero guides after mouseup", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await act(async () => {
       useUIStore.getState().setTool("select");
     });
@@ -240,7 +249,11 @@ describe("midpoint snap SNAP-02 (Phase 30 integration)", () => {
   });
 
   it("drag toward wall midpoint → center aligns to midpoint; midpoint-dot guide renders", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await act(async () => {
       useUIStore.getState().setTool("select");
     });
@@ -284,7 +297,11 @@ describe("Alt disables smart snap D-07 (Phase 30 integration)", () => {
     await act(async () => {
       useUIStore.getState().setGridSnap?.(0.5);
     });
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await act(async () => {
       useUIStore.getState().setTool("select");
     });

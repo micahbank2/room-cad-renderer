@@ -45,6 +45,7 @@ vi.mock("@/lib/serialization", () => ({
 }));
 
 import App from "@/App";
+import { TooltipProvider } from "@/components/ui";
 import { useCADStore, resetCADStoreForTests } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 
@@ -115,7 +116,11 @@ describe("Phase 31 — product resize drag (EDIT-22)", () => {
   });
 
   it("corner drag writes sizeScale (corner path unchanged)", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForDriver();
     await act(async () => {
       window.__driveResize!.start(PP_ID, "corner-ne");
@@ -129,7 +134,11 @@ describe("Phase 31 — product resize drag (EDIT-22)", () => {
   });
 
   it("edge-e drag writes widthFtOverride (NEW per-axis path)", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForDriver();
     const beforeScale = activeDoc().placedProducts[PP_ID].sizeScale;
     await act(async () => {
@@ -145,7 +154,11 @@ describe("Phase 31 — product resize drag (EDIT-22)", () => {
   });
 
   it("edge-n drag writes depthFtOverride (n/s axis)", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForDriver();
     await act(async () => {
       window.__driveResize!.start(PP_ID, "edge-n");
@@ -160,7 +173,11 @@ describe("Phase 31 — product resize drag (EDIT-22)", () => {
 
   it("EDIT-22 grid-snap: edge drag value rounded to uiStore.gridSnap", async () => {
     useUIStore.setState({ gridSnap: 1.0 } as any);
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForDriver();
     await act(async () => {
       window.__driveResize!.start(PP_ID, "edge-e");
@@ -173,7 +190,11 @@ describe("Phase 31 — product resize drag (EDIT-22)", () => {
   });
 
   it("D-02 reset: clearProductOverrides reverts widthFtOverride/depthFtOverride to undefined", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForDriver();
     await act(async () => {
       window.__driveResize!.start(PP_ID, "edge-e");
@@ -191,7 +212,11 @@ describe("Phase 31 — product resize drag (EDIT-22)", () => {
   });
 
   it("edge-w drag also writes widthFtOverride (mirror axis)", async () => {
-    render(<App />);
+    render(
+      <TooltipProvider>
+        <App />
+      </TooltipProvider>
+    );
     await waitForDriver();
     await act(async () => {
       window.__driveResize!.start(PP_ID, "edge-w");
