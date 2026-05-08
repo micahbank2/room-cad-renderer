@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, cleanup } from "@testing-library/react";
+import { render, cleanup, fireEvent, screen } from "@testing-library/react";
 import { ProductLibrary } from "@/components/ProductLibrary";
 import CustomElementsPanel from "@/components/CustomElementsPanel";
 import { useCADStore } from "@/stores/cadStore";
@@ -77,6 +77,8 @@ describe("Library migration — render count regression (GH #89 blocker fix)", (
         onOpenAddModal={() => {}}
       />,
     );
+    // Phase 70: ProductLibrary defaults to Materials tab — click Products to see cards.
+    fireEvent.click(screen.getByRole("tab", { name: "Products" }));
     const cards = container.querySelectorAll('[data-testid="library-card"]');
     // Default activeCategory is "all" → all 5 products rendered.
     expect(cards.length).toBe(SEED_PRODUCTS.length);
