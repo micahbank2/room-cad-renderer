@@ -32,10 +32,17 @@ export default function Sidebar({ productLibrary }: Props) {
         </button>
       </div>
 
-      {/* Scrollable content */}
+      {/* Scrollable content
+          Phase 81 Plan 01 (IA-02): every section is wrapped in the shared
+          PanelSection primitive with a stable sidebar-* id. Only the Rooms tree
+          defaults open; every secondary section defaults closed and persists
+          its expanded state to localStorage["ui:propertiesPanel:sections"]. */}
       <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
-        <RoomsTreePanel productLibrary={productLibrary} />
-        <PanelSection id="sidebar-room-config" label="Room config">
+        <PanelSection id="sidebar-rooms-tree" label="Rooms" defaultOpen={true}>
+          <RoomsTreePanel productLibrary={productLibrary} />
+        </PanelSection>
+
+        <PanelSection id="sidebar-room-config" label="Room config" defaultOpen={false}>
           <RoomSettings />
         </PanelSection>
 
@@ -57,16 +64,19 @@ export default function Sidebar({ productLibrary }: Props) {
           </select>
         </PanelSection>
 
-        {/* Custom Elements (Phase 14) — has its own internal header */}
-        <CustomElementsPanel />
+        <PanelSection id="sidebar-custom-elements" label="Custom elements" defaultOpen={false}>
+          <CustomElementsPanel />
+        </PanelSection>
 
-        {/* Framed Art Library (Phase 15) — has its own internal header */}
-        <FramedArtLibrary />
+        <PanelSection id="sidebar-framed-art" label="Framed art library" defaultOpen={false}>
+          <FramedArtLibrary />
+        </PanelSection>
 
-        {/* Wainscoting Style Library (Phase 16) — has its own internal header */}
-        <WainscotLibrary />
+        <PanelSection id="sidebar-wainscoting" label="Wainscoting library" defaultOpen={false}>
+          <WainscotLibrary />
+        </PanelSection>
 
-        <PanelSection id="sidebar-product-library" label="Product library">
+        <PanelSection id="sidebar-product-library" label="Product library" defaultOpen={false}>
           <SidebarProductPicker />
         </PanelSection>
       </div>

@@ -1,7 +1,7 @@
 // src/components/RoomsTreePanel/RoomsTreePanel.tsx
 // Phase 46: Rooms hierarchy panel — top of Sidebar (D-01).
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCADStore } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { buildRoomTree, type TreeNode } from "@/lib/buildRoomTree";
@@ -64,31 +64,10 @@ interface Props {
 // separate localStorage namespace). The Sidebar's own local CollapsibleSection
 // is the canonical primitive for this context.
 // ---------------------------------------------------------------------------
-function PanelSection({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  const [open, setOpen] = useState(true);
-  return (
-    <div>
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between mb-2 py-1"
-      >
-        <h3 className="font-sans text-base font-medium text-muted-foreground">
-          {label}
-        </h3>
-        <span className="font-sans text-sm text-muted-foreground/60">
-          {open ? "\u2212" : "+"}
-        </span>
-      </button>
-      {open && children}
-    </div>
-  );
-}
+// (Phase 81 Plan 01 / IA-02) Local inline PanelSection clone removed \u2014
+// the parent Sidebar.tsx now wraps this component in the shared PanelSection
+// primitive (id="sidebar-rooms-tree", defaultOpen={true}). Panel-level collapse
+// state persists via "ui:propertiesPanel:sections".
 
 // ---------------------------------------------------------------------------
 // RoomsTreePanel
@@ -284,26 +263,24 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
   // Render
   // ---------------------------------------------------------------------------
   return (
-    <PanelSection label="Rooms">
-      <div role="tree" aria-label="Rooms tree">
-        {tree.map((roomNode) => (
-          <TreeRow
-            key={roomNode.id}
-            node={roomNode}
-            ancestry={[]}
-            depth={0}
-            expanded={expanded}
-            activeRoomId={activeRoomId}
-            selectedIds={selectedIds}
-            hiddenIds={hiddenIds}
-            savedCameraNodeIds={savedCameraNodeIds}
-            onToggleExpand={onToggleExpand}
-            onClickRow={onClickRow}
-            onToggleVisibility={onToggleVisibility}
-            onDoubleClickRow={onDoubleClickRow}
-          />
-        ))}
-      </div>
-    </PanelSection>
+    <div role="tree" aria-label="Rooms tree">
+      {tree.map((roomNode) => (
+        <TreeRow
+          key={roomNode.id}
+          node={roomNode}
+          ancestry={[]}
+          depth={0}
+          expanded={expanded}
+          activeRoomId={activeRoomId}
+          selectedIds={selectedIds}
+          hiddenIds={hiddenIds}
+          savedCameraNodeIds={savedCameraNodeIds}
+          onToggleExpand={onToggleExpand}
+          onClickRow={onClickRow}
+          onToggleVisibility={onToggleVisibility}
+          onDoubleClickRow={onDoubleClickRow}
+        />
+      ))}
+    </div>
   );
 }

@@ -51,10 +51,10 @@ export default function CustomElementsPanel() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="font-sans text-[10px] text-muted-foreground/60 tracking-widest uppercase">
-          CUSTOM ELEMENTS
-        </h3>
+      {/* Phase 81 Plan 01 (IA-02): outer section header moved up to Sidebar.tsx
+          via the shared PanelSection primitive. The local "+ NEW" toggle stays
+          here as a body-level action so the create form remains co-located. */}
+      <div className="flex items-center justify-end mb-2">
         <button
           onClick={() => setCreating((v) => !v)}
           className="font-sans text-[9px] text-foreground hover:text-accent tracking-widest"
