@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: executing
-last_updated: "2026-05-13T15:19:22.648Z"
+last_updated: "2026-05-13T16:31:03.364Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 20
   completed_phases: 11
   total_plans: 45
-  completed_plans: 40
+  completed_plans: 41
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 ## Current Position
 
 Phase: 79 (window-presets-win-presets-01-v1-20-active) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Milestone: v1.20 Surface Depth & Architectural Expansion
 Phases: TBD (starts at Phase 78)
 Status: Ready to execute
@@ -45,6 +45,7 @@ Last activity: 2026-05-13
 - [Phase 70]: Default library tab is Materials (not Products) — puts newest feature front and center
 - [Phase 78]: MapBadge uses text-[10px] arbitrary value for sub-text indicator (smallest Pascal token text-sm=11px is too tall)
 - [Phase 79-window-presets-win-presets-01-v1-20-active]: RED-tests-only Wave 0: 3 test files commit failing imports/drivers to lock the WIN-PRESETS contract in machine-readable form; Wave 1 catalog+bridge will turn unit/integration tests GREEN; Wave 2 UI will turn E2E + PropertiesPanel tests GREEN
+- [Phase 79]: Plan 02 (Wave 1): WIN-PRESETS-01 catalog + bridge GREEN. Bridge persists across tool cleanup (Pitfall 1). 12/12 catalog tests + 3/3 bridge integration tests pass; 4 PropertiesPanel tests intentionally RED for Plan 03.
 
 ## Performance Metrics
 
@@ -59,6 +60,7 @@ Last activity: 2026-05-13
 | 77 | TEST-CLEANUP-01 | Fix v1.18 carry-over test failures (TooltipProvider, Switch role) | ✅ Complete |
 | Phase 78 P04 | 8 | 1 tasks | 3 files |
 | Phase 79-window-presets-win-presets-01-v1-20-active P01 | 164s | 2 tasks | 3 files |
+| Phase 79 P02 | 480 | 2 tasks | 2 files |
 
 ## v1.20 Roadmap
 

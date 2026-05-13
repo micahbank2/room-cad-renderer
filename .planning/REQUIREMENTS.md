@@ -18,7 +18,7 @@
 
 ### Window Presets (WIN)
 
-- [ ] **WIN-01**: When placing a window opening, user can choose from a preset size list (e.g. 2×3 ft, 3×4 ft, 4×5 ft, custom) rather than always typing dimensions manually
+- [x] **WIN-01**: When placing a window opening, user can choose from a preset size list (e.g. 2×3 ft, 3×4 ft, 4×5 ft, custom) rather than always typing dimensions manually
 - [ ] **WIN-02**: The selected preset size is visible and editable in PropertiesPanel after placement — switching to "custom" allows free-form dimension input
 
 ### Parametric Controls (PARAM)
