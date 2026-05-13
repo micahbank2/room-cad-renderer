@@ -413,7 +413,10 @@
   2. Selecting a preset auto-fills widthFt/heightFt on the Opening — no manual typing required
   3. After placement, PropertiesPanel shows the active preset label and allows switching to another preset or "custom"
   4. Existing manual window placement (typing custom dimensions) continues to work unchanged
-**Plans:** TBD (v1.20)
+**Plans:** 3 plans
+- [ ] 79-01-PLAN.md — Wave 0 RED tests pin WIN-PRESETS contract (catalog, bridge, e2e)
+- [ ] 79-02-PLAN.md — Catalog module + windowTool bridge (data + tool layer)
+- [ ] 79-03-PLAN.md — WindowPresetSwitcher + PropertiesPanel preset row + App mount
 **UI hint:** yes
 
 #### Phase 80: Parametric Product Controls (PARAM-01) — v1.20 ACTIVE
