@@ -16,11 +16,7 @@ import {
   Map as MapIcon,
   Box,
   CornerDownRight,
-  BookOpen,
   HelpCircle,
-  Settings,
-  Undo2,
-  Redo2,
   AlertCircle,
   Loader2,
   CloudCheck,
@@ -87,11 +83,7 @@ export function ToolbarSaveStatus(): JSX.Element {
   );
 }
 
-export function TopBar({ viewMode, onViewChange }: TopBarProps): JSX.Element {
-  const undo = useCADStore((s) => s.undo);
-  const redo = useCADStore((s) => s.redo);
-  const pastLen = useCADStore((s) => s.past.length);
-  const futureLen = useCADStore((s) => s.future.length);
+export function TopBar({ viewMode }: TopBarProps): JSX.Element {
   const cameraMode = useUIStore((s) => s.cameraMode);
   const activePreset = useUIStore((s) => s.activePreset);
   const requestPreset = useUIStore((s) => s.requestPreset);
@@ -133,42 +125,7 @@ export function TopBar({ viewMode, onViewChange }: TopBarProps): JSX.Element {
         {/* Save status */}
         <ToolbarSaveStatus />
 
-        <div className="w-px h-5 bg-border/50 mx-1" />
-
-        {/* Undo / Redo (D-11) */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              onClick={undo}
-              disabled={pastLen === 0}
-              aria-label="Undo"
-              variant="ghost"
-              size="icon-sm"
-            >
-              <Undo2 size={16} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            Undo <kbd>Ctrl+Z</kbd>
-          </TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              onClick={redo}
-              disabled={futureLen === 0}
-              aria-label="Redo"
-              variant="ghost"
-              size="icon-sm"
-            >
-              <Redo2 size={16} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            Redo <kbd>Ctrl+Shift+Z</kbd>
-          </TooltipContent>
-        </Tooltip>
+        {/* Phase 80 audit removal: Undo/Redo duplicated in FloatingToolbar — single canonical home. */}
 
         <div className="w-px h-5 bg-border/50 mx-1" />
 
@@ -231,24 +188,9 @@ export function TopBar({ viewMode, onViewChange }: TopBarProps): JSX.Element {
           <TooltipContent side="bottom">Export 3D view as PNG</TooltipContent>
         </Tooltip>
 
-        <div className="w-px h-5 bg-border/50 mx-1" />
+        {/* Phase 80 audit removal: Library button duplicated in FloatingToolbar view-mode group — single canonical home. */}
 
-        {/* Library button */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              onClick={() => onViewChange("library")}
-              variant="ghost"
-              size="icon-sm"
-              data-testid="view-mode-library"
-              aria-label="Product library"
-              active={viewMode === "library"}
-            >
-              <BookOpen size={16} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">Product library</TooltipContent>
-        </Tooltip>
+        <div className="w-px h-5 bg-border/50 mx-1" />
 
         {/* Help */}
         <Tooltip>
@@ -266,10 +208,8 @@ export function TopBar({ viewMode, onViewChange }: TopBarProps): JSX.Element {
           <TooltipContent side="bottom">Help &amp; shortcuts</TooltipContent>
         </Tooltip>
 
-        {/* Settings */}
-        <Button variant="ghost" size="icon-sm" aria-label="Settings">
-          <Settings size={16} />
-        </Button>
+        {/* Phase 80 audit removal: Settings button had no onClick handler — dead.
+            Re-introduce when the theme/settings drawer ships (tracked in v1.21 backlog). */}
       </div>
     </header>
   );

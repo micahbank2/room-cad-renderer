@@ -1,10 +1,5 @@
 import { PanelSection } from "@/components/ui";
 import type { Product } from "@/types/product";
-import {
-  useActiveRoom,
-  useActiveWalls,
-  useActivePlacedProducts,
-} from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import RoomSettings from "./RoomSettings";
 import SidebarProductPicker from "./SidebarProductPicker";
@@ -19,13 +14,6 @@ interface Props {
 
 
 export default function Sidebar({ productLibrary }: Props) {
-  const room = useActiveRoom() ?? { width: 20, length: 16, wallHeight: 8 };
-  const walls = useActiveWalls();
-  const placedProducts = useActivePlacedProducts();
-  const wallCount = Object.keys(walls).length;
-  const productCount = Object.keys(placedProducts).length;
-  const showGrid = useUIStore((s) => s.showGrid);
-  const toggleGrid = useUIStore((s) => s.toggleGrid);
   const gridSnap = useUIStore((s) => s.gridSnap);
   const setGridSnap = useUIStore((s) => s.setGridSnap);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
@@ -51,39 +39,10 @@ export default function Sidebar({ productLibrary }: Props) {
           <RoomSettings />
         </PanelSection>
 
-        <PanelSection id="sidebar-system-stats" label="System stats" defaultOpen={false}>
-          <div className="space-y-1.5">
-            <div className="flex justify-between">
-              <span className="font-sans text-[10px] text-muted-foreground/80">Area</span>
-              <span className="font-sans text-[10px] text-foreground">
-                {(room.width * room.length).toFixed(0)} SQ FT
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-sans text-[10px] text-muted-foreground/80">Walls</span>
-              <span className="font-sans text-[10px] text-foreground">{wallCount}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-sans text-[10px] text-muted-foreground/80">Products</span>
-              <span className="font-sans text-[10px] text-foreground">{productCount}</span>
-            </div>
-          </div>
-        </PanelSection>
-
-        <PanelSection id="sidebar-layers" label="Layers" defaultOpen={false}>
-          <div className="space-y-1.5">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={showGrid}
-                onChange={toggleGrid}
-                className="w-3 h-3 accent-accent rounded-none"
-              />
-              <span className="font-sans text-[10px] text-muted-foreground/80">Grid</span>
-            </label>
-          </div>
-        </PanelSection>
-
+        {/* Phase 80 audit removals (dead code / duplicates):
+            - "System stats" panel — debug chrome with no audience
+            - "Layers" panel — single Show Grid checkbox already in FloatingToolbar
+            Snap stays here until Phase 83 wires it into the FloatingToolbar utility group. */}
 
         <PanelSection id="sidebar-snap" label="Snap" defaultOpen={false}>
           <select
