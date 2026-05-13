@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "./App";
 import HelpPage from "./components/HelpPage";
+import { TooltipProvider } from "./components/ui/Tooltip";
 import "./index.css";
 import { installTreeDrivers } from "./test-utils/treeDrivers";
 import { installDisplayModeDrivers } from "./test-utils/displayModeDrivers";
@@ -48,13 +49,20 @@ installProductFinishDrivers();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        {/* Standalone bookmarkable help center — /help-center */}
-        <Route path="/help-center" element={<HelpPage />} />
-        {/* Main app — handles all other paths (including /help/* modal sync) */}
-        <Route path="/*" element={<App />} />
-      </Routes>
-    </BrowserRouter>
+    {/* Root TooltipProvider — required by all <Tooltip> usages across the app
+       (TopBar, FloatingToolbar already had local providers; this root one
+       covers TopBar + every future Tooltip without each component needing
+       its own. Also unblocks the e2e Playwright harness — pre-existing
+       crash documented in Phase 79 deferred-items.md). */}
+    <TooltipProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Standalone bookmarkable help center — /help-center */}
+          <Route path="/help-center" element={<HelpPage />} />
+          {/* Main app — handles all other paths (including /help/* modal sync) */}
+          <Route path="/*" element={<App />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
   </React.StrictMode>
 );
