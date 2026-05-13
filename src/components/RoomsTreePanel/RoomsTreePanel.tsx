@@ -243,18 +243,17 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
     [productLibrary],
   );
 
-  const onDoubleClickRow = useCallback(
+  // Phase 81 Plan 03 (D-03): saved-camera focus moved from row dbl-click to
+  // the camera-icon button. Same lookup + dispatch shape as the previous
+  // onDoubleClickRow handler — only the entry-point changed.
+  const onSavedCameraFocus = useCallback(
     (node: TreeNode) => {
-      // Defense in depth: TreeRow already guards groups + rooms in its handler,
-      // but enforce here too so any future caller can't accidentally trigger
-      // camera moves on group / room nodes (D-02 leaf-only contract).
       if (node.kind === "group" || node.kind === "room") return;
 
       const cadState = useCADStore.getState();
       const doc = cadState.rooms[node.roomId];
       if (!doc) return;
 
-      // Look up the entity to read savedCameraPos/Target (D-02 fall-through key).
       let savedPos: [number, number, number] | undefined;
       let savedTarget: [number, number, number] | undefined;
       if (node.kind === "wall") {
@@ -279,12 +278,49 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
         savedTarget = s?.savedCameraTarget;
       }
 
-      // D-02 fall-through: if no saved camera, dispatch the default focus
-      // (same path as single-click).
       focusOnSavedCamera(savedPos, savedTarget, () => onClickRow(node));
     },
     [onClickRow],
   );
+
+  // Phase 81 Plan 03 (D-03): inline-rename dispatcher. Routes per node.kind
+  // to the appropriate cadStore action:
+  //   - room   → renameRoom
+  //   - wall   → renameWall (Phase 81 D-04, new this plan)
+  //   - custom → updatePlacedCustomElement({ labelOverride }) (Phase 31)
+  //   - stair  → updateStair({ labelOverride }) (Phase 60)
+  //   - product / ceiling → no-op (no labelOverride field yet; out of scope per CONTEXT.md)
+  const onRename = useCallback((node: TreeNode, name: string) => {
+    const cadActions = useCADStore.getState() as ReturnType<typeof useCADStore.getState> & {
+      renameRoom?: (id: string, name: string) => void;
+      renameWall?: (roomId: string, wallId: string, name: string) => void;
+      updatePlacedCustomElement?: (id: string, changes: { labelOverride?: string }) => void;
+      updateStair?: (roomId: string, stairId: string, patch: { labelOverride?: string }) => void;
+    };
+    if (node.kind === "room") {
+      cadActions.renameRoom?.(node.id, name);
+      return;
+    }
+    if (node.kind === "wall") {
+      cadActions.renameWall?.(node.roomId, node.id, name);
+      return;
+    }
+    if (node.kind === "custom") {
+      const trimmed = name.trim();
+      cadActions.updatePlacedCustomElement?.(node.id, {
+        labelOverride: trimmed === "" ? undefined : trimmed,
+      });
+      return;
+    }
+    if (node.kind === "stair") {
+      const trimmed = name.trim();
+      cadActions.updateStair?.(node.roomId, node.id, {
+        labelOverride: trimmed === "" ? undefined : trimmed,
+      });
+      return;
+    }
+    // product / ceiling: no labelOverride yet — explicit no-op (deferred per CONTEXT.md "Out of Scope").
+  }, []);
 
   // ---------------------------------------------------------------------------
   // Render
@@ -305,7 +341,8 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
           onToggleExpand={onToggleExpand}
           onClickRow={onClickRow}
           onToggleVisibility={onToggleVisibility}
-          onDoubleClickRow={onDoubleClickRow}
+          onRename={onRename}
+          onSavedCameraFocus={onSavedCameraFocus}
           onHoverEnter={onHoverEnter}
           onHoverLeave={onHoverLeave}
         />
