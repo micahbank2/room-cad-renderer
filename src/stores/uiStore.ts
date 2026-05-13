@@ -72,6 +72,17 @@ interface UIState {
   hiddenIds: Set<string>;
 
   /**
+   * Phase 81 Plan 02 (D-02): tree row hover → 2D canvas highlight.
+   * Transient — NOT persisted, NOT in undo history. RAF-coalesced via
+   * setHoveredEntityId so rapid mouse-move across the tree writes at most
+   * one store update per animation frame (research §"Pitfall 3").
+   *
+   * 3D hover wiring is explicitly deferred to Phase 82 (D-02).
+   */
+  hoveredEntityId: string | null;
+  setHoveredEntityId: (id: string | null) => void;
+
+  /**
    * Phase 46: extends Phase 35 dispatch — non-preset bbox/look-at target.
    * ThreeViewport mirrors lines 252–302 useEffect for this field.
    */
@@ -222,6 +233,18 @@ interface UIState {
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 8;
 
+// ─────────────────────────────────────────────────────────────────────
+// Phase 81 Plan 02 (D-02) — RAF coalesce for hoveredEntityId.
+//
+// Fast mouse-move across a long tree can fire setHoveredEntityId 60+ times
+// per frame; without coalescing, every call schedules a Zustand subscriber
+// pass + redraw. We accumulate the latest id in a module-level slot and
+// flush once per animation frame (research §"Pitfall 3"). requestAnimationFrame
+// aligns the write with the render tick; setTimeout would race against
+// Fabric's render loop.
+// ─────────────────────────────────────────────────────────────────────
+let _hoverRafPending: { id: string | null } | null = null;
+
 export const useUIStore = create<UIState>()((set) => ({
   activeTool: "select",
   selectedIds: [],
@@ -241,6 +264,8 @@ export const useUIStore = create<UIState>()((set) => ({
   showSidebar: true,
   isDragging: false,
   hiddenIds: new Set<string>(),
+  // Phase 81 Plan 02 (D-02): tree-hover highlight (2D-only).
+  hoveredEntityId: null,
   pendingCameraTarget: null,
   getCameraCapture: null,
   displayMode: readDisplayMode(),
@@ -342,6 +367,29 @@ export const useUIStore = create<UIState>()((set) => ({
       return { hiddenIds: next };
     }),
   clearHidden: () => set({ hiddenIds: new Set<string>() }),
+  // Phase 81 Plan 02 (D-02): RAF-coalesced hover setter. Multiple calls in a
+  // single frame collapse into one store write — the LAST value wins. SSR-safe
+  // via typeof requestAnimationFrame guard.
+  setHoveredEntityId: (id) => {
+    if (_hoverRafPending) {
+      _hoverRafPending.id = id;
+      return;
+    }
+    _hoverRafPending = { id };
+    if (typeof requestAnimationFrame === "undefined") {
+      // SSR / jsdom fallback — synchronous write, no coalesce.
+      const pending = _hoverRafPending;
+      _hoverRafPending = null;
+      set({ hoveredEntityId: pending.id });
+      return;
+    }
+    requestAnimationFrame(() => {
+      const pending = _hoverRafPending;
+      _hoverRafPending = null;
+      if (!pending) return;
+      set({ hoveredEntityId: pending.id });
+    });
+  },
   requestCameraTarget: (position, target) =>
     set((s) => ({
       pendingCameraTarget: {
