@@ -3,9 +3,9 @@ import { render, screen } from "@testing-library/react";
 import { RoomsTreePanel } from "@/components/RoomsTreePanel";
 
 describe("RoomsTreePanel — render (UI-SPEC § Per-Row Anatomy)", () => {
-  it("renders 'Rooms' panel header", () => {
+  it("renders a tree root with role='tree' and aria-label='Rooms tree' (Phase 81 Plan 01 — section header now owned by parent Sidebar's PanelSection, not RoomsTreePanel itself)", () => {
     render(<RoomsTreePanel />);
-    expect(screen.getByText(/Rooms/i)).toBeInTheDocument();
+    expect(screen.getByRole("tree", { name: /Rooms tree/i })).toBeInTheDocument();
   });
   it("rows are h-6 (24px height)", () => {
     // Plan 03: every interactive tree row uses className containing 'h-6'

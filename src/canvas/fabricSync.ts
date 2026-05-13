@@ -67,6 +67,9 @@ export function renderCustomElements(
   scale: number,
   origin: { x: number; y: number },
   selectedIds: string[],
+  // Phase 81 Plan 02 (D-02): tree row hover → accent-purple outline. Selection
+  // wins over hover when both apply (avoids double-stroke).
+  hoveredId: string | null = null,
 ) {
   for (const p of Object.values(placed)) {
     const el = catalog[p.customElementId];
@@ -78,6 +81,7 @@ export function renderCustomElements(
     const cx = origin.x + p.position.x * scale;
     const cy = origin.y + p.position.y * scale;
     const isSelected = selectedIds.includes(p.id);
+    const isHovered = !isSelected && hoveredId === p.id;
 
     const rect = new fabric.Rect({
       left: cx,
@@ -85,8 +89,8 @@ export function renderCustomElements(
       width: pw,
       height: pd,
       fill: el.color + "66", // ~40% opacity
-      stroke: isSelected ? "#7c5bf0" : el.color,
-      strokeWidth: isSelected ? 2 : 1,
+      stroke: isSelected ? "#7c5bf0" : isHovered ? "#7c5bf0" : el.color,
+      strokeWidth: isSelected ? 2 : isHovered ? 2 : 1,
       strokeDashArray: el.shape === "plane" ? [4, 3] : undefined,
       originX: "center",
       originY: "center",
@@ -202,6 +206,8 @@ export function renderCeilings(
   scale: number,
   origin: { x: number; y: number },
   selectedIds: string[],
+  // Phase 81 Plan 02 (D-02): tree row hover → accent-purple outline.
+  hoveredId: string | null = null,
 ) {
   const customColors = usePaintStore.getState().customColors;
   for (const c of Object.values(ceilings)) {
@@ -210,6 +216,7 @@ export function renderCeilings(
       y: origin.y + p.y * scale,
     }));
     const isSelected = selectedIds.includes(c.id);
+    const isHovered = !isSelected && hoveredId === c.id;
 
     // Resolve fill: paintId takes precedence over material string
     let baseFill: string;
@@ -223,8 +230,8 @@ export function renderCeilings(
     fc.add(
       new fabric.Polygon(pts, {
         fill: baseFill,
-        stroke: isSelected ? "#7c5bf0" : "#938ea0",
-        strokeWidth: isSelected ? 2 : 1,
+        stroke: isSelected ? "#7c5bf0" : isHovered ? "#7c5bf0" : "#938ea0",
+        strokeWidth: isSelected ? 2 : isHovered ? 2 : 1,
         strokeDashArray: [4, 4],
         selectable: false,
         evented: false,
@@ -310,6 +317,9 @@ export function renderWalls(
   // Material rendering).
   materials: ReadonlyArray<Material> = [],
   pixelsPerFoot: number = scale,
+  // Phase 81 Plan 02 (D-02): tree row hover → accent-purple outline on the
+  // matching wall. Selection takes precedence over hover (no double-stroke).
+  hoveredId: string | null = null,
 ) {
   // Pre-compute shared endpoints so we can draw corner caps that hide the
   // visible seams where wall rectangles overlap.
@@ -335,6 +345,8 @@ export function renderWalls(
   for (const wall of Object.values(walls)) {
     const corners = wallCorners(wall);
     const isSelected = selectedIds.includes(wall.id);
+    // Phase 81 Plan 02 (D-02): hover-only outline (selection wins).
+    const isHovered = !isSelected && hoveredId === wall.id;
 
     const points = corners.map((c) => ({
       x: origin.x + c.x * scale,
@@ -416,8 +428,8 @@ export function renderWalls(
       // Outline stroke on top of the split halves
       fc.add(new fabric.Polygon(points, {
         fill: "transparent",
-        stroke: isSelected ? WALL_SELECTED_STROKE : WALL_STROKE,
-        strokeWidth: isSelected ? 2 : 1,
+        stroke: isSelected ? WALL_SELECTED_STROKE : isHovered ? "#7c5bf0" : WALL_STROKE,
+        strokeWidth: isSelected ? 2 : isHovered ? 2 : 1,
         selectable: false,
         evented: false,
         data: { type: "wall", wallId: wall.id },
@@ -426,8 +438,8 @@ export function renderWalls(
       // No per-side paint — single solid polygon
       fc.add(new fabric.Polygon(points, {
         fill: WALL_FILL,
-        stroke: isSelected ? WALL_SELECTED_STROKE : WALL_STROKE,
-        strokeWidth: isSelected ? 2 : 1,
+        stroke: isSelected ? WALL_SELECTED_STROKE : isHovered ? "#7c5bf0" : WALL_STROKE,
+        strokeWidth: isSelected ? 2 : isHovered ? 2 : 1,
         selectable: false,
         evented: false,
         data: { type: "wall", wallId: wall.id },
@@ -980,6 +992,9 @@ export function renderProducts(
   // Phase 57: renamed from onImageReady — both async image loads and
   // GLTF silhouette compute trigger this re-render callback.
   onAssetReady?: () => void,
+  // Phase 81 Plan 02 (D-02): tree row hover → accent-purple outline on the
+  // matching product Group. Selection wins over hover.
+  hoveredId: string | null = null,
 ) {
   for (const pp of Object.values(placedProducts)) {
     const product = productLibrary.find((p) => p.id === pp.productId);
@@ -991,11 +1006,14 @@ export function renderProducts(
     const pw = width * scale;
     const pd = depth * scale;
     const isSelected = selectedIds.includes(pp.id);
+    const isHovered = !isSelected && hoveredId === pp.id;
 
     const cx = origin.x + pp.position.x * scale;
     const cy = origin.y + pp.position.y * scale;
 
-    // Border rect — placeholders always dashed + accent-colored
+    // Border rect — placeholders always dashed + accent-colored.
+    // Phase 81 Plan 02 (D-02): hover paints same accent stroke as selection
+    // (2px solid), but selection wins when both apply.
     const border = new fabric.Rect({
       width: pw,
       height: pd,
@@ -1004,11 +1022,13 @@ export function renderProducts(
         ? PRODUCT_STROKE
         : isSelected
         ? PRODUCT_STROKE
+        : isHovered
+        ? "#7c5bf0"
         : "#94a3b8",
-      strokeWidth: isSelected ? 2 : 1,
+      strokeWidth: isSelected ? 2 : isHovered ? 2 : 1,
       strokeDashArray: showPlaceholder
         ? PLACEHOLDER_DASH
-        : isSelected
+        : isSelected || isHovered
         ? undefined
         : REAL_DASH,
       originX: "center",
@@ -1061,7 +1081,8 @@ export function renderProducts(
           // D-06 fill: --color-text-muted (#cac3d7 = rgb 202,195,215) at 15% opacity.
           fill: "rgba(202,195,215,0.15)",
           stroke: "#7c5bf0",
-          strokeWidth: isSelected ? 2 : 1,
+          // Phase 81 Plan 02 (D-02): hover thickens stroke like selection.
+          strokeWidth: isSelected || isHovered ? 2 : 1,
           originX: "center",
           originY: "center",
         });
@@ -1204,6 +1225,9 @@ export function renderStairs(
   origin: { x: number; y: number },
   selectedIds: string[],
   hiddenIds: Set<string>,
+  // Phase 81 Plan 02 (D-02): tree row hover → accent-purple outline on the
+  // stair bbox. Selection (handled inside buildStairSymbolShapes) takes precedence.
+  hoveredId: string | null = null,
 ) {
   for (const stair of Object.values(stairs ?? {})) {
     if (hiddenIds.has(stair.id)) continue;
@@ -1211,6 +1235,7 @@ export function renderStairs(
     const widthFt = stair.widthFtOverride ?? DEFAULT_STAIR_WIDTH_FT;
     const totalRunFt = (stair.runIn / 12) * stair.stepCount;
     const isSelected = selectedIds.includes(stair.id);
+    const isHovered = !isSelected && hoveredId === stair.id;
 
     // D-04 origin asymmetry: bottom-step center + (UP * halfRun) = bbox center.
     // UP at rotation=0 is -y in feet space. Rotate by stair.rotation (deg).
@@ -1241,6 +1266,27 @@ export function renderStairs(
     });
 
     fc.add(group);
+
+    // Phase 81 Plan 02 (D-02): hover-only outline overlay (accent-purple,
+    // 2px). Selection outline is rendered inside buildStairSymbolShapes, so
+    // we only paint the hover overlay when not selected.
+    if (isHovered) {
+      fc.add(new fabric.Rect({
+        left: cx,
+        top: cy,
+        width: widthFt * scale,
+        height: totalRunFt * scale,
+        fill: "transparent",
+        stroke: "#7c5bf0",
+        strokeWidth: 2,
+        originX: "center",
+        originY: "center",
+        angle: stair.rotation,
+        selectable: false,
+        evented: false,
+        data: { type: "stair-hover-outline", stairId: stair.id },
+      }));
+    }
   }
 }
 

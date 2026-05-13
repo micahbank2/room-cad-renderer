@@ -9,3 +9,4 @@ node-compile-cache/
 playwright-report/
 test-results/
 /playwright/.cache/
+playwright-transform-cache-*/

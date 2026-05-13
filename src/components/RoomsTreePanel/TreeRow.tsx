@@ -5,6 +5,7 @@ import React from "react";
 import { ChevronRight, ChevronDown, Eye, EyeOff, Camera, Footprints } from "lucide-react";
 import type { TreeNode } from "@/lib/buildRoomTree";
 import { isHiddenInTree } from "@/lib/isHiddenInTree";
+import { InlineEditableText } from "@/components/ui/InlineEditableText";
 
 interface TreeRowProps {
   node: TreeNode;
@@ -22,8 +23,26 @@ interface TreeRowProps {
   onToggleExpand: (id: string) => void;
   onClickRow: (node: TreeNode) => void;
   onToggleVisibility: (id: string) => void;
-  /** Phase 48 D-02: double-click handler — falls through to single-click default focus when no savedCamera. */
-  onDoubleClickRow?: (node: TreeNode) => void;
+  /**
+   * Phase 81 Plan 03 (D-03): inline-rename commit handler. Called by
+   * InlineEditableText.onCommit. Parent dispatches to the appropriate
+   * per-kind store action (renameWall / renameRoom / labelOverride).
+   */
+  onRename?: (node: TreeNode, name: string) => void;
+  /**
+   * Phase 81 Plan 03 (D-03): saved-camera focus handler, MOVED from
+   * dbl-click to camera-icon click. Fires only on leaf rows that have a
+   * saved camera (`savedCameraNodeIds.has(node.id)`).
+   */
+  onSavedCameraFocus?: (node: TreeNode) => void;
+  /**
+   * Phase 81 Plan 02 (D-02): leaf-only hover handlers. Fires on mouseenter
+   * of the row container; the parent RoomsTreePanel dispatches to
+   * useUIStore.setHoveredEntityId. NOT fired for room or group header rows
+   * (rooms have no single canvas object; group headers are pure tree chrome).
+   */
+  onHoverEnter?: (id: string) => void;
+  onHoverLeave?: () => void;
 }
 
 export function TreeRow(props: TreeRowProps) {
@@ -43,6 +62,10 @@ export function TreeRow(props: TreeRowProps) {
   // Phase 48 D-07: leaf = not room, not group.
   const isLeaf = !isRoom && !isGroup;
   const hasSavedCamera = isLeaf && props.savedCameraNodeIds.has(node.id);
+
+  // Phase 81 Plan 03 (D-03): row-local inline-rename edit state.
+  // Groups never enter edit mode; rooms + leaves both rename via parent dispatcher.
+  const [isEditing, setIsEditing] = React.useState(false);
 
   // Groups always open (UI-SPEC § Expand/collapse: "always expanded by default, no persistence").
   const isOpen = isRoom ? (expanded[node.id] ?? false) : true;
@@ -125,9 +148,26 @@ export function TreeRow(props: TreeRowProps) {
         }}
 
         onDoubleClick={() => {
-          // Phase 48 D-02: groups ignored (matches single-click NO-OP semantics).
+          // Phase 81 Plan 03 (D-03): dbl-click now opens inline rename
+          // (replaces the Phase 48 saved-camera dispatch — that affordance
+          // moved to the Camera icon button below). Groups are tree chrome
+          // and stay non-editable; rooms + leaves all rename via parent.
           if (isGroup) return;
-          props.onDoubleClickRow?.(node);
+          setIsEditing(true);
+        }}
+
+        // Phase 81 Plan 02 (D-02): leaf-only hover dispatch. Leaves (walls,
+        // products, ceilings, custom-elements, stairs) have a corresponding
+        // canvas object that gets the accent-purple outline. Room rows have
+        // no single canvas counterpart; group headers are pure tree chrome —
+        // skip both.
+        onMouseEnter={() => {
+          if (isGroup || isRoom) return;
+          props.onHoverEnter?.(node.id);
+        }}
+        onMouseLeave={() => {
+          if (isGroup || isRoom) return;
+          props.onHoverLeave?.();
         }}
       >
         {/* D-01: Pascal spine — 1px vertical line at left:21px */}
@@ -170,32 +210,78 @@ export function TreeRow(props: TreeRowProps) {
           // D-15: substitute for material-symbols 'stairs'
         )}
 
-        {/* Label button — data-tree-row for test driver targeting */}
-        <button
-          data-tree-row
-          className={labelClass}
-          title={node.label}
-          onClick={(e) => {
-            if (isGroup) {
-              e.stopPropagation();
-              return;
-            }
-            // Row container onClick handles selection; this button bubbles up
-          }}
-        >
-          {node.label}
-        </button>
-
-        {/* Phase 48 D-07: leaf-only saved-camera indicator. */}
-        {hasSavedCamera && (
+        {/* Label — editable (InlineEditableText) when isEditing, otherwise
+            a button (data-tree-row for test driver targeting).
+            Phase 81 Plan 03 (D-03): dbl-click on the row sets isEditing → swap. */}
+        {isEditing ? (
+          // Phase 81 Plan 03 (D-03): InlineEditableText handles Enter (commit)
+          // and Escape (cancel) internally. We wrap with onKeyDown + onBlur on
+          // a span so that Escape also exits edit-mode (InlineEditableText's
+          // cancel() path does NOT call onCommit; without this wrapper the
+          // input would stay open after Escape).
           <span
-            title="Has saved camera angle"
-            aria-hidden="true"
-            className="text-foreground flex items-center justify-center"
-            data-saved-camera-indicator
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                // Defer one tick so InlineEditableText's own Escape handler
+                // (which calls cancel + blur) runs first.
+                setTimeout(() => setIsEditing(false), 0);
+              }
+            }}
+            onBlur={() => {
+              // If commit() short-circuits (skipNextBlur after Escape) or
+              // succeeds, both paths should exit edit-mode. setTimeout pushes
+              // to next tick so InlineEditableText finishes its blur handler.
+              setTimeout(() => setIsEditing(false), 0);
+            }}
+            className="flex-1 min-w-0"
+          >
+            <InlineEditableText
+              value={node.label}
+              maxLength={40}
+              onLivePreview={() => { /* no-op: tree row is commit-only (no live tree updates) */ }}
+              onCommit={(v) => {
+                props.onRename?.(node, v);
+                setIsEditing(false);
+              }}
+              data-testid={`tree-row-edit-${node.id}`}
+              className={labelClass}
+            />
+          </span>
+        ) : (
+          <button
+            data-tree-row
+            className={labelClass}
+            title={node.label}
+            aria-label={`Rename ${node.label}`}
+            onClick={(e) => {
+              if (isGroup) {
+                e.stopPropagation();
+                return;
+              }
+              // Row container onClick handles selection; this button bubbles up
+            }}
+          >
+            {node.label}
+          </button>
+        )}
+
+        {/* Phase 81 Plan 03 (D-03): saved-camera affordance migrated from
+            row dbl-click to an interactive Camera-icon button. aria-label
+            is mixed-case per D-09. Click dispatches via parent's
+            onSavedCameraFocus handler. */}
+        {hasSavedCamera && (
+          <button
+            data-saved-camera-button
+            title={`Focus saved camera on ${node.label}`}
+            aria-label={`Focus saved camera on ${node.label}`}
+            className="w-6 h-6 flex items-center justify-center text-foreground hover:text-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+            onClick={(e) => {
+              e.stopPropagation();
+              props.onSavedCameraFocus?.(node);
+            }}
           >
             <Camera className="w-3.5 h-3.5" />
-          </span>
+          </button>
         )}
 
         {/* Eye-icon button — UI-SPEC § Per-Row Anatomy: w-6 h-6, inner glyph w-3.5 h-3.5 */}
@@ -233,7 +319,10 @@ export function TreeRow(props: TreeRowProps) {
             onToggleExpand={props.onToggleExpand}
             onClickRow={props.onClickRow}
             onToggleVisibility={props.onToggleVisibility}
-            onDoubleClickRow={props.onDoubleClickRow}
+            onRename={props.onRename}
+            onSavedCameraFocus={props.onSavedCameraFocus}
+            onHoverEnter={props.onHoverEnter}
+            onHoverLeave={props.onHoverLeave}
           />
         ))
       }

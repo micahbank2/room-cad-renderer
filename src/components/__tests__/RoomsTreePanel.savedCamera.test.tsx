@@ -77,58 +77,63 @@ describe("RoomsTreePanel — Phase 48 savedCamera indicator + double-click (D-02
     vi.clearAllMocks();
   });
 
-  it("leaf row WITH savedCameraPos renders Camera icon (title='Has saved camera angle')", () => {
+  it("leaf row WITH savedCameraPos renders Camera icon button (Phase 81 D-03: was indicator, now button)", () => {
     render(<RoomsTreePanel productLibrary={[]} />);
     const row = document.querySelector('[data-tree-node="wall_with_cam"]') as HTMLElement | null;
     expect(row).not.toBeNull();
-    const icon = row?.querySelector('[title="Has saved camera angle"]') as HTMLElement | null;
-    expect(icon).not.toBeNull();
-    // Phase 71 TOKEN-FOUNDATION: text-accent-light → text-foreground (Pascal token sweep)
-    expect(icon?.className).toMatch(/text-foreground/);
-    const svg = icon?.querySelector("svg");
+    // Phase 81 Plan 03 (D-03): the Camera affordance is now a button with
+    // data-saved-camera-button (was a passive span with data-saved-camera-indicator).
+    const button = row?.querySelector('[data-saved-camera-button]') as HTMLElement | null;
+    expect(button).not.toBeNull();
+    expect(button?.tagName.toLowerCase()).toBe("button");
+    // Pascal token sweep — text-foreground preserved.
+    expect(button?.className).toMatch(/text-foreground/);
+    const svg = button?.querySelector("svg");
     expect(svg).not.toBeNull();
   });
 
-  it("leaf row WITHOUT savedCameraPos renders NO Camera icon", () => {
+  it("leaf row WITHOUT savedCameraPos renders NO Camera button", () => {
     render(<RoomsTreePanel productLibrary={[]} />);
     const row = document.querySelector('[data-tree-node="wall_no_cam"]') as HTMLElement | null;
     expect(row).not.toBeNull();
-    const icon = row?.querySelector('[title="Has saved camera angle"]');
-    expect(icon).toBeNull();
+    const button = row?.querySelector('[data-saved-camera-button]');
+    expect(button).toBeNull();
   });
 
-  it("group rows NEVER render Camera icon (D-07 leaf-only)", () => {
+  it("group rows NEVER render Camera button (D-07 leaf-only)", () => {
     render(<RoomsTreePanel productLibrary={[]} />);
     const groupRows = document.querySelectorAll('[data-tree-kind="group"]');
     expect(groupRows.length).toBeGreaterThan(0);
     groupRows.forEach((g) => {
       const rowContainer = g.querySelector(":scope > div");
-      const icon = rowContainer?.querySelector(":scope > [title='Has saved camera angle']");
-      expect(icon).toBeNull();
+      const button = rowContainer?.querySelector(":scope > [data-saved-camera-button]");
+      expect(button).toBeNull();
     });
   });
 
-  it("room rows NEVER render Camera icon (D-07 leaf-only)", () => {
+  it("room rows NEVER render Camera button (D-07 leaf-only)", () => {
     render(<RoomsTreePanel productLibrary={[]} />);
     const roomRows = document.querySelectorAll('[data-tree-kind="room"]');
     expect(roomRows.length).toBeGreaterThan(0);
     roomRows.forEach((r) => {
       const rowContainer = r.querySelector(":scope > div");
-      const icon = rowContainer?.querySelector(":scope > [title='Has saved camera angle']");
-      expect(icon).toBeNull();
+      const button = rowContainer?.querySelector(":scope > [data-saved-camera-button]");
+      expect(button).toBeNull();
     });
   });
 
-  it("double-click leaf row WITH savedCameraPos dispatches requestCameraTarget(savedPos, savedTarget)", () => {
+  it("Camera-button CLICK on leaf row WITH savedCameraPos dispatches requestCameraTarget(savedPos, savedTarget) (Phase 81 D-03)", () => {
     const ui = useUIStore.getState() as ReturnType<typeof useUIStore.getState> & {
       requestCameraTarget?: (p: [number,number,number], t: [number,number,number]) => void;
     };
     const spy = vi.spyOn(ui as unknown as { requestCameraTarget: (...args: unknown[]) => void }, "requestCameraTarget");
 
     render(<RoomsTreePanel productLibrary={[]} />);
-    const row = document.querySelector('[data-tree-node="wall_with_cam"] [data-tree-row]') as HTMLElement | null;
-    expect(row).not.toBeNull();
-    fireEvent.doubleClick(row!);
+    // Phase 81 Plan 03 (D-03): saved-camera now fires on Camera-button click,
+    // not row dbl-click. Row dbl-click opens inline rename.
+    const button = document.querySelector('[data-tree-node="wall_with_cam"] [data-saved-camera-button]') as HTMLElement | null;
+    expect(button).not.toBeNull();
+    fireEvent.click(button!);
 
     // Per seed: savedCameraPos = [10,6,12], savedCameraTarget = [5,3,5]
     expect(spy).toHaveBeenCalled();
@@ -138,35 +143,44 @@ describe("RoomsTreePanel — Phase 48 savedCamera indicator + double-click (D-02
     expect(callMatched).toBe(true);
   });
 
-  it("double-click leaf row WITHOUT savedCameraPos falls through to default focus dispatch (D-02 fall-through)", () => {
-    const ui = useUIStore.getState() as ReturnType<typeof useUIStore.getState> & {
-      focusWallSide?: (id: string, side: "A"|"B") => void;
-    };
-    const spy = vi.spyOn(ui as unknown as { focusWallSide: (...args: unknown[]) => void }, "focusWallSide");
-
-    render(<RoomsTreePanel productLibrary={[]} />);
-    const row = document.querySelector('[data-tree-node="wall_no_cam"] [data-tree-row]') as HTMLElement | null;
-    expect(row).not.toBeNull();
-    fireEvent.doubleClick(row!);
-
-    expect(spy).toHaveBeenCalledWith("wall_no_cam", "A");
-  });
-
-  it("double-click on group row is NO-OP (no pendingCameraTarget update)", () => {
+  it("Phase 81 D-03: dbl-click on a leaf row opens inline rename (NO saved-camera dispatch)", () => {
     const ui = useUIStore.getState() as ReturnType<typeof useUIStore.getState> & {
       requestCameraTarget?: (p: [number,number,number], t: [number,number,number]) => void;
     };
     const spy = vi.spyOn(ui as unknown as { requestCameraTarget: (...args: unknown[]) => void }, "requestCameraTarget");
 
     render(<RoomsTreePanel productLibrary={[]} />);
-    const groupRow = document.querySelector('[data-tree-kind="group"] [data-tree-row]') as HTMLElement | null;
-    if (!groupRow) {
-      const altGroup = document.querySelector('[data-tree-kind="group"]') as HTMLElement | null;
-      expect(altGroup).not.toBeNull();
-      fireEvent.doubleClick(altGroup!);
-    } else {
+    // Phase 81 Plan 03: dbl-click on the row container flips it into edit mode.
+    const rowContainer = document.querySelector('[data-tree-node="wall_with_cam"] > div') as HTMLElement | null;
+    expect(rowContainer).not.toBeNull();
+    fireEvent.doubleClick(rowContainer!);
+
+    // Inline edit input appears — InlineEditableText with data-testid `tree-row-edit-{id}`.
+    const editInput = document.querySelector('[data-testid="tree-row-edit-wall_with_cam"]');
+    expect(editInput).not.toBeNull();
+    // Saved-camera focus must NOT have fired (D-03 contract: dbl-click ≠ camera).
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it("dbl-click on group row is NO-OP (no rename, no camera) — group rows are not editable", () => {
+    const ui = useUIStore.getState() as ReturnType<typeof useUIStore.getState> & {
+      requestCameraTarget?: (p: [number,number,number], t: [number,number,number]) => void;
+    };
+    const spy = vi.spyOn(ui as unknown as { requestCameraTarget: (...args: unknown[]) => void }, "requestCameraTarget");
+
+    render(<RoomsTreePanel productLibrary={[]} />);
+    const groupRow = document.querySelector('[data-tree-kind="group"] > div') as HTMLElement | null;
+    if (groupRow) {
       fireEvent.doubleClick(groupRow);
     }
     expect(spy).not.toHaveBeenCalled();
+    // No edit input on any group row.
+    const editInputs = document.querySelectorAll('[data-testid^="tree-row-edit-"]');
+    // Could include the leaf-row edit input from a prior test if state leaked; assert
+    // that no GROUP node carries an edit input by checking ancestry.
+    editInputs.forEach((input) => {
+      const groupAncestor = input.closest('[data-tree-kind="group"]');
+      expect(groupAncestor).toBeNull();
+    });
   });
 });

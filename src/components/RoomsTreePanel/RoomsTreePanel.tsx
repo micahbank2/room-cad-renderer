@@ -1,7 +1,7 @@
 // src/components/RoomsTreePanel/RoomsTreePanel.tsx
 // Phase 46: Rooms hierarchy panel — top of Sidebar (D-01).
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCADStore } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { buildRoomTree, type TreeNode } from "@/lib/buildRoomTree";
@@ -64,31 +64,10 @@ interface Props {
 // separate localStorage namespace). The Sidebar's own local CollapsibleSection
 // is the canonical primitive for this context.
 // ---------------------------------------------------------------------------
-function PanelSection({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  const [open, setOpen] = useState(true);
-  return (
-    <div>
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between mb-2 py-1"
-      >
-        <h3 className="font-sans text-base font-medium text-muted-foreground">
-          {label}
-        </h3>
-        <span className="font-sans text-sm text-muted-foreground/60">
-          {open ? "\u2212" : "+"}
-        </span>
-      </button>
-      {open && children}
-    </div>
-  );
-}
+// (Phase 81 Plan 01 / IA-02) Local inline PanelSection clone removed \u2014
+// the parent Sidebar.tsx now wraps this component in the shared PanelSection
+// primitive (id="sidebar-rooms-tree", defaultOpen={true}). Panel-level collapse
+// state persists via "ui:propertiesPanel:sections".
 
 // ---------------------------------------------------------------------------
 // RoomsTreePanel
@@ -189,6 +168,33 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
     toggleHidden(id);
   }, []);
 
+  // Phase 81 Plan 02 (D-02): tree row hover → uiStore.hoveredEntityId.
+  // Setter is RAF-coalesced inside uiStore; safe to call on every mouseenter.
+  const onHoverEnter = useCallback((id: string) => {
+    useUIStore.getState().setHoveredEntityId(id);
+  }, []);
+  const onHoverLeave = useCallback(() => {
+    useUIStore.getState().setHoveredEntityId(null);
+  }, []);
+
+  // Phase 81 Plan 02 (D-02): test driver for IA-03 hover criterion.
+  // StrictMode-safe per CLAUDE.md §7 — identity-check cleanup prevents
+  // discarded first-mount from clobbering the second-mount registration
+  // (Phase 58 + 64 documented trap).
+  useEffect(() => {
+    if (import.meta.env.MODE !== "test") return;
+    const w = window as unknown as { __driveTreeHover?: object | null };
+    const me = {
+      enter: (id: string) => useUIStore.getState().setHoveredEntityId(id),
+      leave: () => useUIStore.getState().setHoveredEntityId(null),
+      getHoveredId: () => useUIStore.getState().hoveredEntityId,
+    };
+    w.__driveTreeHover = me;
+    return () => {
+      if (w.__driveTreeHover === me) w.__driveTreeHover = null;
+    };
+  }, []);
+
   const onClickRow = useCallback(
     (node: TreeNode) => {
       const cadState = useCADStore.getState();
@@ -237,18 +243,17 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
     [productLibrary],
   );
 
-  const onDoubleClickRow = useCallback(
+  // Phase 81 Plan 03 (D-03): saved-camera focus moved from row dbl-click to
+  // the camera-icon button. Same lookup + dispatch shape as the previous
+  // onDoubleClickRow handler — only the entry-point changed.
+  const onSavedCameraFocus = useCallback(
     (node: TreeNode) => {
-      // Defense in depth: TreeRow already guards groups + rooms in its handler,
-      // but enforce here too so any future caller can't accidentally trigger
-      // camera moves on group / room nodes (D-02 leaf-only contract).
       if (node.kind === "group" || node.kind === "room") return;
 
       const cadState = useCADStore.getState();
       const doc = cadState.rooms[node.roomId];
       if (!doc) return;
 
-      // Look up the entity to read savedCameraPos/Target (D-02 fall-through key).
       let savedPos: [number, number, number] | undefined;
       let savedTarget: [number, number, number] | undefined;
       if (node.kind === "wall") {
@@ -273,37 +278,75 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
         savedTarget = s?.savedCameraTarget;
       }
 
-      // D-02 fall-through: if no saved camera, dispatch the default focus
-      // (same path as single-click).
       focusOnSavedCamera(savedPos, savedTarget, () => onClickRow(node));
     },
     [onClickRow],
   );
 
+  // Phase 81 Plan 03 (D-03): inline-rename dispatcher. Routes per node.kind
+  // to the appropriate cadStore action:
+  //   - room   → renameRoom
+  //   - wall   → renameWall (Phase 81 D-04, new this plan)
+  //   - custom → updatePlacedCustomElement({ labelOverride }) (Phase 31)
+  //   - stair  → updateStair({ labelOverride }) (Phase 60)
+  //   - product / ceiling → no-op (no labelOverride field yet; out of scope per CONTEXT.md)
+  const onRename = useCallback((node: TreeNode, name: string) => {
+    const cadActions = useCADStore.getState() as ReturnType<typeof useCADStore.getState> & {
+      renameRoom?: (id: string, name: string) => void;
+      renameWall?: (roomId: string, wallId: string, name: string) => void;
+      updatePlacedCustomElement?: (id: string, changes: { labelOverride?: string }) => void;
+      updateStair?: (roomId: string, stairId: string, patch: { labelOverride?: string }) => void;
+    };
+    if (node.kind === "room") {
+      cadActions.renameRoom?.(node.id, name);
+      return;
+    }
+    if (node.kind === "wall") {
+      cadActions.renameWall?.(node.roomId, node.id, name);
+      return;
+    }
+    if (node.kind === "custom") {
+      const trimmed = name.trim();
+      cadActions.updatePlacedCustomElement?.(node.id, {
+        labelOverride: trimmed === "" ? undefined : trimmed,
+      });
+      return;
+    }
+    if (node.kind === "stair") {
+      const trimmed = name.trim();
+      cadActions.updateStair?.(node.roomId, node.id, {
+        labelOverride: trimmed === "" ? undefined : trimmed,
+      });
+      return;
+    }
+    // product / ceiling: no labelOverride yet — explicit no-op (deferred per CONTEXT.md "Out of Scope").
+  }, []);
+
   // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
   return (
-    <PanelSection label="Rooms">
-      <div role="tree" aria-label="Rooms tree">
-        {tree.map((roomNode) => (
-          <TreeRow
-            key={roomNode.id}
-            node={roomNode}
-            ancestry={[]}
-            depth={0}
-            expanded={expanded}
-            activeRoomId={activeRoomId}
-            selectedIds={selectedIds}
-            hiddenIds={hiddenIds}
-            savedCameraNodeIds={savedCameraNodeIds}
-            onToggleExpand={onToggleExpand}
-            onClickRow={onClickRow}
-            onToggleVisibility={onToggleVisibility}
-            onDoubleClickRow={onDoubleClickRow}
-          />
-        ))}
-      </div>
-    </PanelSection>
+    <div role="tree" aria-label="Rooms tree">
+      {tree.map((roomNode) => (
+        <TreeRow
+          key={roomNode.id}
+          node={roomNode}
+          ancestry={[]}
+          depth={0}
+          expanded={expanded}
+          activeRoomId={activeRoomId}
+          selectedIds={selectedIds}
+          hiddenIds={hiddenIds}
+          savedCameraNodeIds={savedCameraNodeIds}
+          onToggleExpand={onToggleExpand}
+          onClickRow={onClickRow}
+          onToggleVisibility={onToggleVisibility}
+          onRename={onRename}
+          onSavedCameraFocus={onSavedCameraFocus}
+          onHoverEnter={onHoverEnter}
+          onHoverLeave={onHoverLeave}
+        />
+      ))}
+    </div>
   );
 }

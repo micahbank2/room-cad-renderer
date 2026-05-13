@@ -38,7 +38,8 @@ export function buildRoomTree(
       roomId: doc.id, groupKey: "walls",
       children: wallEntries.map((wall, idx) => ({
         id: wall.id, kind: "wall" as const,
-        label: wallCardinalLabel(wall, center, idx),
+        // Phase 81 IA-03 (D-04): user-set name wins; fall back to default cardinal label.
+        label: wall.name?.trim() || wallCardinalLabel(wall, center, idx),
         roomId: doc.id,
       })),
     });
