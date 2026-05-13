@@ -103,6 +103,25 @@
   --spacing-lg: 24px;
   --spacing-xl: 32px;
 
+  /* Restore Tailwind v4 default container scale.
+     The named --spacing-{name} tokens above were shadowing the default
+     --container-{name} lookup for max-w-{name} utilities — without these
+     explicit values, max-w-lg resolved to 24px and broke paragraph wrapping
+     (e.g. WelcomeScreen hero copy). */
+  --container-3xs: 16rem;
+  --container-2xs: 18rem;
+  --container-xs: 20rem;
+  --container-sm: 24rem;
+  --container-md: 28rem;
+  --container-lg: 32rem;
+  --container-xl: 36rem;
+  --container-2xl: 42rem;
+  --container-3xl: 48rem;
+  --container-4xl: 56rem;
+  --container-5xl: 64rem;
+  --container-6xl: 72rem;
+  --container-7xl: 80rem;
+
   /* Fonts (D-15 / D-16 — drop Material Symbols + Plex/Inter/SpaceGrotesk) */
   --font-sans: 'Barlow', 'Geist Sans', system-ui, sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
