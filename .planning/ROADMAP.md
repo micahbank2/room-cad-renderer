@@ -383,7 +383,7 @@
 
 ### Phases
 
-- [ ] **Phase 78: PBR Maps (PBR-MAPS-01)** — AO + displacement map upload on Materials; 3D rendering applies all maps; Material card shows map-presence indicators
+- [x] **Phase 78: PBR Maps (PBR-MAPS-01)** — AO + displacement map upload on Materials; 3D rendering applies all maps; Material card shows map-presence indicators (completed 2026-05-13)
 - [ ] **Phase 79: Window Presets (WIN-PRESETS-01)** — Preset size picker when placing windows; PropertiesPanel shows selected preset post-placement
 - [ ] **Phase 80: Parametric Product Controls (PARAM-01)** — Type exact width/depth/position for placed products in PropertiesPanel; single-undo per edit
 - [ ] **Phase 81: Columns & Pillars (COL-01)** — New Column entity; round/rectangular cross-section; renders in 2D + 3D; selectable/movable/deletable
@@ -400,7 +400,7 @@
   2. Uploaded AO map appears on `material.aoMapId`; displacement map on `material.displacementMapId` — both persist across reload
   3. 3D mesh surfaces that use the material render with `aoMap` and `displacementMap` props — surfaces look noticeably more detailed
   4. Material card shows small icons/dots indicating which of the 4 maps (color, roughness, AO, displacement) are loaded
-**Plans:** 1/4 plans executed
+**Plans:** 4/4 plans complete
 **UI hint:** yes
 
 #### Phase 79: Window Presets (WIN-PRESETS-01) — v1.20 ACTIVE
@@ -492,7 +492,7 @@
 | 75. Properties + Library Restyle | 3/3 | Complete   | 2026-05-08 |
 | 76. Modals + Welcome + Final | 3/3 | Complete    | 2026-05-08 |
 | 77. Test Suite Cleanup | 1/1 | Complete   | 2026-05-08 |
-| 78. PBR Maps | 1/4 | In Progress|  |
+| 78. PBR Maps | 1/4 | Complete    | 2026-05-13 |
 | 79. Window Presets | TBD | v1.20 active   | — |
 | 80. Parametric Product Controls | TBD | v1.20 active   | — |
 | 81. Columns & Pillars | TBD | v1.20 active   | — |
