@@ -23,6 +23,8 @@
 - ✅ **v1.17 Library + Material Engine** — Phases 67–68 (partial-shipped 2026-05-07; Phases 69 MAT-LINK-01 + 70 LIB-REBUILD-01 deferred to v1.19)
 - ✅ **v1.18 Pascal Visual Parity** — Phases 71–76 (shipped 2026-05-08) — chrome-only rewrite to emulate pascalorg/editor
 - 🚧 **v1.19 Material Linking & Library Rebuild** — Phases 69, 70, 77 (in progress) — finish slots on placed products + 3-tab library rebuild
+- 🚧 **v1.20 Surface Depth & Architectural Expansion** — Phases 78, 79 (in progress) — PBR maps + window presets shipped; parametric controls + columns remaining
+- 📋 **v1.21 Sidebar IA & Contextual Surfaces** — Phases 80–84 (planned) — rebuild left + right panels and floating toolbar with Figma/Miro-style contextual visibility; surfaced from Phase 79 Jessica UAT feedback — see [milestones/v1.21-REQUIREMENTS.md](milestones/v1.21-REQUIREMENTS.md)
 
 ---
 
