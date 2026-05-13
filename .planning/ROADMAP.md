@@ -444,7 +444,7 @@
   2. 2D canvas shows the column footprint (circle or rectangle outline) at the correct position and scale
   3. 3D viewport shows the column as an extruded pillar from floor to ceiling height
   4. Column is selectable via the select tool; PropertiesPanel shows its cross-section type, diameter/width, height, and material finish; Delete key removes it
-**Plans:** TBD (v1.20)
+**Plans:** 1/3 plans executed
 **UI hint:** yes
 
 ## Progress
@@ -500,7 +500,7 @@
 | 78. PBR Maps | 1/4 | Complete    | 2026-05-13 |
 | 79. Window Presets | 3/3 | Complete    | 2026-05-13 |
 | 80. Parametric Product Controls | TBD | v1.20 active   | — |
-| 81. Columns & Pillars | TBD | v1.20 active   | — |
+| 81. Columns & Pillars | 1/3 | In Progress|  |
 
 ## Backlog
 
