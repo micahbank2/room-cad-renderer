@@ -198,6 +198,9 @@ interface CADState {
 
   // NEW: room-management actions
   addRoom: (name: string, templateId?: RoomTemplateId) => string;
+  /** Phase 81 IA-03 (D-04): rename a wall by writing `WallSegment.name`.
+   *  Empty/whitespace-only input clears the field (reverts to default cardinal label). */
+  renameWall: (roomId: string, wallId: string, name: string) => void;
   renameRoom: (id: string, name: string) => void;
   /**
    * Phase 33 GH #88 — live-preview keystroke variant of renameRoom.
@@ -1698,6 +1701,26 @@ export const useCADStore = create<CADState>()((set) => ({
         if (!s.rooms[id]) return;
         pushHistory(s);
         s.rooms[id].name = name;
+      })
+    ),
+
+  // Phase 81 IA-03 (D-04): rename a wall by writing `WallSegment.name`.
+  // Trim + clamp to 40 chars. Empty input clears the field (delete) so the
+  // tree falls back to the default cardinal label via `wallCardinalLabel`.
+  renameWall: (roomId, wallId, name) =>
+    set(
+      produce((s: CADState) => {
+        const doc = s.rooms[roomId];
+        if (!doc) return;
+        const wall = doc.walls[wallId];
+        if (!wall) return;
+        pushHistory(s);
+        const trimmed = name.trim().slice(0, 40);
+        if (trimmed === "") {
+          delete (wall as { name?: string }).name;
+        } else {
+          wall.name = trimmed;
+        }
       })
     ),
 
