@@ -23,7 +23,7 @@ export function defaultSnapshot(): CADSnapshot {
     annotations: {},
   };
   return {
-    version: 7,
+    version: 8,
     rooms: { room_main: mainRoom },
     activeRoomId: "room_main",
   };
@@ -59,14 +59,23 @@ function migrateWallsPerSide(rooms: Record<string, RoomDoc> | undefined): void {
 }
 
 export function migrateSnapshot(raw: unknown): CADSnapshot {
-  // Phase 69 MAT-LINK-01: v7 passthrough (handed to migrateV6ToV7 in cadStore pipeline — already at v7).
+  // Phase 81 IA-03 (D-04): v8 passthrough — already at current.
+  if (
+    raw &&
+    typeof raw === "object" &&
+    (raw as { version?: number }).version === 8 &&
+    (raw as CADSnapshot).rooms
+  ) {
+    return raw as CADSnapshot;
+  }
+  // Phase 81 IA-03 (D-04): v7 inputs flow through migrateV7ToV8 (passthrough — name is optional).
   if (
     raw &&
     typeof raw === "object" &&
     (raw as { version?: number }).version === 7 &&
     (raw as CADSnapshot).rooms
   ) {
-    return raw as CADSnapshot;
+    return migrateV7ToV8(raw as CADSnapshot);
   }
   // Phase 68 MAT-APPLY-01: v6 passthrough (handed to migrateV5ToV6 / migrateV6ToV7 in cadStore pipeline).
   if (
@@ -538,5 +547,18 @@ export async function migrateV5ToV6(snap: CADSnapshot): Promise<CADSnapshot> {
 export function migrateV6ToV7(snap: CADSnapshot): CADSnapshot {
   if ((snap as { version: number }).version >= 7) return snap;
   (snap as { version: number }).version = 7;
+  return snap;
+}
+
+/* ----------------------------------------------------------------- *
+ * Phase 81 IA-03 (D-04) — v7 → v8. Trivial passthrough: adds optional
+ * WallSegment.name. Absence renders the default cardinal label via
+ * wallCardinalLabel(), so legacy v7 walls have correct behavior with
+ * no data transformation. Pure version bump — matches the Phase 69
+ * v6→v7 + Phase 62 v4→v5 template.
+ * ----------------------------------------------------------------- */
+export function migrateV7ToV8(snap: CADSnapshot): CADSnapshot {
+  if ((snap as { version: number }).version >= 8) return snap;
+  (snap as { version: number }).version = 8;
   return snap;
 }

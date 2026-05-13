@@ -24,6 +24,9 @@ export interface CrownConfig {
 
 export interface WallSegment {
   id: string;
+  /** Phase 81 D-04: user-facing wall name. Optional — absence renders the
+   *  default cardinal label via wallCardinalLabel(). Max 40 chars (client-enforced). */
+  name?: string;
   start: Point;
   end: Point;
   thickness: number; // feet, default 0.5
@@ -352,8 +355,12 @@ export interface CADSnapshot {
    *
    *  Phase 69 MAT-LINK-01: bumped from 6 to 7 — adds optional
    *  `PlacedProduct.finishMaterialId`. Migration is a trivial passthrough
-   *  (the field is optional, so absence is the correct legacy behavior). */
-  version: 7;
+   *  (the field is optional, so absence is the correct legacy behavior).
+   *
+   *  Phase 81 IA-03 (D-04): bumped from 7 to 8 — adds optional
+   *  WallSegment.name. Migration is a trivial passthrough (the field
+   *  is optional, so absence is the correct legacy behavior). */
+  version: 8;
   rooms: Record<string, RoomDoc>;
   activeRoomId: string | null;
   /** Per-project catalog of custom elements (reusable across rooms). */
