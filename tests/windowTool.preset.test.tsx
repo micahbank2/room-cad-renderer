@@ -62,7 +62,11 @@ import {
   getCurrentWindowPreset,
 } from "@/canvas/tools/windowTool";
 // PropertiesPanel will gain a preset row in Wave 2. Import for tests below.
-import { PropertiesPanel } from "@/components/PropertiesPanel";
+// Phase 79-03 Wave 3 [Rule 3 - blocking]: PropertiesPanel exports `default`,
+// not a named export. The RED test as written imports `{ PropertiesPanel }`
+// and renders `undefined`, blocking all 4 WIN-02 assertions before they can
+// inspect the DOM. Switched to the canonical default import to unblock.
+import PropertiesPanel from "@/components/PropertiesPanel";
 
 declare global {
   interface Window {
@@ -207,14 +211,17 @@ describe("Phase 79 — PropertiesPanel preset row (WIN-02)", () => {
   it("renders 'Preset: Standard' for an Opening with 3/4/3", () => {
     render(
       <TooltipProvider>
-        <PropertiesPanel />
+        <PropertiesPanel productLibrary={[]} viewMode="2d" />
       </TooltipProvider>
     );
     // Expand the opening row.
     const wall = activeDoc().walls[WALL_ID];
     const op = wall.openings[0];
     const row = screen.queryByTestId(`opening-row-${op.id}`);
-    if (row) row.click();
+    // Wave 3 [Rule 3 - blocking]: native .click() does not flush React state
+    // updates in happy-dom; wrap in act() so the OpeningEditor expand state
+    // settles before the assertion reads it.
+    if (row) act(() => { row.click(); });
     expect(screen.getByText(/preset:\s*standard/i)).toBeInTheDocument();
   });
 
@@ -231,11 +238,14 @@ describe("Phase 79 — PropertiesPanel preset row (WIN-02)", () => {
     });
     render(
       <TooltipProvider>
-        <PropertiesPanel />
+        <PropertiesPanel productLibrary={[]} viewMode="2d" />
       </TooltipProvider>
     );
     const row = screen.queryByTestId(`opening-row-${op.id}`);
-    if (row) row.click();
+    // Wave 3 [Rule 3 - blocking]: native .click() does not flush React state
+    // updates in happy-dom; wrap in act() so the OpeningEditor expand state
+    // settles before the assertion reads it.
+    if (row) act(() => { row.click(); });
     expect(screen.getByText(/preset:\s*custom/i)).toBeInTheDocument();
   });
 
@@ -244,11 +254,14 @@ describe("Phase 79 — PropertiesPanel preset row (WIN-02)", () => {
     const op = wall.openings[0];
     render(
       <TooltipProvider>
-        <PropertiesPanel />
+        <PropertiesPanel productLibrary={[]} viewMode="2d" />
       </TooltipProvider>
     );
     const row = screen.queryByTestId(`opening-row-${op.id}`);
-    if (row) row.click();
+    // Wave 3 [Rule 3 - blocking]: native .click() does not flush React state
+    // updates in happy-dom; wrap in act() so the OpeningEditor expand state
+    // settles before the assertion reads it.
+    if (row) act(() => { row.click(); });
     const beforePast = useCADStore.getState().past.length;
     const wideChip = screen.getByTestId(`opening-preset-chip-${op.id}-wide`);
     act(() => {
@@ -267,11 +280,14 @@ describe("Phase 79 — PropertiesPanel preset row (WIN-02)", () => {
     const op = wall.openings[0];
     render(
       <TooltipProvider>
-        <PropertiesPanel />
+        <PropertiesPanel productLibrary={[]} viewMode="2d" />
       </TooltipProvider>
     );
     const row = screen.queryByTestId(`opening-row-${op.id}`);
-    if (row) row.click();
+    // Wave 3 [Rule 3 - blocking]: native .click() does not flush React state
+    // updates in happy-dom; wrap in act() so the OpeningEditor expand state
+    // settles before the assertion reads it.
+    if (row) act(() => { row.click(); });
     expect(screen.getByText(/preset:\s*standard/i)).toBeInTheDocument();
     act(() => {
       useCADStore.getState().updateOpening(WALL_ID, op.id, { width: 5 });
