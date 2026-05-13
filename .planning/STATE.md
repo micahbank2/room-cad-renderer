@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: verifying
-last_updated: "2026-05-13T20:11:16.781Z"
+last_updated: "2026-05-13T20:24:11.558Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 20
@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 
 ## Current Position
 
-Phase: 81 — left-panel-restructure-v1-21
-Plan: 03 of 03 (complete)
+Phase: 999.1
+Plan: Not started
 Milestone: v1.21 Sidebar IA & Contextual Surfaces
 Phases: 81 complete (Plans 01 + 02 + 03 all shipped); 82 next (inspector rebuild)
 Status: Phase 81 complete — ready for verification

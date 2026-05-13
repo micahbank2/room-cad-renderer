@@ -29,9 +29,9 @@
 
 ### Columns & Pillars (COL)
 
-- [ ] **COL-01**: User can place a column/pillar in a room — choose round or rectangular cross-section, with configurable diameter/width and height (defaults to room ceiling height)
-- [ ] **COL-02**: Column renders correctly in 2D (footprint outline at correct position and scale) and 3D (extruded pillar with a material finish slot)
-- [ ] **COL-03**: Column is selectable, movable, and deletable via the standard select tool; PropertiesPanel shows its dimensions and finish material
+- [x] **COL-01**: User can place a column/pillar in a room — choose round or rectangular cross-section, with configurable diameter/width and height (defaults to room ceiling height)
+- [x] **COL-02**: Column renders correctly in 2D (footprint outline at correct position and scale) and 3D (extruded pillar with a material finish slot)
+- [x] **COL-03**: Column is selectable, movable, and deletable via the standard select tool; PropertiesPanel shows its dimensions and finish material
 
 ---
 

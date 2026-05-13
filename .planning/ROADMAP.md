@@ -500,7 +500,7 @@
 | 78. PBR Maps | 1/4 | Complete    | 2026-05-13 |
 | 79. Window Presets | 3/3 | Complete    | 2026-05-13 |
 | 80. Parametric Product Controls | TBD | v1.20 active   | — |
-| 81. Columns & Pillars | 3/3 | Complete   | 2026-05-13 |
+| 81. Columns & Pillars | 3/3 | Complete    | 2026-05-13 |
 
 ## Backlog
 
