@@ -496,7 +496,7 @@
 | 76. Modals + Welcome + Final | 3/3 | Complete    | 2026-05-08 |
 | 77. Test Suite Cleanup | 1/1 | Complete   | 2026-05-08 |
 | 78. PBR Maps | 1/4 | Complete    | 2026-05-13 |
-| 79. Window Presets | 3/3 | Complete   | 2026-05-13 |
+| 79. Window Presets | 3/3 | Complete    | 2026-05-13 |
 | 80. Parametric Product Controls | TBD | v1.20 active   | — |
 | 81. Columns & Pillars | TBD | v1.20 active   | — |
 
