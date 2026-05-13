@@ -177,6 +177,24 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
     useUIStore.getState().setHoveredEntityId(null);
   }, []);
 
+  // Phase 81 Plan 02 (D-02): test driver for IA-03 hover criterion.
+  // StrictMode-safe per CLAUDE.md §7 — identity-check cleanup prevents
+  // discarded first-mount from clobbering the second-mount registration
+  // (Phase 58 + 64 documented trap).
+  useEffect(() => {
+    if (import.meta.env.MODE !== "test") return;
+    const w = window as unknown as { __driveTreeHover?: object | null };
+    const me = {
+      enter: (id: string) => useUIStore.getState().setHoveredEntityId(id),
+      leave: () => useUIStore.getState().setHoveredEntityId(null),
+      getHoveredId: () => useUIStore.getState().hoveredEntityId,
+    };
+    w.__driveTreeHover = me;
+    return () => {
+      if (w.__driveTreeHover === me) w.__driveTreeHover = null;
+    };
+  }, []);
+
   const onClickRow = useCallback(
     (node: TreeNode) => {
       const cadState = useCADStore.getState();
