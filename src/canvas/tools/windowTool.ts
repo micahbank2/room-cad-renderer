@@ -3,9 +3,45 @@ import { useCADStore } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { wallLength, angle as wallAngle } from "@/lib/geometry";
 import { pxToFeet, findClosestWall } from "./toolUtils";
+import { WINDOW_PRESETS } from "@/lib/windowPresets";
 import type { WallSegment } from "@/types/cad";
 
-const WINDOW_WIDTH = 3;
+/**
+ * Phase 79 WIN-PRESETS-01 — switcher → tool bridge.
+ *
+ * CLAUDE.md D-07 intentional exception: this is a module-level public-API
+ * bridge between the React WindowPresetSwitcher and the imperative
+ * Fabric tool, parallel to productTool.pendingProductId.
+ *
+ * Default matches the historical hardcoded 3/4/3 so existing placements
+ * (and tests written against the old default) still work when no
+ * switcher has written a selection yet.
+ *
+ * Pitfall 1: do NOT clear this on tool deactivation — StrictMode would
+ * race the next mount's write against the live tool's read. The bridge
+ * persists for the lifetime of the page.
+ */
+let currentWindowPreset: { width: number; height: number; sillHeight: number } = {
+  width: 3,
+  height: 4,
+  sillHeight: 3,
+};
+
+export function setCurrentWindowPreset(p: {
+  width: number;
+  height: number;
+  sillHeight: number;
+}): void {
+  currentWindowPreset = { width: p.width, height: p.height, sillHeight: p.sillHeight };
+}
+
+export function getCurrentWindowPreset(): {
+  width: number;
+  height: number;
+  sillHeight: number;
+} {
+  return currentWindowPreset;
+}
 
 export function activateWindowTool(
   fc: fabric.Canvas,
@@ -26,7 +62,7 @@ export function activateWindowTool(
       return;
     }
     const len = wallLength(hit.wall);
-    const halfWin = WINDOW_WIDTH / 2;
+    const halfWin = currentWindowPreset.width / 2;
     const clampedOffset = Math.max(halfWin, Math.min(len - halfWin, hit.offset));
     const startOffset = clampedOffset - halfWin;
     const endOffset = clampedOffset + halfWin;
@@ -77,26 +113,26 @@ export function activateWindowTool(
   const onMouseMove = (opt: fabric.TEvent) => {
     const pointer = fc.getViewportPoint(opt.e);
     const feet = pxToFeet(pointer, origin, scale);
-    const hit = findClosestWall(feet, WINDOW_WIDTH);
+    const hit = findClosestWall(feet, currentWindowPreset.width);
     updatePreview(hit);
   };
 
   const onMouseDown = (opt: fabric.TEvent) => {
     const pointer = fc.getViewportPoint(opt.e);
     const feet = pxToFeet(pointer, origin, scale);
-    const hit = findClosestWall(feet, WINDOW_WIDTH);
+    const hit = findClosestWall(feet, currentWindowPreset.width);
 
     if (hit) {
       const len = wallLength(hit.wall);
-      const halfWin = WINDOW_WIDTH / 2;
+      const halfWin = currentWindowPreset.width / 2;
       const clampedOffset = Math.max(halfWin, Math.min(len - halfWin, hit.offset));
 
       useCADStore.getState().addOpening(hit.wall.id, {
         type: "window",
         offset: clampedOffset - halfWin,
-        width: WINDOW_WIDTH,
-        height: 4, // 4' tall window
-        sillHeight: 3, // 3' from floor
+        width: currentWindowPreset.width,
+        height: currentWindowPreset.height,
+        sillHeight: currentWindowPreset.sillHeight,
       });
       clearPreview();
       // Auto-revert to Select after placing (EDIT-11)
@@ -115,10 +151,51 @@ export function activateWindowTool(
   fc.on("mouse:down", onMouseDown);
   document.addEventListener("keydown", onKeyDown);
 
+  // Phase 79 — test-mode driver. Mirrors productTool.ts driver pattern.
+  // The bridge itself defaults at module load and is NOT cleared on cleanup
+  // (Pitfall 1 — StrictMode would clobber the next mount's write).
+  let driveHook:
+    | ((
+        arg:
+          | "small"
+          | "standard"
+          | "wide"
+          | "picture"
+          | "bathroom"
+          | { width: number; height: number; sillHeight: number },
+      ) => void)
+    | null = null;
+  if (import.meta.env.MODE === "test") {
+    driveHook = (arg) => {
+      if (typeof arg === "string") {
+        const p = WINDOW_PRESETS.find((x) => x.id === arg);
+        if (p) {
+          setCurrentWindowPreset({
+            width: p.width,
+            height: p.height,
+            sillHeight: p.sillHeight,
+          });
+        }
+      } else {
+        setCurrentWindowPreset(arg);
+      }
+    };
+    (window as unknown as { __driveWindowPreset?: typeof driveHook }).__driveWindowPreset =
+      driveHook;
+  }
+
   return () => {
     fc.off("mouse:move", onMouseMove);
     fc.off("mouse:down", onMouseDown);
     document.removeEventListener("keydown", onKeyDown);
     clearPreview();
+    // Phase 79 — identity-check delete the test driver (Pattern 7). The
+    // bridge value itself persists per Pitfall 1.
+    if (import.meta.env.MODE === "test" && driveHook) {
+      const w = window as unknown as { __driveWindowPreset?: typeof driveHook };
+      if (w.__driveWindowPreset === driveHook) {
+        delete w.__driveWindowPreset;
+      }
+    }
   };
 }
