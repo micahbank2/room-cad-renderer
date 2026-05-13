@@ -384,7 +384,7 @@
 ### Phases
 
 - [x] **Phase 78: PBR Maps (PBR-MAPS-01)** — AO + displacement map upload on Materials; 3D rendering applies all maps; Material card shows map-presence indicators (completed 2026-05-13)
-- [ ] **Phase 79: Window Presets (WIN-PRESETS-01)** — Preset size picker when placing windows; PropertiesPanel shows selected preset post-placement
+- [x] **Phase 79: Window Presets (WIN-PRESETS-01)** — Preset size picker when placing windows; PropertiesPanel shows selected preset post-placement (completed 2026-05-13)
 - [ ] **Phase 80: Parametric Product Controls (PARAM-01)** — Type exact width/depth/position for placed products in PropertiesPanel; single-undo per edit
 - [ ] **Phase 81: Columns & Pillars (COL-01)** — New Column entity; round/rectangular cross-section; renders in 2D + 3D; selectable/movable/deletable
 
@@ -413,10 +413,10 @@
   2. Selecting a preset auto-fills widthFt/heightFt on the Opening — no manual typing required
   3. After placement, PropertiesPanel shows the active preset label and allows switching to another preset or "custom"
   4. Existing manual window placement (typing custom dimensions) continues to work unchanged
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 - [x] 79-01-PLAN.md — Wave 0 RED tests pin WIN-PRESETS contract (catalog, bridge, e2e)
 - [x] 79-02-PLAN.md — Catalog module + windowTool bridge (data + tool layer)
-- [ ] 79-03-PLAN.md — WindowPresetSwitcher + PropertiesPanel preset row + App mount
+- [x] 79-03-PLAN.md — WindowPresetSwitcher + PropertiesPanel preset row + App mount
 **UI hint:** yes
 
 #### Phase 80: Parametric Product Controls (PARAM-01) — v1.20 ACTIVE
@@ -496,7 +496,7 @@
 | 76. Modals + Welcome + Final | 3/3 | Complete    | 2026-05-08 |
 | 77. Test Suite Cleanup | 1/1 | Complete   | 2026-05-08 |
 | 78. PBR Maps | 1/4 | Complete    | 2026-05-13 |
-| 79. Window Presets | 2/3 | In Progress|  |
+| 79. Window Presets | 3/3 | Complete   | 2026-05-13 |
 | 80. Parametric Product Controls | TBD | v1.20 active   | — |
 | 81. Columns & Pillars | TBD | v1.20 active   | — |
 
