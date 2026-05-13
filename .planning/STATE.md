@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: verifying
-last_updated: "2026-05-13T19:40:34.932Z"
+last_updated: "2026-05-13T19:59:42.294Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 20
   completed_phases: 12
   total_plans: 48
-  completed_plans: 43
+  completed_plans: 44
 ---
 
 # Project State
@@ -19,7 +19,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Library Rebuild complete; Phases 69+70+77 all shipped)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 79 — window-presets-win-presets-01-v1-20-active
+**Current focus:** Phase 81 — left-panel-restructure-v1-21 (Plan 02 complete; Plan 03 next)
 
 ## Current Position
 
@@ -48,6 +48,7 @@ Last activity: 2026-05-13
 - [Phase 79]: Plan 02 (Wave 1): WIN-PRESETS-01 catalog + bridge GREEN. Bridge persists across tool cleanup (Pitfall 1). 12/12 catalog tests + 3/3 bridge integration tests pass; 4 PropertiesPanel tests intentionally RED for Plan 03.
 - [Phase 79]: Phase 79 Plan 03 (Wave 3): WIN-PRESETS-01 UI surface shipped. WindowPresetSwitcher + PropertiesPanel preset row + App.tsx mount. 19/19 unit tests GREEN; e2e blocked by pre-existing TooltipProvider harness issue (documented as deferred).
 - [Phase 81]: Phase 81 Plan 01 (IA-02): Sidebar.tsx wraps all 7 left-panel sections in shared PanelSection with stable sidebar-* ids; only sidebar-rooms-tree defaults open; collapse state persists via localStorage[ui:propertiesPanel:sections]
+- [Phase 81]: Phase 81 Plan 02 (IA-03 hover): uiStore.hoveredEntityId + RAF-coalesced setter; TreeRow onMouseEnter/Leave dispatches leaf-only; fabricSync renderers paint accent-purple outline on matched wall/product/ceiling/custom/stair; 2D-only per D-02 (3D hover deferred to Phase 82); e2e/tree-hover.spec.ts 2/2 GREEN
 
 ## Performance Metrics
 
@@ -65,6 +66,7 @@ Last activity: 2026-05-13
 | Phase 79 P02 | 480 | 2 tasks | 2 files |
 | Phase 79 P03 | 1320 | 3 tasks | 4 files |
 | Phase 81 P01 | 320 | 2 tasks | 7 files |
+| Phase 81 P02 | 35min | 3 tasks | 6 files |
 
 ## v1.20 Roadmap
 
