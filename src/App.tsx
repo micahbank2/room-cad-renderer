@@ -36,6 +36,7 @@ import AddRoomDialog from "@/components/AddRoomDialog";
 import TemplatePickerDialog from "@/components/TemplatePickerDialog";
 import FabricCanvas from "@/canvas/FabricCanvas";
 import { CanvasContextMenu } from "@/components/CanvasContextMenu";
+import { WindowPresetSwitcher } from "@/components/WindowPresetSwitcher";
 
 const ThreeViewport = lazy(() => import("@/three/ThreeViewport"));
 
@@ -57,6 +58,10 @@ export default function App() {
   const showSidebar = useUIStore((s) => s.showSidebar);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
   const selectedIds = useUIStore((s) => s.selectedIds);
+  // Phase 79 WIN-PRESETS-01 (D-02/D-04): WindowPresetSwitcher mounts ONLY
+  // when the Window tool is active. Subscribing here means switching tools
+  // unmounts the switcher (which preserves the bridge value — Pitfall 1).
+  const activeTool = useUIStore((s) => s.activeTool);
   const reduced = useReducedMotion();
   const activeWalls = useActiveWalls();
   const wallCount = Object.keys(activeWalls).length;
@@ -261,6 +266,8 @@ export default function App() {
                 <div className="flex-1 h-full relative">
                   <FabricCanvas productLibrary={productLibrary} />
                   <FloatingToolbar viewMode={viewMode} onViewChange={setViewMode} />
+                  {/* Phase 79 WIN-PRESETS-01: floating preset chips when Window tool active */}
+                  {activeTool === "window" && <WindowPresetSwitcher />}
                 </div>
                 <AnimatePresence>
                   {selectedIds.length > 0 && (

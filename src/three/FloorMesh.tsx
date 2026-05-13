@@ -128,7 +128,18 @@ export default function FloorMesh({
       rotation={[-Math.PI / 2, 0, 0]}
       receiveShadow
     >
-      <planeGeometry args={[width, length]} />
+      {/* Phase 78 PBR-03: uv2 setAttribute via ref callback — required for aoMap
+          sampler (Three.js reads aoMap from uv2 channel, not uv). Guard prevents
+          double-write if geometry is reused. */}
+      <planeGeometry
+        ref={(geo) => {
+          if (geo && !geo.attributes.uv2) {
+            const uv = geo.attributes.uv as THREE.BufferAttribute | undefined;
+            if (uv) geo.setAttribute('uv2', new THREE.BufferAttribute(uv.array.slice(), 2));
+          }
+        }}
+        args={[width, length]}
+      />
       {useResolvedBranch ? (
         resolved!.colorHex ? (
           <meshStandardMaterial
@@ -137,6 +148,8 @@ export default function FloorMesh({
             metalness={resolved!.metalness}
           />
         ) : (
+          // Phase 78 PBR-03: aoMap + displacementMap props. displacementScale=0.05
+          // prevents geometry explosion in foot-coordinate world (RESEARCH Pitfall 2).
           <meshStandardMaterial
             color="#ffffff"
             roughness={resolved!.roughness}
@@ -144,6 +157,10 @@ export default function FloorMesh({
             map={resolved!.colorMap ?? undefined}
             roughnessMap={resolved!.roughnessMap ?? undefined}
             metalnessMap={resolved!.reflectionMap ?? undefined}
+            aoMap={resolved!.aoMap ?? undefined}
+            aoMapIntensity={1}
+            displacementMap={resolved!.displacementMap ?? undefined}
+            displacementScale={0.05}
           />
         )
       ) : useUserTextureBranch ? (

@@ -145,9 +145,41 @@ export function MaterialCard({
         <span className="font-sans text-sm text-foreground">
           {formatFeet(material.tileSizeFt)}
         </span>
+        {/* Map presence badges — PBR-04 (Phase 78).
+            COLOR shown only for textured Materials (colorMapId set, not paint).
+            Paint Materials (colorHex set) may still show optional-map badges. */}
+        <div className="flex gap-1 flex-wrap" data-testid="material-card-badges">
+          {material.colorMapId && <MapBadge label="COLOR" />}
+          {material.roughnessMapId && <MapBadge label="ROUGH" />}
+          {material.reflectionMapId && <MapBadge label="REFL" />}
+          {material.aoMapId && <MapBadge label="AO" />}
+          {material.displacementMapId && <MapBadge label="DISP" />}
+        </div>
       </div>
     </div>
   );
 }
 
 export default MaterialCard;
+
+// ---------------------------------------------------------------------------
+// MapBadge — small presence indicator for a PBR map slot (Phase 78 PBR-04).
+// font-mono per D-10 (short uppercase data identifier).
+// bg-accent/20 + text-muted-foreground — Pascal semantic tokens (no obsidian-*).
+// rounded-smooth — Phase 71 squircle utility (D-13).
+// ---------------------------------------------------------------------------
+
+interface MapBadgeProps {
+  label: string;
+}
+
+function MapBadge({ label }: MapBadgeProps): JSX.Element {
+  return (
+    <span
+      className="font-mono text-[10px] px-1 py-0.5 rounded-smooth bg-accent/20 text-muted-foreground uppercase tracking-wide"
+      data-testid={`map-badge-${label.toLowerCase()}`}
+    >
+      {label}
+    </span>
+  );
+}

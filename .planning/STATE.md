@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.20
-milestone_name: Surface Depth & Architectural Expansion
-status: Defining requirements
-last_updated: "2026-05-08T21:00:00.000Z"
-last_activity: 2026-05-08 — Milestone v1.20 started
+milestone: v1.19
+milestone_name: Material Linking & Library Rebuild
+status: verifying
+last_updated: "2026-05-13T18:18:11.844Z"
+last_activity: 2026-05-13
 progress:
-  total_phases: 16
-  completed_phases: 13
-  total_plans: 38
-  completed_plans: 38
+  total_phases: 20
+  completed_phases: 12
+  total_plans: 45
+  completed_plans: 42
 ---
 
 # Project State
@@ -19,16 +19,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Library Rebuild complete; Phases 69+70+77 all shipped)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** v1.19 complete — ready for v1.20
+**Current focus:** Phase 79 — window-presets-win-presets-01-v1-20-active
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
+Phase: 999.1
+Plan: Not started
 Milestone: v1.20 Surface Depth & Architectural Expansion
 Phases: TBD (starts at Phase 78)
-Status: Defining requirements
-Last activity: 2026-05-08 — Milestone v1.20 started
+Status: Phase complete — ready for verification
+Last activity: 2026-05-13
 
 ## Decisions
 
@@ -43,6 +43,10 @@ Last activity: 2026-05-08 — Milestone v1.20 started
 - **[Phase 71-76 decisions preserved]** — see v1.18 SUMMARY/VERIFICATION docs for v1.18 chrome decisions.
 - [Phase 69]: Snapshot v6→v7 is trivial passthrough; GLTF finish deferred to v1.20; MaterialPicker customElementFace surface type reused for product finish
 - [Phase 70]: Default library tab is Materials (not Products) — puts newest feature front and center
+- [Phase 78]: MapBadge uses text-[10px] arbitrary value for sub-text indicator (smallest Pascal token text-sm=11px is too tall)
+- [Phase 79-window-presets-win-presets-01-v1-20-active]: RED-tests-only Wave 0: 3 test files commit failing imports/drivers to lock the WIN-PRESETS contract in machine-readable form; Wave 1 catalog+bridge will turn unit/integration tests GREEN; Wave 2 UI will turn E2E + PropertiesPanel tests GREEN
+- [Phase 79]: Plan 02 (Wave 1): WIN-PRESETS-01 catalog + bridge GREEN. Bridge persists across tool cleanup (Pitfall 1). 12/12 catalog tests + 3/3 bridge integration tests pass; 4 PropertiesPanel tests intentionally RED for Plan 03.
+- [Phase 79]: Phase 79 Plan 03 (Wave 3): WIN-PRESETS-01 UI surface shipped. WindowPresetSwitcher + PropertiesPanel preset row + App.tsx mount. 19/19 unit tests GREEN; e2e blocked by pre-existing TooltipProvider harness issue (documented as deferred).
 
 ## Performance Metrics
 
@@ -55,6 +59,10 @@ Last activity: 2026-05-08 — Milestone v1.20 started
 | 69 | MAT-LINK-01 | Finish slot on placed products — swap material without re-placing | ✅ Complete |
 | 70 | LIB-REBUILD-01 | Library 3-tab rebuild: Materials / Products / Assemblies | ✅ Complete |
 | 77 | TEST-CLEANUP-01 | Fix v1.18 carry-over test failures (TooltipProvider, Switch role) | ✅ Complete |
+| Phase 78 P04 | 8 | 1 tasks | 3 files |
+| Phase 79-window-presets-win-presets-01-v1-20-active P01 | 164s | 2 tasks | 3 files |
+| Phase 79 P02 | 480 | 2 tasks | 2 files |
+| Phase 79 P03 | 1320 | 3 tasks | 4 files |
 
 ## v1.20 Roadmap
 

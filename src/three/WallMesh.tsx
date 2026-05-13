@@ -273,9 +273,22 @@ export default function WallMesh({ wall, isSelected, roomId }: Props) {
         // Direct map={...} prop pattern (Phase 49 BUG-02 contract). The
         // userTextureCache retains ownership; R3F never auto-disposes
         // externally-passed texture props.
+        //
+        // Phase 78 PBR-03: aoMap + displacementMap bound here. uv2 setAttribute
+        // is required for aoMap to function (Three.js Pitfall 1 — aoMap sampler
+        // reads from uv2 channel, not uv). displacementScale=0.05 prevents
+        // geometry explosion in foot-coordinate world (Pitfall 2, default=1.0).
         return (
           <mesh key={key} position={[0, 0, thickness / 2 + bandOffset / 2]}>
-            <planeGeometry args={[length, height]} />
+            <planeGeometry
+              ref={(geo) => {
+                if (geo && !geo.attributes.uv2) {
+                  const uv = geo.attributes.uv as THREE.BufferAttribute | undefined;
+                  if (uv) geo.setAttribute('uv2', new THREE.BufferAttribute(uv.array.slice(), 2));
+                }
+              }}
+              args={[length, height]}
+            />
             <meshStandardMaterial
               ref={matRef}
               color="#ffffff"
@@ -285,6 +298,10 @@ export default function WallMesh({ wall, isSelected, roomId }: Props) {
               map={resolved.colorMap}
               roughnessMap={resolved.roughnessMap ?? undefined}
               metalnessMap={resolved.reflectionMap ?? undefined}
+              aoMap={resolved.aoMap ?? undefined}
+              aoMapIntensity={1}
+              displacementMap={resolved.displacementMap ?? undefined}
+              displacementScale={0.05}
               {...ghost}
             />
           </mesh>

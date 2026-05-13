@@ -59,6 +59,7 @@ const VIEW_MODES = [
   { id: "2d" as const, label: "2D", tooltip: "2D Plan view", testId: "view-mode-2d" },
   { id: "3d" as const, label: "3D", tooltip: "3D View", testId: "view-mode-3d" },
   { id: "split" as const, label: "Split", tooltip: "Side-by-side 2D + 3D", testId: "view-mode-split" },
+  { id: "library" as const, label: "Library", tooltip: "Browse product + material library", testId: "view-mode-library" },
 ];
 
 // ─── Thin divider ─────────────────────────────────────────────────────────

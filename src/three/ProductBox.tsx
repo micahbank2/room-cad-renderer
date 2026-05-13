@@ -1,4 +1,12 @@
 /**
+ * Phase 78 PBR-MAPS-01 (PBR-03) audit: ProductBox is OUT OF SCOPE.
+ * ProductBox uses `useProductTexture(textureUrl)` — a legacy single-texture
+ * path tied to `product.imageUrl`, not the Material catalog. Phase 78 binds
+ * aoMap/displacementMap on wall/floor/ceiling/custom-element surfaces only.
+ * If product Materials become a thing in a future phase, mirror the WallMesh
+ * priority-1 pattern (uv2 + aoMap + displacementMap with displacementScale=0.05).
+ */
+/**
  * Phase 56 GLTF-RENDER-3D-01: ProductBox — extracted box mesh sub-component.
  *
  * Pure refactor extracted from ProductMesh.tsx. Renders a textured or placeholder

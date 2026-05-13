@@ -11,15 +11,15 @@
 
 ### PBR Maps (PBR)
 
-- [ ] **PBR-01**: User can upload an AO (ambient occlusion) map alongside a material's color map in the material upload / edit form
-- [ ] **PBR-02**: User can upload a displacement map on a material in the same upload / edit form
-- [ ] **PBR-03**: 3D mesh rendering applies AO and displacement maps in addition to existing color and roughness — surfaces look noticeably more detailed and textured
-- [ ] **PBR-04**: Material card shows small map-presence indicators so Jessica can see which maps are loaded (color, roughness, AO, displacement) at a glance
+- [x] **PBR-01**: User can upload an AO (ambient occlusion) map alongside a material's color map in the material upload / edit form
+- [x] **PBR-02**: User can upload a displacement map on a material in the same upload / edit form
+- [x] **PBR-03**: 3D mesh rendering applies AO and displacement maps in addition to existing color and roughness — surfaces look noticeably more detailed and textured
+- [x] **PBR-04**: Material card shows small map-presence indicators so Jessica can see which maps are loaded (color, roughness, AO, displacement) at a glance
 
 ### Window Presets (WIN)
 
-- [ ] **WIN-01**: When placing a window opening, user can choose from a preset size list (e.g. 2×3 ft, 3×4 ft, 4×5 ft, custom) rather than always typing dimensions manually
-- [ ] **WIN-02**: The selected preset size is visible and editable in PropertiesPanel after placement — switching to "custom" allows free-form dimension input
+- [x] **WIN-01**: When placing a window opening, user can choose from a preset size list (e.g. 2×3 ft, 3×4 ft, 4×5 ft, custom) rather than always typing dimensions manually
+- [x] **WIN-02**: The selected preset size is visible and editable in PropertiesPanel after placement — switching to "custom" allows free-form dimension input
 
 ### Parametric Controls (PARAM)
 
@@ -65,8 +65,8 @@ These were considered for v1.20 and explicitly deferred:
 | PBR-02 | TBD | TBD | Not started |
 | PBR-03 | TBD | TBD | Not started |
 | PBR-04 | TBD | TBD | Not started |
-| WIN-01 | TBD | TBD | Not started |
-| WIN-02 | TBD | TBD | Not started |
+| WIN-01 | 79 | 01 | RED tests landed |
+| WIN-02 | 79 | 01 | RED tests landed |
 | PARAM-01 | TBD | TBD | Not started |
 | PARAM-02 | TBD | TBD | Not started |
 | PARAM-03 | TBD | TBD | Not started |

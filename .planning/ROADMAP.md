@@ -23,6 +23,8 @@
 - ✅ **v1.17 Library + Material Engine** — Phases 67–68 (partial-shipped 2026-05-07; Phases 69 MAT-LINK-01 + 70 LIB-REBUILD-01 deferred to v1.19)
 - ✅ **v1.18 Pascal Visual Parity** — Phases 71–76 (shipped 2026-05-08) — chrome-only rewrite to emulate pascalorg/editor
 - 🚧 **v1.19 Material Linking & Library Rebuild** — Phases 69, 70, 77 (in progress) — finish slots on placed products + 3-tab library rebuild
+- 🚧 **v1.20 Surface Depth & Architectural Expansion** — Phases 78, 79 (in progress) — PBR maps + window presets shipped; parametric controls + columns remaining
+- 📋 **v1.21 Sidebar IA & Contextual Surfaces** — Phases 80–84 (planned) — rebuild left + right panels and floating toolbar with Figma/Miro-style contextual visibility; surfaced from Phase 79 Jessica UAT feedback — see [milestones/v1.21-REQUIREMENTS.md](milestones/v1.21-REQUIREMENTS.md)
 
 ---
 
@@ -383,8 +385,8 @@
 
 ### Phases
 
-- [ ] **Phase 78: PBR Maps (PBR-MAPS-01)** — AO + displacement map upload on Materials; 3D rendering applies all maps; Material card shows map-presence indicators
-- [ ] **Phase 79: Window Presets (WIN-PRESETS-01)** — Preset size picker when placing windows; PropertiesPanel shows selected preset post-placement
+- [x] **Phase 78: PBR Maps (PBR-MAPS-01)** — AO + displacement map upload on Materials; 3D rendering applies all maps; Material card shows map-presence indicators (completed 2026-05-13)
+- [x] **Phase 79: Window Presets (WIN-PRESETS-01)** — Preset size picker when placing windows; PropertiesPanel shows selected preset post-placement (completed 2026-05-13)
 - [ ] **Phase 80: Parametric Product Controls (PARAM-01)** — Type exact width/depth/position for placed products in PropertiesPanel; single-undo per edit
 - [ ] **Phase 81: Columns & Pillars (COL-01)** — New Column entity; round/rectangular cross-section; renders in 2D + 3D; selectable/movable/deletable
 
@@ -400,7 +402,7 @@
   2. Uploaded AO map appears on `material.aoMapId`; displacement map on `material.displacementMapId` — both persist across reload
   3. 3D mesh surfaces that use the material render with `aoMap` and `displacementMap` props — surfaces look noticeably more detailed
   4. Material card shows small icons/dots indicating which of the 4 maps (color, roughness, AO, displacement) are loaded
-**Plans:** TBD (v1.20)
+**Plans:** 4/4 plans complete
 **UI hint:** yes
 
 #### Phase 79: Window Presets (WIN-PRESETS-01) — v1.20 ACTIVE
@@ -413,7 +415,10 @@
   2. Selecting a preset auto-fills widthFt/heightFt on the Opening — no manual typing required
   3. After placement, PropertiesPanel shows the active preset label and allows switching to another preset or "custom"
   4. Existing manual window placement (typing custom dimensions) continues to work unchanged
-**Plans:** TBD (v1.20)
+**Plans:** 3/3 plans complete
+- [x] 79-01-PLAN.md — Wave 0 RED tests pin WIN-PRESETS contract (catalog, bridge, e2e)
+- [x] 79-02-PLAN.md — Catalog module + windowTool bridge (data + tool layer)
+- [x] 79-03-PLAN.md — WindowPresetSwitcher + PropertiesPanel preset row + App mount
 **UI hint:** yes
 
 #### Phase 80: Parametric Product Controls (PARAM-01) — v1.20 ACTIVE
@@ -492,8 +497,8 @@
 | 75. Properties + Library Restyle | 3/3 | Complete   | 2026-05-08 |
 | 76. Modals + Welcome + Final | 3/3 | Complete    | 2026-05-08 |
 | 77. Test Suite Cleanup | 1/1 | Complete   | 2026-05-08 |
-| 78. PBR Maps | TBD | v1.20 active   | — |
-| 79. Window Presets | TBD | v1.20 active   | — |
+| 78. PBR Maps | 1/4 | Complete    | 2026-05-13 |
+| 79. Window Presets | 3/3 | Complete    | 2026-05-13 |
 | 80. Parametric Product Controls | TBD | v1.20 active   | — |
 | 81. Columns & Pillars | TBD | v1.20 active   | — |
 

@@ -133,9 +133,20 @@ export default function CeilingMesh({ ceiling, isSelected }: Props) {
   // Phase 34 — user-texture branch wins over PBR and flat paths when loaded.
   const useUserTextureBranch = ceiling.userTextureId && userTex !== null;
 
+  // Phase 78 PBR-03: add uv2 attribute to ShapeGeometry for aoMap sampler.
+  // useEffect approach because geometry is created via useMemo (not JSX ref).
+  // No cleanup needed — uv2 BufferAttribute is owned by the geometry instance.
+  const geoRef = useMemo(() => {
+    if (geometry && !geometry.attributes.uv2) {
+      const uv = geometry.attributes.uv as THREE.BufferAttribute | undefined;
+      if (uv) geometry.setAttribute('uv2', new THREE.BufferAttribute(uv.array.slice(), 2));
+    }
+    return geometry;
+  }, [geometry]);
+
   return (
     <mesh
-      geometry={geometry}
+      geometry={geoRef}
       position={[0, ceiling.height, 0]}
       receiveShadow
       onPointerDown={handlePointerDown}
@@ -164,6 +175,8 @@ export default function CeilingMesh({ ceiling, isSelected }: Props) {
             emissiveIntensity={isSelected ? 0.2 : 0}
           />
         ) : (
+          // Phase 78 PBR-03: aoMap + displacementMap props. displacementScale=0.05
+          // prevents geometry explosion in foot-coordinate world (RESEARCH Pitfall 2).
           <meshStandardMaterial
             color="#ffffff"
             side={THREE.DoubleSide}
@@ -172,6 +185,10 @@ export default function CeilingMesh({ ceiling, isSelected }: Props) {
             map={resolved.colorMap ?? undefined}
             roughnessMap={resolved.roughnessMap ?? undefined}
             metalnessMap={resolved.reflectionMap ?? undefined}
+            aoMap={resolved.aoMap ?? undefined}
+            aoMapIntensity={1}
+            displacementMap={resolved.displacementMap ?? undefined}
+            displacementScale={0.05}
             emissive={isSelected ? "#7c5bf0" : "#000000"}
             emissiveIntensity={isSelected ? 0.2 : 0}
           />
