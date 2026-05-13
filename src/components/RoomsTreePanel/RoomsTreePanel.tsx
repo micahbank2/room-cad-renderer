@@ -168,6 +168,15 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
     toggleHidden(id);
   }, []);
 
+  // Phase 81 Plan 02 (D-02): tree row hover → uiStore.hoveredEntityId.
+  // Setter is RAF-coalesced inside uiStore; safe to call on every mouseenter.
+  const onHoverEnter = useCallback((id: string) => {
+    useUIStore.getState().setHoveredEntityId(id);
+  }, []);
+  const onHoverLeave = useCallback(() => {
+    useUIStore.getState().setHoveredEntityId(null);
+  }, []);
+
   const onClickRow = useCallback(
     (node: TreeNode) => {
       const cadState = useCADStore.getState();
@@ -279,6 +288,8 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
           onClickRow={onClickRow}
           onToggleVisibility={onToggleVisibility}
           onDoubleClickRow={onDoubleClickRow}
+          onHoverEnter={onHoverEnter}
+          onHoverLeave={onHoverLeave}
         />
       ))}
     </div>

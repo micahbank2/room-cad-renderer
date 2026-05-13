@@ -119,6 +119,8 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const measureLines = activeDoc?.measureLines ?? {};
   const annotations = activeDoc?.annotations ?? {};
   const hiddenIds = useUIStore((s) => s.hiddenIds);
+  // Phase 81 Plan 02 (D-02): tree row hover → accent-purple outline in 2D.
+  const hoveredEntityId = useUIStore((s) => s.hoveredEntityId);
   // Phase 68 Plan 05 — Material catalog feeds renderFloor + renderWalls
   // for D-03 surface-material resolution (paint colorHex / textured Pattern).
   const { materials } = useMaterials();
@@ -217,13 +219,15 @@ export default function FabricCanvas({ productLibrary }: Props) {
 
     // 3. Walls — Phase 68 Plan 05 passes materials + pixelsPerFoot for D-03
     //    per-side Material resolution (paint colorHex / textured Pattern).
-    renderWalls(fc, walls, scale, origin, selectedIds, materials, scale);
+    //    Phase 81 Plan 02 (D-02): hoveredEntityId paints accent-purple outline.
+    renderWalls(fc, walls, scale, origin, selectedIds, materials, scale, hoveredEntityId);
 
     // 4. Products — onAssetReady bumps the tick so this redraw re-runs once
     // an async asset (image cache OR Phase 57 GLTF silhouette compute)
     // populates its cache, rebuilding the product Group with the new child.
     // Functional setState avoids stale closures when multiple products
     // finish loading concurrently (D-03).
+    // Phase 81 Plan 02 (D-02): hoveredEntityId paints accent-purple outline.
     renderProducts(
       fc,
       placedProducts,
@@ -232,17 +236,18 @@ export default function FabricCanvas({ productLibrary }: Props) {
       origin,
       selectedIds,
       () => setProductImageTick((t) => t + 1),
+      hoveredEntityId,
     );
 
     // 5. Ceilings (translucent overlays)
-    renderCeilings(fc, ceilings, scale, origin, selectedIds);
+    renderCeilings(fc, ceilings, scale, origin, selectedIds, hoveredEntityId);
 
     // 6. Custom elements
-    renderCustomElements(fc, placedCustoms, customCatalog, scale, origin, selectedIds);
+    renderCustomElements(fc, placedCustoms, customCatalog, scale, origin, selectedIds, hoveredEntityId);
 
     // 7. Stairs (Phase 60 STAIRS-01) — render after products + customs so
     //    selection outlines layer above. Skips hidden via Phase 46 cascade.
-    renderStairs(fc, stairs, scale, origin, selectedIds, hiddenIds);
+    renderStairs(fc, stairs, scale, origin, selectedIds, hiddenIds, hoveredEntityId);
 
     // 8. Phase 62 MEASURE-01 — measure lines + annotations + room-area overlay.
     //    Rendered last so they layer above all geometry.
@@ -261,7 +266,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // Hotfix #2 — record the tool we just activated so the next redraw can
     // tell whether activeTool changed (affects the drag short-circuit above).
     prevActiveToolRef.current = activeTool as ToolType;
-  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog, productImageTick, stairs, hiddenIds, measureLines, annotations, editingAnnotationId, materials, activeDoc]);
+  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog, productImageTick, stairs, hiddenIds, measureLines, annotations, editingAnnotationId, materials, activeDoc, hoveredEntityId]);
 
   // Init canvas
   useEffect(() => {

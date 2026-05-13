@@ -24,6 +24,14 @@ interface TreeRowProps {
   onToggleVisibility: (id: string) => void;
   /** Phase 48 D-02: double-click handler — falls through to single-click default focus when no savedCamera. */
   onDoubleClickRow?: (node: TreeNode) => void;
+  /**
+   * Phase 81 Plan 02 (D-02): leaf-only hover handlers. Fires on mouseenter
+   * of the row container; the parent RoomsTreePanel dispatches to
+   * useUIStore.setHoveredEntityId. NOT fired for room or group header rows
+   * (rooms have no single canvas object; group headers are pure tree chrome).
+   */
+  onHoverEnter?: (id: string) => void;
+  onHoverLeave?: () => void;
 }
 
 export function TreeRow(props: TreeRowProps) {
@@ -128,6 +136,20 @@ export function TreeRow(props: TreeRowProps) {
           // Phase 48 D-02: groups ignored (matches single-click NO-OP semantics).
           if (isGroup) return;
           props.onDoubleClickRow?.(node);
+        }}
+
+        // Phase 81 Plan 02 (D-02): leaf-only hover dispatch. Leaves (walls,
+        // products, ceilings, custom-elements, stairs) have a corresponding
+        // canvas object that gets the accent-purple outline. Room rows have
+        // no single canvas counterpart; group headers are pure tree chrome —
+        // skip both.
+        onMouseEnter={() => {
+          if (isGroup || isRoom) return;
+          props.onHoverEnter?.(node.id);
+        }}
+        onMouseLeave={() => {
+          if (isGroup || isRoom) return;
+          props.onHoverLeave?.();
         }}
       >
         {/* D-01: Pascal spine — 1px vertical line at left:21px */}
@@ -234,6 +256,8 @@ export function TreeRow(props: TreeRowProps) {
             onClickRow={props.onClickRow}
             onToggleVisibility={props.onToggleVisibility}
             onDoubleClickRow={props.onDoubleClickRow}
+            onHoverEnter={props.onHoverEnter}
+            onHoverLeave={props.onHoverLeave}
           />
         ))
       }
