@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
-status: Defining requirements
-last_updated: "2026-05-13T14:31:40.287Z"
+status: executing
+last_updated: "2026-05-13T15:19:22.648Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 20
   completed_phases: 11
-  total_plans: 42
-  completed_plans: 39
+  total_plans: 45
+  completed_plans: 40
 ---
 
 # Project State
@@ -19,15 +19,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Library Rebuild complete; Phases 69+70+77 all shipped)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** v1.19 complete — ready for v1.20
+**Current focus:** Phase 79 — window-presets-win-presets-01-v1-20-active
 
 ## Current Position
 
-Phase: 999.1
-Plan: Not started
+Phase: 79 (window-presets-win-presets-01-v1-20-active) — EXECUTING
+Plan: 2 of 3
 Milestone: v1.20 Surface Depth & Architectural Expansion
 Phases: TBD (starts at Phase 78)
-Status: Defining requirements
+Status: Ready to execute
 Last activity: 2026-05-13
 
 ## Decisions
@@ -44,6 +44,7 @@ Last activity: 2026-05-13
 - [Phase 69]: Snapshot v6→v7 is trivial passthrough; GLTF finish deferred to v1.20; MaterialPicker customElementFace surface type reused for product finish
 - [Phase 70]: Default library tab is Materials (not Products) — puts newest feature front and center
 - [Phase 78]: MapBadge uses text-[10px] arbitrary value for sub-text indicator (smallest Pascal token text-sm=11px is too tall)
+- [Phase 79-window-presets-win-presets-01-v1-20-active]: RED-tests-only Wave 0: 3 test files commit failing imports/drivers to lock the WIN-PRESETS contract in machine-readable form; Wave 1 catalog+bridge will turn unit/integration tests GREEN; Wave 2 UI will turn E2E + PropertiesPanel tests GREEN
 
 ## Performance Metrics
 
@@ -57,6 +58,7 @@ Last activity: 2026-05-13
 | 70 | LIB-REBUILD-01 | Library 3-tab rebuild: Materials / Products / Assemblies | ✅ Complete |
 | 77 | TEST-CLEANUP-01 | Fix v1.18 carry-over test failures (TooltipProvider, Switch role) | ✅ Complete |
 | Phase 78 P04 | 8 | 1 tasks | 3 files |
+| Phase 79-window-presets-win-presets-01-v1-20-active P01 | 164s | 2 tasks | 3 files |
 
 ## v1.20 Roadmap
 

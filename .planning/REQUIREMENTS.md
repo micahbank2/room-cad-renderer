@@ -65,8 +65,8 @@ These were considered for v1.20 and explicitly deferred:
 | PBR-02 | TBD | TBD | Not started |
 | PBR-03 | TBD | TBD | Not started |
 | PBR-04 | TBD | TBD | Not started |
-| WIN-01 | TBD | TBD | Not started |
-| WIN-02 | TBD | TBD | Not started |
+| WIN-01 | 79 | 01 | RED tests landed |
+| WIN-02 | 79 | 01 | RED tests landed |
 | PARAM-01 | TBD | TBD | Not started |
 | PARAM-02 | TBD | TBD | Not started |
 | PARAM-03 | TBD | TBD | Not started |
