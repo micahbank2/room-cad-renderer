@@ -122,20 +122,39 @@ export default function RightInspector({ productLibrary, viewMode }: Props) {
         Properties
       </h3>
 
-      {ceiling && <CeilingInspector ceiling={ceiling} viewMode={viewMode} />}
-      {wall && <WallInspector wall={wall} viewMode={viewMode} />}
+      {/* D-03 (Plan 82-02): each per-entity inspector is keyed on the
+          entity id so React unmounts the previous inspector and mounts
+          a fresh one — local activeTab useState resets to the default
+          tab on every new selection. */}
+      {ceiling && (
+        <CeilingInspector
+          key={ceiling.id}
+          ceiling={ceiling}
+          viewMode={viewMode}
+        />
+      )}
+      {wall && (
+        <WallInspector key={wall.id} wall={wall} viewMode={viewMode} />
+      )}
       {pp && (
         <ProductInspector
+          key={pp.id}
           pp={pp}
           productLibrary={productLibrary}
           viewMode={viewMode}
         />
       )}
       {pce && ce && (
-        <CustomElementInspector pce={pce} ce={ce} viewMode={viewMode} />
+        <CustomElementInspector
+          key={pce.id}
+          pce={pce}
+          ce={ce}
+          viewMode={viewMode}
+        />
       )}
       {stair && activeRoomId && (
         <StairInspector
+          key={stair.id}
           stair={stair}
           activeRoomId={activeRoomId}
           viewMode={viewMode}

@@ -18,7 +18,7 @@
  *   - D-17: regression suite for all four drag types + label edit
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, act } from "@testing-library/react";
+import { render, act, screen } from "@testing-library/react";
 
 vi.mock("@/hooks/useHelpRouteSync", () => ({ useHelpRouteSync: () => {} }));
 vi.mock("@/three/ThreeViewport", () => ({ default: () => null }));
@@ -138,6 +138,22 @@ async function waitForLabelDriver() {
   await vi.waitFor(() => expect(window.__driveLabelOverride).toBeDefined(), { timeout: 2000 });
 }
 
+// Phase 82-02: <LabelOverrideInput> now lives inside the
+// CustomElementInspector's "Label" tab. The label-driver useEffect only
+// runs while the input is mounted; tests must switch to the Label tab
+// before waitForLabelDriver().
+async function openLabelTab() {
+  const tabs = await screen.findAllByRole("tab");
+  const labelTab = tabs.find(
+    (t) => (t.textContent ?? "").trim() === "Label",
+  );
+  if (labelTab) {
+    await act(async () => {
+      labelTab.click();
+    });
+  }
+}
+
 describe("Phase 31 — EDIT-24 single-undo regression", () => {
   beforeEach(() => {
     seedAll();
@@ -220,6 +236,7 @@ describe("Phase 31 — EDIT-24 single-undo regression", () => {
         <App />
       </TooltipProvider>
     );
+    await openLabelTab();
     await waitForLabelDriver();
     const before = useCADStore.getState().past.length;
     await act(async () => {
@@ -235,6 +252,7 @@ describe("Phase 31 — EDIT-24 single-undo regression", () => {
         <App />
       </TooltipProvider>
     );
+    await openLabelTab();
     await waitForLabelDriver();
     const before = useCADStore.getState().past.length;
     await act(async () => {
