@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: completed
-last_updated: "2026-05-14T23:19:49.252Z"
+last_updated: "2026-05-14T23:45:00.000Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 20
-  completed_phases: 13
+  completed_phases: 14
   total_plans: 48
-  completed_plans: 46
+  completed_plans: 47
 ---
 
 # Project State
@@ -19,15 +19,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Library Rebuild complete; Phases 69+70+77 all shipped)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 82 — right-panel-inspector-v1-21 (Plans 01 + 02 complete; Plan 03 next)
+**Current focus:** Phase 82 complete — IA-04 + IA-05 shipped. Awaiting next phase.
 
 ## Current Position
 
-Phase: 82
-Plan: 03 (next)
+Phase: 82 (COMPLETE)
+Plan: — (all 3 plans landed)
 Milestone: v1.21 Sidebar IA & Contextual Surfaces
-Phases: 81 complete; 82 in progress (Plans 01 + 02 shipped, Plan 03 pending)
-Status: Phase 82 Plan 02 complete — ready for Plan 03 (Opening sub-selection — IA-05)
+Phases: 81 complete; 82 complete (Plans 01 + 02 + 03 all shipped)
+Status: Phase 82 COMPLETE — RightInspector + per-entity tabs + OpeningInspector sub-selection (IA-04 + IA-05)
 Last activity: 2026-05-14
 
 ## Decisions
@@ -52,6 +52,7 @@ Last activity: 2026-05-14
 - [Phase 81]: Phase 81 Plan 03 (IA-03 rename, D-03 + D-04): WallSegment.name?:string + schema v7→v8 passthrough migration; cadStore.renameWall with empty-trim→delete; TreeRow dbl-click swaps to InlineEditableText; Camera passive indicator becomes interactive button (saved-camera moved from dbl-click to icon-click affordance); RoomsTreePanel onRename routes per-kind (room/wall/custom/stair); e2e/tree-rename.spec.ts 3/3 GREEN; 996 unit tests passing (0 regressions); Phase 81 COMPLETE
 - [Phase 82]: Phase 82 Plan 01 (IA-04): RightInspector shell + per-entity inspectors under src/components/inspectors/; PropertiesPanel.tsx becomes ~100-line compat shim preserving empty-state Room properties block for Phase 62 test; uiStore.selectedOpeningId slice added (setter consumers land in Plan 82-03); 996/996 vitest pass, 0 regressions
 - [Phase 82]: Plan 82-02 (IA-04): per-entity tab system on Wall/Product/CustomElement/Ceiling inspectors via Phase 72 Tabs primitive; D-03 reset via keyed inspector mount in RightInspector (not inner div — useState lives on the component itself); StairInspector stays flat per D-04; bulk-select stays untabbed per D-05; 1003/1003 vitest pass
+- [Phase 82]: Plan 82-03 (IA-05): OpeningInspector renders Preset/Dimensions/Position tabs for windows (Type/Dimensions/Position for doors/archways/passthroughs/niches); WallInspector early-returns OpeningInspector when uiStore.selectedOpeningId matches; Phase 79 WindowPresetRow JSX lifted VERBATIM into the Preset tab (D-07 single-undo + D-08 derive-on-read invariants mechanically preserved); OpeningRow click sets selectedOpeningId (was accordion expand); D-06 data-testids verbatim; 1012/1012 vitest pass; Phase 82 COMPLETE
 
 ## Performance Metrics
 
@@ -73,6 +74,7 @@ Last activity: 2026-05-14
 | Phase 81 P03 | 25min | 3 tasks | 8 files |
 | Phase 82 P01 | 21min | 4 tasks | 10 files |
 | Phase 82 P02 | 11min | 3 tasks | 9 files |
+| Phase 82 P03 | 18min | 4 tasks | 8 files |
 
 ## v1.20 Roadmap
 
