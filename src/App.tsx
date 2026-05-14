@@ -24,7 +24,7 @@ import { TopBar } from "@/components/TopBar";
 import { FloatingToolbar } from "@/components/FloatingToolbar";
 import Sidebar from "@/components/Sidebar";
 import StatusBar from "@/components/StatusBar";
-import PropertiesPanel from "@/components/PropertiesPanel";
+import RightInspector from "@/components/RightInspector";
 import ProductLibrary from "@/components/ProductLibrary";
 import AddProductModal from "@/components/AddProductModal";
 import HelpModal from "@/components/HelpModal";
@@ -279,7 +279,7 @@ export default function App() {
                       exit={{ x: 288, opacity: 0 }}
                       transition={springTransition(reduced)}
                     >
-                      <PropertiesPanel productLibrary={productLibrary} viewMode={viewMode} />
+                      <RightInspector productLibrary={productLibrary} viewMode={viewMode} />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -311,7 +311,7 @@ export default function App() {
                       exit={{ x: 288, opacity: 0 }}
                       transition={springTransition(reduced)}
                     >
-                      <PropertiesPanel productLibrary={productLibrary} viewMode={viewMode} />
+                      <RightInspector productLibrary={productLibrary} viewMode={viewMode} />
                     </motion.div>
                   )}
                 </AnimatePresence>
