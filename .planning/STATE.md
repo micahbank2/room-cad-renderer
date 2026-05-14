@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
-status: verifying
-last_updated: "2026-05-14T22:43:14.809Z"
-last_activity: 2026-05-13
+status: completed
+last_updated: "2026-05-14T23:19:49.252Z"
+last_activity: 2026-05-14
 progress:
   total_phases: 20
   completed_phases: 13
   total_plans: 48
-  completed_plans: 45
+  completed_plans: 46
 ---
 
 # Project State
@@ -19,15 +19,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Library Rebuild complete; Phases 69+70+77 all shipped)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 81 — left-panel-restructure-v1-21 (Plan 02 complete; Plan 03 next)
+**Current focus:** Phase 82 — right-panel-inspector-v1-21 (Plans 01 + 02 complete; Plan 03 next)
 
 ## Current Position
 
 Phase: 82
-Plan: 02 (next)
+Plan: 03 (next)
 Milestone: v1.21 Sidebar IA & Contextual Surfaces
-Phases: 81 complete; 82 in progress (Plan 01 shipped, Plans 02 + 03 pending)
-Status: Phase 82 Plan 01 complete — ready for Plan 02 (Tabs surface across non-stair inspectors)
+Phases: 81 complete; 82 in progress (Plans 01 + 02 shipped, Plan 03 pending)
+Status: Phase 82 Plan 02 complete — ready for Plan 03 (Opening sub-selection — IA-05)
 Last activity: 2026-05-14
 
 ## Decisions
@@ -51,6 +51,7 @@ Last activity: 2026-05-14
 - [Phase 81]: Phase 81 Plan 02 (IA-03 hover): uiStore.hoveredEntityId + RAF-coalesced setter; TreeRow onMouseEnter/Leave dispatches leaf-only; fabricSync renderers paint accent-purple outline on matched wall/product/ceiling/custom/stair; 2D-only per D-02 (3D hover deferred to Phase 82); e2e/tree-hover.spec.ts 2/2 GREEN
 - [Phase 81]: Phase 81 Plan 03 (IA-03 rename, D-03 + D-04): WallSegment.name?:string + schema v7→v8 passthrough migration; cadStore.renameWall with empty-trim→delete; TreeRow dbl-click swaps to InlineEditableText; Camera passive indicator becomes interactive button (saved-camera moved from dbl-click to icon-click affordance); RoomsTreePanel onRename routes per-kind (room/wall/custom/stair); e2e/tree-rename.spec.ts 3/3 GREEN; 996 unit tests passing (0 regressions); Phase 81 COMPLETE
 - [Phase 82]: Phase 82 Plan 01 (IA-04): RightInspector shell + per-entity inspectors under src/components/inspectors/; PropertiesPanel.tsx becomes ~100-line compat shim preserving empty-state Room properties block for Phase 62 test; uiStore.selectedOpeningId slice added (setter consumers land in Plan 82-03); 996/996 vitest pass, 0 regressions
+- [Phase 82]: Plan 82-02 (IA-04): per-entity tab system on Wall/Product/CustomElement/Ceiling inspectors via Phase 72 Tabs primitive; D-03 reset via keyed inspector mount in RightInspector (not inner div — useState lives on the component itself); StairInspector stays flat per D-04; bulk-select stays untabbed per D-05; 1003/1003 vitest pass
 
 ## Performance Metrics
 
@@ -71,6 +72,7 @@ Last activity: 2026-05-14
 | Phase 81 P02 | 35min | 3 tasks | 6 files |
 | Phase 81 P03 | 25min | 3 tasks | 8 files |
 | Phase 82 P01 | 21min | 4 tasks | 10 files |
+| Phase 82 P02 | 11min | 3 tasks | 9 files |
 
 ## v1.20 Roadmap
 
