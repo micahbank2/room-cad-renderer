@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: verifying
-last_updated: "2026-05-13T20:24:11.558Z"
+last_updated: "2026-05-14T22:43:14.809Z"
 last_activity: 2026-05-13
 progress:
   total_phases: 20
@@ -23,12 +23,12 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 
 ## Current Position
 
-Phase: 999.1
-Plan: Not started
+Phase: 82
+Plan: 02 (next)
 Milestone: v1.21 Sidebar IA & Contextual Surfaces
-Phases: 81 complete (Plans 01 + 02 + 03 all shipped); 82 next (inspector rebuild)
-Status: Phase 81 complete — ready for verification
-Last activity: 2026-05-13
+Phases: 81 complete; 82 in progress (Plan 01 shipped, Plans 02 + 03 pending)
+Status: Phase 82 Plan 01 complete — ready for Plan 02 (Tabs surface across non-stair inspectors)
+Last activity: 2026-05-14
 
 ## Decisions
 
@@ -50,6 +50,7 @@ Last activity: 2026-05-13
 - [Phase 81]: Phase 81 Plan 01 (IA-02): Sidebar.tsx wraps all 7 left-panel sections in shared PanelSection with stable sidebar-* ids; only sidebar-rooms-tree defaults open; collapse state persists via localStorage[ui:propertiesPanel:sections]
 - [Phase 81]: Phase 81 Plan 02 (IA-03 hover): uiStore.hoveredEntityId + RAF-coalesced setter; TreeRow onMouseEnter/Leave dispatches leaf-only; fabricSync renderers paint accent-purple outline on matched wall/product/ceiling/custom/stair; 2D-only per D-02 (3D hover deferred to Phase 82); e2e/tree-hover.spec.ts 2/2 GREEN
 - [Phase 81]: Phase 81 Plan 03 (IA-03 rename, D-03 + D-04): WallSegment.name?:string + schema v7→v8 passthrough migration; cadStore.renameWall with empty-trim→delete; TreeRow dbl-click swaps to InlineEditableText; Camera passive indicator becomes interactive button (saved-camera moved from dbl-click to icon-click affordance); RoomsTreePanel onRename routes per-kind (room/wall/custom/stair); e2e/tree-rename.spec.ts 3/3 GREEN; 996 unit tests passing (0 regressions); Phase 81 COMPLETE
+- [Phase 82]: Phase 82 Plan 01 (IA-04): RightInspector shell + per-entity inspectors under src/components/inspectors/; PropertiesPanel.tsx becomes ~100-line compat shim preserving empty-state Room properties block for Phase 62 test; uiStore.selectedOpeningId slice added (setter consumers land in Plan 82-03); 996/996 vitest pass, 0 regressions
 
 ## Performance Metrics
 
@@ -69,6 +70,7 @@ Last activity: 2026-05-13
 | Phase 81 P01 | 320 | 2 tasks | 7 files |
 | Phase 81 P02 | 35min | 3 tasks | 6 files |
 | Phase 81 P03 | 25min | 3 tasks | 8 files |
+| Phase 82 P01 | 21min | 4 tasks | 10 files |
 
 ## v1.20 Roadmap
 
