@@ -7,12 +7,16 @@
 // selected wall changes.
 // D-05 trailing row: <SavedCameraButtons> renders BELOW the Tabs, always
 // visible regardless of active tab.
-// Phase 79 invariant: <OpeningsSection> mounts unchanged inside the
-// Openings tab; the preset chip row stays nested in OpeningEditor for
-// this plan — Plan 82-03 lifts it into its own tab.
+//
+// Phase 82 Plan 82-03 (IA-05) — when uiStore.selectedOpeningId matches an
+// opening on this wall, the wall inspector body is replaced by
+// <OpeningInspector>. The OpeningInspector owns its own "← Back to wall"
+// breadcrumb that clears selectedOpeningId; <SavedCameraButtons> does
+// NOT render in sub-selection (it's a wall-view affordance).
 
 import { useState } from "react";
 import { useCADStore } from "@/stores/cadStore";
+import { useUIStore } from "@/stores/uiStore";
 import { wallLength } from "@/lib/geometry";
 import { validateInput } from "@/canvas/dimensionEditor";
 import type { WallSegment } from "@/types/cad";
@@ -20,6 +24,7 @@ import { PanelSection } from "@/components/ui/PanelSection";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import WallSurfacePanel from "@/components/WallSurfacePanel";
 import { OpeningsSection } from "@/components/PropertiesPanel.OpeningSection";
+import { OpeningInspector } from "./OpeningInspector";
 import {
   Row,
   EditableRow,
@@ -43,7 +48,21 @@ export function WallInspector({ wall, viewMode }: Props) {
     (s) => s.clearSavedCameraNoHistory,
   );
 
+  // Phase 82 Plan 82-03 (IA-05): opening sub-selection. When non-null and
+  // matching an opening on THIS wall, swap the wall inspector body for
+  // <OpeningInspector>. selectedOpeningId is cleared by uiStore on any
+  // selectedIds change (select / clearSelection / setTool), so a wall
+  // swap also wipes the sub-selection automatically.
+  const selectedOpeningId = useUIStore((s) => s.selectedOpeningId);
+  const subOpening = selectedOpeningId
+    ? (wall.openings ?? []).find((o) => o.id === selectedOpeningId)
+    : undefined;
+
   const [activeTab, setActiveTab] = useState<WallTab>("geometry");
+
+  if (subOpening) {
+    return <OpeningInspector wall={wall} opening={subOpening} />;
+  }
 
   return (
     // D-03: key forces a fresh mount + default activeTab on wall swap.
