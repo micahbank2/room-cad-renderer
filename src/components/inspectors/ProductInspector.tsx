@@ -171,6 +171,8 @@ export function ProductInspector({ pp, productLibrary, viewMode }: Props) {
           </div>
         </TabsContent>
         <TabsContent value="rotation">
+          {/* Plan 82-02 Task 3: single-section tab — PanelSection wrapper
+              dropped (the tab IS the section label). */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between gap-2">
               <Row label="Rotation" value={`${pp.rotation.toFixed(0)}°`} />

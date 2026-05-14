@@ -12,7 +12,6 @@
 import { useState } from "react";
 import { useCADStore } from "@/stores/cadStore";
 import type { Ceiling } from "@/types/cad";
-import { PanelSection } from "@/components/ui/PanelSection";
 import { Button } from "@/components/ui/Button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import { MaterialPicker } from "@/components/MaterialPicker";
@@ -59,18 +58,18 @@ export function CeilingInspector({ ceiling, viewMode }: Props) {
           <TabsTrigger value="material">Material</TabsTrigger>
         </TabsList>
         <TabsContent value="geometry">
+          {/* Plan 82-02 Task 3: single-section tab — PanelSection wrapper
+              dropped (the tab IS the dimensions section). */}
           <div className="space-y-2">
-            <PanelSection id="dimensions" label="Dimensions">
-              <div className="space-y-1.5">
-                {/* Phase 65 CEIL-02 — WIDTH + DEPTH override inputs above
-                    HEIGHT. Live-preview via NoHistory on every keystroke;
-                    Enter/blur commits via the history-pushing variant. */}
-                <CeilingDimInput ceiling={ceiling} axis="width" label="Width" />
-                <CeilingDimInput ceiling={ceiling} axis="depth" label="Depth" />
-                <Row label="Height" value={`${ceiling.height.toFixed(1)} FT`} />
-                <Row label="Vertices" value={String(ceiling.points.length)} />
-              </div>
-            </PanelSection>
+            <div className="space-y-1.5">
+              {/* Phase 65 CEIL-02 — WIDTH + DEPTH override inputs above
+                  HEIGHT. Live-preview via NoHistory on every keystroke;
+                  Enter/blur commits via the history-pushing variant. */}
+              <CeilingDimInput ceiling={ceiling} axis="width" label="Width" />
+              <CeilingDimInput ceiling={ceiling} axis="depth" label="Depth" />
+              <Row label="Height" value={`${ceiling.height.toFixed(1)} FT`} />
+              <Row label="Vertices" value={String(ceiling.points.length)} />
+            </div>
             {hasOverrides && (
               <Button
                 variant="outline"
