@@ -1,8 +1,16 @@
 // tests/components/PropertiesPanel.opening.test.tsx
-// Phase 61 OPEN-01 (D-12 C1-C3): kind-aware OpeningsSection rendering.
+// Phase 61 OPEN-01 (D-12 C1-C3): kind-aware opening editor rendering.
+//
+// Phase 82 Plan 82-03 (IA-05) migration: clicking an opening row no
+// longer expands an inline editor inside OpeningsSection — it sets
+// uiStore.selectedOpeningId, and the editor surface moves to
+// <OpeningInspector>. Tests now render OpeningInspector directly for
+// the kind-specific assertions (Depth presence/absence, Height
+// placeholder). The data-testid + label contracts are preserved
+// verbatim (D-06).
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { OpeningsSection } from "@/components/PropertiesPanel.OpeningSection";
+import { render, screen, act } from "@testing-library/react";
+import { OpeningInspector } from "@/components/inspectors/OpeningInspector";
 import type { WallSegment, Opening } from "@/types/cad";
 
 function makeWall(openings: Opening[]): WallSegment {
@@ -16,13 +24,19 @@ function makeWall(openings: Opening[]): WallSegment {
   };
 }
 
-describe("Phase 61 — PropertiesPanel OpeningsSection (C1-C3)", () => {
+function clickTab(name: string) {
+  const tabs = screen.queryAllByRole("tab");
+  const tab = tabs.find((t) => (t.textContent ?? "").trim() === name);
+  if (tab) act(() => { tab.click(); });
+}
+
+describe("Phase 61 — OpeningInspector kind-aware rendering (C1-C3, updated for Phase 82 IA-05)", () => {
   beforeEach(() => {
-    // Each test mounts fresh; no cross-test state to clear here since
-    // OpeningsSection is purely store-backed and the store is per-process.
+    // OpeningInspector + NumericRow are pure store consumers; no
+    // cross-test state to clear here.
   });
 
-  it("C1: niche row shows Depth input when expanded", () => {
+  it("C1: niche shows Depth input on the Position tab", () => {
     const niche: Opening = {
       id: "op1",
       type: "niche",
@@ -33,21 +47,21 @@ describe("Phase 61 — PropertiesPanel OpeningsSection (C1-C3)", () => {
       depthFt: 0.5,
     };
     const wall = makeWall([niche]);
-    render(<OpeningsSection wall={wall} />);
-    // Expand the row.
-    fireEvent.click(screen.getByTestId("opening-row-op1"));
-    // Depth input is rendered with kind-specific test id.
-    expect(screen.getByTestId("opening-depth-op1")).toBeTruthy();
-    // Width / Height / Sill / Offset rows also present.
+    render(<OpeningInspector wall={wall} opening={niche} />);
+    // Niche openings are non-window — Type tab is default. Switch to
+    // Dimensions for the W/H/Sill assertions, then Position for Depth.
+    clickTab("Dimensions");
     // Phase 71 D-09: labels are mixed-case ("Width" not "WIDTH")
     expect(screen.getByText("Width")).toBeTruthy();
     expect(screen.getByText("Height")).toBeTruthy();
     expect(screen.getByText("Sill")).toBeTruthy();
+    clickTab("Position");
     expect(screen.getByText("Offset")).toBeTruthy();
     expect(screen.getByText("Depth")).toBeTruthy();
+    expect(screen.getByTestId("opening-depth-op1")).toBeTruthy();
   });
 
-  it("C2: passthrough row shows wall-height placeholder on the Height input", () => {
+  it("C2: passthrough shows wall-height placeholder on the Height input (Dimensions tab)", () => {
     const passthrough: Opening = {
       id: "op2",
       type: "passthrough",
@@ -57,14 +71,13 @@ describe("Phase 61 — PropertiesPanel OpeningsSection (C1-C3)", () => {
       sillHeight: 0,
     };
     const wall = makeWall([passthrough]);
-    render(<OpeningsSection wall={wall} />);
-    fireEvent.click(screen.getByTestId("opening-row-op2"));
-    // Find the Height input — it's the input with placeholder "Wall height".
+    render(<OpeningInspector wall={wall} opening={passthrough} />);
+    clickTab("Dimensions");
     const heightInputs = screen.getAllByPlaceholderText("Wall height");
     expect(heightInputs.length).toBe(1);
   });
 
-  it("C3: archway row hides the Depth input", () => {
+  it("C3: archway hides the Depth input on the Position tab", () => {
     const archway: Opening = {
       id: "op3",
       type: "archway",
@@ -74,12 +87,10 @@ describe("Phase 61 — PropertiesPanel OpeningsSection (C1-C3)", () => {
       sillHeight: 0,
     };
     const wall = makeWall([archway]);
-    render(<OpeningsSection wall={wall} />);
-    fireEvent.click(screen.getByTestId("opening-row-op3"));
-    // Depth label must NOT be in the DOM.
+    render(<OpeningInspector wall={wall} opening={archway} />);
+    clickTab("Position");
     // Phase 71 D-09: label is mixed-case ("Depth" not "DEPTH")
     expect(screen.queryByText("Depth")).toBeNull();
-    // No Depth input either.
     expect(screen.queryByTestId("opening-depth-op3")).toBeNull();
   });
 });

@@ -110,12 +110,29 @@ function seed(opts: { labelOverride?: string } = {}) {
 describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
   beforeEach(() => seed());
 
+  // Phase 82-02: <LabelOverrideInput> now lives inside the
+  // CustomElementInspector's "Label" tab (D-05). Tests that exercise the
+  // input or its driver must first switch to that tab so the component
+  // mounts (TabsContent returns null when inactive).
+  async function openLabelTab() {
+    const tabs = await screen.findAllByRole("tab");
+    const labelTab = tabs.find(
+      (t) => (t.textContent ?? "").trim() === "Label",
+    );
+    if (labelTab) {
+      await act(async () => {
+        labelTab.click();
+      });
+    }
+  }
+
   it("renders an input with placeholder = uppercase catalog name (D-11) and maxLength=40 (D-12)", async () => {
     render(
       <TooltipProvider>
         <App />
       </TooltipProvider>
     );
+    await openLabelTab();
     // Use placeholder lookup — Plan 31-03 input uses placeholder = "FRIDGE"
     const input = await screen.findByPlaceholderText(/FRIDGE/i);
     expect(input).toBeDefined();
@@ -128,6 +145,7 @@ describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
         <App />
       </TooltipProvider>
     );
+    await openLabelTab();
     const input = await screen.findByPlaceholderText(/FRIDGE/i);
     const user = userEvent.setup();
 
@@ -144,6 +162,7 @@ describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
         <App />
       </TooltipProvider>
     );
+    await openLabelTab();
     const input = await screen.findByPlaceholderText(/FRIDGE/i);
     const before = useCADStore.getState().past.length;
     const user = userEvent.setup();
@@ -158,6 +177,7 @@ describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
         <App />
       </TooltipProvider>
     );
+    await openLabelTab();
     await vi.waitFor(() => expect(window.__driveLabelOverride).toBeDefined(), { timeout: 2000 });
     const before = useCADStore.getState().past.length;
     await act(async () => {
@@ -173,6 +193,7 @@ describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
         <App />
       </TooltipProvider>
     );
+    await openLabelTab();
     await vi.waitFor(() => expect(window.__driveLabelOverride).toBeDefined(), { timeout: 2000 });
     const before = useCADStore.getState().past.length;
     await act(async () => {
@@ -188,6 +209,7 @@ describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
         <App />
       </TooltipProvider>
     );
+    await openLabelTab();
     await vi.waitFor(() => expect(window.__driveLabelOverride).toBeDefined(), { timeout: 2000 });
     await act(async () => {
       window.__driveLabelOverride!.typeAndCommit(PCE_ID, "", "enter");
@@ -202,6 +224,7 @@ describe("CUSTOM-06 — PropertiesPanel label-override input", () => {
         <App />
       </TooltipProvider>
     );
+    await openLabelTab();
     const input = await screen.findByPlaceholderText(/FRIDGE/i);
     const user = userEvent.setup();
     await user.clear(input);

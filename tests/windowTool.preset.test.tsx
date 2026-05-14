@@ -208,12 +208,24 @@ describe("Phase 79 — PropertiesPanel preset row (WIN-02)", () => {
     setCurrentWindowPreset({ width: 3, height: 4, sillHeight: 3 });
   });
 
+  // Phase 82-02: <OpeningsSection> now lives inside the WallInspector's
+  // "Openings" tab (D-05). Each test must first switch to that tab
+  // before the opening row is in the DOM.
+  function openOpeningsTab() {
+    const tabs = screen.queryAllByRole("tab");
+    const openingsTab = tabs.find(
+      (t) => (t.textContent ?? "").trim() === "Openings",
+    );
+    if (openingsTab) act(() => { openingsTab.click(); });
+  }
+
   it("renders 'Preset: Standard' for an Opening with 3/4/3", () => {
     render(
       <TooltipProvider>
         <PropertiesPanel productLibrary={[]} viewMode="2d" />
       </TooltipProvider>
     );
+    openOpeningsTab();
     // Expand the opening row.
     const wall = activeDoc().walls[WALL_ID];
     const op = wall.openings[0];
@@ -241,6 +253,7 @@ describe("Phase 79 — PropertiesPanel preset row (WIN-02)", () => {
         <PropertiesPanel productLibrary={[]} viewMode="2d" />
       </TooltipProvider>
     );
+    openOpeningsTab();
     const row = screen.queryByTestId(`opening-row-${op.id}`);
     // Wave 3 [Rule 3 - blocking]: native .click() does not flush React state
     // updates in happy-dom; wrap in act() so the OpeningEditor expand state
@@ -257,6 +270,7 @@ describe("Phase 79 — PropertiesPanel preset row (WIN-02)", () => {
         <PropertiesPanel productLibrary={[]} viewMode="2d" />
       </TooltipProvider>
     );
+    openOpeningsTab();
     const row = screen.queryByTestId(`opening-row-${op.id}`);
     // Wave 3 [Rule 3 - blocking]: native .click() does not flush React state
     // updates in happy-dom; wrap in act() so the OpeningEditor expand state
@@ -283,6 +297,7 @@ describe("Phase 79 — PropertiesPanel preset row (WIN-02)", () => {
         <PropertiesPanel productLibrary={[]} viewMode="2d" />
       </TooltipProvider>
     );
+    openOpeningsTab();
     const row = screen.queryByTestId(`opening-row-${op.id}`);
     // Wave 3 [Rule 3 - blocking]: native .click() does not flush React state
     // updates in happy-dom; wrap in act() so the OpeningEditor expand state

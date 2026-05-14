@@ -83,6 +83,21 @@ interface UIState {
   setHoveredEntityId: (id: string | null) => void;
 
   /**
+   * Phase 82 IA-05 (D-02): opening sub-selection state for the right
+   * inspector. When a wall is selected and the user clicks an opening
+   * row, the inspector swaps from wall tabs to opening tabs. NOT a
+   * first-class selectedIds entry — purely UI state.
+   *
+   * Cleared by: clearSelection, select, setTool. (Stale when the parent
+   * wall changes or selection is wiped.)
+   *
+   * Plan 82-01 adds the slice; Plan 82-03 wires the setter to the
+   * OpeningInspector / wall-Openings-tab click handlers.
+   */
+  selectedOpeningId: string | null;
+  setSelectedOpeningId: (id: string | null) => void;
+
+  /**
    * Phase 46: extends Phase 35 dispatch — non-preset bbox/look-at target.
    * ThreeViewport mirrors lines 252–302 useEffect for this field.
    */
@@ -266,6 +281,8 @@ export const useUIStore = create<UIState>()((set) => ({
   hiddenIds: new Set<string>(),
   // Phase 81 Plan 02 (D-02): tree-hover highlight (2D-only).
   hoveredEntityId: null,
+  // Phase 82 IA-05 (D-02): opening sub-selection (set in Plan 82-03).
+  selectedOpeningId: null,
   pendingCameraTarget: null,
   getCameraCapture: null,
   displayMode: readDisplayMode(),
@@ -275,11 +292,16 @@ export const useUIStore = create<UIState>()((set) => ({
   cutawayAutoDetectedWallId: new Map<string, string | null>(),
   cutawayManualWallIds: new Set<string>(),
 
-  setTool: (tool) => set({ activeTool: tool, selectedIds: [] }),
-  select: (ids) => set({ selectedIds: ids }),
+  // Phase 82 IA-05 (D-02): tool switch wipes sub-selection along with selection.
+  setTool: (tool) => set({ activeTool: tool, selectedIds: [], selectedOpeningId: null }),
+  // Phase 82 IA-05 (D-02): new selection invalidates any prior opening sub-selection.
+  select: (ids) => set({ selectedIds: ids, selectedOpeningId: null }),
   addToSelection: (id) =>
     set((s) => ({ selectedIds: [...s.selectedIds, id] })),
-  clearSelection: () => set({ selectedIds: [] }),
+  // Phase 82 IA-05 (D-02): clearing selection wipes sub-selection too.
+  clearSelection: () => set({ selectedIds: [], selectedOpeningId: null }),
+  // Phase 82 IA-05 (D-02): opening sub-selection setter; consumers land in Plan 82-03.
+  setSelectedOpeningId: (id) => set({ selectedOpeningId: id }),
   toggleProductLibrary: () =>
     set((s) => ({ showProductLibrary: !s.showProductLibrary })),
   toggleProperties: () =>

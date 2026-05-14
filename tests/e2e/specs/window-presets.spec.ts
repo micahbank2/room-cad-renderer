@@ -148,6 +148,9 @@ test.describe("Phase 79 — Window Presets (WIN-PRESETS-01)", () => {
       }).__cadStore.getState();
       return s.rooms[s.activeRoomId].walls.wall_1.openings[0].id;
     });
+    // Phase 82 Plan 82-03 nav: Wall tabs → Openings tab → opening row →
+    // OpeningInspector Preset tab (default for window).
+    await page.getByRole("tab", { name: "Openings" }).click();
     await page.locator(`[data-testid="opening-row-${openingId}"]`).click();
     await settle(page);
     await expect(page.getByText(/preset:\s*wide/i)).toBeVisible();
@@ -183,6 +186,8 @@ test.describe("Phase 79 — Window Presets (WIN-PRESETS-01)", () => {
       }).__cadStore.getState();
       return s.rooms[s.activeRoomId].walls.wall_1.openings[0].id;
     });
+    // Phase 82 Plan 82-03 nav: Wall tabs → Openings tab → opening row.
+    await page.getByRole("tab", { name: "Openings" }).click();
     await page.locator(`[data-testid="opening-row-${openingId}"]`).click();
     await settle(page);
     const beforePast = await page.evaluate(
@@ -245,6 +250,8 @@ test.describe("Phase 79 — Window Presets (WIN-PRESETS-01)", () => {
       }).__cadStore.getState();
       return s.rooms[s.activeRoomId].walls.wall_1.openings[0].id;
     });
+    // Phase 82 Plan 82-03 nav: Wall tabs → Openings tab → opening row.
+    await page.getByRole("tab", { name: "Openings" }).click();
     await page.locator(`[data-testid="opening-row-${openingId}"]`).click();
     await settle(page);
     await expect(page.getByText(/preset:\s*standard/i)).toBeVisible();
