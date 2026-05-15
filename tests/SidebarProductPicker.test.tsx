@@ -1,9 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, createEvent } from "@testing-library/react";
 
 vi.mock("idb-keyval", () => ({
   get: vi.fn(() => Promise.resolve(undefined)),
   set: vi.fn(() => Promise.resolve()),
+  del: vi.fn(() => Promise.resolve()),
+  keys: vi.fn(() => Promise.resolve([])),
+  values: vi.fn(() => Promise.resolve([])),
+  clear: vi.fn(() => Promise.resolve()),
+  createStore: vi.fn(() => ({})),
 }));
 
 import SidebarProductPicker from "@/components/SidebarProductPicker";
@@ -35,7 +40,7 @@ describe("SidebarProductPicker (LIB-05)", () => {
     fireEvent.change(screen.getByPlaceholderText("SEARCH..."), { target: { value: "eames" } });
     const rows = screen.getAllByTestId("picker-row");
     expect(rows).toHaveLength(1);
-    expect(rows[0].textContent).toContain("EAMES_LOUNGE_CHAIR");
+    expect(rows[0].textContent).toContain("EAMES LOUNGE CHAIR");
   });
 
   it("empty search shows all products", () => {
@@ -55,11 +60,14 @@ describe("SidebarProductPicker (LIB-05)", () => {
   it("dragstart sets effectAllowed to copy", () => {
     render(<SidebarProductPicker />);
     const row = screen.getAllByTestId("picker-row")[0];
-    const dt: { setData: ReturnType<typeof vi.fn>; effectAllowed: string } = {
-      setData: vi.fn(),
-      effectAllowed: "",
-    };
-    fireEvent.dragStart(row, { dataTransfer: dt });
+    // happy-dom's DragEvent creates its own DataTransfer that ignores the
+    // `init.dataTransfer` argument passed via fireEvent. Override the
+    // event's dataTransfer property directly so the component's
+    // `e.dataTransfer.effectAllowed = "copy"` write lands on our spy.
+    const dt = { setData: vi.fn(), effectAllowed: "" };
+    const event = createEvent.dragStart(row);
+    Object.defineProperty(event, "dataTransfer", { value: dt, writable: false });
+    fireEvent(row, event);
     expect(dt.effectAllowed).toBe("copy");
   });
 });
