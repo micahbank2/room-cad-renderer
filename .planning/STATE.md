@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: completed
-last_updated: "2026-05-15T01:03:38.796Z"
-last_activity: 2026-05-14
+last_updated: "2026-05-15T01:14:08.448Z"
+last_activity: 2026-05-15
 progress:
   total_phases: 20
   completed_phases: 13
   total_plans: 48
-  completed_plans: 46
+  completed_plans: 45
 ---
 
 # Project State
@@ -23,12 +23,12 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 
 ## Current Position
 
-Phase: 83 COMPLETE
-Plan: 02 complete (Snap migrated to FloatingToolbar Utility Popover)
+Phase: 999.1
+Plan: Not started
 Milestone: v1.21 Sidebar IA & Contextual Surfaces
 Phases: 81 complete; 82 complete; 83 complete
 Status: Phase 83 COMPLETE — banded 5-group FloatingToolbar with 44px hit targets + Snap migrated from Sidebar to Utility group (IA-06 + IA-07; Phase 81 D-05 carry-over closed)
-Last activity: 2026-05-14
+Last activity: 2026-05-15
 
 ## Decisions
 
