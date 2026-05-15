@@ -46,6 +46,7 @@ type DragType =
   | "wall"
   | "product"
   | "ceiling"
+  | "column" // Phase 86 COL-01 — column move drag
   | "rotate"
   | "wall-rotate"
   | "product-resize"
@@ -82,7 +83,7 @@ function pointInPolygon(pt: Point, polygon: Point[]): boolean {
 function hitTestStore(
   feetPos: Point,
   productLibrary: Product[]
-): { id: string; type: "wall" | "product" | "ceiling" | "opening"; wallId?: string } | null {
+): { id: string; type: "wall" | "product" | "ceiling" | "opening" | "column"; wallId?: string } | null {
   const doc = getActiveRoomDoc();
   if (!doc) return null;
 
@@ -128,6 +129,26 @@ function hitTestStore(
   for (const c of Object.values(doc.ceilings ?? {})) {
     if (c.points && c.points.length >= 3 && pointInPolygon(feetPos, c.points)) {
       return { id: c.id, type: "ceiling" };
+    }
+  }
+
+  // Phase 86 COL-01 (D-01 Pitfall 4): columns BEFORE walls so the column
+  // wins over the wall when the cursor sits inside both footprints. Rotated
+  // AABB test: transform point into the column's local (un-rotated) frame
+  // then bound-check against half-extents.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const columns = (doc as any).columns ?? {};
+  for (const col of Object.values(columns) as import("@/types/cad").Column[]) {
+    if (col.shape !== "box") continue;
+    const dx = feetPos.x - col.position.x;
+    const dy = feetPos.y - col.position.y;
+    const rad = -(col.rotation * Math.PI) / 180;
+    const lx = dx * Math.cos(rad) - dy * Math.sin(rad);
+    const ly = dx * Math.sin(rad) + dy * Math.cos(rad);
+    const halfW = col.widthFt / 2;
+    const halfD = col.depthFt / 2;
+    if (lx >= -halfW && lx <= halfW && ly >= -halfD && ly <= halfD) {
+      return { id: col.id, type: "column" };
     }
   }
 
@@ -901,7 +922,7 @@ export function activateSelectTool(
 
       dragging = true;
       dragId = hit.id;
-      dragType = hit.type as "wall" | "product" | "ceiling";
+      dragType = hit.type as "wall" | "product" | "ceiling" | "column";
 
       // Phase 30 — D-09b: cache SceneGeometry ONCE at drag start for
       // products + ceilings (generic-move smart-snap path). Walls use the
@@ -969,6 +990,24 @@ export function activateSelectTool(
           };
           lastDragWallStart = { ...wall.start };
           lastDragWallEnd = { ...wall.end };
+        }
+      } else if (hit.type === "column") {
+        // Phase 86 COL-01 — column move drag. Single-undo via Phase 31
+        // transaction pattern: push history once at drag start via empty
+        // updateColumn, then use moveColumnNoHistory mid-stroke. No extra
+        // commit on mouseup.
+        const cad = useCADStore.getState();
+        const roomId = cad.activeRoomId;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const col = roomId ? ((cad.rooms[roomId] as any)?.columns?.[hit.id] as import("@/types/cad").Column | undefined) : undefined;
+        if (col && roomId) {
+          dragOffsetFeet = {
+            x: feet.x - col.position.x,
+            y: feet.y - col.position.y,
+          };
+          lastDragFeetPos = { ...col.position };
+          // Push one history entry at drag start.
+          cad.updateColumn(roomId, hit.id, {});
         }
       }
     } else {
@@ -1369,6 +1408,17 @@ export function activateSelectTool(
           (dragPre.fabricObj as unknown as { setCoords: () => void }).setCoords();
         }
         fc.requestRenderAll();
+        lastDragFeetPos = snapped;
+      }
+    } else if (dragType === "column") {
+      // Phase 86 COL-01 — column move. History entry already pushed at
+      // drag start via empty updateColumn(); mid-stroke uses NoHistory.
+      // Snap-engine path skipped for v1.20 (D-08a stair-precedent) — falls
+      // through to the grid-only `snapped` computed above.
+      const cad = useCADStore.getState();
+      const roomId = cad.activeRoomId;
+      if (roomId) {
+        cad.moveColumnNoHistory(roomId, dragId, snapped);
         lastDragFeetPos = snapped;
       }
     } else if (dragType === "wall") {
