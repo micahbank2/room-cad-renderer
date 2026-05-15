@@ -9,21 +9,17 @@
 
 import { test, expect } from "@playwright/test";
 import { setupPage } from "../playwright-helpers/setupPage";
+import { seedRoom } from "../playwright-helpers/seedRoom";
 
 test.describe("Theme toggle + persistence (Phase 87)", () => {
-  test.beforeEach(async ({ page }) => {
-    // Reset theme before each test so we control initial state.
-    await page.addInitScript(() => {
-      try {
-        localStorage.removeItem("room-cad-theme");
-      } catch {
-        /* about:blank */
-      }
-    });
-  });
+  // No beforeEach init-script reset — that would clobber localStorage on the
+  // reload step in THEME-05, defeating the persistence check. Each test sets
+  // its own theme explicitly via the gear UI and starts from a clean profile
+  // (Playwright spins up a fresh browser context per test by default).
 
   test("THEME-03 — click gear → Dark adds .dark; Light removes it", async ({ page }) => {
     await setupPage(page);
+    await seedRoom(page);
 
     const gear = page.locator('[data-testid="topbar-settings-button"]');
     await expect(gear).toBeVisible();
@@ -47,6 +43,7 @@ test.describe("Theme toggle + persistence (Phase 87)", () => {
 
   test("THEME-05 — choice persists across reload (no flash)", async ({ page }) => {
     await setupPage(page);
+    await seedRoom(page);
 
     // Set Dark
     await page.locator('[data-testid="topbar-settings-button"]').click();
@@ -63,6 +60,9 @@ test.describe("Theme toggle + persistence (Phase 87)", () => {
       document.documentElement.classList.contains("dark"),
     );
     expect(hasDarkOnReload).toBe(true);
+
+    // Re-seed for the Light leg (page reload reset hasStarted)
+    await seedRoom(page);
 
     // Now switch to Light, reload, verify .dark is absent
     await page.locator('[data-testid="topbar-settings-button"]').click();
@@ -83,6 +83,7 @@ test.describe("Theme toggle + persistence (Phase 87)", () => {
     page,
   }) => {
     await setupPage(page);
+    await seedRoom(page);
 
     // Toggle Dark
     await page.locator('[data-testid="topbar-settings-button"]').click();
