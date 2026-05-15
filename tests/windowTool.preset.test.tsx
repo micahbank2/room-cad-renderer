@@ -61,12 +61,11 @@ import {
   setCurrentWindowPreset,
   getCurrentWindowPreset,
 } from "@/canvas/tools/windowTool";
-// PropertiesPanel will gain a preset row in Wave 2. Import for tests below.
-// Phase 79-03 Wave 3 [Rule 3 - blocking]: PropertiesPanel exports `default`,
-// not a named export. The RED test as written imports `{ PropertiesPanel }`
-// and renders `undefined`, blocking all 4 WIN-02 assertions before they can
-// inspect the DOM. Switched to the canonical default import to unblock.
-import PropertiesPanel from "@/components/PropertiesPanel";
+// Window preset row is rendered by WallInspector (entity-discriminated inside
+// RightInspector). Issue #182 cleanup migrated this test off the
+// PropertiesPanel.tsx compatibility shim onto the canonical RightInspector
+// mount point.
+import RightInspector from "@/components/RightInspector";
 
 declare global {
   interface Window {
@@ -222,7 +221,7 @@ describe("Phase 79 — PropertiesPanel preset row (WIN-02)", () => {
   it("renders 'Preset: Standard' for an Opening with 3/4/3", () => {
     render(
       <TooltipProvider>
-        <PropertiesPanel productLibrary={[]} viewMode="2d" />
+        <RightInspector productLibrary={[]} viewMode="2d" />
       </TooltipProvider>
     );
     openOpeningsTab();
@@ -250,7 +249,7 @@ describe("Phase 79 — PropertiesPanel preset row (WIN-02)", () => {
     });
     render(
       <TooltipProvider>
-        <PropertiesPanel productLibrary={[]} viewMode="2d" />
+        <RightInspector productLibrary={[]} viewMode="2d" />
       </TooltipProvider>
     );
     openOpeningsTab();
@@ -267,7 +266,7 @@ describe("Phase 79 — PropertiesPanel preset row (WIN-02)", () => {
     const op = wall.openings[0];
     render(
       <TooltipProvider>
-        <PropertiesPanel productLibrary={[]} viewMode="2d" />
+        <RightInspector productLibrary={[]} viewMode="2d" />
       </TooltipProvider>
     );
     openOpeningsTab();
@@ -294,7 +293,7 @@ describe("Phase 79 — PropertiesPanel preset row (WIN-02)", () => {
     const op = wall.openings[0];
     render(
       <TooltipProvider>
-        <PropertiesPanel productLibrary={[]} viewMode="2d" />
+        <RightInspector productLibrary={[]} viewMode="2d" />
       </TooltipProvider>
     );
     openOpeningsTab();
