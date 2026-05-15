@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: completed
-stopped_at: Completed 88-02-PLAN.md — chrome typography one-step bump (D-07) shipped; Phase 88 COMPLETE
-last_updated: "2026-05-15T18:32:22.479Z"
+stopped_at: Completed 89-01-PLAN.md — product/custom-element 2D image polish (Cover-fit + clipPath + label backdrops + cache invalidation)
+last_updated: "2026-05-15T23:33:32.691Z"
 last_activity: 2026-05-15
 progress:
   total_phases: 20
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 
 Phase: 999.1
 Plan: Not started
-Milestone: v1.20 Surface Depth & Architectural Expansion — COMPLETE. Phase 87 + Phase 88 ship as standalone polish phases per D-01.
-Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86 complete; 87 complete; 88 complete (88-01 + 88-02)
-Status: Phase 88 COMPLETE — chrome polish ready for Jessica UAT; ready for PR (closes #194 #195 #196 #197)
+Milestone: v1.20 Surface Depth & Architectural Expansion — COMPLETE. Phase 87 + Phase 88 + Phase 89 ship as standalone polish phases per D-01.
+Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86 complete; 87 complete; 88 complete (88-01 + 88-02); 89 complete (89-01)
+Status: Phase 89 COMPLETE — 2D image polish (Cover-fit, custom-element images, label backdrops, cache invalidation) ready for Jessica UAT; ready for PR
 Last activity: 2026-05-15
-Stopped at: Completed 88-02-PLAN.md — chrome typography one-step bump (D-07) shipped; Phase 88 COMPLETE
+Stopped at: Completed 89-01-PLAN.md — product/custom-element 2D image polish (Cover-fit + clipPath + label backdrops + cache invalidation)
 
 ## Decisions
 
@@ -71,6 +71,7 @@ Stopped at: Completed 88-02-PLAN.md — chrome typography one-step bump (D-07) s
 - [Phase 87]: Plan 87-01 (THEME-01..05): standalone polish phase. SettingsPopover component (~70 lines, src/components/SettingsPopover.tsx) extracted as its own file (vs research's inline-in-TopBar recommendation) to anticipate future settings rows. D-03 honored — popover stays open after segment click (deliberately different from Phase 83 Snap auto-close, because theme is a "try it" choice). D-04 — three .light force-wrappers removed (WelcomeScreen:55, ProjectManager:69, HelpPage:83); .light CSS class definition preserved as reserved utility. 6 unit + 3 e2e tests; 1113/1113 vitest passing.
 - [Phase 88]: Plan 88-01 (POLISH-01/02/03): Canvas theme bridge via getCanvasTheme() + setFabricSyncTheme() per-frame ref; FloatingToolbar mount hoisted; --border bumped to oklch(0.85). 1120/1120 vitest pass (1113 baseline + 7 new), 0 regressions. Refs #194, #195, #196.
 - [Phase 88]: Plan 88-02 (POLISH-04 #197): mechanical typography sweep across 36 files, 187 occurrences (text-[9/10/11px] -> text-[11/12/13px]). Single safe-revert commit (c83d36c). 2 DO-NOT-BUMP exceptions preserved at FabricCanvas.tsx:820 (dimension-edit input) + :855 (annotation input). 1120/1131 vitest pass, 0 regressions; 8/8 critical e2e on chromium-dev. 2 pre-existing Wave 1 light-mode-canvas.spec.ts failures logged to deferred-items.md (chromium getComputedStyle oklch literal vs rgb regex — not 88-02 fallout). Phase 88 COMPLETE.
+- [Phase 89]: Phase 89 Plan 01: Cover-fit + clipPath replaces Stretch in renderProducts; renderCustomElements refactored to Group-wrap rect+image+label so rotation propagates; productImageCache shared via UUID namespace (no key collision); imageUrl-trigger invalidation in productStore + cadStore; data-tag-based test queries to survive jsdom probe-div empty CSS var lookups
 
 ## Performance Metrics
 
@@ -104,6 +105,7 @@ Stopped at: Completed 88-02-PLAN.md — chrome typography one-step bump (D-07) s
 | Phase 87 P01 | ~8min | 4 tasks | 7 files |
 | Phase 88 P01 | 35 | 4 tasks | 12 files |
 | Phase 88 P02 | 8min | 2 tasks | 36 files |
+| Phase 89 P01 | 16min | 4 tasks | 7 files |
 
 ## v1.20 Roadmap
 
