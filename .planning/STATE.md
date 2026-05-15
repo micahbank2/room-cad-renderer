@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.20
-milestone_name: Surface Depth & Architectural Expansion
+milestone: v1.19
+milestone_name: Material Linking & Library Rebuild
 status: completed
 stopped_at: Completed 86-03-PLAN.md (Wave 3 — ColumnInspector + Tree + Toolbar) — v1.20 milestone COMPLETE
-last_updated: "2026-05-15T15:02:00.000Z"
+last_updated: "2026-05-15T15:15:20.198Z"
 last_activity: 2026-05-15
 progress:
   total_phases: 20
-  completed_phases: 14
+  completed_phases: 13
   total_plans: 48
-  completed_plans: 46
+  completed_plans: 45
 ---
 
 # Project State
@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 
 ## Current Position
 
-Phase: 86 (columns-v1-20) — COMPLETE
-Plan: 86-03 COMPLETE — v1.20 milestone CLOSED.
+Phase: 999.1
+Plan: Not started
 Milestone: v1.20 Surface Depth & Architectural Expansion — COMPLETE (Phases 78, 79, 80, 86 all shipped). Next milestone TBD.
 Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86 complete (all 3 waves)
 Status: Phase 86 Plan 03 COMPLETE — ColumnInspector with Dimensions/Material/Rotation tabs + RightInspector dispatch + Columns group in Rooms tree (buildRoomTree + RoomsTreePanel + savedCameraSet + focusOnColumn) + FloatingToolbar Cuboid Column button. 1107 vitest passing (+12 new) + 4 e2e GREEN (2 placement + 2 lifecycle). Jessica can place / select / edit / rename / camera-save / focus / delete a column entirely through the visible UI. v1.20 milestone closed.
