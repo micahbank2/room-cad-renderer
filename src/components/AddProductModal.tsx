@@ -143,7 +143,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
             {/* Right: form fields */}
             <div className="flex-1 space-y-3">
               <label className="block space-y-1">
-                <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">
+                <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">
                   PRODUCT NAME
                 </span>
                 <Input
@@ -156,7 +156,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
               </label>
 
               <label className="block space-y-1">
-                <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">
+                <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">
                   CATEGORY
                 </span>
                 <select
@@ -174,7 +174,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider block">
+                  <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider block">
                     DIMENSIONS (W / D / H)
                   </span>
                   <Switch
@@ -227,7 +227,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
               </div>
 
               <label className="block space-y-1">
-                <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">
+                <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">
                   MATERIAL FINISH
                 </span>
                 <Input
@@ -240,7 +240,7 @@ export default function AddProductModal({ onAdd, onClose }: Props) {
 
               {/* 3D Model — optional (Phase 55 GLTF-UPLOAD-01) */}
               <div className="space-y-1">
-                <span className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">
+                <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">
                   3D MODEL (OPTIONAL)
                 </span>
                 <div className="flex items-center gap-2">

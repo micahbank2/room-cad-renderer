@@ -84,7 +84,7 @@ export default function ProductForm({ onAdd }: Props) {
       </label>
       <div className={`grid grid-cols-3 gap-1.5 ${skipDims ? "opacity-40 pointer-events-none" : ""}`}>
         <label className="space-y-0.5">
-          <span className="text-[10px] text-muted-foreground">W (ft)</span>
+          <span className="text-[12px] text-muted-foreground">W (ft)</span>
           <input
             type="number"
             min={0.25}
@@ -95,7 +95,7 @@ export default function ProductForm({ onAdd }: Props) {
           />
         </label>
         <label className="space-y-0.5">
-          <span className="text-[10px] text-muted-foreground">D (ft)</span>
+          <span className="text-[12px] text-muted-foreground">D (ft)</span>
           <input
             type="number"
             min={0.25}
@@ -106,7 +106,7 @@ export default function ProductForm({ onAdd }: Props) {
           />
         </label>
         <label className="space-y-0.5">
-          <span className="text-[10px] text-muted-foreground">H (ft)</span>
+          <span className="text-[12px] text-muted-foreground">H (ft)</span>
           <input
             type="number"
             min={0.25}

@@ -110,20 +110,20 @@ export default function ProjectManager() {
                 <div className="font-sans font-medium text-foreground truncate">
                   {p.name}
                 </div>
-                <div className="font-sans text-[10px] text-muted-foreground">
+                <div className="font-sans text-[12px] text-muted-foreground">
                   {new Date(p.updatedAt).toLocaleDateString()}
                 </div>
               </div>
               <div className="flex gap-1 ml-2">
                 <button
                   onClick={() => handleLoad(p.id)}
-                  className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground hover:bg-muted/80 text-[10px]"
+                  className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground hover:bg-muted/80 text-[12px]"
                 >
                   Load
                 </button>
                 <button
                   onClick={() => handleDelete(p.id)}
-                  className="px-1.5 py-0.5 rounded bg-destructive/10 text-destructive hover:bg-destructive/20 text-[10px]"
+                  className="px-1.5 py-0.5 rounded bg-destructive/10 text-destructive hover:bg-destructive/20 text-[12px]"
                 >
                   ×
                 </button>

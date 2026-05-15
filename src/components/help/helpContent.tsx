@@ -24,7 +24,7 @@ export const SHORTCUTS: Shortcut[] = SHORTCUT_DISPLAY_LIST;
 
 function Kbd({ children }: { children: React.ReactNode }) {
   return (
-    <kbd className="font-sans text-[10px] text-foreground bg-accent px-1.5 py-0.5 rounded-smooth-md border border-border/50 inline-block">
+    <kbd className="font-sans text-[12px] text-foreground bg-accent px-1.5 py-0.5 rounded-smooth-md border border-border/50 inline-block">
       {children}
     </kbd>
   );
@@ -40,7 +40,7 @@ function H1({ children }: { children: React.ReactNode }) {
 
 function H2({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="font-sans text-[11px] text-foreground tracking-wider uppercase mt-6 mb-2">
+    <h3 className="font-sans text-[13px] text-foreground tracking-wider uppercase mt-6 mb-2">
       {children}
     </h3>
   );
@@ -48,7 +48,7 @@ function H2({ children }: { children: React.ReactNode }) {
 
 function P({ children }: { children: React.ReactNode }) {
   return (
-    <p className="font-sans text-[11px] text-muted-foreground leading-relaxed mb-2">
+    <p className="font-sans text-[13px] text-muted-foreground leading-relaxed mb-2">
       {children}
     </p>
   );
@@ -56,7 +56,7 @@ function P({ children }: { children: React.ReactNode }) {
 
 function OL({ children }: { children: React.ReactNode }) {
   return (
-    <ol className="font-sans text-[11px] text-muted-foreground leading-relaxed list-decimal list-inside space-y-1.5 mb-2 [&_kbd]:mx-0.5">
+    <ol className="font-sans text-[13px] text-muted-foreground leading-relaxed list-decimal list-inside space-y-1.5 mb-2 [&_kbd]:mx-0.5">
       {children}
     </ol>
   );
@@ -64,7 +64,7 @@ function OL({ children }: { children: React.ReactNode }) {
 
 function UL({ children }: { children: React.ReactNode }) {
   return (
-    <ul className="font-sans text-[11px] text-muted-foreground leading-relaxed list-disc list-inside space-y-1.5 mb-2 [&_kbd]:mx-0.5">
+    <ul className="font-sans text-[13px] text-muted-foreground leading-relaxed list-disc list-inside space-y-1.5 mb-2 [&_kbd]:mx-0.5">
       {children}
     </ul>
   );
@@ -143,17 +143,17 @@ export function KeyboardShortcutsContent() {
                     <span key={j} className="flex items-center gap-1">
                       <Kbd>{k}</Kbd>
                       {j < s.keys.length - 1 && (
-                        <span className="text-muted-foreground/60 text-[10px]">+</span>
+                        <span className="text-muted-foreground/60 text-[12px]">+</span>
                       )}
                     </span>
                   ))}
                 </div>
                 <div className="flex-1">
-                  <div className="font-sans text-[11px] text-muted-foreground">
+                  <div className="font-sans text-[13px] text-muted-foreground">
                     {s.action}
                   </div>
                   {s.context && (
-                    <div className="font-sans text-[9px] text-muted-foreground/60 mt-0.5">
+                    <div className="font-sans text-[11px] text-muted-foreground/60 mt-0.5">
                       {s.context}
                     </div>
                   )}

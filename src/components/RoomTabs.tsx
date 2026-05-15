@@ -39,7 +39,7 @@ export default function RoomTabs({ onAddClick }: Props) {
               <TabsTrigger
                 key={room.id}
                 value={room.id}
-                className={`group h-10 px-2 gap-1.5 font-sans text-[10px] tracking-wider rounded-none border-b-2
+                className={`group h-10 px-2 gap-1.5 font-sans text-[12px] tracking-wider rounded-none border-b-2
                   data-[active=true]:border-accent-light data-[active=true]:bg-transparent data-[active=true]:text-foreground
                   border-transparent text-muted-foreground/80 hover:text-muted-foreground
                   ${isActive ? "cursor-text" : "cursor-pointer"}`}
@@ -55,7 +55,7 @@ export default function RoomTabs({ onAddClick }: Props) {
                     }
                     maxLength={60}
                     data-testid={`inline-room-tab-${room.id}`}
-                    className="font-sans text-[10px] tracking-wider min-w-[40px] max-w-[200px]"
+                    className="font-sans text-[12px] tracking-wider min-w-[40px] max-w-[200px]"
                   />
                 ) : (
                   <span>{room.name}</span>
@@ -63,7 +63,7 @@ export default function RoomTabs({ onAddClick }: Props) {
                 {canDelete && (
                   <button
                     onClick={(e) => handleDelete(e, room.id, room.name)}
-                    className="invisible group-hover:visible text-muted-foreground/60 hover:text-destructive text-[11px] leading-none"
+                    className="invisible group-hover:visible text-muted-foreground/60 hover:text-destructive text-[13px] leading-none"
                     aria-label={`Delete ${room.name}`}
                   >
                     ×
@@ -76,7 +76,7 @@ export default function RoomTabs({ onAddClick }: Props) {
       </Tabs>
       <button
         onClick={onAddClick}
-        className="ml-auto font-sans text-[10px] tracking-wider text-muted-foreground/80 hover:text-foreground transition-colors px-2 shrink-0"
+        className="ml-auto font-sans text-[12px] tracking-wider text-muted-foreground/80 hover:text-foreground transition-colors px-2 shrink-0"
       >
         + ADD ROOM
       </button>

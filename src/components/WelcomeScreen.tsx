@@ -82,7 +82,7 @@ export default function WelcomeScreen({ onStart }: Props) {
               <h3 className="font-sans text-xs text-foreground tracking-widest mb-2 group-hover:text-foreground transition-colors">
                 CREATE FLOOR PLAN
               </h3>
-              <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
+              <p className="text-[13px] text-muted-foreground/60 leading-relaxed">
                 Start with a blank room or one of four pre-drawn templates.
               </p>
             </button>
@@ -96,7 +96,7 @@ export default function WelcomeScreen({ onStart }: Props) {
               <h3 className="font-sans text-xs text-foreground tracking-widest mb-2 group-hover:text-foreground transition-colors">
                 UPLOAD FLOOR PLAN
               </h3>
-              <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
+              <p className="text-[13px] text-muted-foreground/60 leading-relaxed">
                 Drop an image of an existing plan and trace walls on top of it.
               </p>
             </button>
@@ -111,7 +111,7 @@ export default function WelcomeScreen({ onStart }: Props) {
                 <h3 className="font-sans text-xs text-foreground tracking-widest mb-2 group-hover:text-foreground transition-colors">
                   OPEN PROJECT
                 </h3>
-                <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
+                <p className="text-[13px] text-muted-foreground/60 leading-relaxed">
                   Resume a previously saved project from your library.
                 </p>
               </button>
@@ -122,7 +122,7 @@ export default function WelcomeScreen({ onStart }: Props) {
           {showProjects && projects.length > 0 && (
             <div className="mt-6 w-full max-w-2xl">
               <div className="bg-card border border-border/10 rounded-smooth-md p-4 space-y-2">
-                <h4 className="font-sans text-[9px] text-muted-foreground/60 tracking-widest mb-3">
+                <h4 className="font-sans text-[11px] text-muted-foreground/60 tracking-widest mb-3">
                   SAVED PROJECTS
                 </h4>
                 {projects.map((p) => (
@@ -135,7 +135,7 @@ export default function WelcomeScreen({ onStart }: Props) {
                       <div className="font-sans text-xs text-foreground tracking-wide group-hover:text-foreground transition-colors truncate">
                         {p.name.toUpperCase().replace(/\s/g, "_")}
                       </div>
-                      <div className="font-sans text-[10px] text-muted-foreground/60 mt-0.5">
+                      <div className="font-sans text-[12px] text-muted-foreground/60 mt-0.5">
                         {new Date(p.updatedAt).toLocaleDateString()}
                       </div>
                     </div>
@@ -163,7 +163,7 @@ export default function WelcomeScreen({ onStart }: Props) {
       <div className="h-8 bg-background flex items-center px-4 border border-border/50 border-0 border-t">
         <div className="flex items-center gap-1.5">
           <div className="w-1.5 h-1.5 rounded-full bg-success" />
-          <span className="font-sans text-[9px] text-muted-foreground/60 tracking-widest">
+          <span className="font-sans text-[11px] text-muted-foreground/60 tracking-widest">
             SYSTEM STATUS: READY
           </span>
         </div>

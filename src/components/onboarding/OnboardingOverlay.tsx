@@ -216,7 +216,7 @@ function CoachMark({
             />
           ))}
         </div>
-        <span className="font-sans text-[9px] text-muted-foreground/60 tracking-widest">
+        <span className="font-sans text-[11px] text-muted-foreground/60 tracking-widest">
           {stepIndex + 1} OF {totalSteps}
         </span>
       </div>
@@ -225,7 +225,7 @@ function CoachMark({
       <h3 className="font-sans text-[12px] text-foreground tracking-wider uppercase mb-2">
         {step.title}
       </h3>
-      <p className="font-sans text-[11px] text-muted-foreground leading-relaxed mb-4">
+      <p className="font-sans text-[13px] text-muted-foreground leading-relaxed mb-4">
         {step.body}
       </p>
 
@@ -233,7 +233,7 @@ function CoachMark({
       <div className="flex items-center justify-between">
         <button
           onClick={onSkip}
-          className="font-sans text-[10px] tracking-widest text-muted-foreground/60 hover:text-foreground transition-colors"
+          className="font-sans text-[12px] tracking-widest text-muted-foreground/60 hover:text-foreground transition-colors"
         >
           SKIP TOUR
         </button>
@@ -241,14 +241,14 @@ function CoachMark({
           {!isFirst && (
             <button
               onClick={onPrev}
-              className="font-sans text-[10px] tracking-widest px-3 py-1 text-muted-foreground/80 hover:text-foreground transition-colors"
+              className="font-sans text-[12px] tracking-widest px-3 py-1 text-muted-foreground/80 hover:text-foreground transition-colors"
             >
               BACK
             </button>
           )}
           <button
             onClick={onNext}
-            className="font-sans text-[10px] tracking-widest px-3 py-1 border border-accent text-foreground hover:bg-accent/10 transition-colors rounded-smooth-md"
+            className="font-sans text-[12px] tracking-widest px-3 py-1 border border-accent text-foreground hover:bg-accent/10 transition-colors rounded-smooth-md"
           >
             {isLast ? "GOT IT" : "NEXT"}
           </button>

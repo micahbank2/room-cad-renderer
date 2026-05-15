@@ -149,7 +149,7 @@ export function ProductInspector({ pp, productLibrary, viewMode }: Props) {
             </PanelSection>
             {libProduct && !hasDimensions(libProduct) && (
               <div className="space-y-1.5 pt-2 border-t border-border/50">
-                <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">
+                <span className="font-sans text-[13px] text-muted-foreground/60 tracking-wider">
                   Set dimensions (ft)
                 </span>
                 <div className="grid grid-cols-3 gap-1">
@@ -205,7 +205,7 @@ export function ProductInspector({ pp, productLibrary, viewMode }: Props) {
               <PanelSection id="finish" label="Finish">
                 <div className="space-y-1.5">
                   {product.gltfId && (
-                    <p className="font-sans text-[11px] text-muted-foreground/60 italic mt-1">
+                    <p className="font-sans text-[13px] text-muted-foreground/60 italic mt-1">
                       GLTF products use their built-in materials. Finish picker
                       has no visual effect on this product (deferred to v1.20).
                     </p>
