@@ -2,7 +2,9 @@
  * Phase 81 Plan 01 — Sidebar IA-02 contract
  *
  * Verifies the "left sidebar default visibility" contract:
- * 1. Sidebar mounts 7 PanelSections with the stable sidebar-* ids.
+ * 1. Sidebar mounts 6 PanelSections with the stable sidebar-* ids.
+ *    (sidebar-snap was removed in Phase 83 D-04 — Snap migrated to
+ *    FloatingToolbar Utility group.)
  * 2. On a fresh user state (empty localStorage), only sidebar-rooms-tree is
  *    expanded; every other section is collapsed.
  * 3. Toggling a section persists to localStorage["ui:propertiesPanel:sections"]
@@ -18,7 +20,6 @@ const STORAGE_KEY = "ui:propertiesPanel:sections";
 const EXPECTED_IDS = [
   "sidebar-rooms-tree",
   "sidebar-room-config",
-  "sidebar-snap",
   "sidebar-custom-elements",
   "sidebar-framed-art",
   "sidebar-wainscoting",
@@ -53,7 +54,6 @@ describe("Sidebar — IA-02 contract (Phase 81 Plan 01)", () => {
     const labelById: Record<string, string> = {
       "sidebar-rooms-tree": "Rooms",
       "sidebar-room-config": "Room config",
-      "sidebar-snap": "Snap",
       "sidebar-custom-elements": "Custom elements",
       "sidebar-framed-art": "Framed art library",
       "sidebar-wainscoting": "Wainscoting library",

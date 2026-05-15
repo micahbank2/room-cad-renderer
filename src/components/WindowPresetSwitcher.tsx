@@ -91,8 +91,8 @@ export function WindowPresetSwitcher(): JSX.Element {
     <div
       data-testid="window-preset-switcher"
       // Position above the FloatingToolbar pill (which sits at bottom-6).
-      // bottom-32 leaves room for the toolbar's two-row layout + zoom %.
-      className="fixed bottom-32 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 max-w-[calc(100vw-24px)]"
+      // Phase 83 D-07: bottom-44 clears the wrapped 2-row banded toolbar at 1024×768.
+      className="fixed bottom-44 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 max-w-[calc(100vw-24px)]"
     >
       {/* Chip row — mirrors FloatingToolbar pill aesthetic */}
       <div

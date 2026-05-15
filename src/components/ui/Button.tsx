@@ -25,6 +25,7 @@ export const buttonVariants = cva(
         icon: "h-9 w-9",
         "icon-sm": "h-7 w-7",
         "icon-lg": "h-10 w-10",
+        "icon-touch": "h-11 w-11",   // Phase 83 D-01 — 44 px WCAG 2.5.5 AAA target
       },
     },
     defaultVariants: {
