@@ -87,37 +87,43 @@ export function ProductInspector({ pp, productLibrary, viewMode }: Props) {
         </TabsList>
         <TabsContent value="dimensions">
           <div className="space-y-2">
-            {product && (
+            {/* Phase 85 PARAM-01/02 — W/D/H inputs render whenever the
+                product has effective dimensions resolvable (either the
+                catalog product is found with dims, OR the placement has
+                override fields). For catalog products explicitly missing
+                dims (hasDimensions false), the "Set dimensions" affordance
+                below handles the unset case. */}
+            {(product ? hasDimensions(product) : true) ? (
               <PanelSection id="dimensions" label="Dimensions">
                 <div className="space-y-1.5">
-                  {hasDimensions(product) ? (
-                    <>
-                      <NumericInputRow
-                        label="Width (ft)"
-                        value={dims.width}
-                        onCommit={(v) =>
-                          resizeProductAxis(pp.id, "width", v)
-                        }
-                        testid="product-width-input"
-                      />
-                      <NumericInputRow
-                        label="Depth (ft)"
-                        value={dims.depth}
-                        onCommit={(v) =>
-                          resizeProductAxis(pp.id, "depth", v)
-                        }
-                        testid="product-depth-input"
-                      />
-                      <NumericInputRow
-                        label="Height (ft)"
-                        value={dims.height}
-                        onCommit={(v) => resizeProductHeight(pp.id, v)}
-                        testid="product-height-input"
-                      />
-                    </>
-                  ) : (
-                    <Row label="Size" value="Unset" />
-                  )}
+                  <NumericInputRow
+                    label="Width (ft)"
+                    value={dims.width}
+                    onCommit={(v) =>
+                      resizeProductAxis(pp.id, "width", v)
+                    }
+                    testid="product-width-input"
+                  />
+                  <NumericInputRow
+                    label="Depth (ft)"
+                    value={dims.depth}
+                    onCommit={(v) =>
+                      resizeProductAxis(pp.id, "depth", v)
+                    }
+                    testid="product-depth-input"
+                  />
+                  <NumericInputRow
+                    label="Height (ft)"
+                    value={dims.height}
+                    onCommit={(v) => resizeProductHeight(pp.id, v)}
+                    testid="product-height-input"
+                  />
+                </div>
+              </PanelSection>
+            ) : (
+              <PanelSection id="dimensions" label="Dimensions">
+                <div className="space-y-1.5">
+                  <Row label="Size" value="Unset" />
                 </div>
               </PanelSection>
             )}
