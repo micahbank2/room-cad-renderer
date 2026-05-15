@@ -52,7 +52,18 @@ export function installNumericInputDrivers(): () => void {
     else el.value = String(value);
     el.dispatchEvent(new Event("input", { bubbles: true }));
     el.dispatchEvent(new Event("change", { bubbles: true }));
-    el.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
+    // React synthetic onBlur listens via the bubbling `focusout` event,
+    // not the non-bubbling DOM `blur` event. el.blur() fires both natively
+    // (firing focusout on activeElement) and is the most reliable way to
+    // trigger the commit handler. If the element wasn't actually focused
+    // (focus() can fail silently in some jsdom paths), fall back to a
+    // synthetic focusout — but only one of the two paths runs, otherwise
+    // the input commits twice and the single-undo invariant breaks.
+    if (document.activeElement === el) {
+      el.blur();
+    } else {
+      el.dispatchEvent(new FocusEvent("focusout", { bubbles: true }));
+    }
   };
 
   window.__driveNumericInput = driver;

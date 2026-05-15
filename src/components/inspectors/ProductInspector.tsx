@@ -11,18 +11,20 @@
 // D-05 trailing row: <SavedCameraButtons> below tabs, always visible.
 // D-03: key={pp.id} forces fresh mount on selection change.
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCADStore } from "@/stores/cadStore";
 import { useProductStore } from "@/stores/productStore";
 import type { Product } from "@/types/product";
-import { hasDimensions } from "@/types/product";
+import { hasDimensions, resolveEffectiveDims } from "@/types/product";
 import type { PlacedProduct } from "@/types/cad";
 import { PanelSection } from "@/components/ui/PanelSection";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import { MaterialPicker } from "@/components/MaterialPicker";
+import { installNumericInputDrivers } from "@/test-utils/numericInputDrivers";
 import {
+  NumericInputRow,
   Row,
   RotationPresetChips,
   SavedCameraButtons,
@@ -46,6 +48,14 @@ export function ProductInspector({ pp, productLibrary, viewMode }: Props) {
     (s) => s.clearSavedCameraNoHistory,
   );
   const clearProductOverrides = useCADStore((s) => s.clearProductOverrides);
+  // Phase 85 PARAM-01/02/03 — store actions wired to numeric inputs.
+  const resizeProductAxis = useCADStore((s) => s.resizeProductAxis);
+  const resizeProductHeight = useCADStore((s) => s.resizeProductHeight);
+  const moveProduct = useCADStore((s) => s.moveProduct);
+
+  // Phase 85 D-05 — install __driveNumericInput test driver. StrictMode-safe
+  // via identity-check cleanup inside installNumericInputDrivers (CLAUDE.md §7).
+  useEffect(() => installNumericInputDrivers(), []);
 
   const [activeTab, setActiveTab] = useState<ProductTab>("dimensions");
 
@@ -53,8 +63,13 @@ export function ProductInspector({ pp, productLibrary, viewMode }: Props) {
   const libProduct =
     storeProducts.find((p) => p.id === pp.productId) ?? product;
 
+  // Phase 85 — effective dims honor per-placement overrides + sizeScale.
+  const dims = resolveEffectiveDims(product, pp);
+
   const hasOverrides =
-    pp.widthFtOverride !== undefined || pp.depthFtOverride !== undefined;
+    pp.widthFtOverride !== undefined ||
+    pp.depthFtOverride !== undefined ||
+    pp.heightFtOverride !== undefined;
 
   return (
     <div className="space-y-2" key={pp.id}>
@@ -77,9 +92,28 @@ export function ProductInspector({ pp, productLibrary, viewMode }: Props) {
                 <div className="space-y-1.5">
                   {hasDimensions(product) ? (
                     <>
-                      <Row label="Width" value={`${product.width} FT`} />
-                      <Row label="Depth" value={`${product.depth} FT`} />
-                      <Row label="Height" value={`${product.height} FT`} />
+                      <NumericInputRow
+                        label="Width (ft)"
+                        value={dims.width}
+                        onCommit={(v) =>
+                          resizeProductAxis(pp.id, "width", v)
+                        }
+                        testid="product-width-input"
+                      />
+                      <NumericInputRow
+                        label="Depth (ft)"
+                        value={dims.depth}
+                        onCommit={(v) =>
+                          resizeProductAxis(pp.id, "depth", v)
+                        }
+                        testid="product-depth-input"
+                      />
+                      <NumericInputRow
+                        label="Height (ft)"
+                        value={dims.height}
+                        onCommit={(v) => resizeProductHeight(pp.id, v)}
+                        testid="product-height-input"
+                      />
                     </>
                   ) : (
                     <Row label="Size" value="Unset" />
@@ -87,11 +121,23 @@ export function ProductInspector({ pp, productLibrary, viewMode }: Props) {
                 </div>
               </PanelSection>
             )}
-            <PanelSection id="position" label="Position" defaultOpen={false}>
+            <PanelSection id="position" label="Position">
               <div className="space-y-1.5">
-                <Row
-                  label="Position"
-                  value={`${pp.position.x.toFixed(1)}, ${pp.position.y.toFixed(1)}`}
+                <NumericInputRow
+                  label="X (ft)"
+                  value={pp.position.x}
+                  onCommit={(v) =>
+                    moveProduct(pp.id, { x: v, y: pp.position.y })
+                  }
+                  testid="product-x-input"
+                />
+                <NumericInputRow
+                  label="Y (ft)"
+                  value={pp.position.y}
+                  onCommit={(v) =>
+                    moveProduct(pp.id, { x: pp.position.x, y: v })
+                  }
+                  testid="product-y-input"
                 />
               </div>
             </PanelSection>
