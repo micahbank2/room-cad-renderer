@@ -455,7 +455,7 @@ Standalone phases that ship outside any v1.xx milestone — small, focused, one-
 - 🚧 **Phase 88 — Light Mode + Visual Density Polish** (in progress) — branch `gsd/phase-88-light-mode-polish`. Closes 4 GH issues surfaced from Phase 87 UAT: #194 FloatingToolbar missing in 3D (mount hoist), #195 2D canvas ignores light mode (new `canvasTheme.ts` bridge + thread theme through every render module), #196 light-mode borders invisible (`--border`/`--input` bumped to oklch(0.85)), #197 chrome typography too small (one-step bump 9→11, 10→12, 11→13). 2 plans across 2 waves. See [.planning/phases/88-light-mode-polish/88-CONTEXT.md](phases/88-light-mode-polish/88-CONTEXT.md).
   Plans:
   - [x] 88-01-PLAN.md — Canvas theme bridge + FloatingToolbar mount + border contrast (POLISH-01/02/03)
-  - [ ] 88-02-PLAN.md — Typography density sweep (POLISH-04)
+  - [x] 88-02-PLAN.md — Typography density sweep (POLISH-04)
 
 ---
 
