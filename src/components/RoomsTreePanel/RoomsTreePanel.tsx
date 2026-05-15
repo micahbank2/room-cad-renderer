@@ -14,6 +14,7 @@ import {
   focusOnCeiling,
   focusOnPlacedCustomElement,
   focusOnStair,
+  focusOnColumn,
   focusOnSavedCamera,
 } from "./focusDispatch";
 import { buildSavedCameraSet } from "./savedCameraSet";
@@ -239,6 +240,11 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
         if (s) focusOnStair(s);
         return;
       }
+      if (node.kind === "column") {
+        const c = (doc.columns ?? {})[node.id];
+        if (c) focusOnColumn(c);
+        return;
+      }
     },
     [productLibrary],
   );
@@ -276,6 +282,10 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
         const s = (doc.stairs ?? {})[node.id];
         savedPos = s?.savedCameraPos;
         savedTarget = s?.savedCameraTarget;
+      } else if (node.kind === "column") {
+        const c = (doc.columns ?? {})[node.id];
+        savedPos = c?.savedCameraPos;
+        savedTarget = c?.savedCameraTarget;
       }
 
       focusOnSavedCamera(savedPos, savedTarget, () => onClickRow(node));
@@ -296,6 +306,7 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
       renameWall?: (roomId: string, wallId: string, name: string) => void;
       updatePlacedCustomElement?: (id: string, changes: { labelOverride?: string }) => void;
       updateStair?: (roomId: string, stairId: string, patch: { labelOverride?: string }) => void;
+      updateColumn?: (roomId: string, columnId: string, patch: { name?: string }) => void;
     };
     if (node.kind === "room") {
       cadActions.renameRoom?.(node.id, name);
@@ -316,6 +327,15 @@ export function RoomsTreePanel({ productLibrary = [] }: Props) {
       const trimmed = name.trim();
       cadActions.updateStair?.(node.roomId, node.id, {
         labelOverride: trimmed === "" ? undefined : trimmed,
+      });
+      return;
+    }
+    // Phase 86 COL-01 (D-02): column rename writes Column.name (not
+    // labelOverride — Column's type field is `name?: string`).
+    if (node.kind === "column") {
+      const trimmed = name.trim();
+      cadActions.updateColumn?.(node.roomId, node.id, {
+        name: trimmed === "" ? undefined : trimmed,
       });
       return;
     }

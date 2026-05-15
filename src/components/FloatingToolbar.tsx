@@ -24,6 +24,7 @@ import {
   RectangleVertical,
   Triangle,
   Footprints,
+  Cuboid,
   ChevronDown,
   Ruler,
   Type,
@@ -57,6 +58,7 @@ import {
 } from "@/components/ui/Popover";
 import { WallCutoutsDropdown } from "@/components/Toolbar.WallCutoutsDropdown";
 import { setPendingStair } from "@/canvas/tools/stairTool";
+import { setPendingColumn } from "@/canvas/tools/columnTool";
 
 type ViewMode = "2d" | "3d" | "split" | "library";
 
@@ -353,6 +355,38 @@ export function FloatingToolbar({ viewMode, onViewChange }: Props): JSX.Element 
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top" collisionPadding={8}>Stair tool</TooltipContent>
+          </Tooltip>
+
+          {/* Column — Phase 86 D-01: rectangular box, v1.20. Cylinder
+              deferred to a v1.21 phase. D-07: no keyboard shortcut yet —
+              `C` collides with Ceiling. */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon-touch"
+                data-testid="tool-column"
+                active={toolActive("column")}
+                className={toolClass(toolActive("column"))}
+                onClick={() => {
+                  const cad = useCADStore.getState();
+                  const roomId = cad.activeRoomId;
+                  const wallHeight =
+                    roomId ? cad.rooms[roomId]?.room.wallHeight ?? 8 : 8;
+                  setPendingColumn({
+                    widthFt: 1,
+                    depthFt: 1,
+                    heightFt: wallHeight,
+                    rotation: 0,
+                    shape: "box",
+                  });
+                  setTool("column");
+                }}
+              >
+                <Cuboid size={22} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="top" collisionPadding={8}>Column tool</TooltipContent>
           </Tooltip>
 
         </ToolGroup>

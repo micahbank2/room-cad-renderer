@@ -3,14 +3,14 @@ import type { RoomDoc } from "@/types/cad";
 import type { Product } from "@/types/product";
 import { wallCardinalLabel } from "./wallLabels";
 
-export type TreeNodeKind = "room" | "group" | "wall" | "ceiling" | "product" | "custom" | "stair";
+export type TreeNodeKind = "room" | "group" | "wall" | "ceiling" | "product" | "custom" | "stair" | "column";
 
 export interface TreeNode {
   id: string;
   kind: TreeNodeKind;
   label: string;
   roomId: string;
-  groupKey?: "walls" | "ceiling" | "products" | "custom" | "stairs";
+  groupKey?: "walls" | "ceiling" | "products" | "custom" | "stairs" | "columns";
   children?: TreeNode[];
 }
 
@@ -112,6 +112,26 @@ export function buildRoomTree(
         stairNameCounts.set(baseName, count);
         const label = count === 1 ? baseName : `${baseName} (${count})`;
         return { id: s.id, kind: "stair" as const, label, roomId: doc.id };
+      }),
+    });
+
+    // Phase 86 COL-01 (D-02): columns group — ALWAYS emit per room.
+    // column.name override wins; otherwise auto-numbered "Column (N)"
+    // starting at 1. Defensive `?? {}` per Phase 60 Pitfall 2.
+    const columnEntries = Object.values(doc.columns ?? {});
+    const columnNameCounts = new Map<string, number>();
+    groups.push({
+      id: `${doc.id}:columns`, kind: "group", label: "Columns",
+      roomId: doc.id, groupKey: "columns",
+      children: columnEntries.map((c) => {
+        if (c.name) {
+          return { id: c.id, kind: "column" as const, label: c.name, roomId: doc.id };
+        }
+        const baseName = "Column";
+        const count = (columnNameCounts.get(baseName) ?? 0) + 1;
+        columnNameCounts.set(baseName, count);
+        const label = count === 1 ? baseName : `${baseName} (${count})`;
+        return { id: c.id, kind: "column" as const, label, roomId: doc.id };
       }),
     });
 
