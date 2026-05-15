@@ -121,6 +121,10 @@ export interface PlacedProduct {
   widthFtOverride?: number;
   /** D-01/D-02: per-axis depth override. Set only by edge-handle drag. */
   depthFtOverride?: number;
+  /** Phase 85 D-05: per-placement height override. Set by ProductInspector
+   *  numeric input (Plan 85-02). When present, resolver returns override
+   *  (sizeScale never applied to height per existing contract). */
+  heightFtOverride?: number;
   /** Phase 48 CAM-04 (D-03). */
   savedCameraPos?: [number, number, number];
   /** Phase 48 CAM-04 (D-03). */
@@ -208,6 +212,10 @@ export interface PlacedCustomElement {
   widthFtOverride?: number;
   /** D-01/D-02: per-axis depth override. */
   depthFtOverride?: number;
+  /** Phase 85 D-05: per-placement height override. Set by CustomElementInspector
+   *  numeric input (Plan 85-03). When present, resolver returns override
+   *  (sizeScale never applied to height per existing contract). */
+  heightFtOverride?: number;
   /** D-13: per-placement display name override. Empty/undefined → render catalog name. Max 40 chars (client-enforced). */
   labelOverride?: string;
   /** Phase 68 D-07: per-face Material override. Each face independently resolves
@@ -359,8 +367,13 @@ export interface CADSnapshot {
    *
    *  Phase 81 IA-03 (D-04): bumped from 7 to 8 — adds optional
    *  WallSegment.name. Migration is a trivial passthrough (the field
-   *  is optional, so absence is the correct legacy behavior). */
-  version: 8;
+   *  is optional, so absence is the correct legacy behavior).
+   *
+   *  Phase 85 D-05: bumped from 8 to 9 — adds optional heightFtOverride
+   *  on PlacedProduct + PlacedCustomElement. Migration is a passthrough
+   *  (the field is optional — legacy snapshots without it render at
+   *  catalog height, which is the correct legacy behavior). */
+  version: 9;
   rooms: Record<string, RoomDoc>;
   activeRoomId: string | null;
   /** Per-project catalog of custom elements (reusable across rooms). */
