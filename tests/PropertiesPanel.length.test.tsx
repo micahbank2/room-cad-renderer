@@ -10,7 +10,7 @@ import { render, fireEvent, act, screen } from "@testing-library/react";
 import { useCADStore, resetCADStoreForTests } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { wallLength } from "@/lib/geometry";
-import PropertiesPanel from "@/components/PropertiesPanel";
+import RightInspector from "@/components/RightInspector";
 
 const WALL_ID = "wall_pp_test";
 
@@ -63,7 +63,7 @@ describe("PropertiesPanel Length row (D-05 parser prop)", () => {
   });
 
   it("accepts feet+inches notation and commits decimal feet (D-05)", async () => {
-    render(<PropertiesPanel productLibrary={[]} />);
+    render(<RightInspector productLibrary={[]} viewMode="2d" />);
     let input!: HTMLInputElement;
     await act(async () => {
       input = openEditForLabel("Length");
@@ -79,7 +79,7 @@ describe("PropertiesPanel Length row (D-05 parser prop)", () => {
   });
 
   it("rejects bare '12 6' silently (D-02a, D-06a)", async () => {
-    render(<PropertiesPanel productLibrary={[]} />);
+    render(<RightInspector productLibrary={[]} viewMode="2d" />);
     let input!: HTMLInputElement;
     await act(async () => {
       input = openEditForLabel("Length");
@@ -95,7 +95,7 @@ describe("PropertiesPanel Length row (D-05 parser prop)", () => {
   });
 
   it("THICKNESS row keeps decimal-only parsing (D-05a default parser unchanged)", async () => {
-    render(<PropertiesPanel productLibrary={[]} />);
+    render(<RightInspector productLibrary={[]} viewMode="2d" />);
     // Commit a plain decimal via THICKNESS — must still work.
     let input!: HTMLInputElement;
     await act(async () => {
@@ -124,7 +124,7 @@ describe("PropertiesPanel Length row (D-05 parser prop)", () => {
   });
 
   it("no-op commit (same value) does not grow past history (RESEARCH Pitfall #2)", async () => {
-    render(<PropertiesPanel productLibrary={[]} />);
+    render(<RightInspector productLibrary={[]} viewMode="2d" />);
     const priorPast = useCADStore.getState().past.length;
     let input!: HTMLInputElement;
     await act(async () => {
