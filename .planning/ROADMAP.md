@@ -447,6 +447,14 @@
 **Plans:** 3/3 plans complete
 **UI hint:** yes
 
+## Polish Phases
+
+Standalone phases that ship outside any v1.xx milestone — small, focused, one-off improvements.
+
+- 🚧 **Phase 87 — Theme Toggle + Settings Popover** (in progress) — branch `gsd/phase-87-theme-toggle`. Gear button in TopBar → popover with Light / Dark / System segmented control wired to existing `useTheme()` hook. Removes the three `.light` force-wrappers from WelcomeScreen / ProjectManager / HelpPage shipped in Phase 76. See [.planning/phases/87-theme-toggle-settings/87-CONTEXT.md](phases/87-theme-toggle-settings/87-CONTEXT.md).
+
+---
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -506,6 +514,7 @@
 | 84. Contextual Sidebar Visibility (IA-08) | 1/1 | Complete    | 2026-05-15 |
 | 85. Parametric Product Controls (PARAM-01) | 3/3 | Complete    | 2026-05-15 |
 | 86. Columns & Pillars (COL-01) | 3/3 | Complete    | 2026-05-15 |
+| 87. Theme Toggle + Settings Popover (polish) | 0/1 | In Progress | — |
 
 ## Backlog
 
