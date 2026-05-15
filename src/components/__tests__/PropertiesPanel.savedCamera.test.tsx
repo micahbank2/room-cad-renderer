@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import PropertiesPanel from "@/components/PropertiesPanel";
+import RightInspector from "@/components/RightInspector";
 import { useCADStore } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 
@@ -41,7 +41,7 @@ function seedAndSelectWall(): string {
 }
 
 function renderPanelWithViewMode(viewMode: "2d" | "3d" | "split") {
-  return render(<PropertiesPanel productLibrary={[]} viewMode={viewMode as never} />);
+  return render(<RightInspector productLibrary={[]} viewMode={viewMode} />);
 }
 
 describe("PropertiesPanel — Phase 48 savedCamera Save/Clear (D-01, D-09, D-11)", () => {
