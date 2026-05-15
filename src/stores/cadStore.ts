@@ -41,6 +41,7 @@ import {
 } from "@/lib/snapshotMigration";
 import type { SurfaceTarget } from "@/lib/surfaceMaterial";
 import type { PaintColor } from "@/types/paint";
+import { invalidateProduct } from "@/canvas/productImageCache";
 
 const MAX_HISTORY = 50;
 
@@ -1058,7 +1059,13 @@ export const useCADStore = create<CADState>()((set) => ({
     return id;
   },
 
-  updateCustomElement: (id, changes) =>
+  updateCustomElement: (id, changes) => {
+    // Phase 89 D-05: bust the shared productImageCache when imageUrl changes.
+    // Product IDs and custom-element IDs share the same UUID namespace —
+    // no key collision risk per D-05.
+    if ("imageUrl" in changes) {
+      invalidateProduct(id);
+    }
     set(
       produce((s: CADState) => {
         const root = s as any;
@@ -1066,7 +1073,8 @@ export const useCADStore = create<CADState>()((set) => ({
         pushHistory(s);
         Object.assign(root.customElements[id], changes);
       })
-    ),
+    );
+  },
 
   removeCustomElement: (id) =>
     set(

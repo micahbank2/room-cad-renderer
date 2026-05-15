@@ -456,6 +456,9 @@ Standalone phases that ship outside any v1.xx milestone — small, focused, one-
   Plans:
   - [x] 88-01-PLAN.md — Canvas theme bridge + FloatingToolbar mount + border contrast (POLISH-01/02/03)
   - [x] 88-02-PLAN.md — Typography density sweep (POLISH-04)
+- 🚧 **Phase 89 — Product/Custom-Element Image Polish (2D Canvas)** (in progress) — branch `gsd/phase-89-product-images-2d`. Polish pass on the existing 2D image-rendering path: switch product images from Stretch to Cover fit with `clipPath`, add image rendering to custom elements (`CustomElement.imageUrl` exists but is unrendered), add semi-transparent label backdrops for readability over busy photos, fix the stale `PRODUCT_STROKE` dim-label constant, and wire cache invalidation on `imageUrl` update. 1 plan, 4 atomic tasks. See [.planning/phases/89-product-images-2d/89-CONTEXT.md](phases/89-product-images-2d/89-CONTEXT.md).
+  Plans:
+  - [x] 89-01-PLAN.md — Cover-fit + clipPath, label backdrops, custom-element images, cache invalidation
 
 ---
 

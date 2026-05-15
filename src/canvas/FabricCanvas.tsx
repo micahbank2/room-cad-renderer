@@ -265,7 +265,19 @@ export default function FabricCanvas({ productLibrary }: Props) {
     renderCeilings(fc, ceilings, scale, origin, selectedIds, hoveredEntityId);
 
     // 6. Custom elements
-    renderCustomElements(fc, placedCustoms, customCatalog, scale, origin, selectedIds, hoveredEntityId);
+    // Phase 89 D-03: thread onAssetReady through so async image loads trigger
+    // a redraw (same callback as renderProducts — productImageCache shares
+    // namespace; UUIDs prevent key collisions per D-05).
+    renderCustomElements(
+      fc,
+      placedCustoms,
+      customCatalog,
+      scale,
+      origin,
+      selectedIds,
+      hoveredEntityId,
+      () => setProductImageTick((t) => t + 1),
+    );
 
     // 7. Stairs (Phase 60 STAIRS-01) — render after products + customs so
     //    selection outlines layer above. Skips hidden via Phase 46 cascade.
