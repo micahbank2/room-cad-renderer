@@ -3,7 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: completed
-last_updated: "2026-05-15T13:47:24.030Z"
+stopped_at: Completed 86-02-PLAN.md (Wave 2 — column tool + 2D/3D + selection)
+last_updated: "2026-05-15T14:46:46.719Z"
 last_activity: 2026-05-15
 progress:
   total_phases: 20
@@ -24,11 +25,12 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 ## Current Position
 
 Phase: 86 (columns-v1-20)
-Plan: 86-01 COMPLETE; next 86-02 (rendering)
-Milestone: v1.20 — Phase 86 Wave 1 shipped (schema + store + tests). Final v1.20 phase.
-Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86-01 complete
-Status: Phase 86 Plan 01 COMPLETE — Column type + RoomDoc.columns + snapshot v10 seed-empty migration + 13 D-06 store actions + 19 GREEN tests. RED contract pinned for 86-02 (tool) and 86-03 (rendering + UI).
+Plan: 86-02 COMPLETE; next 86-03 (toolbar + inspector + Rooms tree)
+Milestone: v1.20 — Phase 86 Waves 1 + 2 shipped (schema + store + tool + 2D/3D + selection). Final v1.20 phase.
+Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86-01 complete; 86-02 complete
+Status: Phase 86 Plan 02 COMPLETE — columnTool + columnSymbol + renderColumns + ColumnMesh + RoomGroup iteration + selectTool column branch + GREEN e2e placement spec. 1095 vitest passing + 2 e2e GREEN. Plan 86-03 wires the user-facing toolbar / inspector / Rooms tree to close the loop.
 Last activity: 2026-05-15
+Stopped at: Completed 86-02-PLAN.md (Wave 2 — column tool + 2D/3D + selection)
 
 ## Decisions
 
@@ -62,6 +64,9 @@ Last activity: 2026-05-15
 - [Phase 85]: Plan 85-02: fixed numericInputDrivers double-commit bug (was firing both el.blur() and synthetic focusout, doubling history); restored single-undo invariant
 - [Phase 85]: Plan 85-03: combine Tasks 1+2 into one commit (same file, same import block); Position section default-open (mirrors Wave 2); X/Y use generic updatePlacedCustomElement (no dedicated CE mover action). Phase 85 COMPLETE — PARAM-01/02/03 shipped for both products + custom elements.
 - [Phase 86]: Plan 86-01 (Wave 1 schema + store, COL-01/02/03 RED-first): Column type added with all D-05 fields (id, position, widthFt, depthFt, heightFt, rotation degrees, shape "box"|"cylinder", materialId?, name?, savedCamera*); RoomDoc.columns?: Record<string, Column> field; snapshot version 9 → 10; migrateV9ToV10 seed-empty per RoomDoc (NOT a passthrough — mirrors Phase 60 v3→v4 stair migration); ToolType union widened with "column"; 13 D-06 store actions + NoHistory siblings line-for-line mirror of stair pattern (clamp [0.25, 50] for size axes — narrower than stair's [0.5, 20] floor); clearSavedCameraNoHistory kind union widened to "column"; clearColumnOverrides D-03 resets heightFt to room.wallHeight. 19 new GREEN tests (6 migration + 13 store actions). 1095 unit tests passing (no regressions). 4 atomic commits.
+- [Phase 86]: Phase 86-02: Column.position IS bbox center (no Stair-style UP-axis asymmetry) — simpler tool + render math; no snap-engine integration in v1.20
+- [Phase 86]: Phase 86-02: Column hit-test inserted BEFORE wall in selectTool — D-01 Pitfall 4 (column wins when cursor in both); rotated AABB via cos/sin into local frame
+- [Phase 86]: Phase 86-02: Column drag uses Phase 31 transaction pattern (empty updateColumn at drag-start + moveColumnNoHistory mid-stroke); no fast-path (cheap redraw)
 
 ## Performance Metrics
 
@@ -91,6 +96,7 @@ Last activity: 2026-05-15
 | Phase 85 P02 | 10min | 3 tasks | 4 files |
 | Phase 85 P03 | 6min | 3 tasks | 1 files |
 | Phase 86 P01 | ~18min | 4 tasks | 9 files |
+| Phase 86 P02 | 22 | 3 tasks | 11 files |
 
 ## v1.20 Roadmap
 
