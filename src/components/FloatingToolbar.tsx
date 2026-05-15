@@ -38,6 +38,8 @@ import {
   LayoutGrid,
   Square,
   Move3d,
+  Magnet,
+  Check,
 } from "lucide-react";
 import { useUIStore } from "@/stores/uiStore";
 import { useCADStore } from "@/stores/cadStore";
@@ -48,6 +50,11 @@ import {
   TooltipContent,
   TooltipProvider,
 } from "@/components/ui/Tooltip";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/Popover";
 import { WallCutoutsDropdown } from "@/components/Toolbar.WallCutoutsDropdown";
 import { setPendingStair } from "@/canvas/tools/stairTool";
 
@@ -65,6 +72,19 @@ const DISPLAY_MODES = [
   { id: "solo" as const, label: "Solo", Icon: Square, tooltip: "Only the active room renders", testId: "display-mode-solo" },
   { id: "explode" as const, label: "Explode", Icon: Move3d, tooltip: "Rooms separated along X-axis", testId: "display-mode-explode" },
 ];
+
+// ─── Snap options (D-04 — Phase 81 D-05 carry-over closure) ───────────────
+
+const SNAP_OPTIONS = [
+  { value: 0,    label: "Off"    },
+  { value: 0.25, label: "3 inch" },
+  { value: 0.5,  label: "6 inch" },
+  { value: 1,    label: "1 foot" },
+] as const;
+
+function snapLabel(v: number): string {
+  return SNAP_OPTIONS.find((o) => o.value === v)?.label ?? "Off";
+}
 
 const VIEW_MODES = [
   { id: "2d" as const, label: "2D", tooltip: "2D Plan view", testId: "view-mode-2d" },
@@ -102,6 +122,9 @@ export function FloatingToolbar({ viewMode, onViewChange }: Props): JSX.Element 
   const setTool = useUIStore((s) => s.setTool);
   const showGrid = useUIStore((s) => s.showGrid);
   const toggleGrid = useUIStore((s) => s.toggleGrid);
+  const gridSnap = useUIStore((s) => s.gridSnap);
+  const setGridSnap = useUIStore((s) => s.setGridSnap);
+  const [snapPopoverOpen, setSnapPopoverOpen] = useState(false);
   const userZoom = useUIStore((s) => s.userZoom);
   const setUserZoom = useUIStore((s) => s.setUserZoom);
   const resetView = useUIStore((s) => s.resetView);
@@ -386,6 +409,60 @@ export function FloatingToolbar({ viewMode, onViewChange }: Props): JSX.Element 
             </TooltipTrigger>
             <TooltipContent side="top" collisionPadding={8}>Toggle grid</TooltipContent>
           </Tooltip>
+
+          {/* Snap — Phase 83 D-04, migrated from Sidebar */}
+          <Popover open={snapPopoverOpen} onOpenChange={setSnapPopoverOpen}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon-touch"
+                    data-testid="toolbar-snap"
+                    aria-label={`Snap: ${snapLabel(gridSnap)}`}
+                    active={gridSnap > 0}
+                    className={toolClass(gridSnap > 0)}
+                  >
+                    <Magnet size={18} />
+                  </Button>
+                </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="top" collisionPadding={8}>
+                Snap: {snapLabel(gridSnap)}
+              </TooltipContent>
+            </Tooltip>
+            <PopoverContent
+              side="top"
+              align="center"
+              sideOffset={6}
+              className="w-32 p-1"
+            >
+              <div className="flex flex-col gap-0.5" data-testid="toolbar-snap-options">
+                {SNAP_OPTIONS.map((opt) => {
+                  const isActive = gridSnap === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      data-testid={`toolbar-snap-option-${opt.value}`}
+                      onClick={() => {
+                        setGridSnap(opt.value);
+                        setSnapPopoverOpen(false);
+                      }}
+                      className={
+                        "flex items-center justify-between gap-2 px-2 py-1.5 " +
+                        "font-sans text-xs rounded-smooth-md hover:bg-accent/10 " +
+                        (isActive ? "text-foreground" : "text-muted-foreground")
+                      }
+                    >
+                      <span>{opt.label}</span>
+                      {isActive && <Check size={12} className="text-foreground" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </PopoverContent>
+          </Popover>
 
           {/* Zoom In — additive testid */}
           <Tooltip>
