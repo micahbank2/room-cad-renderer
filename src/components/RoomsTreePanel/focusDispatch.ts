@@ -5,7 +5,7 @@
 import { useUIStore } from "@/stores/uiStore";
 import { useCADStore } from "@/stores/cadStore";
 import { resolveEffectiveDims } from "@/types/product";
-import type { WallSegment, RoomDoc, Ceiling, PlacedProduct, PlacedCustomElement, Stair } from "@/types/cad";
+import type { WallSegment, RoomDoc, Ceiling, PlacedProduct, PlacedCustomElement, Stair, Column } from "@/types/cad";
 import { DEFAULT_STAIR_WIDTH_FT } from "@/types/cad";
 import type { Product } from "@/types/product";
 
@@ -182,6 +182,32 @@ export function focusOnStair(stair: Stair): void {
 
   requestCameraTarget(camPos, camTarget);
   useUIStore.getState().select([stair.id]);
+}
+
+/**
+ * Phase 86 COL-01 (D-02): focus camera on a column.
+ * Camera target = bbox center (footprint center XY, half-height Z). Pose at
+ * 1.5× diagonal away mirrors focusOnPlacedProduct / focusOnStair. Sets
+ * selectedIds to the column id so the inspector mounts on focus.
+ */
+export function focusOnColumn(c: Column): void {
+  const widthFt = c.widthFt;
+  const depthFt = c.depthFt;
+  const heightFt = c.heightFt;
+
+  const cx = c.position.x;
+  const cy = heightFt / 2;
+  const cz = c.position.y;
+
+  const diag = Math.sqrt(widthFt * widthFt + depthFt * depthFt + heightFt * heightFt);
+  const dist = diag * 1.5;
+  const offset = dist / Math.sqrt(3);
+
+  const camPos: [number, number, number] = [cx + offset, cy + offset, cz + offset];
+  const camTarget: [number, number, number] = [cx, cy, cz];
+
+  requestCameraTarget(camPos, camTarget);
+  useUIStore.getState().select([c.id]);
 }
 
 /**

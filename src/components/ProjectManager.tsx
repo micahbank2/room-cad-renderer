@@ -32,7 +32,9 @@ export default function ProjectManager() {
     const id = currentId ?? `proj_${uid()}`;
     const st = useCADStore.getState() as any;
     await saveProject(id, projectName, {
-      version: 2,
+      // Persist at current schema version — Phase 86 D-04 bumped to 10.
+      // Legacy on-disk values flow through migrateSnapshot on load.
+      version: 10,
       rooms: st.rooms,
       activeRoomId: st.activeRoomId,
       ...(st.customElements ? { customElements: st.customElements } : {}),

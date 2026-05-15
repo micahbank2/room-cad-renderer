@@ -10,12 +10,13 @@ import {
   useActivePlacedCustomElements,
   useCustomElements,
   useActiveStairs,
+  useActiveColumns,
   getActiveRoomDoc,
 } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { drawGrid } from "./grid";
 import { drawRoomDimensions } from "./dimensions";
-import { renderWalls, renderProducts, renderCeilings, renderCustomElements, renderStairs, renderMeasureLines, renderAnnotations, renderRoomAreaOverlay, renderFloor, setLabelLookupCanvas } from "./fabricSync";
+import { renderWalls, renderProducts, renderCeilings, renderCustomElements, renderStairs, renderColumns, renderMeasureLines, renderAnnotations, renderRoomAreaOverlay, renderFloor, setLabelLookupCanvas } from "./fabricSync";
 import { useMaterials } from "@/hooks/useMaterials";
 import { activateWallTool } from "./tools/wallTool";
 import {
@@ -31,6 +32,8 @@ import { activateDoorTool } from "./tools/doorTool";
 import { activateWindowTool } from "./tools/windowTool";
 import { activateCeilingTool } from "./tools/ceilingTool";
 import { activateStairTool, setStairToolLibrary } from "./tools/stairTool";
+// Phase 86 COL-01 (D-01): column placement tool.
+import { activateColumnTool } from "./tools/columnTool";
 // Phase 61 OPEN-01 (D-09): three new wall-cutout placement tools.
 import { activateArchwayTool } from "./tools/archwayTool";
 import { activatePassthroughTool } from "./tools/passthroughTool";
@@ -115,6 +118,8 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const placedCustoms = useActivePlacedCustomElements();
   const customCatalog = useCustomElements();
   const stairs = useActiveStairs();
+  // Phase 86 COL-01: per-room columns subscription for redraw.
+  const columns = useActiveColumns();
   // Phase 62 MEASURE-01 — subscribe to per-room measure/annotation maps so redraw fires.
   const measureLines = activeDoc?.measureLines ?? {};
   const annotations = activeDoc?.annotations ?? {};
@@ -249,6 +254,10 @@ export default function FabricCanvas({ productLibrary }: Props) {
     //    selection outlines layer above. Skips hidden via Phase 46 cascade.
     renderStairs(fc, stairs, scale, origin, selectedIds, hiddenIds, hoveredEntityId);
 
+    // 7b. Columns (Phase 86 COL-01) — render alongside stairs. Note arg order
+    //     matches renderColumns signature (hiddenIds, selectedIds, hoveredId).
+    renderColumns(fc, columns, scale, origin, hiddenIds, selectedIds, hoveredEntityId);
+
     // 8. Phase 62 MEASURE-01 — measure lines + annotations + room-area overlay.
     //    Rendered last so they layer above all geometry.
     renderMeasureLines(fc, measureLines, scale, origin);
@@ -266,7 +275,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // Hotfix #2 — record the tool we just activated so the next redraw can
     // tell whether activeTool changed (affects the drag short-circuit above).
     prevActiveToolRef.current = activeTool as ToolType;
-  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog, productImageTick, stairs, hiddenIds, measureLines, annotations, editingAnnotationId, materials, activeDoc, hoveredEntityId]);
+  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog, productImageTick, stairs, columns, hiddenIds, measureLines, annotations, editingAnnotationId, materials, activeDoc, hoveredEntityId]);
 
   // Init canvas
   useEffect(() => {
@@ -594,6 +603,12 @@ export default function FabricCanvas({ productLibrary }: Props) {
             hit = { kind: "stair", nodeId: d.stairId as string };
             break;
           }
+        } else if (d.type === "column" && d.columnId) {
+          // Phase 86 COL-01: right-click on a column Group opens the context menu.
+          if ((obj as fabric.FabricObject).containsPoint(pointer)) {
+            hit = { kind: "column", nodeId: d.columnId as string };
+            break;
+          }
         }
         // Skip: rotation-handle, resize-handle, grid, dimension labels,
         //       stair-preview (evented:false anyway).
@@ -637,7 +652,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const cursorClass =
     activeTool === "wall" || activeTool === "product" ||
     activeTool === "door" || activeTool === "window" ||
-    activeTool === "stair" ||
+    activeTool === "stair" || activeTool === "column" ||
     activeTool === "archway" || activeTool === "passthrough" || activeTool === "niche"
       ? "cursor-crosshair"
       : "";
@@ -851,6 +866,8 @@ function activateCurrentTool(
     case "window":  return activateWindowTool(fc, scale, origin);
     case "ceiling": return activateCeilingTool(fc, scale, origin);
     case "stair":       return activateStairTool(fc, scale, origin);
+    // Phase 86 COL-01
+    case "column":      return activateColumnTool(fc, scale, origin);
     // Phase 61 OPEN-01 (D-09)
     case "archway":     return activateArchwayTool(fc, scale, origin);
     case "passthrough": return activatePassthroughTool(fc, scale, origin);

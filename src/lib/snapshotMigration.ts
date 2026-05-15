@@ -12,6 +12,7 @@ export function defaultSnapshot(): CADSnapshot {
   // Phase 62 MEASURE-01 (D-02): seed `measureLines: {}` and `annotations: {}`
   // alongside the Phase 60 `stairs: {}` seed so consumers don't need to
   // defensively check for undefined on freshly-created rooms.
+  // Phase 86 D-04: seed `columns: {}` on new rooms (mirrors the stairs seed).
   const mainRoom: RoomDoc = {
     id: "room_main",
     name: "Main Room",
@@ -19,11 +20,12 @@ export function defaultSnapshot(): CADSnapshot {
     walls: {},
     placedProducts: {},
     stairs: {},
+    columns: {},
     measureLines: {},
     annotations: {},
   };
   return {
-    version: 9,
+    version: 10,
     rooms: { room_main: mainRoom },
     activeRoomId: "room_main",
   };
@@ -59,14 +61,23 @@ function migrateWallsPerSide(rooms: Record<string, RoomDoc> | undefined): void {
 }
 
 export function migrateSnapshot(raw: unknown): CADSnapshot {
-  // Phase 85 D-05: v9 passthrough — already at current.
+  // Phase 86 D-04: v10 passthrough — already at current.
+  if (
+    raw &&
+    typeof raw === "object" &&
+    (raw as { version?: number }).version === 10 &&
+    (raw as CADSnapshot).rooms
+  ) {
+    return raw as CADSnapshot;
+  }
+  // Phase 86 D-04: v9 inputs flow through migrateV9ToV10 (seed-empty per RoomDoc).
   if (
     raw &&
     typeof raw === "object" &&
     (raw as { version?: number }).version === 9 &&
     (raw as CADSnapshot).rooms
   ) {
-    return raw as CADSnapshot;
+    return migrateV9ToV10(raw as CADSnapshot);
   }
   // Phase 85 D-05: v8 inputs flow through migrateV8ToV9 (passthrough — heightFtOverride is optional).
   if (
@@ -159,8 +170,8 @@ export function migrateSnapshot(raw: unknown): CADSnapshot {
     migrateWallsPerSide(rooms);
     return {
       // Returned at v2 — downstream pipeline (migrateFloorMaterials → v3,
-      // migrateV3ToV4 → v4, migrateV4ToV5 → v5, migrateV5ToV6 → v6) lifts to v6.
-      version: 2 as unknown as 6,
+      // migrateV3ToV4 → v4, migrateV4ToV5 → v5, migrateV5ToV6 → v6 → v7 → v8 → v9 → v10) lifts to v10.
+      version: 2 as unknown as 10,
       rooms,
       activeRoomId: "room_main",
     };
@@ -581,5 +592,21 @@ export function migrateV7ToV8(snap: CADSnapshot): CADSnapshot {
 export function migrateV8ToV9(snap: CADSnapshot): CADSnapshot {
   if ((snap as { version: number }).version >= 9) return snap;
   (snap as { version: number }).version = 9;
+  return snap;
+}
+
+/* ----------------------------------------------------------------- *
+ * Phase 86 COL-01 (D-04) — v9 → v10. Seed-empty migration:
+ * iterates every RoomDoc and ensures `columns: {}` is present.
+ * Mirrors the Phase 60 v3→v4 stair migration line-for-line.
+ *
+ * Idempotent on v10 inputs.
+ * ----------------------------------------------------------------- */
+export function migrateV9ToV10(snap: CADSnapshot): CADSnapshot {
+  if ((snap as { version: number }).version >= 10) return snap;
+  for (const doc of Object.values(snap.rooms)) {
+    if (!(doc as RoomDoc).columns) (doc as RoomDoc).columns = {};
+  }
+  (snap as { version: number }).version = 10;
   return snap;
 }

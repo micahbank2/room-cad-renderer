@@ -11,6 +11,7 @@ import CeilingMesh from "./CeilingMesh";
 import FloorMesh from "./FloorMesh";
 import CustomElementMesh from "./CustomElementMesh";
 import StairMesh from "./StairMesh";
+import ColumnMesh from "./ColumnMesh";
 import { computeRoomBboxCenter } from "./cutawayDetection";
 import { getFloorTexture } from "./floorTexture";
 
@@ -70,7 +71,7 @@ export function RoomGroup({
   hiddenIds,
   customCatalog,
 }: RoomGroupProps): JSX.Element | null {
-  const { id: roomId, room, walls, placedProducts, placedCustomElements, ceilings, floorMaterial, stairs } = roomDoc;
+  const { id: roomId, room, walls, placedProducts, placedCustomElements, ceilings, floorMaterial, stairs, columns } = roomDoc;
 
   // Per-room cascade — Phase 46 D-12 logic scoped to this room's roomId.
   const effectivelyHidden = useMemo(() => {
@@ -82,6 +83,8 @@ export function RoomGroup({
       Object.values(placedCustomElements ?? {}).forEach((p) => out.add(p.id));
       // Phase 60: stair-cascade follows the same id-keyed Set (research Q6).
       Object.values(stairs ?? {}).forEach((s) => out.add(s.id));
+      // Phase 86 COL-01: column-cascade follows the same pattern.
+      Object.values(columns ?? {}).forEach((c) => out.add(c.id));
       return out;
     }
     if (hiddenIds.has(`${roomId}:walls`)) {
@@ -99,9 +102,12 @@ export function RoomGroup({
     if (hiddenIds.has(`${roomId}:stairs`)) {
       Object.values(stairs ?? {}).forEach((s) => out.add(s.id));
     }
+    if (hiddenIds.has(`${roomId}:columns`)) {
+      Object.values(columns ?? {}).forEach((c) => out.add(c.id));
+    }
     for (const id of hiddenIds) out.add(id);
     return out;
-  }, [hiddenIds, roomId, walls, placedProducts, ceilings, placedCustomElements, stairs]);
+  }, [hiddenIds, roomId, walls, placedProducts, ceilings, placedCustomElements, stairs, columns]);
 
   const halfW = room.width / 2;
   const halfL = room.length / 2;
@@ -189,6 +195,18 @@ export function RoomGroup({
             stair={s}
             roomId={roomId}
             isSelected={selectedIds.includes(s.id)}
+          />
+        ))}
+      {/* Phase 86 COL-01 (D-04): per-room columns. Defensive `?? {}` per
+          Phase 60 Pitfall 2 contract. */}
+      {Object.values(columns ?? {})
+        .filter((c) => !effectivelyHidden.has(c.id))
+        .map((c) => (
+          <ColumnMesh
+            key={c.id}
+            column={c}
+            roomId={roomId}
+            isSelected={selectedIds.includes(c.id)}
           />
         ))}
     </group>

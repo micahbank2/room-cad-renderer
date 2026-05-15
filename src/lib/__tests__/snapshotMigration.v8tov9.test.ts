@@ -107,17 +107,19 @@ describe("migrateSnapshot routing (Phase 85 D-05)", () => {
     expect(out.version).toBe(9);
   });
 
-  it("v9 input passes through unchanged (same reference)", () => {
+  it("v9 input is lifted through migrateV9ToV10 (Phase 86 D-04 seed-empty)", () => {
+    // Phase 86 D-04: v9 is no longer the top of the pipeline. migrateSnapshot
+    // now seeds columns: {} on every RoomDoc and bumps the version to 10.
     const raw: any = { ...v8Fixture(), version: 9 };
     const out = migrateSnapshot(raw);
-    expect(out.version).toBe(9);
-    expect(out).toBe(raw);
+    expect(out.version).toBe(10);
+    expect(out.rooms.room_main.columns).toEqual({});
   });
 });
 
 describe("defaultSnapshot (Phase 85 D-05)", () => {
-  it("emits version 9", () => {
-    expect(defaultSnapshot().version).toBe(9);
+  it("emits version 10 (Phase 86 D-04 bumped from 9)", () => {
+    expect(defaultSnapshot().version).toBe(10);
   });
 
   it("has empty stairs / measureLines / annotations on the main room (Phase 60/62 seeds preserved)", () => {

@@ -30,6 +30,10 @@ export function buildSavedCameraSet(
     for (const s of Object.values(room.stairs ?? {})) {
       if (s.savedCameraPos !== undefined) out.add(s.id);
     }
+    // Phase 86 COL-01 (D-02): column saved-camera mirror.
+    for (const c of Object.values(room.columns ?? {})) {
+      if (c.savedCameraPos !== undefined) out.add(c.id);
+    }
   }
   return out;
 }

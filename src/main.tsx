@@ -12,6 +12,7 @@ import { installUserTextureDrivers } from "./test-utils/userTextureDrivers";
 import { installGltfDrivers } from "./test-utils/gltfDrivers";
 import { installCutawayDrivers } from "./test-utils/cutawayDrivers";
 import { installStairDrivers } from "./test-utils/stairDrivers";
+import { installColumnDrivers } from "./test-utils/columnDrivers";
 import { installOpeningDrivers } from "./test-utils/openingDrivers";
 import { installMeasureDrivers } from "./test-utils/measureDrivers";
 import { installCeilingDrivers } from "./test-utils/ceilingDrivers";
@@ -33,6 +34,8 @@ installGltfDrivers();
 installCutawayDrivers();
 // Phase 60: install stair test drivers (gated by MODE==="test", production no-op)
 installStairDrivers();
+// Phase 86: install column test drivers (gated by MODE==="test", production no-op)
+installColumnDrivers();
 // Phase 61: install opening placement test drivers (gated by MODE==="test", production no-op)
 installOpeningDrivers();
 // Phase 62: install measure-line + annotation test drivers (gated by MODE==="test", production no-op)

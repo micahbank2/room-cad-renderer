@@ -82,12 +82,12 @@ export function SavedCameraButtons({
   onSave,
   onClear,
 }: {
-  kind: "wall" | "product" | "ceiling" | "custom" | "stair";
+  kind: "wall" | "product" | "ceiling" | "custom" | "stair" | "column";
   id: string;
   hasSavedCamera: boolean;
   viewMode: "2d" | "3d" | "split" | "library";
   onSave: (id: string, pos: [number, number, number], target: [number, number, number]) => void;
-  onClear: (kind: "wall" | "product" | "ceiling" | "custom" | "stair", id: string) => void;
+  onClear: (kind: "wall" | "product" | "ceiling" | "custom" | "stair" | "column", id: string) => void;
 }) {
   const disabled = viewMode === "2d" || viewMode === "library";
   const saveTitle = disabled
@@ -108,12 +108,14 @@ export function SavedCameraButtons({
       setSavedCameraOnCeilingNoHistory?: typeof onSave;
       setSavedCameraOnCustomElementNoHistory?: typeof onSave;
       setSavedCameraOnStairNoHistory?: (id: string, pos: [number, number, number], target: [number, number, number]) => void;
+      setSavedCameraOnColumnNoHistory?: (id: string, pos: [number, number, number], target: [number, number, number]) => void;
     };
     if (kind === "wall") cadState.setSavedCameraOnWallNoHistory?.(id, capture.pos, capture.target);
     else if (kind === "product") cadState.setSavedCameraOnProductNoHistory?.(id, capture.pos, capture.target);
     else if (kind === "ceiling") cadState.setSavedCameraOnCeilingNoHistory?.(id, capture.pos, capture.target);
     else if (kind === "custom") cadState.setSavedCameraOnCustomElementNoHistory?.(id, capture.pos, capture.target);
     else if (kind === "stair") cadState.setSavedCameraOnStairNoHistory?.(id, capture.pos, capture.target);
+    else if (kind === "column") cadState.setSavedCameraOnColumnNoHistory?.(id, capture.pos, capture.target);
     else onSave(id, capture.pos, capture.target);
   };
 

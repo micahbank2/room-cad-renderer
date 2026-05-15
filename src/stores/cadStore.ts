@@ -16,10 +16,16 @@ import type {
   CustomElement,
   PlacedCustomElement,
   Stair,
+  Column,
   MeasureLine,
   Annotation,
 } from "@/types/cad";
-import { DEFAULT_STAIR } from "@/types/cad";
+import {
+  DEFAULT_STAIR,
+  DEFAULT_COLUMN,
+  DEFAULT_COLUMN_WIDTH_FT,
+  DEFAULT_COLUMN_DEPTH_FT,
+} from "@/types/cad";
 import { uid, resizeWall } from "@/lib/geometry";
 import { ROOM_TEMPLATES, type RoomTemplateId } from "@/data/roomTemplates";
 import {
@@ -31,6 +37,7 @@ import {
   migrateV6ToV7,
   migrateV7ToV8,
   migrateV8ToV9,
+  migrateV9ToV10,
 } from "@/lib/snapshotMigration";
 import type { SurfaceTarget } from "@/lib/surfaceMaterial";
 import type { PaintColor } from "@/types/paint";
@@ -154,9 +161,31 @@ interface CADState {
   ) => void;
   /** Phase 48 CAM-04 (D-04): NoHistory clearer — remove savedCamera fields from any leaf entity. */
   clearSavedCameraNoHistory: (
-    kind: "wall" | "product" | "ceiling" | "custom" | "stair",
+    kind: "wall" | "product" | "ceiling" | "custom" | "stair" | "column",
     id: string,
   ) => void;
+  // Phase 86 COL-01 (D-06): column CRUD + override + saved-camera mirrors.
+  addColumn: (roomId: string, partial: Partial<Column> & { position: Point }) => string;
+  updateColumn: (roomId: string, columnId: string, patch: Partial<Column>) => void;
+  updateColumnNoHistory: (roomId: string, columnId: string, patch: Partial<Column>) => void;
+  removeColumn: (roomId: string, columnId: string) => void;
+  removeColumnNoHistory: (roomId: string, columnId: string) => void;
+  moveColumn: (roomId: string, columnId: string, position: Point) => void;
+  moveColumnNoHistory: (roomId: string, columnId: string, position: Point) => void;
+  resizeColumnAxis: (roomId: string, columnId: string, axis: "width" | "depth", valueFt: number) => void;
+  resizeColumnAxisNoHistory: (roomId: string, columnId: string, axis: "width" | "depth", valueFt: number) => void;
+  resizeColumnHeight: (roomId: string, columnId: string, valueFt: number) => void;
+  resizeColumnHeightNoHistory: (roomId: string, columnId: string, valueFt: number) => void;
+  rotateColumn: (roomId: string, columnId: string, degrees: number) => void;
+  rotateColumnNoHistory: (roomId: string, columnId: string, degrees: number) => void;
+  clearColumnOverrides: (roomId: string, columnId: string) => void;
+  renameColumn: (roomId: string, columnId: string, name: string) => void;
+  setSavedCameraOnColumnNoHistory: (
+    columnId: string,
+    pos: [number, number, number],
+    target: [number, number, number],
+  ) => void;
+  clearColumnSavedCameraNoHistory: (columnId: string) => void;
   // Phase 60 STAIRS-01 (D-01): stair CRUD + override + saved-camera mirrors.
   addStair: (roomId: string, partial: Partial<Stair> & { position: Point }) => string;
   updateStair: (roomId: string, stairId: string, patch: Partial<Stair>) => void;
@@ -231,7 +260,7 @@ function snapshot(state: CADState): CADSnapshot {
   const root = state as any;
   const t0 = import.meta.env.DEV ? performance.now() : 0;
   const snap: CADSnapshot = {
-    version: 9,
+    version: 10,
     rooms: structuredClone(toPlain(state.rooms)),
     activeRoomId: state.activeRoomId,
     ...(root.customElements
@@ -1297,6 +1326,12 @@ export const useCADStore = create<CADState>()((set) => ({
           if (!stairs || !stairs[id]) return;
           stairs[id].savedCameraPos = undefined;
           stairs[id].savedCameraTarget = undefined;
+        } else if (kind === "column") {
+          // Phase 86 COL-01 (D-06)
+          const columns = doc.columns;
+          if (!columns || !columns[id]) return;
+          columns[id].savedCameraPos = undefined;
+          columns[id].savedCameraTarget = undefined;
         }
       })
     ),
@@ -1414,6 +1449,201 @@ export const useCADStore = create<CADState>()((set) => ({
         if (!stair) return;
         stair.savedCameraPos = undefined;
         stair.savedCameraTarget = undefined;
+      })
+    ),
+
+  // -------------------------------------------------------------------------
+  // Phase 86 COL-01 — column CRUD + override + saved-camera mirrors.
+  // Mirrors the Phase 60 stair pattern line-for-line (room-scoped, NoHistory
+  // siblings, defensive guards, clamp [0.25, 50] for size axes).
+  // -------------------------------------------------------------------------
+
+  addColumn: (roomId, partial) => {
+    const id = `col_${uid()}`;
+    set(
+      produce((s: CADState) => {
+        const doc = s.rooms[roomId];
+        if (!doc) return;
+        pushHistory(s);
+        if (!doc.columns) doc.columns = {};
+        const { position, ...rest } = partial;
+        doc.columns[id] = {
+          ...DEFAULT_COLUMN,
+          ...rest,
+          id,
+          position,
+        } as Column;
+      })
+    );
+    return id;
+  },
+
+  updateColumn: (roomId, columnId, patch) =>
+    set(
+      produce((s: CADState) => {
+        const col = s.rooms[roomId]?.columns?.[columnId];
+        if (!col) return;
+        pushHistory(s);
+        Object.assign(col, patch);
+      })
+    ),
+
+  updateColumnNoHistory: (roomId, columnId, patch) =>
+    set(
+      produce((s: CADState) => {
+        const col = s.rooms[roomId]?.columns?.[columnId];
+        if (!col) return;
+        Object.assign(col, patch);
+      })
+    ),
+
+  removeColumn: (roomId, columnId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = s.rooms[roomId];
+        if (!doc?.columns?.[columnId]) return;
+        pushHistory(s);
+        delete doc.columns[columnId];
+      })
+    ),
+
+  removeColumnNoHistory: (roomId, columnId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = s.rooms[roomId];
+        if (!doc?.columns?.[columnId]) return;
+        delete doc.columns[columnId];
+      })
+    ),
+
+  moveColumn: (roomId, columnId, position) =>
+    set(
+      produce((s: CADState) => {
+        const col = s.rooms[roomId]?.columns?.[columnId];
+        if (!col) return;
+        pushHistory(s);
+        col.position = position;
+      })
+    ),
+
+  moveColumnNoHistory: (roomId, columnId, position) =>
+    set(
+      produce((s: CADState) => {
+        const col = s.rooms[roomId]?.columns?.[columnId];
+        if (!col) return;
+        col.position = position;
+      })
+    ),
+
+  resizeColumnAxis: (roomId, columnId, axis, valueFt) =>
+    set(
+      produce((s: CADState) => {
+        const col = s.rooms[roomId]?.columns?.[columnId];
+        if (!col) return;
+        const v = Math.max(0.25, Math.min(50, valueFt));
+        pushHistory(s);
+        if (axis === "width") col.widthFt = v;
+        else col.depthFt = v;
+      })
+    ),
+
+  resizeColumnAxisNoHistory: (roomId, columnId, axis, valueFt) =>
+    set(
+      produce((s: CADState) => {
+        const col = s.rooms[roomId]?.columns?.[columnId];
+        if (!col) return;
+        const v = Math.max(0.25, Math.min(50, valueFt));
+        if (axis === "width") col.widthFt = v;
+        else col.depthFt = v;
+      })
+    ),
+
+  resizeColumnHeight: (roomId, columnId, valueFt) =>
+    set(
+      produce((s: CADState) => {
+        const col = s.rooms[roomId]?.columns?.[columnId];
+        if (!col) return;
+        const v = Math.max(0.25, Math.min(50, valueFt));
+        pushHistory(s);
+        col.heightFt = v;
+      })
+    ),
+
+  resizeColumnHeightNoHistory: (roomId, columnId, valueFt) =>
+    set(
+      produce((s: CADState) => {
+        const col = s.rooms[roomId]?.columns?.[columnId];
+        if (!col) return;
+        const v = Math.max(0.25, Math.min(50, valueFt));
+        col.heightFt = v;
+      })
+    ),
+
+  rotateColumn: (roomId, columnId, degrees) =>
+    set(
+      produce((s: CADState) => {
+        const col = s.rooms[roomId]?.columns?.[columnId];
+        if (!col) return;
+        pushHistory(s);
+        col.rotation = degrees;
+      })
+    ),
+
+  rotateColumnNoHistory: (roomId, columnId, degrees) =>
+    set(
+      produce((s: CADState) => {
+        const col = s.rooms[roomId]?.columns?.[columnId];
+        if (!col) return;
+        col.rotation = degrees;
+      })
+    ),
+
+  clearColumnOverrides: (roomId, columnId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = s.rooms[roomId];
+        const col = doc?.columns?.[columnId];
+        if (!col || !doc) return;
+        pushHistory(s);
+        col.widthFt = DEFAULT_COLUMN_WIDTH_FT;
+        col.depthFt = DEFAULT_COLUMN_DEPTH_FT;
+        // D-03: reset-to-wall-height surface.
+        col.heightFt = doc.room.wallHeight;
+      })
+    ),
+
+  renameColumn: (roomId, columnId, name) =>
+    set(
+      produce((s: CADState) => {
+        const col = s.rooms[roomId]?.columns?.[columnId];
+        if (!col) return;
+        pushHistory(s);
+        col.name = name;
+      })
+    ),
+
+  setSavedCameraOnColumnNoHistory: (columnId, pos, target) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const col = doc.columns?.[columnId];
+        if (!col) return;
+        // No pushHistory — Phase 48 D-04 bypass.
+        col.savedCameraPos = pos;
+        col.savedCameraTarget = target;
+      })
+    ),
+
+  clearColumnSavedCameraNoHistory: (columnId) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const col = doc.columns?.[columnId];
+        if (!col) return;
+        col.savedCameraPos = undefined;
+        col.savedCameraTarget = undefined;
       })
     ),
 
@@ -1550,6 +1780,8 @@ export const useCADStore = create<CADState>()((set) => ({
           if (doc.ceilings) delete doc.ceilings[id];
           // Phase 60 STAIRS-01 — bulk-delete stairs too.
           if (doc.stairs) delete doc.stairs[id];
+          // Phase 86 COL-01 — bulk-delete columns too.
+          if (doc.columns) delete doc.columns[id];
         }
       })
     ),
@@ -1592,13 +1824,14 @@ export const useCADStore = create<CADState>()((set) => ({
     const migratedV7 = migrateV6ToV7(migrated); // sync: v6→v7 finishMaterialId passthrough (Phase 69)
     const migratedV8 = migrateV7ToV8(migratedV7); // sync: v7→v8 WallSegment.name passthrough (Phase 81)
     const migratedV9 = migrateV8ToV9(migratedV8); // sync: v8→v9 heightFtOverride passthrough (Phase 85)
+    const migratedV10 = migrateV9ToV10(migratedV9); // sync: v9→v10 columns seed-empty per RoomDoc (Phase 86)
     set(
       produce((s: CADState) => {
-        s.rooms = migratedV9.rooms;
-        s.activeRoomId = migratedV9.activeRoomId;
-        (s as any).customElements = (migratedV9 as any).customElements ?? {};
-        (s as any).customPaints = (migratedV9 as any).customPaints ?? [];
-        (s as any).recentPaints = (migratedV9 as any).recentPaints ?? [];
+        s.rooms = migratedV10.rooms;
+        s.activeRoomId = migratedV10.activeRoomId;
+        (s as any).customElements = (migratedV10 as any).customElements ?? {};
+        (s as any).customPaints = (migratedV10 as any).customPaints ?? [];
+        (s as any).recentPaints = (migratedV10 as any).recentPaints ?? [];
         s.past = [];
         s.future = [];
       })
@@ -1848,6 +2081,14 @@ const EMPTY_STAIRS: Record<string, Stair> = Object.freeze({});
 export const useActiveStairs = () =>
   useCADStore((s) =>
     s.activeRoomId ? s.rooms[s.activeRoomId]?.stairs ?? EMPTY_STAIRS : EMPTY_STAIRS,
+  );
+
+// Phase 86 COL-01: active-room columns selector. Defensive `?? {}` per
+// Phase 60 Pitfall 2 — ensures consumers never see `undefined`.
+const EMPTY_COLUMNS: Record<string, Column> = Object.freeze({});
+export const useActiveColumns = () =>
+  useCADStore((s) =>
+    s.activeRoomId ? s.rooms[s.activeRoomId]?.columns ?? EMPTY_COLUMNS : EMPTY_COLUMNS,
   );
 
 // Non-hook for imperative paths (tools)

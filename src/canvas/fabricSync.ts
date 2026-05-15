@@ -6,11 +6,13 @@ import type {
   CustomElement,
   PlacedCustomElement,
   Stair,
+  Column,
   MeasureLine,
   Annotation,
 } from "@/types/cad";
 import { buildMeasureLineGroup, buildAnnotationGroup, buildRoomAreaOverlay } from "./measureSymbols";
 import { buildStairSymbolShapes } from "./stairSymbol";
+import { buildColumnSymbolShapes } from "./columnSymbol";
 import { DEFAULT_STAIR_WIDTH_FT } from "@/types/cad";
 import type { Product } from "@/types/product";
 import { hasDimensions, resolveEffectiveDims, resolveEffectiveCustomDims } from "@/types/product";
@@ -1285,6 +1287,77 @@ export function renderStairs(
         selectable: false,
         evented: false,
         data: { type: "stair-hover-outline", stairId: stair.id },
+      }));
+    }
+  }
+}
+
+/**
+ * Phase 86 COL-01 — render placed columns as fabric.Group on the 2D canvas.
+ *
+ * Mirrors renderStairs but simpler: column.position IS the footprint center
+ * (= bbox center; no UP-axis translation needed). Selection is highlighted
+ * inside buildColumnSymbolShapes. Hover ring (accent-purple) drawn as an
+ * extra outline when hoveredId matches and not selected (Phase 81 D-02).
+ *
+ * data: { type: "column", columnId } — selectTool + Phase 53 right-click
+ * hit-test branches on this.
+ *
+ * Skips render for columns in hiddenIds (Phase 46 cascade).
+ * D-01: v1.20 box-only enforcement — non-"box" shapes are silently skipped.
+ */
+export function renderColumns(
+  fc: fabric.Canvas,
+  columns: Record<string, Column>,
+  scale: number,
+  origin: { x: number; y: number },
+  hiddenIds: Set<string>,
+  selectedIds: string[],
+  hoveredId: string | null = null,
+): void {
+  for (const column of Object.values(columns ?? {})) {
+    if (hiddenIds.has(column.id)) continue;
+    if (column.shape !== "box") continue; // D-01 v1.20 box-only
+
+    const isSelected = selectedIds.includes(column.id);
+    const isHovered = !isSelected && hoveredId === column.id;
+
+    const children = buildColumnSymbolShapes(column, scale, origin, isSelected);
+    const cx = origin.x + column.position.x * scale;
+    const cy = origin.y + column.position.y * scale;
+
+    const group = new fabric.Group(children, {
+      left: cx,
+      top: cy,
+      angle: column.rotation,
+      originX: "center",
+      originY: "center",
+      selectable: false,
+      evented: true,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data: { type: "column", columnId: column.id } as any,
+    });
+    fc.add(group);
+
+    if (isHovered) {
+      const widthPx = column.widthFt * scale;
+      const depthPx = column.depthFt * scale;
+      fc.add(new fabric.Rect({
+        left: cx,
+        top: cy,
+        width: widthPx + 4,
+        height: depthPx + 4,
+        fill: "transparent",
+        stroke: "#7c5bf0",
+        strokeWidth: 2,
+        opacity: 0.8,
+        angle: column.rotation,
+        originX: "center",
+        originY: "center",
+        selectable: false,
+        evented: false,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        data: { type: "column-hover-outline", columnId: column.id } as any,
       }));
     }
   }
