@@ -14,8 +14,6 @@ interface Props {
 
 
 export default function Sidebar({ productLibrary }: Props) {
-  const gridSnap = useUIStore((s) => s.gridSnap);
-  const setGridSnap = useUIStore((s) => s.setGridSnap);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
 
   return (
@@ -46,23 +44,8 @@ export default function Sidebar({ productLibrary }: Props) {
           <RoomSettings />
         </PanelSection>
 
-        {/* Phase 80 audit removals (dead code / duplicates):
-            - "System stats" panel — debug chrome with no audience
-            - "Layers" panel — single Show Grid checkbox already in FloatingToolbar
-            Snap stays here until Phase 83 wires it into the FloatingToolbar utility group. */}
-
-        <PanelSection id="sidebar-snap" label="Snap" defaultOpen={false}>
-          <select
-            value={gridSnap}
-            onChange={(e) => setGridSnap(+e.target.value)}
-            className="w-full px-2 py-1 text-[10px]"
-          >
-            <option value={0}>Off</option>
-            <option value={0.25}>3 inch</option>
-            <option value={0.5}>6 inch</option>
-            <option value={1}>1 foot</option>
-          </select>
-        </PanelSection>
+        {/* Phase 80 audit removals: System Stats, Layers (now in toolbar grid toggle).
+            Phase 83 D-04: Snap moved to FloatingToolbar Utility group. */}
 
         <PanelSection id="sidebar-custom-elements" label="Custom elements" defaultOpen={false}>
           <CustomElementsPanel />
