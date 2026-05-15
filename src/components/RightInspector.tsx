@@ -19,6 +19,7 @@ import {
   useActiveCeilings,
   useActivePlacedCustomElements,
   useActiveStairs,
+  useActiveColumns,
   useCustomElements,
 } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
@@ -29,6 +30,7 @@ import { ProductInspector } from "./inspectors/ProductInspector";
 import { CeilingInspector } from "./inspectors/CeilingInspector";
 import { CustomElementInspector } from "./inspectors/CustomElementInspector";
 import { StairInspector } from "./inspectors/StairInspector";
+import { ColumnInspector } from "./inspectors/ColumnInspector";
 
 interface Props {
   productLibrary: Product[];
@@ -44,6 +46,7 @@ export default function RightInspector({ productLibrary, viewMode }: Props) {
   const placedCustoms = useActivePlacedCustomElements();
   const customCatalog = useCustomElements();
   const stairs = useActiveStairs();
+  const columns = useActiveColumns();
   const activeRoomId = useCADStore((s) => s.activeRoomId);
   const removeSelected = useCADStore((s) => s.removeSelected);
   const clearSelection = useUIStore((s) => s.clearSelection);
@@ -115,6 +118,8 @@ export default function RightInspector({ productLibrary, viewMode }: Props) {
   const ce = pce ? customCatalog[pce.customElementId] : undefined;
   // Phase 60 STAIRS-01 (D-08): sequential `if (entity)` discriminator.
   const stair = stairs[id];
+  // Phase 86 COL-01 (D-08): column branch.
+  const column = columns[id];
 
   return (
     <div className="absolute right-3 top-3 z-10 w-64 max-h-[calc(100vh-6rem)] overflow-y-auto bg-card border border-border rounded-smooth-md p-4 space-y-3">
@@ -156,6 +161,14 @@ export default function RightInspector({ productLibrary, viewMode }: Props) {
         <StairInspector
           key={stair.id}
           stair={stair}
+          activeRoomId={activeRoomId}
+          viewMode={viewMode}
+        />
+      )}
+      {column && activeRoomId && (
+        <ColumnInspector
+          key={column.id}
+          column={column}
           activeRoomId={activeRoomId}
           viewMode={viewMode}
         />
