@@ -1,8 +1,9 @@
 import * as fabric from "fabric";
 import { formatFeet, wallLength } from "@/lib/geometry";
 import type { WallSegment } from "@/types/cad";
+import type { CanvasTheme } from "./canvasTheme";
+import { withAlpha } from "./canvasTheme";
 
-const DIM_COLOR = "#938ea0";
 const DIM_FONT = "Inter, system-ui, sans-serif";
 
 /** Draw room dimension labels (width along bottom, length along right) */
@@ -11,22 +12,24 @@ export function drawRoomDimensions(
   roomW: number,
   roomH: number,
   scale: number,
-  origin: { x: number; y: number }
+  origin: { x: number; y: number },
+  theme: CanvasTheme,
 ) {
   const rw = roomW * scale;
   const rh = roomH * scale;
+  const dim = theme.dimensionFg;
 
   // Bottom: width label + line + ticks
   fc.add(
     new fabric.Line(
       [origin.x, origin.y + rh + 8, origin.x + rw, origin.y + rh + 8],
-      { stroke: DIM_COLOR, strokeWidth: 0.5, selectable: false, evented: false, data: { type: "dim" } }
+      { stroke: dim, strokeWidth: 0.5, selectable: false, evented: false, data: { type: "dim" } }
     )
   );
   for (const x of [origin.x, origin.x + rw]) {
     fc.add(
       new fabric.Line([x, origin.y + rh + 4, x, origin.y + rh + 12], {
-        stroke: DIM_COLOR, strokeWidth: 1, selectable: false, evented: false, data: { type: "dim" },
+        stroke: dim, strokeWidth: 1, selectable: false, evented: false, data: { type: "dim" },
       })
     );
   }
@@ -36,7 +39,7 @@ export function drawRoomDimensions(
       top: origin.y + rh + 14,
       fontSize: 12,
       fontFamily: DIM_FONT,
-      fill: DIM_COLOR,
+      fill: dim,
       originX: "center",
       selectable: false,
       evented: false,
@@ -48,13 +51,13 @@ export function drawRoomDimensions(
   fc.add(
     new fabric.Line(
       [origin.x + rw + 8, origin.y, origin.x + rw + 8, origin.y + rh],
-      { stroke: DIM_COLOR, strokeWidth: 0.5, selectable: false, evented: false, data: { type: "dim" } }
+      { stroke: dim, strokeWidth: 0.5, selectable: false, evented: false, data: { type: "dim" } }
     )
   );
   for (const y of [origin.y, origin.y + rh]) {
     fc.add(
       new fabric.Line([origin.x + rw + 4, y, origin.x + rw + 12, y], {
-        stroke: DIM_COLOR, strokeWidth: 1, selectable: false, evented: false, data: { type: "dim" },
+        stroke: dim, strokeWidth: 1, selectable: false, evented: false, data: { type: "dim" },
       })
     );
   }
@@ -64,7 +67,7 @@ export function drawRoomDimensions(
       top: origin.y + rh / 2,
       fontSize: 12,
       fontFamily: DIM_FONT,
-      fill: DIM_COLOR,
+      fill: dim,
       originX: "center",
       angle: 90,
       selectable: false,
@@ -79,7 +82,8 @@ export function drawWallDimension(
   fc: fabric.Canvas,
   wall: WallSegment,
   scale: number,
-  origin: { x: number; y: number }
+  origin: { x: number; y: number },
+  theme: CanvasTheme,
 ) {
   const len = wallLength(wall);
   if (len < 0.5) return;
@@ -101,12 +105,12 @@ export function drawWallDimension(
   if (angleDeg > 90) angleDeg -= 180;
   if (angleDeg < -90) angleDeg += 180;
 
-  // Background rect for readability
+  // Background rect for readability — D-04: card token with 0.85 alpha
   const text = formatFeet(len);
   const bg = new fabric.Rect({
     width: text.length * 7 + 8,
     height: 16,
-    fill: "rgba(18,18,29,0.85)",
+    fill: withAlpha(theme.dimensionLabelBg, 0.85),
     rx: 3,
     ry: 3,
     originX: "center",
@@ -116,7 +120,7 @@ export function drawWallDimension(
   const label = new fabric.FabricText(text, {
     fontSize: 11,
     fontFamily: DIM_FONT,
-    fill: "#ccbeff",
+    fill: theme.dimensionLabelFg,
     fontWeight: "600",
     originX: "center",
     originY: "center",

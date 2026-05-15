@@ -3,6 +3,7 @@ import { useCADStore, getActiveRoomDoc } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { snapPoint, constrainOrthogonal, distance, formatFeet } from "@/lib/geometry";
 import { pxToFeet } from "./toolUtils";
+import { getCanvasTheme } from "@/canvas/canvasTheme";
 import type { Point } from "@/types/cad";
 
 /** Snap threshold in feet — if cursor is within this distance of an existing
@@ -181,10 +182,13 @@ export function activateWallTool(
       const textObj = lengthLabel.item(1) as fabric.Text;
       if (textObj) textObj.set({ text: labelText });
     } else {
+      // Phase 88 D-04: card-bg honors theme; accent stroke + label fg stay
+      // theme-invariant per the brand-purple guidance.
+      const tm = getCanvasTheme();
       const bg = new fabric.Rect({
         width: 52,
         height: 18,
-        fill: "#12121d",
+        fill: tm.cardBg,
         stroke: "#7c5bf0",
         strokeWidth: 1,
         rx: 2,
