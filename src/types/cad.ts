@@ -190,6 +190,60 @@ export const DEFAULT_STAIR: Omit<Stair, "id" | "position"> = {
   labelOverride: undefined,
 };
 
+/**
+ * Phase 86 COL-01 (D-01, D-05): rectangular column / pillar primitive.
+ *
+ * Stored at the room level (`RoomDoc.columns`). Mirrors the Phase 60
+ * Stair pattern — NOT a customElement (column-specific fields, room-
+ * scoped persistence).
+ *
+ * v1.20 ships rectangular columns only. The `shape` union is widened
+ * for future cylinder support; renderers branch on `shape === "box"`
+ * defensively (D-01).
+ */
+export interface Column {
+  /** Format: `col_<uid>`. */
+  id: string;
+  /** Footprint center on the floor plane, in feet (room-local). */
+  position: Point;
+  /** Footprint width in feet (X axis at rotation=0). Default 1.0. */
+  widthFt: number;
+  /** Footprint depth in feet (Y axis in 2D / Z axis in 3D at rotation=0). Default 1.0. */
+  depthFt: number;
+  /** Vertical extent in feet. Initialized from room.wallHeight at
+   *  placement time per D-03; thereafter stored as a static value. */
+  heightFt: number;
+  /** Continuous degrees. Tool snaps to 15° while Shift held (mirror Stair). */
+  rotation: number;
+  /** v1.20 ships "box" only (D-01); union widened for forward compat. */
+  shape: "box" | "cylinder";
+  /** Phase 68 Material reference. Optional — falls back to off-white
+   *  paint (#f5f5f5, roughness 0.85) when unset. */
+  materialId?: string;
+  /** Per-placement display name override. Max 40 chars. */
+  name?: string;
+  /** Phase 48 CAM-04 mirror. */
+  savedCameraPos?: [number, number, number];
+  /** Phase 48 CAM-04 mirror. */
+  savedCameraTarget?: [number, number, number];
+}
+
+/** Phase 86 (D-05): default footprint width when unspecified. */
+export const DEFAULT_COLUMN_WIDTH_FT = 1.0;
+/** Phase 86 (D-05): default footprint depth when unspecified. */
+export const DEFAULT_COLUMN_DEPTH_FT = 1.0;
+
+/** Phase 86 (D-05): non-id, non-position, non-heightFt defaults.
+ *  heightFt is resolved at placement time from room.wallHeight (D-03). */
+export const DEFAULT_COLUMN: Omit<Column, "id" | "position" | "heightFt"> = {
+  widthFt: DEFAULT_COLUMN_WIDTH_FT,
+  depthFt: DEFAULT_COLUMN_DEPTH_FT,
+  rotation: 0,
+  shape: "box",
+  materialId: undefined,
+  name: undefined,
+};
+
 export interface CustomElement {
   id: string;
   name: string;
@@ -325,6 +379,10 @@ export interface RoomDoc {
    *  load with empty `{}` via v3→v4 migration. Consumers MUST use `?? {}`
    *  defensive fallback (research Pitfall 2). */
   stairs?: Record<string, Stair>;
+  /** Phase 86 COL-01 (D-04): per-room columns. Optional — older snapshots
+   *  load with empty `{}` via v9→v10 migration. Consumers MUST use `?? {}`
+   *  defensive fallback (Phase 60 research Pitfall 2 contract). */
+  columns?: Record<string, Column>;
   /** Phase 62 MEASURE-01: per-room dimension lines (decorative annotations).
    *  Optional — older snapshots load with empty `{}` via v4→v5 migration. */
   measureLines?: Record<string, MeasureLine>;
@@ -372,8 +430,12 @@ export interface CADSnapshot {
    *  Phase 85 D-05: bumped from 8 to 9 — adds optional heightFtOverride
    *  on PlacedProduct + PlacedCustomElement. Migration is a passthrough
    *  (the field is optional — legacy snapshots without it render at
-   *  catalog height, which is the correct legacy behavior). */
-  version: 9;
+   *  catalog height, which is the correct legacy behavior).
+   *
+   *  Phase 86 D-04: bumped from 9 to 10 — adds Room.columns: Record<string, Column>.
+   *  Migration seeds {} per RoomDoc (NOT a passthrough — mirrors Phase 60 v3→v4
+   *  + Phase 62 v4→v5 shape). */
+  version: 10;
   rooms: Record<string, RoomDoc>;
   activeRoomId: string | null;
   /** Per-project catalog of custom elements (reusable across rooms). */
@@ -406,7 +468,9 @@ export type ToolType =
   | "niche"
   // Phase 62 MEASURE-01: dimension-line + text-label placement tools.
   | "measure"
-  | "label";
+  | "label"
+  // Phase 86 COL-01: column placement tool.
+  | "column";
 
 /** Phase 61 OPEN-01: per-kind default dimensions for new openings.
  *  - door: 3ft × 6.67ft (6'-8" std), sill 0
