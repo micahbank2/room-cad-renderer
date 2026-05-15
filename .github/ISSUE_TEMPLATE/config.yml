@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Planning state
+    url: https://github.com/micahbank2/room-cad-renderer/tree/main/.planning
+    about: Check ROADMAP.md / STATE.md / REQUIREMENTS.md before filing — your issue may already be tracked there.
