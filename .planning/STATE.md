@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 
 ## Current Position
 
-Phase: 999.1
-Plan: Not started
+Phase: 83
+Plan: 01 complete; 02 pending (Snap migration)
 Milestone: v1.21 Sidebar IA & Contextual Surfaces
-Phases: 81 complete; 82 complete (Plans 01 + 02 + 03 all shipped)
-Status: Phase 82 COMPLETE — RightInspector + per-entity tabs + OpeningInspector sub-selection (IA-04 + IA-05)
+Phases: 81 complete; 82 complete; 83 Plan 01 complete
+Status: Phase 83 Plan 01 COMPLETE — banded 5-group FloatingToolbar with 44px hit targets, hover labels, responsive wrap (IA-06 + IA-07)
 Last activity: 2026-05-14
 
 ## Decisions
@@ -53,6 +53,7 @@ Last activity: 2026-05-14
 - [Phase 82]: Phase 82 Plan 01 (IA-04): RightInspector shell + per-entity inspectors under src/components/inspectors/; PropertiesPanel.tsx becomes ~100-line compat shim preserving empty-state Room properties block for Phase 62 test; uiStore.selectedOpeningId slice added (setter consumers land in Plan 82-03); 996/996 vitest pass, 0 regressions
 - [Phase 82]: Plan 82-02 (IA-04): per-entity tab system on Wall/Product/CustomElement/Ceiling inspectors via Phase 72 Tabs primitive; D-03 reset via keyed inspector mount in RightInspector (not inner div — useState lives on the component itself); StairInspector stays flat per D-04; bulk-select stays untabbed per D-05; 1003/1003 vitest pass
 - [Phase 82]: Plan 82-03 (IA-05): OpeningInspector renders Preset/Dimensions/Position tabs for windows (Type/Dimensions/Position for doors/archways/passthroughs/niches); WallInspector early-returns OpeningInspector when uiStore.selectedOpeningId matches; Phase 79 WindowPresetRow JSX lifted VERBATIM into the Preset tab (D-07 single-undo + D-08 derive-on-read invariants mechanically preserved); OpeningRow click sets selectedOpeningId (was accordion expand); D-06 data-testids verbatim; 1012/1012 vitest pass; Phase 82 COMPLETE
+- [Phase 83]: Plan 83-01 (IA-06 + IA-07): FloatingToolbar restructured to 5 banded groups (Drawing/Measure/Structure/View/Utility) with mixed-case always-on labels; new icon-touch Button variant (h-11 w-11 = 44px WCAG 2.5.5 AAA); flex-wrap container with max-w-[min(calc(100vw-24px),1240px)]; all TooltipContent uses side="top" + collisionPadding={8}; WindowPresetSwitcher anchor bottom-32 -> bottom-44 to clear wrapped toolbar; all 18 pre-Phase-83 data-testids preserved verbatim; 6 additive toolbar-* testids added; 1012/1012 vitest pass; e2e spec committed. Resumed after prior executor crashed with 529 overload mid-Task-2; verified disk state then atomic-committed remaining tasks.
 
 ## Performance Metrics
 
@@ -75,6 +76,7 @@ Last activity: 2026-05-14
 | Phase 82 P01 | 21min | 4 tasks | 10 files |
 | Phase 82 P02 | 11min | 3 tasks | 9 files |
 | Phase 82 P03 | 18min | 4 tasks | 8 files |
+| Phase 83 P01 | ~25min (resumed) | 4 tasks | 4 files |
 
 ## v1.20 Roadmap
 
