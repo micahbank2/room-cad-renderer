@@ -11,7 +11,7 @@ import type {
   Annotation,
 } from "@/types/cad";
 import type { CanvasTheme } from "./canvasTheme";
-import { getCanvasTheme } from "./canvasTheme";
+import { getCanvasTheme, withAlpha } from "./canvasTheme";
 import { buildMeasureLineGroup, buildAnnotationGroup, buildRoomAreaOverlay } from "./measureSymbols";
 import { buildStairSymbolShapes } from "./stairSymbol";
 import { buildColumnSymbolShapes } from "./columnSymbol";
@@ -1071,6 +1071,21 @@ export function renderProducts(
       top: -pd / 2 - 3,
     });
 
+    // Phase 89 D-04: semi-transparent backdrop behind nameLabel for
+    // readability over busy product photos. 4px padding each side; sized
+    // from nameLabel.width which Fabric measures synchronously in the ctor.
+    const nameBg = new fabric.Rect({
+      width: (nameLabel.width ?? 40) + 8,
+      height: 14,
+      fill: withAlpha(theme().background, 0.75),
+      originX: "center",
+      originY: "bottom",
+      top: -pd / 2 - 3,
+      selectable: false,
+      evented: false,
+      data: { type: "product-label-backdrop", placedProductId: pp.id, role: "name" },
+    });
+
     // Dimension label
     const dimText = showPlaceholder
       ? "SIZE: UNSET"
@@ -1078,10 +1093,25 @@ export function renderProducts(
     const dimLabel = new fabric.FabricText(dimText, {
       fontSize: 9,
       fontFamily: "Inter, system-ui, sans-serif",
-      fill: PRODUCT_STROKE,
+      // Phase 89 D-04: replace stale PRODUCT_STROKE constant with the
+      // theme-aware dimensionFg so light + dark mode both look correct.
+      fill: theme().dimensionFg,
       originX: "center",
       originY: "top",
       top: pd / 2 + 3,
+    });
+
+    // Phase 89 D-04: backdrop behind dimLabel — same pattern as nameBg.
+    const dimBg = new fabric.Rect({
+      width: (dimLabel.width ?? 40) + 8,
+      height: 12,
+      fill: withAlpha(theme().background, 0.75),
+      originX: "center",
+      originY: "top",
+      top: pd / 2 + 3,
+      selectable: false,
+      evented: false,
+      data: { type: "product-label-backdrop", placedProductId: pp.id, role: "dim" },
     });
 
     // Phase 57: GLTF products replace the border rect with a top-down
@@ -1115,7 +1145,10 @@ export function renderProducts(
       // hull === undefined → compute in flight; keep border rect placeholder (D-08)
     }
 
-    const children: fabric.FabricObject[] = [shapeChild, nameLabel, dimLabel];
+    // Phase 89 D-04: backdrop rect lives immediately below its label in
+    // z-order. After the image-branch splices fImg in at index 1, the final
+    // order becomes [shapeChild, fImg, nameBg, nameLabel, dimBg, dimLabel].
+    const children: fabric.FabricObject[] = [shapeChild, nameBg, nameLabel, dimBg, dimLabel];
 
     // Async image loading via cache — only for real products with images.
     // Phase 57: GLTF products skip this branch (gltfId already replaced border

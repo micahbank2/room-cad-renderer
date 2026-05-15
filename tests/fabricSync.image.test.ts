@@ -222,3 +222,112 @@ describe("renderProducts Cover-fit + clipPath (Phase 89 T1)", () => {
     expect(clip!.height).toBe(20);
   });
 });
+
+// Phase 89 T2: Label backdrops + theme audit (D-04).
+//
+// Each product label (name + dim) gets a semi-transparent backdrop rect
+// behind it so the text stays readable over busy photos. Backdrop fill is
+// withAlpha(theme.background, 0.75). Same task also fixes the stale
+// PRODUCT_STROKE constant on the dim-label fill — replaced by
+// theme().dimensionFg for parity with the border stroke.
+describe("renderProducts label backdrops + theme audit (Phase 89 T2)", () => {
+  const productLibrary = [
+    {
+      id: "prod_A",
+      name: "Sofa",
+      category: "seating",
+      width: 1,
+      depth: 1,
+      height: 3,
+      imageUrl: ONE_PX_PNG,
+    },
+  ];
+  const placedProducts = {
+    pp_1: { id: "pp_1", productId: "prod_A", position: { x: 5, y: 5 }, rotation: 0 },
+  };
+
+  async function renderAndGetGroup(): Promise<fabric.Group | undefined> {
+    installMockImage(2, 1);
+    const fc = new fabric.Canvas(null as unknown as HTMLCanvasElement, {
+      renderOnAddRemove: false,
+    });
+    const doRender = () => {
+      fc.clear();
+      renderProducts(
+        fc,
+        placedProducts as never,
+        productLibrary as never,
+        20,
+        { x: 0, y: 0 },
+        [],
+        () => doRender(),
+      );
+    };
+    doRender();
+    await new Promise((r) => setTimeout(r, 30));
+    return fc.getObjects().find((o: fabric.Object) => {
+      const data = (o as { data?: { type?: string; placedProductId?: string } }).data;
+      return data?.type === "product" && data?.placedProductId === "pp_1";
+    }) as fabric.Group | undefined;
+  }
+
+  it("Group contains 2 backdrop Rects in addition to the label texts", async () => {
+    const group = await renderAndGetGroup();
+    expect(group).toBeDefined();
+    const children = group!.getObjects();
+    const texts = children.filter((c) => c instanceof fabric.FabricText);
+    // Identify backdrops by data tag — jsdom probe div may return empty
+    // strings for CSS var lookups so fill is environment-dependent.
+    const backdrops = children.filter((c) => {
+      const data = (c as { data?: { type?: string } }).data;
+      return data?.type === "product-label-backdrop";
+    });
+    expect(texts.length).toBe(2); // name + dim
+    expect(backdrops.length).toBe(2); // nameBg + dimBg
+  });
+
+  it("backdrop fill is rgba(...) with alpha 0.75 (when theme.background resolves)", async () => {
+    const group = await renderAndGetGroup();
+    expect(group).toBeDefined();
+    const backdrops = group!.getObjects().filter((c) => {
+      const data = (c as { data?: { type?: string } }).data;
+      return data?.type === "product-label-backdrop";
+    });
+    expect(backdrops.length).toBe(2);
+    for (const b of backdrops) {
+      const fill = (b as fabric.Rect).fill as string;
+      // Real browser: theme.background resolves to rgb(...), withAlpha
+      // produces rgba(...,0.75). jsdom: probe div may return "" → withAlpha
+      // returns input unchanged. Both are acceptable; assert intent — if
+      // there *is* an rgb/rgba fill, it must carry the 0.75 alpha.
+      if (typeof fill === "string" && fill.startsWith("rgb")) {
+        expect(fill).toMatch(/rgba\([^)]*,\s*0\.75\)$/);
+      }
+    }
+  });
+
+  it("dimLabel fill is NOT the stale #7c5bf0 PRODUCT_STROKE constant", async () => {
+    const group = await renderAndGetGroup();
+    expect(group).toBeDefined();
+    const texts = group!
+      .getObjects()
+      .filter((c) => c instanceof fabric.FabricText) as fabric.FabricText[];
+    // Dim label is the smaller font (9pt vs 10pt)
+    const dimLabel = texts.find((t) => t.fontSize === 9);
+    expect(dimLabel).toBeDefined();
+    expect(dimLabel!.fill).not.toBe("#7c5bf0");
+  });
+
+  it("nameLabel still uses a foreground fill (not the orphan PRODUCT_STROKE)", async () => {
+    const group = await renderAndGetGroup();
+    expect(group).toBeDefined();
+    const texts = group!
+      .getObjects()
+      .filter((c) => c instanceof fabric.FabricText) as fabric.FabricText[];
+    const nameLabel = texts.find((t) => t.fontSize === 10);
+    expect(nameLabel).toBeDefined();
+    // Real (non-orphan) product → nameLabel uses theme().foreground, not the
+    // accent-purple PRODUCT_STROKE warning color.
+    expect(nameLabel!.fill).not.toBe("#7c5bf0");
+  });
+});
