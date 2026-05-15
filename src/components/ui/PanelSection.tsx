@@ -23,17 +23,27 @@ const STORAGE_KEY = "ui:propertiesPanel:sections";
  *  - D-13: entire header row is the click target (not just the chevron)
  *  - D-14: data-panel-id replaces data-collapsible-id
  *  - D-02: all animation gated on useReducedMotion()
+ *
+ * Phase 84 D-04 — forceOpen override:
+ *  When `forceOpen === true`, the section renders expanded regardless of
+ *  persisted state. The persisted localStorage entry is NOT mutated by
+ *  force-open — clicks still write `open` so when forceOpen lifts back to
+ *  false, the user's prior collapse choice is restored.
+ *  Used by Sidebar to auto-expand sidebar-product-library while
+ *  activeTool === "product".
  */
 export function PanelSection({
   id,
   label,
   children,
   defaultOpen = true,
+  forceOpen = false,
 }: {
   id: string;
   label: string;
   children: ReactNode;
   defaultOpen?: boolean;
+  forceOpen?: boolean;
 }) {
   const reduced = useReducedMotion();
 
@@ -48,17 +58,22 @@ export function PanelSection({
     writeUIObject(STORAGE_KEY, state);
   }, [id, open]);
 
+  // Phase 84 D-04: when forceOpen is true, render expanded regardless of `open`.
+  // `open` (and its localStorage persistence) is unchanged so the user's
+  // last-chosen state is restored when forceOpen flips back to false.
+  const effectiveOpen = forceOpen || open;
+
   return (
     <div data-panel-id={id} className="group">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center gap-2 py-1 text-muted-foreground hover:text-foreground"
-        aria-expanded={open}
+        aria-expanded={effectiveOpen}
         aria-label={label}
       >
         <motion.span
-          animate={{ rotate: open ? 90 : 0 }}
+          animate={{ rotate: effectiveOpen ? 90 : 0 }}
           transition={springTransition(reduced)}
           style={{ display: "flex", alignItems: "center" }}
         >
@@ -72,7 +87,7 @@ export function PanelSection({
 
       {/* CRITICAL: initial={false} prevents animation on first mount (Pitfall 1) */}
       <AnimatePresence initial={false}>
-        {open && (
+        {effectiveOpen && (
           <motion.div
             key="content"
             initial={{ height: 0, opacity: 0 }}

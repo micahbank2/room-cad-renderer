@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.19
-milestone_name: Material Linking & Library Rebuild
+milestone: v1.21
+milestone_name: Sidebar IA & Contextual Surfaces
 status: completed
-last_updated: "2026-05-15T01:14:08.448Z"
-last_activity: 2026-05-15
+last_updated: "2026-05-14T21:45:00.000Z"
+last_activity: 2026-05-14
 progress:
-  total_phases: 20
-  completed_phases: 13
-  total_plans: 48
-  completed_plans: 45
+  total_phases: 21
+  completed_phases: 14
+  total_plans: 49
+  completed_plans: 46
 ---
 
 # Project State
@@ -19,16 +19,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Library Rebuild complete; Phases 69+70+77 all shipped)
 
 **Core value:** Jessica can see her future room with her actual furniture before spending money.
-**Current focus:** Phase 83 complete — IA-06 + IA-07 shipped; Phase 81 D-05 carry-over closed. Awaiting Phase 84 (IA-08 contextual visibility rules).
+**Current focus:** Phase 84 complete — IA-08 shipped. v1.21 Sidebar IA & Contextual Surfaces milestone fully closed (8/8 IA requirements ✅).
 
 ## Current Position
 
 Phase: 999.1
 Plan: Not started
-Milestone: v1.21 Sidebar IA & Contextual Surfaces
-Phases: 81 complete; 82 complete; 83 complete
-Status: Phase 83 COMPLETE — banded 5-group FloatingToolbar with 44px hit targets + Snap migrated from Sidebar to Utility group (IA-06 + IA-07; Phase 81 D-05 carry-over closed)
-Last activity: 2026-05-15
+Milestone: v1.21 Sidebar IA & Contextual Surfaces — COMPLETE
+Phases: 81 complete; 82 complete; 83 complete; 84 complete
+Status: Phase 84 COMPLETE — Sidebar tool-bound contextual visibility (D-02 gating + D-04 product-library forceOpen). v1.21 final phase shipped.
+Last activity: 2026-05-14
 
 ## Decisions
 
@@ -55,6 +55,7 @@ Last activity: 2026-05-15
 - [Phase 82]: Plan 82-03 (IA-05): OpeningInspector renders Preset/Dimensions/Position tabs for windows (Type/Dimensions/Position for doors/archways/passthroughs/niches); WallInspector early-returns OpeningInspector when uiStore.selectedOpeningId matches; Phase 79 WindowPresetRow JSX lifted VERBATIM into the Preset tab (D-07 single-undo + D-08 derive-on-read invariants mechanically preserved); OpeningRow click sets selectedOpeningId (was accordion expand); D-06 data-testids verbatim; 1012/1012 vitest pass; Phase 82 COMPLETE
 - [Phase 83]: Plan 83-01 (IA-06 + IA-07): FloatingToolbar restructured to 5 banded groups (Drawing/Measure/Structure/View/Utility) with mixed-case always-on labels; new icon-touch Button variant (h-11 w-11 = 44px WCAG 2.5.5 AAA); flex-wrap container with max-w-[min(calc(100vw-24px),1240px)]; all TooltipContent uses side="top" + collisionPadding={8}; WindowPresetSwitcher anchor bottom-32 -> bottom-44 to clear wrapped toolbar; all 18 pre-Phase-83 data-testids preserved verbatim; 6 additive toolbar-* testids added; 1012/1012 vitest pass; e2e spec committed. Resumed after prior executor crashed with 529 overload mid-Task-2; verified disk state then atomic-committed remaining tasks.
 - [Phase 83]: Plan 83-02 (Phase 81 D-05 carry-over closure): Snap migrated from sidebar-snap PanelSection to FloatingToolbar Utility group as Radix Popover button (lucide Magnet icon, w-32 popover, 4 options Off/3in/6in/1ft, active=Check marker). Sidebar.tsx loses gridSnap/setGridSnap selectors + sidebar-snap PanelSection; Sidebar.ia02.test fixture trimmed 7→6 panels. New tests/e2e/specs/toolbar-snap.spec.ts (3 chromium-dev cases, 4.4s, all pass). Tooltip text dynamic per gridSnap value. Phase 83 COMPLETE; IA-06+IA-07 issues #175/#176 closeable on PR merge.
+- [Phase 84]: Plan 84-01 (IA-08): tool-bound sidebar contextual visibility. Sidebar.tsx conditionally mounts 3 PanelSections per D-02 — sidebar-custom-elements visible when activeTool ∈ {select, product}; sidebar-framed-art + sidebar-wainscoting visible only when activeTool=select AND a wall is selected (full unmount, not CSS-hidden). PanelSection.tsx gains optional forceOpen prop (D-04): when true, renders expanded regardless of persisted state, NEVER mutates localStorage; sidebar-product-library passes forceOpen={activeTool === "product"} for auto-expand. New tests/Sidebar.ia08.test.tsx (19 cases) + tests/e2e/specs/sidebar-contextual-visibility.spec.ts. Phase 81 Sidebar.ia02.test.tsx split into default + wall-selected regimes (9 cases). 27/27 Phase 81+84 tests GREEN, 0 regressions vs HEAD (2 pre-existing transform failures in SaveIndicator + SidebarProductPicker are baseline, not Phase-84-induced). Phase 84 COMPLETE; v1.21 milestone fully shipped (8/8 IA requirements). Closes #177 on PR merge.
 
 ## Performance Metrics
 
@@ -79,6 +80,7 @@ Last activity: 2026-05-15
 | Phase 82 P03 | 18min | 4 tasks | 8 files |
 | Phase 83 P01 | ~25min (resumed) | 4 tasks | 4 files |
 | Phase 83 P02 | 13min | 3 tasks | 4 files |
+| Phase 84 P01 | ~10min | 4 tasks | 5 files |
 
 ## v1.20 Roadmap
 
@@ -109,4 +111,4 @@ Last activity: 2026-05-15
 
 ## Next Step
 
-Run `/gsd:plan-phase 78` to plan the first phase of v1.20. ROADMAP.md Phase 78 section has the full success criteria.
+v1.21 Sidebar IA & Contextual Surfaces milestone is COMPLETE. Open Phase 84 PR (closes #177) once branch lands. Next milestone candidates: continue v1.20 (Phases 78 P02-P04 remaining PBR maps, Phase 80 parametric controls) or move to v1.22 scope.
