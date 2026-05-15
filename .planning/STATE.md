@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: completed
-last_updated: "2026-05-15T03:44:21.350Z"
+last_updated: "2026-05-15T03:52:17.458Z"
 last_activity: 2026-05-15
 progress:
   total_phases: 20
@@ -60,6 +60,7 @@ Last activity: 2026-05-15
 - [Phase 85]: Plan 85-02: dropped {product && ...} guard on Dimensions PanelSection so W/D/H inputs render with placeholder dims when catalog product is missing — required for e2e seed flow
 - [Phase 85]: Plan 85-02: Position section now defaultOpen so X/Y inputs are mountable + match the 'type all 5 numbers at once' workflow
 - [Phase 85]: Plan 85-02: fixed numericInputDrivers double-commit bug (was firing both el.blur() and synthetic focusout, doubling history); restored single-undo invariant
+- [Phase 85]: Plan 85-03: combine Tasks 1+2 into one commit (same file, same import block); Position section default-open (mirrors Wave 2); X/Y use generic updatePlacedCustomElement (no dedicated CE mover action). Phase 85 COMPLETE — PARAM-01/02/03 shipped for both products + custom elements.
 
 ## Performance Metrics
 
@@ -87,6 +88,7 @@ Last activity: 2026-05-15
 | Phase 84 P01 | ~10min | 4 tasks | 5 files |
 | Phase 85 P01 | ~25min | 6 tasks | 10 files |
 | Phase 85 P02 | 10min | 3 tasks | 4 files |
+| Phase 85 P03 | 6min | 3 tasks | 1 files |
 
 ## v1.20 Roadmap
 

@@ -23,9 +23,9 @@
 
 ### Parametric Controls (PARAM)
 
-- [ ] **PARAM-01**: User can type exact width and depth values (feet) for any placed product in PropertiesPanel — updates the product's override dimensions immediately without requiring a drag
-- [ ] **PARAM-02**: User can type exact X and Y position (feet from room origin) for any placed product in PropertiesPanel
-- [ ] **PARAM-03**: Each parametric edit (size or position) is a single undo entry (Ctrl+Z reverts to previous value)
+- [x] **PARAM-01**: User can type exact width and depth values (feet) for any placed product in PropertiesPanel — updates the product's override dimensions immediately without requiring a drag
+- [x] **PARAM-02**: User can type exact X and Y position (feet from room origin) for any placed product in PropertiesPanel
+- [x] **PARAM-03**: Each parametric edit (size or position) is a single undo entry (Ctrl+Z reverts to previous value)
 
 ### Columns & Pillars (COL)
 
