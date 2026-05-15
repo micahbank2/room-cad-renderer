@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: completed
-stopped_at: Completed 87-01-PLAN.md — theme toggle + Settings popover shipped (standalone polish phase)
-last_updated: "2026-05-15T16:59:33.845Z"
+stopped_at: Completed 88-01-PLAN.md — canvas theme bridge + toolbar mount + light borders shipped
+last_updated: "2026-05-15T17:48:18.971Z"
 last_activity: 2026-05-15
 progress:
   total_phases: 20
@@ -24,13 +24,13 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 
 ## Current Position
 
-Phase: 999.1
-Plan: Not started
-Milestone: v1.20 Surface Depth & Architectural Expansion — COMPLETE. Phase 87 ships as standalone polish phase per D-01.
-Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86 complete; 87 complete (1 plan)
-Status: Phase 87 Plan 01 COMPLETE — Settings gear button + SettingsPopover (Light/Dark/System SegmentedControl) wired to useTheme(); removed .light force-wrappers from WelcomeScreen + ProjectManager + HelpPage (D-04). 6 unit tests + 3 e2e tests GREEN. 1113 vitest passing (+6 new). All 5 THEME requirements traced. Jessica can flip themes from the gear button; choice persists across reload; HelpPage/Welcome/ProjectManager now inherit the .dark cascade.
+Phase: 88
+Plan: 01 of 2 (Plan 88-02 pending)
+Milestone: v1.20 Surface Depth & Architectural Expansion — COMPLETE. Phase 87 + Phase 88 ship as standalone polish phases per D-01.
+Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86 complete; 87 complete; 88-01 complete (Plan 88-02 pending)
+Status: Phase 88 Plan 01 COMPLETE — canvas theme bridge + FloatingToolbar mount hoist + light-mode border contrast. New src/canvas/canvasTheme.ts (getCanvasTheme/withAlpha); setFabricSyncTheme() per-frame ref keeps internal fabricSync helpers reading fresh theme without signature explosion. drawGrid/drawRoomDimensions/drawWallDimension now accept theme: CanvasTheme. FabricCanvas subscribes to useTheme().resolved; resolved in redraw deps. src/index.css :root + .light --border/--input bumped from oklch(0.922) to oklch(0.85). FloatingToolbar mount hoisted out of (viewMode === "2d" || "split") branch — renders in 3D + Split too. 7 new unit tests + 3 new e2e cases. 1120/1131 vitest pass (1113 baseline + 7 new), 0 regressions. Closes #194, #195, #196 on PR merge.
 Last activity: 2026-05-15
-Stopped at: Completed 87-01-PLAN.md — theme toggle + Settings popover shipped (standalone polish phase)
+Stopped at: Completed 88-01-PLAN.md — canvas theme bridge + toolbar mount + light borders shipped
 
 ## Decisions
 
@@ -69,6 +69,7 @@ Stopped at: Completed 87-01-PLAN.md — theme toggle + Settings popover shipped 
 - [Phase 86]: Phase 86-02: Column drag uses Phase 31 transaction pattern (empty updateColumn at drag-start + moveColumnNoHistory mid-stroke); no fast-path (cheap redraw)
 - [Phase 86]: Phase 86-03: ColumnInspector with Dimensions/Material/Rotation tabs (D-08) mounts via RightInspector keyed on column.id; Reset-to-wall-height button (D-03) single-history-push verified by 12-case vitest suite; Columns group emitted in Rooms tree mirror of Phase 60 Stairs pattern; FloatingToolbar Cuboid Column button reads room.wallHeight at click time and bridges via setPendingColumn → setTool('column'); no C keyboard shortcut (collides with Ceiling — D-07 deferral)
 - [Phase 87]: Plan 87-01 (THEME-01..05): standalone polish phase. SettingsPopover component (~70 lines, src/components/SettingsPopover.tsx) extracted as its own file (vs research's inline-in-TopBar recommendation) to anticipate future settings rows. D-03 honored — popover stays open after segment click (deliberately different from Phase 83 Snap auto-close, because theme is a "try it" choice). D-04 — three .light force-wrappers removed (WelcomeScreen:55, ProjectManager:69, HelpPage:83); .light CSS class definition preserved as reserved utility. 6 unit + 3 e2e tests; 1113/1113 vitest passing.
+- [Phase 88]: Plan 88-01 (POLISH-01/02/03): Canvas theme bridge via getCanvasTheme() + setFabricSyncTheme() per-frame ref; FloatingToolbar mount hoisted; --border bumped to oklch(0.85). 1120/1120 vitest pass (1113 baseline + 7 new), 0 regressions. Refs #194, #195, #196.
 
 ## Performance Metrics
 
@@ -100,6 +101,7 @@ Stopped at: Completed 87-01-PLAN.md — theme toggle + Settings popover shipped 
 | Phase 86 P01 | ~18min | 4 tasks | 9 files |
 | Phase 86 P02 | 22 | 3 tasks | 11 files |
 | Phase 87 P01 | ~8min | 4 tasks | 7 files |
+| Phase 88 P01 | 35 | 4 tasks | 12 files |
 
 ## v1.20 Roadmap
 
