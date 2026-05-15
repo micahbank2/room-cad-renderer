@@ -3,9 +3,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { useCADStore } from "@/stores/cadStore";
 
+// Phase 82 moved RotationPresetChips out of the PropertiesPanel monolith into
+// inspectors/ProductInspector.tsx (definition in PropertiesPanel.shared.tsx).
 describe("Rotation preset chips — file-level contracts (GH #87)", () => {
-  it("PropertiesPanel includes a RotationPresetChips row", () => {
-    const src = fs.readFileSync(path.resolve("src/components/PropertiesPanel.tsx"), "utf-8");
+  it("ProductInspector includes a RotationPresetChips row", () => {
+    const src = fs.readFileSync(path.resolve("src/components/inspectors/ProductInspector.tsx"), "utf-8");
     const hasPresets = /RotationPresetChips|data-rotation-preset/.test(src);
     expect(hasPresets).toBe(true);
   });
@@ -13,9 +15,12 @@ describe("Rotation preset chips — file-level contracts (GH #87)", () => {
     const readme = fs.readFileSync(path.resolve("tests/phase33/README.md"), "utf-8");
     expect(readme).toMatch(/__driveRotationPreset/);
   });
-  it("PropertiesPanel uses rotateProduct (history-pushing), NOT rotateProductNoHistory, in the preset block", () => {
-    const src = fs.readFileSync(path.resolve("src/components/PropertiesPanel.tsx"), "utf-8");
-    const presetBlock = src.match(/RotationPresetChips[\s\S]{0,800}/);
+  it("ProductInspector uses rotateProduct (history-pushing), NOT rotateProductNoHistory, in the preset block", () => {
+    const src = fs.readFileSync(path.resolve("src/components/inspectors/ProductInspector.tsx"), "utf-8");
+    // Anchor on the JSX use site (<RotationPresetChips ...>) rather than the
+    // import line — the import is the first match but doesn't include the
+    // rotateProduct() callback.
+    const presetBlock = src.match(/<RotationPresetChips[\s\S]{0,800}/);
     if (presetBlock) {
       expect(presetBlock[0]).toMatch(/rotateProduct\(/);
       expect(presetBlock[0]).not.toMatch(/rotateProductNoHistory/);

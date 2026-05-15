@@ -2,10 +2,17 @@ import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 
+// Phase 82 decomposed PropertiesPanel into RightInspector + per-entity
+// inspectors. The arbitrary-spacing audit applies to those new files.
 const TARGET_FILES = [
   "src/components/FloatingToolbar.tsx",
   "src/components/Sidebar.tsx",
-  "src/components/PropertiesPanel.tsx",
+  "src/components/RightInspector.tsx",
+  "src/components/inspectors/WallInspector.tsx",
+  "src/components/inspectors/ProductInspector.tsx",
+  "src/components/inspectors/CeilingInspector.tsx",
+  "src/components/inspectors/CustomElementInspector.tsx",
+  "src/components/inspectors/StairInspector.tsx",
   "src/components/RoomSettings.tsx",
 ];
 

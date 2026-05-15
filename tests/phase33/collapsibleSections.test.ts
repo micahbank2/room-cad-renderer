@@ -17,9 +17,20 @@ describe("PanelSection (Phase 72 — replaces CollapsibleSection)", () => {
     const src = fs.readFileSync(path.resolve("src/components/ui/PanelSection.tsx"), "utf-8");
     expect(src).toMatch(/ui:propertiesPanel:sections/);
   });
-  it("PropertiesPanel wraps sections in PanelSection", () => {
-    const src = fs.readFileSync(path.resolve("src/components/PropertiesPanel.tsx"), "utf-8");
-    expect(src).toMatch(/PanelSection/);
-    expect(src).not.toMatch(/CollapsibleSection/);
+  it("Per-entity inspectors wrap sections in PanelSection (post-Phase 82)", () => {
+    // Phase 82 decomposed PropertiesPanel into per-entity inspectors. At least
+    // one of them must keep wrapping sections in PanelSection and never reach
+    // for the deprecated CollapsibleSection.
+    const inspectors = [
+      "src/components/inspectors/WallInspector.tsx",
+      "src/components/inspectors/ProductInspector.tsx",
+      "src/components/inspectors/CeilingInspector.tsx",
+      "src/components/inspectors/CustomElementInspector.tsx",
+    ];
+    const sources = inspectors.map((p) => fs.readFileSync(path.resolve(p), "utf-8"));
+    expect(sources.some((src) => /PanelSection/.test(src))).toBe(true);
+    sources.forEach((src) => {
+      expect(src).not.toMatch(/CollapsibleSection/);
+    });
   });
 });
