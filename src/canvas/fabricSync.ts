@@ -1129,11 +1129,27 @@ export function renderProducts(
         onAssetReady?.();
       });
       if (cachedImg) {
+        // Phase 89 D-02: Cover-fit (single coverScale, no aspect-ratio
+        // distortion) + clipPath Rect (absolutePositioned: false so it rotates
+        // with the parent Group). Replaces the old Stretch math.
+        const imgAspect = cachedImg.naturalWidth / cachedImg.naturalHeight;
+        const footprintAspect = pw / pd;
+        const coverScale =
+          imgAspect > footprintAspect
+            ? pd / cachedImg.naturalHeight // image is wider → height constrains
+            : pw / cachedImg.naturalWidth; // image is taller → width constrains
         const fImg = new fabric.FabricImage(cachedImg, {
-          scaleX: pw / cachedImg.naturalWidth,
-          scaleY: pd / cachedImg.naturalHeight,
+          scaleX: coverScale,
+          scaleY: coverScale,
           originX: "center",
           originY: "center",
+          clipPath: new fabric.Rect({
+            width: pw,
+            height: pd,
+            originX: "center",
+            originY: "center",
+            absolutePositioned: false,
+          }),
         });
         children.splice(1, 0, fImg); // insert after border, before labels
       }
