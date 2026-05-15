@@ -74,6 +74,12 @@ export function renderCustomElements(
   // Phase 81 Plan 02 (D-02): tree row hover → accent-purple outline. Selection
   // wins over hover when both apply (avoids double-stroke).
   hoveredId: string | null = null,
+  // Phase 89 D-03: async image-load callback mirroring renderProducts. When
+  // the productImageCache (shared with products — UUID namespace, no key
+  // collision per D-05) resolves an image, fc.renderAll() repaints existing
+  // objects and onAssetReady signals FabricCanvas to re-invoke this fn so
+  // the Group rebuilds with the FabricImage child.
+  onAssetReady?: () => void,
 ) {
   for (const p of Object.values(placed)) {
     const el = catalog[p.customElementId];
@@ -87,9 +93,10 @@ export function renderCustomElements(
     const isSelected = selectedIds.includes(p.id);
     const isHovered = !isSelected && hoveredId === p.id;
 
+    // Phase 89 D-03: refactor rect + label into Group children so that an
+    // optional image child rotates with the parent. Position + rotation now
+    // live on the Group, not on each child.
     const rect = new fabric.Rect({
-      left: cx,
-      top: cy,
       width: pw,
       height: pd,
       fill: el.color + "66", // ~40% opacity
@@ -98,20 +105,48 @@ export function renderCustomElements(
       strokeDashArray: el.shape === "plane" ? [4, 3] : undefined,
       originX: "center",
       originY: "center",
-      angle: p.rotation,
-      selectable: false,
-      evented: false,
-      data: { type: "custom-element", placedId: p.id },
     });
-    fc.add(rect);
+
+    const children: fabric.FabricObject[] = [rect];
+
+    // Phase 89 D-03: image branch — mirror renderProducts Cover-fit + clipPath.
+    // Shared productImageCache works for custom elements too (D-05: UUID ID
+    // namespace shared between productStore and cadStore.customElements →
+    // no key collision risk).
+    if (el.imageUrl) {
+      const cachedImg = getCachedImage(el.id, el.imageUrl, () => {
+        fc.renderAll();
+        onAssetReady?.();
+      });
+      if (cachedImg) {
+        const imgAspect = cachedImg.naturalWidth / cachedImg.naturalHeight;
+        const footprintAspect = pw / pd;
+        const coverScale =
+          imgAspect > footprintAspect
+            ? pd / cachedImg.naturalHeight
+            : pw / cachedImg.naturalWidth;
+        const fImg = new fabric.FabricImage(cachedImg, {
+          scaleX: coverScale,
+          scaleY: coverScale,
+          originX: "center",
+          originY: "center",
+          clipPath: new fabric.Rect({
+            width: pw,
+            height: pd,
+            originX: "center",
+            originY: "center",
+            absolutePositioned: false,
+          }),
+        });
+        children.push(fImg);
+      }
+    }
 
     // Phase 31 CUSTOM-06 D-14 — label override at the custom-element label site.
     const displayName = (p.labelOverride && p.labelOverride.trim() !== "")
       ? p.labelOverride
       : el.name;
     const label = new fabric.FabricText(displayName.toUpperCase(), {
-      left: cx,
-      top: cy,
       fontSize: 9,
       fontFamily: "IBM Plex Mono",
       fill: theme().foreground,
@@ -122,7 +157,33 @@ export function renderCustomElements(
       // Tag for the __getCustomElementLabel test bridge.
       data: { type: "custom-element-label", pceId: p.id },
     });
-    fc.add(label);
+
+    // Phase 89 D-04: semi-transparent backdrop behind the label so it stays
+    // readable over busy element photos.
+    const labelBg = new fabric.Rect({
+      width: (label.width ?? 40) + 8,
+      height: 12,
+      fill: withAlpha(theme().background, 0.75),
+      originX: "center",
+      originY: "center",
+      selectable: false,
+      evented: false,
+      data: { type: "custom-element-label-backdrop", pceId: p.id },
+    });
+
+    children.push(labelBg, label);
+
+    const group = new fabric.Group(children, {
+      left: cx,
+      top: cy,
+      originX: "center",
+      originY: "center",
+      angle: p.rotation,
+      selectable: false,
+      evented: false,
+      data: { type: "custom-element", placedId: p.id },
+    });
+    fc.add(group);
 
     // Rotation handle for selected custom element (POLISH-01)
     if (isSelected && selectedIds.length === 1) {
@@ -1576,13 +1637,26 @@ export function setLabelLookupCanvas(fc: fabric.Canvas | null): void {
     }).__getCustomElementLabel = (pceId: string): string | null => {
       const cv = _labelLookupFc;
       if (!cv) return null;
-      const obj = cv.getObjects().find(
-        (o) =>
-          (o as unknown as { data?: { type?: string; pceId?: string } }).data
-            ?.type === "custom-element-label" &&
-          (o as unknown as { data?: { pceId?: string } }).data?.pceId === pceId,
-      );
-      // FabricText stores the rendered string in `text`.
+      // Phase 89 D-03: label now lives inside the per-element fabric.Group;
+      // walk groups recursively to find the FabricText child.
+      const matches = (o: unknown): boolean => {
+        const data = (o as { data?: { type?: string; pceId?: string } }).data;
+        return data?.type === "custom-element-label" && data?.pceId === pceId;
+      };
+      const search = (objs: fabric.Object[]): fabric.Object | undefined => {
+        for (const o of objs) {
+          if (matches(o)) return o;
+          // fabric.Group exposes getObjects(); recurse.
+          const inner = (o as unknown as { getObjects?: () => fabric.Object[] })
+            .getObjects;
+          if (typeof inner === "function") {
+            const hit = search(inner.call(o));
+            if (hit) return hit;
+          }
+        }
+        return undefined;
+      };
+      const obj = search(cv.getObjects());
       return obj ? ((obj as unknown as { text?: string }).text ?? null) : null;
     };
   }
