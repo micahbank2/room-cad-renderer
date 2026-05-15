@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: completed
-last_updated: "2026-05-15T04:00:08.333Z"
+last_updated: "2026-05-15T13:47:24.030Z"
 last_activity: 2026-05-15
 progress:
   total_phases: 20
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 
 ## Current Position
 
-Phase: 999.1
-Plan: Not started
-Milestone: v1.21 Sidebar IA & Contextual Surfaces — COMPLETE
-Phases: 81 complete; 82 complete; 83 complete; 84 complete
-Status: Phase 84 COMPLETE — Sidebar tool-bound contextual visibility (D-02 gating + D-04 product-library forceOpen). v1.21 final phase shipped.
+Phase: 86 (columns-v1-20)
+Plan: 86-01 COMPLETE; next 86-02 (rendering)
+Milestone: v1.20 — Phase 86 Wave 1 shipped (schema + store + tests). Final v1.20 phase.
+Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86-01 complete
+Status: Phase 86 Plan 01 COMPLETE — Column type + RoomDoc.columns + snapshot v10 seed-empty migration + 13 D-06 store actions + 19 GREEN tests. RED contract pinned for 86-02 (tool) and 86-03 (rendering + UI).
 Last activity: 2026-05-15
 
 ## Decisions
@@ -61,6 +61,7 @@ Last activity: 2026-05-15
 - [Phase 85]: Plan 85-02: Position section now defaultOpen so X/Y inputs are mountable + match the 'type all 5 numbers at once' workflow
 - [Phase 85]: Plan 85-02: fixed numericInputDrivers double-commit bug (was firing both el.blur() and synthetic focusout, doubling history); restored single-undo invariant
 - [Phase 85]: Plan 85-03: combine Tasks 1+2 into one commit (same file, same import block); Position section default-open (mirrors Wave 2); X/Y use generic updatePlacedCustomElement (no dedicated CE mover action). Phase 85 COMPLETE — PARAM-01/02/03 shipped for both products + custom elements.
+- [Phase 86]: Plan 86-01 (Wave 1 schema + store, COL-01/02/03 RED-first): Column type added with all D-05 fields (id, position, widthFt, depthFt, heightFt, rotation degrees, shape "box"|"cylinder", materialId?, name?, savedCamera*); RoomDoc.columns?: Record<string, Column> field; snapshot version 9 → 10; migrateV9ToV10 seed-empty per RoomDoc (NOT a passthrough — mirrors Phase 60 v3→v4 stair migration); ToolType union widened with "column"; 13 D-06 store actions + NoHistory siblings line-for-line mirror of stair pattern (clamp [0.25, 50] for size axes — narrower than stair's [0.5, 20] floor); clearSavedCameraNoHistory kind union widened to "column"; clearColumnOverrides D-03 resets heightFt to room.wallHeight. 19 new GREEN tests (6 migration + 13 store actions). 1095 unit tests passing (no regressions). 4 atomic commits.
 
 ## Performance Metrics
 
@@ -89,6 +90,7 @@ Last activity: 2026-05-15
 | Phase 85 P01 | ~25min | 6 tasks | 10 files |
 | Phase 85 P02 | 10min | 3 tasks | 4 files |
 | Phase 85 P03 | 6min | 3 tasks | 1 files |
+| Phase 86 P01 | ~18min | 4 tasks | 9 files |
 
 ## v1.20 Roadmap
 
