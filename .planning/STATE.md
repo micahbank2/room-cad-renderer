@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: completed
-stopped_at: Completed 86-03-PLAN.md (Wave 3 — ColumnInspector + Tree + Toolbar) — v1.20 milestone COMPLETE
-last_updated: "2026-05-15T15:15:20.198Z"
+stopped_at: Completed 87-01-PLAN.md — theme toggle + Settings popover shipped (standalone polish phase)
+last_updated: "2026-05-15T16:09:00.000Z"
 last_activity: 2026-05-15
 progress:
-  total_phases: 20
-  completed_phases: 13
-  total_plans: 48
-  completed_plans: 45
+  total_phases: 21
+  completed_phases: 14
+  total_plans: 49
+  completed_plans: 46
 ---
 
 # Project State
@@ -24,13 +24,13 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 
 ## Current Position
 
-Phase: 999.1
-Plan: Not started
-Milestone: v1.20 Surface Depth & Architectural Expansion — COMPLETE (Phases 78, 79, 80, 86 all shipped). Next milestone TBD.
-Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86 complete (all 3 waves)
-Status: Phase 86 Plan 03 COMPLETE — ColumnInspector with Dimensions/Material/Rotation tabs + RightInspector dispatch + Columns group in Rooms tree (buildRoomTree + RoomsTreePanel + savedCameraSet + focusOnColumn) + FloatingToolbar Cuboid Column button. 1107 vitest passing (+12 new) + 4 e2e GREEN (2 placement + 2 lifecycle). Jessica can place / select / edit / rename / camera-save / focus / delete a column entirely through the visible UI. v1.20 milestone closed.
+Phase: 87 (standalone polish — no active milestone)
+Plan: Complete
+Milestone: v1.20 Surface Depth & Architectural Expansion — COMPLETE. Phase 87 ships as standalone polish phase per D-01.
+Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86 complete; 87 complete (1 plan)
+Status: Phase 87 Plan 01 COMPLETE — Settings gear button + SettingsPopover (Light/Dark/System SegmentedControl) wired to useTheme(); removed .light force-wrappers from WelcomeScreen + ProjectManager + HelpPage (D-04). 6 unit tests + 3 e2e tests GREEN. 1113 vitest passing (+6 new). All 5 THEME requirements traced. Jessica can flip themes from the gear button; choice persists across reload; HelpPage/Welcome/ProjectManager now inherit the .dark cascade.
 Last activity: 2026-05-15
-Stopped at: Completed 86-03-PLAN.md (Wave 3 — ColumnInspector + Tree + Toolbar) — v1.20 milestone COMPLETE
+Stopped at: Completed 87-01-PLAN.md — theme toggle + Settings popover shipped (standalone polish phase)
 
 ## Decisions
 
@@ -68,6 +68,7 @@ Stopped at: Completed 86-03-PLAN.md (Wave 3 — ColumnInspector + Tree + Toolbar
 - [Phase 86]: Phase 86-02: Column hit-test inserted BEFORE wall in selectTool — D-01 Pitfall 4 (column wins when cursor in both); rotated AABB via cos/sin into local frame
 - [Phase 86]: Phase 86-02: Column drag uses Phase 31 transaction pattern (empty updateColumn at drag-start + moveColumnNoHistory mid-stroke); no fast-path (cheap redraw)
 - [Phase 86]: Phase 86-03: ColumnInspector with Dimensions/Material/Rotation tabs (D-08) mounts via RightInspector keyed on column.id; Reset-to-wall-height button (D-03) single-history-push verified by 12-case vitest suite; Columns group emitted in Rooms tree mirror of Phase 60 Stairs pattern; FloatingToolbar Cuboid Column button reads room.wallHeight at click time and bridges via setPendingColumn → setTool('column'); no C keyboard shortcut (collides with Ceiling — D-07 deferral)
+- [Phase 87]: Plan 87-01 (THEME-01..05): standalone polish phase. SettingsPopover component (~70 lines, src/components/SettingsPopover.tsx) extracted as its own file (vs research's inline-in-TopBar recommendation) to anticipate future settings rows. D-03 honored — popover stays open after segment click (deliberately different from Phase 83 Snap auto-close, because theme is a "try it" choice). D-04 — three .light force-wrappers removed (WelcomeScreen:55, ProjectManager:69, HelpPage:83); .light CSS class definition preserved as reserved utility. 6 unit + 3 e2e tests; 1113/1113 vitest passing.
 
 ## Performance Metrics
 
@@ -98,6 +99,7 @@ Stopped at: Completed 86-03-PLAN.md (Wave 3 — ColumnInspector + Tree + Toolbar
 | Phase 85 P03 | 6min | 3 tasks | 1 files |
 | Phase 86 P01 | ~18min | 4 tasks | 9 files |
 | Phase 86 P02 | 22 | 3 tasks | 11 files |
+| Phase 87 P01 | ~8min | 4 tasks | 7 files |
 
 ## v1.20 Roadmap
 
@@ -128,4 +130,4 @@ Stopped at: Completed 86-03-PLAN.md (Wave 3 — ColumnInspector + Tree + Toolbar
 
 ## Next Step
 
-v1.21 Sidebar IA & Contextual Surfaces milestone is COMPLETE. Open Phase 84 PR (closes #177) once branch lands. Next milestone candidates: continue v1.20 (Phases 78 P02-P04 remaining PBR maps, Phase 80 parametric controls) or move to v1.22 scope.
+Phase 87 (theme toggle + Settings popover) COMPLETE as standalone polish phase. Ready to open PR (closes the v1.21 / v1.22 theme-toggle backlog item, no GH issue tracks it directly per CONTEXT.md). Next milestone candidates: visual polish for dark mode on Welcome/Help/ProjectManager surfaces (if UAT surfaces contrast issues), or move to next v1.22 scope.

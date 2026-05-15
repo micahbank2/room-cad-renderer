@@ -66,7 +66,7 @@ export default function ProjectManager() {
   }
 
   return (
-    <div className="light space-y-3">
+    <div className="space-y-3">
       <h3 className="font-sans text-base font-medium text-muted-foreground">
         Project
       </h3>

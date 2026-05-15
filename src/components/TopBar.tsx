@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useUIStore } from "@/stores/uiStore";
 import { useCADStore } from "@/stores/cadStore";
 import { useProjectStore } from "@/stores/projectStore";
@@ -5,6 +6,7 @@ import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { exportRenderedImage } from "@/lib/export";
 import { InlineEditableText } from "@/components/ui/InlineEditableText";
 import { Button } from "@/components/ui/Button";
+import { SettingsPopover } from "@/components/SettingsPopover";
 import { PRESETS, type PresetId } from "@/three/cameraPresets";
 import {
   Tooltip,
@@ -99,6 +101,9 @@ export function TopBar({ viewMode }: TopBarProps): JSX.Element {
   const displayValue = draftName ?? activeName;
 
   const show3DControls = viewMode === "3d" || viewMode === "split";
+
+  // Phase 87 THEME-01 — Settings popover open state.
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 h-10 flex items-center justify-between px-3 bg-background/80 backdrop-blur-sm border-b border-border/30">
@@ -208,8 +213,9 @@ export function TopBar({ viewMode }: TopBarProps): JSX.Element {
           <TooltipContent side="bottom">Help &amp; shortcuts</TooltipContent>
         </Tooltip>
 
-        {/* Phase 80 audit removal: Settings button had no onClick handler — dead.
-            Re-introduce when the theme/settings drawer ships (tracked in v1.21 backlog). */}
+        {/* Phase 87 THEME-01 — Settings popover (theme toggle: Light / Dark / System) */}
+        <SettingsPopover open={settingsOpen} onOpenChange={setSettingsOpen} />
+
       </div>
     </header>
   );

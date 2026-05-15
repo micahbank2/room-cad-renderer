@@ -77,10 +77,8 @@ export default function HelpPage() {
     : SECTIONS;
 
   return (
-    // Force light mode for the help page (same pattern as WelcomeScreen).
-    // This gives a clean, readable SaaS-docs feel regardless of the user's
-    // current app theme.
-    <div className="light min-h-screen bg-background text-foreground flex flex-col font-sans">
+    // Phase 87 D-04: respects user theme choice (was force-light prior to Phase 87).
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
       {/* ------------------------------------------------------------------ */}
       {/* Top bar                                                             */}
       {/* ------------------------------------------------------------------ */}
