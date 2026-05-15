@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: completed
-last_updated: "2026-05-15T02:50:35.081Z"
+last_updated: "2026-05-15T03:29:38.489Z"
 last_activity: 2026-05-15
 progress:
   total_phases: 20
@@ -56,6 +56,7 @@ Last activity: 2026-05-15
 - [Phase 83]: Plan 83-01 (IA-06 + IA-07): FloatingToolbar restructured to 5 banded groups (Drawing/Measure/Structure/View/Utility) with mixed-case always-on labels; new icon-touch Button variant (h-11 w-11 = 44px WCAG 2.5.5 AAA); flex-wrap container with max-w-[min(calc(100vw-24px),1240px)]; all TooltipContent uses side="top" + collisionPadding={8}; WindowPresetSwitcher anchor bottom-32 -> bottom-44 to clear wrapped toolbar; all 18 pre-Phase-83 data-testids preserved verbatim; 6 additive toolbar-* testids added; 1012/1012 vitest pass; e2e spec committed. Resumed after prior executor crashed with 529 overload mid-Task-2; verified disk state then atomic-committed remaining tasks.
 - [Phase 83]: Plan 83-02 (Phase 81 D-05 carry-over closure): Snap migrated from sidebar-snap PanelSection to FloatingToolbar Utility group as Radix Popover button (lucide Magnet icon, w-32 popover, 4 options Off/3in/6in/1ft, active=Check marker). Sidebar.tsx loses gridSnap/setGridSnap selectors + sidebar-snap PanelSection; Sidebar.ia02.test fixture trimmed 7→6 panels. New tests/e2e/specs/toolbar-snap.spec.ts (3 chromium-dev cases, 4.4s, all pass). Tooltip text dynamic per gridSnap value. Phase 83 COMPLETE; IA-06+IA-07 issues #175/#176 closeable on PR merge.
 - [Phase 84]: Plan 84-01 (IA-08): tool-bound sidebar contextual visibility. Sidebar.tsx conditionally mounts 3 PanelSections per D-02 — sidebar-custom-elements visible when activeTool ∈ {select, product}; sidebar-framed-art + sidebar-wainscoting visible only when activeTool=select AND a wall is selected (full unmount, not CSS-hidden). PanelSection.tsx gains optional forceOpen prop (D-04): when true, renders expanded regardless of persisted state, NEVER mutates localStorage; sidebar-product-library passes forceOpen={activeTool === "product"} for auto-expand. New tests/Sidebar.ia08.test.tsx (19 cases) + tests/e2e/specs/sidebar-contextual-visibility.spec.ts. Phase 81 Sidebar.ia02.test.tsx split into default + wall-selected regimes (9 cases). 27/27 Phase 81+84 tests GREEN, 0 regressions vs HEAD (2 pre-existing transform failures in SaveIndicator + SidebarProductPicker are baseline, not Phase-84-induced). Phase 84 COMPLETE; v1.21 milestone fully shipped (8/8 IA requirements). Closes #177 on PR merge.
+- [Phase 85]: [Phase 85]: Plan 85-01 (Wave 0 RED): snapshot v8->v9 + heightFtOverride on PlacedProduct + PlacedCustomElement + height store actions + StrictMode-safe __driveNumericInput test driver + 22 RED unit tests + 3 RED e2e tests. All schema/migration tests GREEN (28 total, 11 new + 17 existing); all 22 inspector RED tests fail with expected 'no element' signal. Zero regressions (1054/1054 pre-RED suite passing). 3 atomic commits: schema/store (25dc8bb), test driver (1dca148), RED tests (4c00087).
 
 ## Performance Metrics
 
@@ -81,6 +82,7 @@ Last activity: 2026-05-15
 | Phase 83 P01 | ~25min (resumed) | 4 tasks | 4 files |
 | Phase 83 P02 | 13min | 3 tasks | 4 files |
 | Phase 84 P01 | ~10min | 4 tasks | 5 files |
+| Phase 85 P01 | ~25min | 6 tasks | 10 files |
 
 ## v1.20 Roadmap
 

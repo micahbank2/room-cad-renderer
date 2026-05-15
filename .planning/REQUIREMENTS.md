@@ -67,9 +67,9 @@ These were considered for v1.20 and explicitly deferred:
 | PBR-04 | TBD | TBD | Not started |
 | WIN-01 | 79 | 01 | RED tests landed |
 | WIN-02 | 79 | 01 | RED tests landed |
-| PARAM-01 | TBD | TBD | Not started |
-| PARAM-02 | TBD | TBD | Not started |
-| PARAM-03 | TBD | TBD | Not started |
+| PARAM-01 | 85 | 01 | RED tests + schema landed |
+| PARAM-02 | 85 | 01 | RED tests + schema landed |
+| PARAM-03 | 85 | 01 | RED tests + schema landed |
 | COL-01 | TBD | TBD | Not started |
 | COL-02 | TBD | TBD | Not started |
 | COL-03 | TBD | TBD | Not started |
