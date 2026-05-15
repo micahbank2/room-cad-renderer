@@ -10,7 +10,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { render, fireEvent, act, screen } from "@testing-library/react";
 import { useCADStore, resetCADStoreForTests } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
-import PropertiesPanel from "@/components/PropertiesPanel";
+import RightInspector from "@/components/RightInspector";
 import type { Ceiling, Point } from "@/types/cad";
 
 const CEILING_ID = "ceiling_pp_test";
@@ -55,7 +55,7 @@ describe("Phase 65 PropertiesPanel — ceiling-resize section", () => {
   });
 
   it("C1: WIDTH + DEPTH inputs render; keystroke writes NoHistory, Enter commits via history", async () => {
-    render(<PropertiesPanel productLibrary={[]} viewMode={"3d" as never} />);
+    render(<RightInspector productLibrary={[]} viewMode="3d" />);
 
     const widthInput = screen.getByLabelText(/^WIDTH$/i) as HTMLInputElement;
     const depthInput = screen.getByLabelText(/^DEPTH$/i) as HTMLInputElement;
@@ -87,7 +87,7 @@ describe("Phase 65 PropertiesPanel — ceiling-resize section", () => {
     // Re-seed with widthFtOverride already set so the button shows up.
     seedRectCeilingAndSelect({ widthFtOverride: 15 });
 
-    render(<PropertiesPanel productLibrary={[]} viewMode={"3d" as never} />);
+    render(<RightInspector productLibrary={[]} viewMode="3d" />);
 
     const button = screen.getByText(/^Reset size$/i);
     expect(button).toBeTruthy();
@@ -105,7 +105,7 @@ describe("Phase 65 PropertiesPanel — ceiling-resize section", () => {
   });
 
   it("C2b: RESET_SIZE button is NOT rendered when there are no overrides", () => {
-    render(<PropertiesPanel productLibrary={[]} viewMode={"3d" as never} />);
+    render(<RightInspector productLibrary={[]} viewMode="3d" />);
     expect(screen.queryByText(/^Reset size$/i)).toBeNull();
   });
 });
