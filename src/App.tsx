@@ -265,7 +265,6 @@ export default function App() {
               <div className={`${viewMode === "split" ? "w-1/2" : "flex-1"} h-full relative flex`}>
                 <div className="flex-1 h-full relative">
                   <FabricCanvas productLibrary={productLibrary} />
-                  <FloatingToolbar viewMode={viewMode} onViewChange={setViewMode} />
                   {/* Phase 79 WIN-PRESETS-01: floating preset chips when Window tool active */}
                   {activeTool === "window" && <WindowPresetSwitcher />}
                 </div>
@@ -317,6 +316,9 @@ export default function App() {
                 </AnimatePresence>
               </div>
             )}
+            {/* Phase 88 D-03: hoisted toolbar mount — renders for 2D, 3D, and Split.
+                FloatingToolbar is `position: fixed` so it self-anchors to the viewport. */}
+            <FloatingToolbar viewMode={viewMode} onViewChange={setViewMode} />
             </div>
           </div>
         )}

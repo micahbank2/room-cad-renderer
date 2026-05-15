@@ -157,6 +157,7 @@ export function FloatingToolbar({ viewMode, onViewChange }: Props): JSX.Element 
   return (
     <TooltipProvider>
       <div
+        data-testid="floating-toolbar"
         className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50
                    flex flex-wrap items-start justify-center gap-3
                    rounded-2xl border border-border bg-background/90
