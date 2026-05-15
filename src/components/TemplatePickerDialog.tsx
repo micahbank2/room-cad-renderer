@@ -58,7 +58,8 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
       const tpl = ROOM_TEMPLATES[id];
       const roomId = `room_${uid()}`;
       const snap: CADSnapshot = {
-        version: 2,
+        // Phase 86 D-04: write at current schema version (10).
+        version: 10,
         rooms: {
           [roomId]: {
             id: roomId,

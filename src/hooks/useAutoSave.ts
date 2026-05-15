@@ -27,7 +27,8 @@ export function useAutoSave(): void {
         try {
           const st = useCADStore.getState() as any;
           await saveProject(id, name, {
-            version: 2,
+            // Phase 86 D-04: persist at current schema version (10).
+            version: 10,
             rooms: st.rooms,
             activeRoomId: st.activeRoomId,
             ...(st.customElements ? { customElements: st.customElements } : {}),
