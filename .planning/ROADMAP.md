@@ -502,7 +502,7 @@
 | 80. Parametric Product Controls | TBD | v1.20 active   | — |
 | 81. Columns & Pillars | 3/3 | Complete    | 2026-05-13 |
 | 82. Inspector Rebuild (IA-04 + IA-05) | 3/3 | Complete    | 2026-05-14 |
-| 83. Floating Toolbar Redesign (IA-06 + IA-07) | 1/2 | In progress | 2026-05-14 |
+| 83. Floating Toolbar Redesign (IA-06 + IA-07) | 2/2 | Complete   | 2026-05-15 |
 
 ## Backlog
 
