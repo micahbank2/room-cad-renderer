@@ -1780,6 +1780,8 @@ export const useCADStore = create<CADState>()((set) => ({
           if (doc.ceilings) delete doc.ceilings[id];
           // Phase 60 STAIRS-01 — bulk-delete stairs too.
           if (doc.stairs) delete doc.stairs[id];
+          // Phase 86 COL-01 — bulk-delete columns too.
+          if (doc.columns) delete doc.columns[id];
         }
       })
     ),
@@ -2079,6 +2081,14 @@ const EMPTY_STAIRS: Record<string, Stair> = Object.freeze({});
 export const useActiveStairs = () =>
   useCADStore((s) =>
     s.activeRoomId ? s.rooms[s.activeRoomId]?.stairs ?? EMPTY_STAIRS : EMPTY_STAIRS,
+  );
+
+// Phase 86 COL-01: active-room columns selector. Defensive `?? {}` per
+// Phase 60 Pitfall 2 — ensures consumers never see `undefined`.
+const EMPTY_COLUMNS: Record<string, Column> = Object.freeze({});
+export const useActiveColumns = () =>
+  useCADStore((s) =>
+    s.activeRoomId ? s.rooms[s.activeRoomId]?.columns ?? EMPTY_COLUMNS : EMPTY_COLUMNS,
   );
 
 // Non-hook for imperative paths (tools)

@@ -31,6 +31,8 @@ import { activateDoorTool } from "./tools/doorTool";
 import { activateWindowTool } from "./tools/windowTool";
 import { activateCeilingTool } from "./tools/ceilingTool";
 import { activateStairTool, setStairToolLibrary } from "./tools/stairTool";
+// Phase 86 COL-01 (D-01): column placement tool.
+import { activateColumnTool } from "./tools/columnTool";
 // Phase 61 OPEN-01 (D-09): three new wall-cutout placement tools.
 import { activateArchwayTool } from "./tools/archwayTool";
 import { activatePassthroughTool } from "./tools/passthroughTool";
@@ -637,7 +639,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const cursorClass =
     activeTool === "wall" || activeTool === "product" ||
     activeTool === "door" || activeTool === "window" ||
-    activeTool === "stair" ||
+    activeTool === "stair" || activeTool === "column" ||
     activeTool === "archway" || activeTool === "passthrough" || activeTool === "niche"
       ? "cursor-crosshair"
       : "";
@@ -851,6 +853,8 @@ function activateCurrentTool(
     case "window":  return activateWindowTool(fc, scale, origin);
     case "ceiling": return activateCeilingTool(fc, scale, origin);
     case "stair":       return activateStairTool(fc, scale, origin);
+    // Phase 86 COL-01
+    case "column":      return activateColumnTool(fc, scale, origin);
     // Phase 61 OPEN-01 (D-09)
     case "archway":     return activateArchwayTool(fc, scale, origin);
     case "passthrough": return activatePassthroughTool(fc, scale, origin);
