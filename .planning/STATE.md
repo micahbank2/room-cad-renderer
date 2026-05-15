@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.19
-milestone_name: Material Linking & Library Rebuild
+milestone: v1.20
+milestone_name: Surface Depth & Architectural Expansion
 status: completed
-stopped_at: Completed 86-02-PLAN.md (Wave 2 — column tool + 2D/3D + selection)
-last_updated: "2026-05-15T14:46:46.719Z"
+stopped_at: Completed 86-03-PLAN.md (Wave 3 — ColumnInspector + Tree + Toolbar) — v1.20 milestone COMPLETE
+last_updated: "2026-05-15T15:02:00.000Z"
 last_activity: 2026-05-15
 progress:
   total_phases: 20
-  completed_phases: 13
+  completed_phases: 14
   total_plans: 48
-  completed_plans: 45
+  completed_plans: 46
 ---
 
 # Project State
@@ -24,13 +24,13 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 
 ## Current Position
 
-Phase: 86 (columns-v1-20)
-Plan: 86-02 COMPLETE; next 86-03 (toolbar + inspector + Rooms tree)
-Milestone: v1.20 — Phase 86 Waves 1 + 2 shipped (schema + store + tool + 2D/3D + selection). Final v1.20 phase.
-Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86-01 complete; 86-02 complete
-Status: Phase 86 Plan 02 COMPLETE — columnTool + columnSymbol + renderColumns + ColumnMesh + RoomGroup iteration + selectTool column branch + GREEN e2e placement spec. 1095 vitest passing + 2 e2e GREEN. Plan 86-03 wires the user-facing toolbar / inspector / Rooms tree to close the loop.
+Phase: 86 (columns-v1-20) — COMPLETE
+Plan: 86-03 COMPLETE — v1.20 milestone CLOSED.
+Milestone: v1.20 Surface Depth & Architectural Expansion — COMPLETE (Phases 78, 79, 80, 86 all shipped). Next milestone TBD.
+Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86 complete (all 3 waves)
+Status: Phase 86 Plan 03 COMPLETE — ColumnInspector with Dimensions/Material/Rotation tabs + RightInspector dispatch + Columns group in Rooms tree (buildRoomTree + RoomsTreePanel + savedCameraSet + focusOnColumn) + FloatingToolbar Cuboid Column button. 1107 vitest passing (+12 new) + 4 e2e GREEN (2 placement + 2 lifecycle). Jessica can place / select / edit / rename / camera-save / focus / delete a column entirely through the visible UI. v1.20 milestone closed.
 Last activity: 2026-05-15
-Stopped at: Completed 86-02-PLAN.md (Wave 2 — column tool + 2D/3D + selection)
+Stopped at: Completed 86-03-PLAN.md (Wave 3 — ColumnInspector + Tree + Toolbar) — v1.20 milestone COMPLETE
 
 ## Decisions
 
@@ -67,6 +67,7 @@ Stopped at: Completed 86-02-PLAN.md (Wave 2 — column tool + 2D/3D + selection)
 - [Phase 86]: Phase 86-02: Column.position IS bbox center (no Stair-style UP-axis asymmetry) — simpler tool + render math; no snap-engine integration in v1.20
 - [Phase 86]: Phase 86-02: Column hit-test inserted BEFORE wall in selectTool — D-01 Pitfall 4 (column wins when cursor in both); rotated AABB via cos/sin into local frame
 - [Phase 86]: Phase 86-02: Column drag uses Phase 31 transaction pattern (empty updateColumn at drag-start + moveColumnNoHistory mid-stroke); no fast-path (cheap redraw)
+- [Phase 86]: Phase 86-03: ColumnInspector with Dimensions/Material/Rotation tabs (D-08) mounts via RightInspector keyed on column.id; Reset-to-wall-height button (D-03) single-history-push verified by 12-case vitest suite; Columns group emitted in Rooms tree mirror of Phase 60 Stairs pattern; FloatingToolbar Cuboid Column button reads room.wallHeight at click time and bridges via setPendingColumn → setTool('column'); no C keyboard shortcut (collides with Ceiling — D-07 deferral)
 
 ## Performance Metrics
 

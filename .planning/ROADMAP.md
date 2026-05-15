@@ -23,7 +23,7 @@
 - ✅ **v1.17 Library + Material Engine** — Phases 67–68 (partial-shipped 2026-05-07; Phases 69 MAT-LINK-01 + 70 LIB-REBUILD-01 deferred to v1.19)
 - ✅ **v1.18 Pascal Visual Parity** — Phases 71–76 (shipped 2026-05-08) — chrome-only rewrite to emulate pascalorg/editor
 - 🚧 **v1.19 Material Linking & Library Rebuild** — Phases 69, 70, 77 (in progress) — finish slots on placed products + 3-tab library rebuild
-- 🚧 **v1.20 Surface Depth & Architectural Expansion** — Phases 78, 79 (in progress) — PBR maps + window presets shipped; parametric controls + columns remaining
+- ✅ **v1.20 Surface Depth & Architectural Expansion** — Phases 78, 79, 80, 86 (shipped 2026-05-15) — PBR maps + window presets + parametric controls + columns all complete; v1.20 milestone closed by Phase 86 Plan 03
 - ✅ **v1.21 Sidebar IA & Contextual Surfaces** — Phases 81–84 (shipped 2026-05-14) — rebuilt left + right panels and floating toolbar with Figma/Miro-style contextual visibility; 8/8 IA requirements complete (IA-02 through IA-08); surfaced from Phase 79 Jessica UAT feedback — see [milestones/v1.21-REQUIREMENTS.md](milestones/v1.21-REQUIREMENTS.md)
 
 ---
@@ -377,7 +377,7 @@
 
 ---
 
-## v1.20 — Surface Depth & Architectural Expansion 🚧
+## v1.20 — Surface Depth & Architectural Expansion ✅
 
 **Goal:** Deepen material realism with PBR maps (AO + displacement), speed up window placement with standard-size presets, enable precise numeric sizing of placed products, and add columns/pillars as a new architectural element type.
 
@@ -434,7 +434,7 @@
 **Plans:** TBD (v1.20)
 **UI hint:** yes
 
-#### Phase 81: Columns & Pillars (COL-01) — v1.20 ACTIVE
+#### Phase 86: Columns & Pillars (COL-01) — v1.20 COMPLETE (2026-05-15)
 
 **Goal:** Jessica places a structural column in a room, sees it in both 2D floor plan and 3D walk-through, and can resize/reposition it like any other element.
 **Depends on:** Phase 60 (Stair entity pattern — new top-level entity, store actions, 2D + 3D rendering), Phase 67/68 (material finish slot pattern from PlacedProduct), snapshot migration pattern (v7→v8 expected)
@@ -499,11 +499,13 @@
 | 77. Test Suite Cleanup | 1/1 | Complete   | 2026-05-08 |
 | 78. PBR Maps | 1/4 | Complete    | 2026-05-13 |
 | 79. Window Presets | 3/3 | Complete    | 2026-05-13 |
-| 80. Parametric Product Controls | TBD | v1.20 active   | — |
+| 80. Parametric Product Controls | n/a | Renumbered → Phase 85   | — |
 | 81. Columns & Pillars | 3/3 | Complete    | 2026-05-13 |
 | 82. Inspector Rebuild (IA-04 + IA-05) | 3/3 | Complete    | 2026-05-14 |
 | 83. Floating Toolbar Redesign (IA-06 + IA-07) | 2/2 | Complete    | 2026-05-15 |
 | 84. Contextual Sidebar Visibility (IA-08) | 1/1 | Complete    | 2026-05-15 |
+| 85. Parametric Product Controls (PARAM-01) | 3/3 | Complete    | 2026-05-15 |
+| 86. Columns & Pillars (COL-01) | 3/3 | Complete    | 2026-05-15 |
 
 ## Backlog
 
