@@ -1,11 +1,11 @@
 import * as fabric from "fabric";
-
-const GRID_COLOR = "#1f1e2a";
-const GRID_COLOR_MAJOR = "#292935";
-const ROOM_OUTLINE = "#484554";
+import type { CanvasTheme } from "./canvasTheme";
 
 /**
- * Draw the grid and room outline on the dark canvas.
+ * Draw the grid and room outline. Colors come from the theme bridge so the
+ * canvas repaints when the user flips Light/Dark in the Settings popover.
+ * Phase 88 D-04: hardcoded GRID_COLOR/GRID_COLOR_MAJOR/ROOM_OUTLINE constants
+ * removed in favor of theme.gridMinor/gridMajor/roomOutline.
  */
 export function drawGrid(
   fc: fabric.Canvas,
@@ -13,7 +13,8 @@ export function drawGrid(
   roomH: number,
   scale: number,
   origin: { x: number; y: number },
-  showGrid: boolean
+  showGrid: boolean,
+  theme: CanvasTheme,
 ) {
   const rw = roomW * scale;
   const rh = roomH * scale;
@@ -26,7 +27,7 @@ export function drawGrid(
         new fabric.Line(
           [origin.x + x * scale, origin.y, origin.x + x * scale, origin.y + rh],
           {
-            stroke: isMajor ? GRID_COLOR_MAJOR : GRID_COLOR,
+            stroke: isMajor ? theme.gridMajor : theme.gridMinor,
             strokeWidth: isMajor ? 0.5 : 0.25,
             selectable: false,
             evented: false,
@@ -41,7 +42,7 @@ export function drawGrid(
         new fabric.Line(
           [origin.x, origin.y + y * scale, origin.x + rw, origin.y + y * scale],
           {
-            stroke: isMajor ? GRID_COLOR_MAJOR : GRID_COLOR,
+            stroke: isMajor ? theme.gridMajor : theme.gridMinor,
             strokeWidth: isMajor ? 0.5 : 0.25,
             selectable: false,
             evented: false,
@@ -60,7 +61,7 @@ export function drawGrid(
       width: rw,
       height: rh,
       fill: "transparent",
-      stroke: ROOM_OUTLINE,
+      stroke: theme.roomOutline,
       strokeWidth: 1.5,
       selectable: false,
       evented: false,

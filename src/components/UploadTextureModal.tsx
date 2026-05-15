@@ -313,7 +313,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
                   <button
                     type="button"
                     onClick={openFilePicker}
-                    className="text-foreground text-[11px] font-sans text-left hover:text-foreground"
+                    className="text-foreground text-[13px] font-sans text-left hover:text-foreground"
                   >
                     Change
                   </button>
@@ -351,7 +351,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
               />
 
               {fileError && (
-                <p className="font-sans text-[11px] text-error">{fileError}</p>
+                <p className="font-sans text-[13px] text-error">{fileError}</p>
               )}
             </>
           )}
@@ -387,7 +387,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
             >
               TILE SIZE
             </label>
-            <p className="font-body text-[11px] text-muted-foreground/60">
+            <p className="font-body text-[13px] text-muted-foreground/60">
               {COPY.tileHelper}
             </p>
             <input
@@ -405,7 +405,7 @@ export function UploadTextureModal(props: UploadTextureModalProps): JSX.Element 
               }`}
             />
             {tileSizeError && (
-              <p className="font-sans text-[11px] text-error">{tileSizeError}</p>
+              <p className="font-sans text-[13px] text-error">{tileSizeError}</p>
             )}
           </div>
         </div>

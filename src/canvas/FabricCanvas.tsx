@@ -14,9 +14,11 @@ import {
   getActiveRoomDoc,
 } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
+import { useTheme } from "@/hooks/useTheme";
+import { getCanvasTheme } from "./canvasTheme";
 import { drawGrid } from "./grid";
 import { drawRoomDimensions } from "./dimensions";
-import { renderWalls, renderProducts, renderCeilings, renderCustomElements, renderStairs, renderColumns, renderMeasureLines, renderAnnotations, renderRoomAreaOverlay, renderFloor, setLabelLookupCanvas } from "./fabricSync";
+import { renderWalls, renderProducts, renderCeilings, renderCustomElements, renderStairs, renderColumns, renderMeasureLines, renderAnnotations, renderRoomAreaOverlay, renderFloor, setLabelLookupCanvas, setFabricSyncTheme } from "./fabricSync";
 import { useMaterials } from "@/hooks/useMaterials";
 import { activateWallTool } from "./tools/wallTool";
 import {
@@ -135,6 +137,10 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const showGrid = useUIStore((s) => s.showGrid);
   const userZoom = useUIStore((s) => s.userZoom);
   const panOffset = useUIStore((s) => s.panOffset);
+  // Phase 88 D-04: theme subscription. Flipping Settings → Light/Dark updates
+  // resolved → adds it to redraw deps → forces a redraw with fresh CSS-token
+  // values pulled via getCanvasTheme().
+  const { resolved } = useTheme();
 
   // Keep select tool's product library reference up to date
   useEffect(() => {
@@ -182,7 +188,18 @@ export default function FabricCanvas({ productLibrary }: Props) {
 
     fc.setDimensions({ width: cW, height: cH });
     fc.clear();
-    fc.backgroundColor = "#12121d";
+    // Phase 88 D-04: read CSS tokens fresh per redraw (no module cache —
+    // CLAUDE.md StrictMode rule). Thread theme into fabricSync via a
+    // per-frame setter so internal helpers don't need signature changes.
+    const canvasTheme = getCanvasTheme();
+    setFabricSyncTheme(canvasTheme);
+    fc.backgroundColor = canvasTheme.background;
+
+    // Phase 88 — test-mode driver for e2e canvas-bg probe.
+    if (import.meta.env.MODE === "test") {
+      (window as unknown as { __driveGetCanvasBg?: () => string }).__driveGetCanvasBg =
+        () => fc.backgroundColor as string;
+    }
 
     const userZoom = useUIStore.getState().userZoom;
     const panOffset = useUIStore.getState().panOffset;
@@ -213,10 +230,10 @@ export default function FabricCanvas({ productLibrary }: Props) {
     }
 
     // 1. Grid
-    drawGrid(fc, room.width, room.length, scale, origin, showGrid);
+    drawGrid(fc, room.width, room.length, scale, origin, showGrid, canvasTheme);
 
     // 2. Room dimension labels
-    drawRoomDimensions(fc, room.width, room.length, scale, origin);
+    drawRoomDimensions(fc, room.width, room.length, scale, origin, canvasTheme);
 
     // 3a. Phase 68 Plan 05 — Floor surface (when room.floorMaterialId set).
     //     Rendered before walls so the wall polygons layer above.
@@ -275,7 +292,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // Hotfix #2 — record the tool we just activated so the next redraw can
     // tell whether activeTool changed (affects the drag short-circuit above).
     prevActiveToolRef.current = activeTool as ToolType;
-  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog, productImageTick, stairs, columns, hiddenIds, measureLines, annotations, editingAnnotationId, materials, activeDoc, hoveredEntityId]);
+  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog, productImageTick, stairs, columns, hiddenIds, measureLines, annotations, editingAnnotationId, materials, activeDoc, hoveredEntityId, resolved]);
 
   // Init canvas
   useEffect(() => {
@@ -325,6 +342,9 @@ export default function FabricCanvas({ productLibrary }: Props) {
       fcRef.current = null;
       if (import.meta.env.MODE === "test") {
         delete (window as unknown as { __fabricCanvas?: fabric.Canvas }).__fabricCanvas;
+        // Phase 88 — clean up the canvas-bg probe driver. Identity check not
+        // needed (single canvas instance per app lifetime).
+        delete (window as unknown as { __driveGetCanvasBg?: () => string }).__driveGetCanvasBg;
       }
     };
   }, []);

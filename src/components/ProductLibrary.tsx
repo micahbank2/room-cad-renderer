@@ -144,7 +144,7 @@ export function ProductLibrary({
               </span>
               <button
                 onClick={onOpenAddModal}
-                className="font-sans text-[10px] tracking-widest px-4 py-2 bg-primary text-primary-foreground rounded-smooth-md hover:opacity-90 active:scale-95 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
+                className="font-sans text-[12px] tracking-widest px-4 py-2 bg-primary text-primary-foreground rounded-smooth-md hover:opacity-90 active:scale-95 transition-all shadow-[0_0_15px_rgba(124,91,240,0.2)]"
               >
                 + ADD PRODUCT
               </button>
@@ -162,7 +162,7 @@ export function ProductLibrary({
                   <TabsTrigger key={tab.id} value={tab.id}>
                     {tab.label}
                     {tab.count > 0 && (
-                      <span className="ml-1 font-mono text-[9px] text-muted-foreground/60">
+                      <span className="ml-1 font-mono text-[11px] text-muted-foreground/60">
                         {tab.count}
                       </span>
                     )}
@@ -177,12 +177,12 @@ export function ProductLibrary({
             {filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full">
                 <Package size={36} className="text-muted-foreground/60 mb-3" /> {/* D-15: substitute for material-symbols 'inventory_2' */}
-                <span className="font-sans text-[10px] text-muted-foreground/60 tracking-widest">
+                <span className="font-sans text-[12px] text-muted-foreground/60 tracking-widest">
                   NO ITEMS FOUND
                 </span>
                 <button
                   onClick={onOpenAddModal}
-                  className="mt-3 font-sans text-[10px] tracking-widest px-4 py-1.5 text-foreground border border-ring rounded-smooth-md hover:bg-accent/10 transition-colors"
+                  className="mt-3 font-sans text-[12px] tracking-widest px-4 py-1.5 text-foreground border border-ring rounded-smooth-md hover:bg-accent/10 transition-colors"
                 >
                   + ADD PRODUCT
                 </button>

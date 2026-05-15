@@ -199,7 +199,7 @@ export default function HelpPage() {
               >
                 in-app help
               </button>{" "}
-              (press <kbd className="bg-muted border border-border rounded px-1 py-0.5 font-mono text-[10px]">?</kbd> while designing).
+              (press <kbd className="bg-muted border border-border rounded px-1 py-0.5 font-mono text-[12px]">?</kbd> while designing).
             </p>
           </div>
         </aside>

@@ -10,6 +10,8 @@ import type {
   MeasureLine,
   Annotation,
 } from "@/types/cad";
+import type { CanvasTheme } from "./canvasTheme";
+import { getCanvasTheme } from "./canvasTheme";
 import { buildMeasureLineGroup, buildAnnotationGroup, buildRoomAreaOverlay } from "./measureSymbols";
 import { buildStairSymbolShapes } from "./stairSymbol";
 import { buildColumnSymbolShapes } from "./columnSymbol";
@@ -112,7 +114,7 @@ export function renderCustomElements(
       top: cy,
       fontSize: 9,
       fontFamily: "IBM Plex Mono",
-      fill: "#e3e0f1",
+      fill: theme().foreground,
       originX: "center",
       originY: "center",
       selectable: false,
@@ -141,7 +143,7 @@ export function renderCustomElements(
         left: hx,
         top: hy,
         radius: 5,
-        fill: "#12121d",
+        fill: theme().cardBg,
         stroke: "#7c5bf0",
         strokeWidth: 2,
         originX: "center",
@@ -164,7 +166,7 @@ export function renderCustomElements(
             top: origin.y + h.y * scale,
             width: 10,
             height: 10,
-            fill: "#12121d",
+            fill: theme().cardBg,
             stroke: "#7c5bf0",
             strokeWidth: 2,
             originX: "center",
@@ -186,7 +188,7 @@ export function renderCustomElements(
             top: origin.y + h.y * scale,
             width: 10,
             height: 10,
-            fill: "#12121d",
+            fill: theme().cardBg,
             stroke: "#7c5bf0",
             strokeWidth: 2,
             originX: "center",
@@ -232,7 +234,7 @@ export function renderCeilings(
     fc.add(
       new fabric.Polygon(pts, {
         fill: baseFill,
-        stroke: isSelected ? "#7c5bf0" : isHovered ? "#7c5bf0" : "#938ea0",
+        stroke: isSelected ? "#7c5bf0" : isHovered ? "#7c5bf0" : theme().dimensionFg,
         strokeWidth: isSelected ? 2 : isHovered ? 2 : 1,
         strokeDashArray: [4, 4],
         selectable: false,
@@ -280,7 +282,7 @@ export function renderCeilings(
               top: origin.y + h.fy * scale,
               width: 10,
               height: 10,
-              fill: "#12121d",
+              fill: theme().cardBg,
               stroke: "#7c5bf0",
               strokeWidth: 2,
               originX: "center",
@@ -296,12 +298,32 @@ export function renderCeilings(
   }
 }
 
-const WALL_FILL = "#343440";
-const WALL_STROKE = "#484554";
+// Phase 88 D-04: theme-invariant brand purple stays inline (selection +
+// preview ghost colors must look identical in light/dark mode).
 const WALL_SELECTED_STROKE = "#7c5bf0";
 const PRODUCT_STROKE = "#7c5bf0";
 const PLACEHOLDER_DASH = [6, 4];
 const REAL_DASH = [4, 3];
+
+/**
+ * Per-redraw theme reference set by FabricCanvas at the top of redraw().
+ * Reset to a fresh CanvasTheme each frame — NOT a cache. Module-level
+ * lifespan is one redraw cycle, after which it's overwritten. This avoids
+ * threading `theme` through every internal helper while still letting
+ * FabricCanvas drive theme resolution from inside its useCallback.
+ */
+let _currentTheme: CanvasTheme | null = null;
+
+/** Called from FabricCanvas.redraw() at the top of each frame. */
+export function setFabricSyncTheme(theme: CanvasTheme): void {
+  _currentTheme = theme;
+}
+
+function theme(): CanvasTheme {
+  // Fallback for legacy callers (tests that don't go through FabricCanvas).
+  // getCanvasTheme() is cheap (~1 ms), so this is fine on the rare cold path.
+  return _currentTheme ?? getCanvasTheme();
+}
 
 /**
  * Render wall segments on the Fabric canvas.
@@ -409,7 +431,7 @@ export function renderWalls(
 
       // Side A half (left side of wall)
       fc.add(new fabric.Polygon([sL, midStart, midEnd, eL], {
-        fill: fillA ?? WALL_FILL,
+        fill: fillA ?? theme().wallFill,
         stroke: undefined,
         strokeWidth: 0,
         selectable: false,
@@ -419,7 +441,7 @@ export function renderWalls(
 
       // Side B half (right side of wall)
       fc.add(new fabric.Polygon([midStart, sR, eR, midEnd], {
-        fill: fillB ?? WALL_FILL,
+        fill: fillB ?? theme().wallFill,
         stroke: undefined,
         strokeWidth: 0,
         selectable: false,
@@ -430,7 +452,7 @@ export function renderWalls(
       // Outline stroke on top of the split halves
       fc.add(new fabric.Polygon(points, {
         fill: "transparent",
-        stroke: isSelected ? WALL_SELECTED_STROKE : isHovered ? "#7c5bf0" : WALL_STROKE,
+        stroke: isSelected ? WALL_SELECTED_STROKE : isHovered ? "#7c5bf0" : theme().wallStroke,
         strokeWidth: isSelected ? 2 : isHovered ? 2 : 1,
         selectable: false,
         evented: false,
@@ -439,8 +461,8 @@ export function renderWalls(
     } else {
       // No per-side paint — single solid polygon
       fc.add(new fabric.Polygon(points, {
-        fill: WALL_FILL,
-        stroke: isSelected ? WALL_SELECTED_STROKE : isHovered ? "#7c5bf0" : WALL_STROKE,
+        fill: theme().wallFill,
+        stroke: isSelected ? WALL_SELECTED_STROKE : isHovered ? "#7c5bf0" : theme().wallStroke,
         strokeWidth: isSelected ? 2 : isHovered ? 2 : 1,
         selectable: false,
         evented: false,
@@ -527,7 +549,7 @@ export function renderWalls(
         fc.add(
           new fabric.Polygon(openingPoints, {
             fill: opening.type === "door" ? "rgba(255,184,117,0.15)" : "rgba(124,91,240,0.15)",
-            stroke: "#484554",
+            stroke: theme().wallStroke,
             strokeWidth: 0.5,
             selectable: true,
             evented: true,
@@ -550,7 +572,7 @@ export function renderWalls(
     }
 
     // Dimension label
-    drawWallDimension(fc, wall, scale, origin);
+    drawWallDimension(fc, wall, scale, origin, theme());
 
     // Edit handles for selected walls (EDIT-12 rotate + EDIT-15/16 endpoint + thickness)
     if (isSelected) {
@@ -593,7 +615,7 @@ export function renderWalls(
             top: origin.y + point.y * scale,
             width: 9,
             height: 9,
-            fill: "#12121d",
+            fill: theme().cardBg,
             stroke: WALL_SELECTED_STROKE,
             strokeWidth: 2,
             originX: "center",
@@ -736,7 +758,7 @@ function addCapPolygon(
   }));
   fc.add(
     new fabric.Polygon(px, {
-      fill: WALL_FILL,
+      fill: theme().wallFill,
       stroke: null as unknown as string,
       strokeWidth: 0,
       selectable: false,
@@ -1026,7 +1048,7 @@ export function renderProducts(
         ? PRODUCT_STROKE
         : isHovered
         ? "#7c5bf0"
-        : "#94a3b8",
+        : theme().dimensionFg,
       strokeWidth: isSelected ? 2 : isHovered ? 2 : 1,
       strokeDashArray: showPlaceholder
         ? PLACEHOLDER_DASH
@@ -1042,7 +1064,7 @@ export function renderProducts(
     const nameLabel = new fabric.FabricText(labelText, {
       fontSize: 10,
       fontFamily: "Inter, system-ui, sans-serif",
-      fill: orphan ? PRODUCT_STROKE : "#e3e0f1",
+      fill: orphan ? PRODUCT_STROKE : theme().foreground,
       fontWeight: "600",
       originX: "center",
       originY: "bottom",
@@ -1146,7 +1168,7 @@ export function renderProducts(
         left: hx,
         top: hy,
         radius: 5,
-        fill: "#12121d",
+        fill: theme().cardBg,
         stroke: "#7c5bf0",
         strokeWidth: 2,
         originX: "center",
@@ -1170,7 +1192,7 @@ export function renderProducts(
             top: origin.y + h.y * scale,
             width: 10,
             height: 10,
-            fill: "#12121d",
+            fill: theme().cardBg,
             stroke: "#7c5bf0",
             strokeWidth: 2,
             originX: "center",
@@ -1192,7 +1214,7 @@ export function renderProducts(
             top: origin.y + h.y * scale,
             width: 10,
             height: 10,
-            fill: "#12121d",
+            fill: theme().cardBg,
             stroke: "#7c5bf0",
             strokeWidth: 2,
             originX: "center",

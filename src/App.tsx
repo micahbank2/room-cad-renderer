@@ -208,7 +208,7 @@ export default function App() {
             className="absolute left-2 top-2 z-20 w-8 h-8 bg-card rounded-smooth-md border border-border/60 flex items-center justify-center hover:bg-popover"
             title="SHOW SIDEBAR"
           >
-            <span className="font-sans text-[10px] text-muted-foreground/80">&#9776;</span>
+            <span className="font-sans text-[12px] text-muted-foreground/80">&#9776;</span>
           </button>
         )}
 
@@ -218,29 +218,29 @@ export default function App() {
             {/* Library sidebar filters */}
             <aside className="w-48 shrink-0 bg-card p-4 space-y-4 overflow-y-auto">
               <div>
-                <h4 className="font-sans text-[9px] text-muted-foreground/60 tracking-widest mb-2">
+                <h4 className="font-sans text-[11px] text-muted-foreground/60 tracking-widest mb-2">
                   CATEGORIES
                 </h4>
                 {["SEATING", "STORAGE", "LIGHTING", "TABLES", "DECOR"].map((cat) => (
                   <label key={cat} className="flex items-center gap-2 py-0.5 cursor-pointer">
                     <input type="checkbox" className="w-3 h-3 accent-accent rounded-none" />
-                    <span className="font-sans text-[10px] text-muted-foreground/80">{cat}</span>
+                    <span className="font-sans text-[12px] text-muted-foreground/80">{cat}</span>
                   </label>
                 ))}
               </div>
               <div>
-                <h4 className="font-sans text-[9px] text-muted-foreground/60 tracking-widest mb-2">
+                <h4 className="font-sans text-[11px] text-muted-foreground/60 tracking-widest mb-2">
                   MATERIALS
                 </h4>
                 {["NATURAL OAK", "BRUSHED STEEL", "CONCRETE", "FABRIC"].map((mat) => (
                   <label key={mat} className="flex items-center gap-2 py-0.5 cursor-pointer">
                     <input type="checkbox" className="w-3 h-3 accent-accent rounded-none" />
-                    <span className="font-sans text-[10px] text-muted-foreground/80">{mat}</span>
+                    <span className="font-sans text-[12px] text-muted-foreground/80">{mat}</span>
                   </label>
                 ))}
               </div>
               <div className="pt-2">
-                <span className="font-sans text-[9px] text-muted-foreground/60 tracking-widest">
+                <span className="font-sans text-[11px] text-muted-foreground/60 tracking-widest">
                   RECENT IMPORTS
                 </span>
               </div>
@@ -265,7 +265,6 @@ export default function App() {
               <div className={`${viewMode === "split" ? "w-1/2" : "flex-1"} h-full relative flex`}>
                 <div className="flex-1 h-full relative">
                   <FabricCanvas productLibrary={productLibrary} />
-                  <FloatingToolbar viewMode={viewMode} onViewChange={setViewMode} />
                   {/* Phase 79 WIN-PRESETS-01: floating preset chips when Window tool active */}
                   {activeTool === "window" && <WindowPresetSwitcher />}
                 </div>
@@ -293,7 +292,7 @@ export default function App() {
                 <Suspense
                   fallback={
                     <div className="w-full h-full bg-background flex items-center justify-center">
-                      <span className="font-mono text-[10px] text-muted-foreground/60 tracking-widest animate-pulse">
+                      <span className="font-mono text-[12px] text-muted-foreground/60 tracking-widest animate-pulse">
                         BUILDING SCENE...
                       </span>
                     </div>
@@ -317,6 +316,9 @@ export default function App() {
                 </AnimatePresence>
               </div>
             )}
+            {/* Phase 88 D-03: hoisted toolbar mount — renders for 2D, 3D, and Split.
+                FloatingToolbar is `position: fixed` so it self-anchors to the viewport. */}
+            <FloatingToolbar viewMode={viewMode} onViewChange={setViewMode} />
             </div>
           </div>
         )}

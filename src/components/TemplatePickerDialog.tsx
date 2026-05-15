@@ -118,10 +118,10 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
               className="group text-left bg-card border border-border/10 hover:border-accent/40 rounded-smooth-md p-4 transition-all"
             >
               <t.Icon size={28} className="text-foreground mb-2 block" />
-              <h3 className="font-sans text-[11px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
+              <h3 className="font-sans text-[13px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
                 {t.title}
               </h3>
-              <p className="font-sans text-[10px] text-muted-foreground/60 leading-relaxed">
+              <p className="font-sans text-[12px] text-muted-foreground/60 leading-relaxed">
                 {t.sub}
               </p>
             </button>
@@ -133,10 +133,10 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
                 className="group text-left bg-card border border-border/10 hover:border-accent/40 rounded-smooth-md p-4 transition-all"
               >
                 <Upload size={28} className="text-foreground mb-2 block" />
-                <h3 className="font-sans text-[11px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
+                <h3 className="font-sans text-[13px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
                   UPLOAD IMAGE
                 </h3>
-                <p className="font-sans text-[10px] text-muted-foreground/60 leading-relaxed">
+                <p className="font-sans text-[12px] text-muted-foreground/60 leading-relaxed">
                   Use an existing plan as a tracing reference.
                 </p>
               </button>
@@ -145,10 +145,10 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
                 className="group text-left bg-card border border-border/10 hover:border-accent/40 rounded-smooth-md p-4 transition-all"
               >
                 <ImageOff size={28} className="text-muted-foreground/60 mb-2 block" />
-                <h3 className="font-sans text-[11px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
+                <h3 className="font-sans text-[13px] text-foreground tracking-widest mb-1 group-hover:text-foreground transition-colors">
                   REMOVE IMAGE
                 </h3>
-                <p className="font-sans text-[10px] text-muted-foreground/60 leading-relaxed">
+                <p className="font-sans text-[12px] text-muted-foreground/60 leading-relaxed">
                   Clear the current tracing background.
                 </p>
               </button>
@@ -167,7 +167,7 @@ export default function TemplatePickerDialog({ open, onClose, onPicked, showUplo
           }}
         />
         <div className="px-5 pb-4">
-          <p className="font-sans text-[9px] text-muted-foreground/60 tracking-wider">
+          <p className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">
             ESC TO CLOSE
           </p>
         </div>

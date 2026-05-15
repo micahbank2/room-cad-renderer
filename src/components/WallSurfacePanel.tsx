@@ -103,7 +103,7 @@ export default function WallSurfacePanel() {
 
   return (
     <div className="space-y-3 p-3 border-t border-border/50">
-      <h3 className="font-sans text-[10px] text-foreground tracking-widest uppercase">
+      <h3 className="font-sans text-[12px] text-foreground tracking-widest uppercase">
         WALL SURFACE
       </h3>
 
@@ -113,7 +113,7 @@ export default function WallSurfacePanel() {
           <button
             key={s}
             onClick={() => focusWallSide(wall.id, s)}
-            className={`flex-1 font-sans text-[11px] tracking-widest py-2 rounded-smooth-md border ${
+            className={`flex-1 font-sans text-[13px] tracking-widest py-2 rounded-smooth-md border ${
               activeSide === s
                 ? "border-accent text-foreground bg-accent/10"
                 : "border-border/60 text-muted-foreground/80"
@@ -129,7 +129,7 @@ export default function WallSurfacePanel() {
       <div className="flex gap-1">
         <button
           onClick={() => swapWallSides(wall.id)}
-          className="flex-1 font-sans text-[11px] text-muted-foreground/80 hover:text-accent tracking-widest py-1.5 border border-border/60 rounded-smooth-md hover:bg-accent/10"
+          className="flex-1 font-sans text-[13px] text-muted-foreground/80 hover:text-accent tracking-widest py-1.5 border border-border/60 rounded-smooth-md hover:bg-accent/10"
         >
           Swap A/B
         </button>
@@ -138,7 +138,7 @@ export default function WallSurfacePanel() {
             const target = activeSide === "A" ? "B" : "A";
             copyWallSide(wall.id, activeSide, target);
           }}
-          className="flex-1 font-sans text-[11px] text-foreground hover:text-accent tracking-widest py-1.5 border border-ring rounded-smooth-md hover:bg-accent/10"
+          className="flex-1 font-sans text-[13px] text-foreground hover:text-accent tracking-widest py-1.5 border border-ring rounded-smooth-md hover:bg-accent/10"
         >
           Copy to {activeSide === "A" ? "B" : "A"}
         </button>
@@ -190,7 +190,7 @@ export default function WallSurfacePanel() {
                     id
                   );
                 }}
-                className="w-full font-sans text-[11px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-smooth-md"
+                className="w-full font-sans text-[13px] bg-accent text-foreground border border-border/60 px-1 py-0.5 rounded-smooth-md"
               >
                 <option value="">(LEGACY DEFAULT)</option>
                 {wainscotStyles.map((it) => (
@@ -242,19 +242,19 @@ export default function WallSurfacePanel() {
       {/* Wall art */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <span className="font-sans text-[11px] text-muted-foreground/80 tracking-wider">
+          <span className="font-sans text-[13px] text-muted-foreground/80 tracking-wider">
             WALL ART ({artItems.length})
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowLibrary((v) => !v)}
-              className="font-sans text-[11px] text-foreground hover:text-accent tracking-widest"
+              className="font-sans text-[13px] text-foreground hover:text-accent tracking-widest"
             >
               {showLibrary ? "CLOSE" : "+ LIB"}
             </button>
             <button
               onClick={() => artFileRef.current?.click()}
-              className="font-sans text-[11px] text-foreground hover:text-accent tracking-widest"
+              className="font-sans text-[13px] text-foreground hover:text-accent tracking-widest"
             >
               + ADD
             </button>
@@ -263,7 +263,7 @@ export default function WallSurfacePanel() {
         {showLibrary && (
           <div className="bg-accent rounded-smooth-md p-2 mb-1 max-h-40 overflow-y-auto">
             {framedArtItems.length === 0 ? (
-              <div className="font-sans text-[11px] text-muted-foreground/60 text-center py-1">
+              <div className="font-sans text-[13px] text-muted-foreground/60 text-center py-1">
                 ART LIBRARY EMPTY
               </div>
             ) : (
@@ -287,7 +287,7 @@ export default function WallSurfacePanel() {
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div className="font-sans text-[11px] text-muted-foreground/80 truncate">
+                      <div className="font-sans text-[13px] text-muted-foreground/80 truncate">
                         {it.name.toUpperCase()}
                       </div>
                     </button>
@@ -302,7 +302,7 @@ export default function WallSurfacePanel() {
             {artItems.map((a) => (
               <li
                 key={a.id}
-                className="flex items-center justify-between font-sans text-[11px] text-muted-foreground/80 px-2 py-1 bg-accent rounded-smooth-md"
+                className="flex items-center justify-between font-sans text-[13px] text-muted-foreground/80 px-2 py-1 bg-accent rounded-smooth-md"
               >
                 <div className="flex items-center gap-2 min-w-0 flex-1">
                   <span className="truncate">

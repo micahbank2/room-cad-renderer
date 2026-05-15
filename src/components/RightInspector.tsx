@@ -69,7 +69,7 @@ export default function RightInspector({ productLibrary, viewMode }: Props) {
         <h3 id="bulk-actions" className="font-sans text-base font-medium text-muted-foreground">
           Bulk actions
         </h3>
-        <div className="font-sans text-[11px] text-foreground">
+        <div className="font-sans text-[13px] text-foreground">
           {totalCount} ITEMS SELECTED
           {wallIds.length > 0 && ` (${wallIds.length} WALLS)`}
         </div>
@@ -90,7 +90,7 @@ export default function RightInspector({ productLibrary, viewMode }: Props) {
                 }}
                 className="w-8 h-7 bg-transparent border border-border/60 rounded-smooth-md cursor-pointer"
               />
-              <span className="font-sans text-[11px] text-muted-foreground/60">
+              <span className="font-sans text-[13px] text-muted-foreground/60">
                 APPLIES TO BOTH SIDES
               </span>
             </div>

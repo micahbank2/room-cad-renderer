@@ -34,7 +34,7 @@ export default function AddRoomDialog({ open, onClose }: Props) {
         <DialogHeader>
           <DialogTitle className="text-sm tracking-widest">ADD ROOM</DialogTitle>
         </DialogHeader>
-        <label className="block text-muted-foreground/80 text-[9px] tracking-wider mb-1">ROOM NAME</label>
+        <label className="block text-muted-foreground/80 text-[11px] tracking-wider mb-1">ROOM NAME</label>
         <input
           autoFocus
           value={name}
@@ -53,14 +53,14 @@ export default function AddRoomDialog({ open, onClose }: Props) {
           className="w-full bg-background text-foreground px-2 py-1.5 border border-border/60 mb-4 font-sans text-xs outline-none focus:border-accent"
           placeholder="ROOM NAME"
         />
-        <label className="block text-muted-foreground/80 text-[9px] tracking-wider mb-2">Template</label>
+        <label className="block text-muted-foreground/80 text-[11px] tracking-wider mb-2">Template</label>
         <div className="grid grid-cols-2 gap-2 mb-4">
           {TEMPLATE_IDS.map((id) => (
             <button
               key={id}
               type="button"
               onClick={() => setTpl(id)}
-              className={`p-3 text-[10px] text-left border transition-colors ${
+              className={`p-3 text-[12px] text-left border transition-colors ${
                 tpl === id
                   ? "border-accent text-foreground bg-accent/10"
                   : "border-border/60 text-muted-foreground hover:border-accent/50"
@@ -74,7 +74,7 @@ export default function AddRoomDialog({ open, onClose }: Props) {
           <button
             type="button"
             onClick={handleCancel}
-            className="px-3 py-1.5 text-[10px] tracking-widest text-muted-foreground/80 hover:text-muted-foreground"
+            className="px-3 py-1.5 text-[12px] tracking-widest text-muted-foreground/80 hover:text-muted-foreground"
           >
             CANCEL
           </button>
@@ -82,7 +82,7 @@ export default function AddRoomDialog({ open, onClose }: Props) {
             type="button"
             onClick={handleCreate}
             disabled={!name.trim()}
-            className="px-3 py-1.5 text-[10px] tracking-widest bg-accent text-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
+            className="px-3 py-1.5 text-[12px] tracking-widest bg-accent text-foreground disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
           >
             CREATE
           </button>

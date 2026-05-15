@@ -176,7 +176,7 @@ interface MapBadgeProps {
 function MapBadge({ label }: MapBadgeProps): JSX.Element {
   return (
     <span
-      className="font-mono text-[10px] px-1 py-0.5 rounded-smooth bg-accent/20 text-muted-foreground uppercase tracking-wide"
+      className="font-mono text-[12px] px-1 py-0.5 rounded-smooth bg-accent/20 text-muted-foreground uppercase tracking-wide"
       data-testid={`map-badge-${label.toLowerCase()}`}
     >
       {label}

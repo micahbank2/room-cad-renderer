@@ -35,7 +35,7 @@ export default function FramedArtLibrary() {
       <div className="flex items-center justify-end mb-2">
         <button
           onClick={() => setCreating((v) => !v)}
-          className="font-sans text-[9px] text-foreground hover:text-accent tracking-widest"
+          className="font-sans text-[11px] text-foreground hover:text-accent tracking-widest"
         >
           {creating ? "CANCEL" : "+ NEW"}
         </button>
@@ -48,7 +48,7 @@ export default function FramedArtLibrary() {
             placeholder="NAME..."
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-smooth-md placeholder:text-muted-foreground/60"
+            className="w-full font-sans text-[12px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-smooth-md placeholder:text-muted-foreground/60"
           />
           <input
             ref={fileInputRef}
@@ -62,7 +62,7 @@ export default function FramedArtLibrary() {
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full font-sans text-[9px] tracking-widest py-1 bg-background text-muted-foreground/80 border border-border/60 rounded-smooth-md hover:text-foreground"
+            className="w-full font-sans text-[11px] tracking-widest py-1 bg-background text-muted-foreground/80 border border-border/60 rounded-smooth-md hover:text-foreground"
           >
             {imageUrl ? "CHANGE IMAGE" : "+ UPLOAD IMAGE"}
           </button>
@@ -74,7 +74,7 @@ export default function FramedArtLibrary() {
           <select
             value={frameStyle}
             onChange={(e) => setFrameStyle(e.target.value as FrameStyle)}
-            className="w-full font-sans text-[10px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-smooth-md"
+            className="w-full font-sans text-[12px] bg-background text-foreground border border-border/60 px-2 py-1 rounded-smooth-md"
           >
             {FRAME_STYLES.map((s) => (
               <option key={s} value={s}>
@@ -85,7 +85,7 @@ export default function FramedArtLibrary() {
           <button
             onClick={handleCreate}
             disabled={!name.trim() || !imageUrl}
-            className="w-full font-sans text-[10px] tracking-widest py-1 bg-primary text-primary-foreground rounded-smooth-md hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-full font-sans text-[12px] tracking-widest py-1 bg-primary text-primary-foreground rounded-smooth-md hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
           >
             SAVE TO LIBRARY
           </button>
@@ -93,7 +93,7 @@ export default function FramedArtLibrary() {
       )}
 
       {items.length === 0 ? (
-        <div className="font-sans text-[9px] text-muted-foreground/60 text-center py-2">
+        <div className="font-sans text-[11px] text-muted-foreground/60 text-center py-2">
           NO ART YET
         </div>
       ) : (
@@ -113,7 +113,7 @@ export default function FramedArtLibrary() {
                     <img src={it.imageUrl} alt={it.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="font-sans text-[10px] text-foreground truncate">
+                    <div className="font-sans text-[12px] text-foreground truncate">
                       {it.name.toUpperCase()}
                     </div>
                     <div className="font-sans text-[8px] text-muted-foreground/60">
@@ -124,7 +124,7 @@ export default function FramedArtLibrary() {
                 <button
                   onClick={() => removeItem(it.id)}
                   title="Delete from library"
-                  className="font-sans text-[9px] text-muted-foreground/60 hover:text-foreground px-1 shrink-0"
+                  className="font-sans text-[11px] text-muted-foreground/60 hover:text-foreground px-1 shrink-0"
                 >
                   ✕
                 </button>

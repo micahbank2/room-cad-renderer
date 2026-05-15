@@ -109,7 +109,7 @@ function Divider() {
 function ToolGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-1">
-      <div className="font-sans text-[9px] tracking-wider text-muted-foreground/70 leading-none select-none">
+      <div className="font-sans text-[11px] tracking-wider text-muted-foreground/70 leading-none select-none">
         {label}
       </div>
       <div className="flex items-center gap-0.5">{children}</div>
@@ -157,6 +157,7 @@ export function FloatingToolbar({ viewMode, onViewChange }: Props): JSX.Element 
   return (
     <TooltipProvider>
       <div
+        data-testid="floating-toolbar"
         className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50
                    flex flex-wrap items-start justify-center gap-3
                    rounded-2xl border border-border bg-background/90
@@ -410,7 +411,7 @@ export function FloatingToolbar({ viewMode, onViewChange }: Props): JSX.Element 
                     size="icon-touch"
                     data-testid={testId}
                     active={viewMode === id}
-                    className={`${toolClass(viewMode === id)} font-sans text-[11px] w-auto px-3`}
+                    className={`${toolClass(viewMode === id)} font-sans text-[13px] w-auto px-3`}
                     onClick={() => onViewChange(id)}
                   >
                     {label}
@@ -609,7 +610,7 @@ export function FloatingToolbar({ viewMode, onViewChange }: Props): JSX.Element 
         </ToolGroup>
 
         {/* Zoom percentage — basis-full forces onto its own line beneath wrapped groups */}
-        <div className="basis-full text-center font-mono text-[9px] text-muted-foreground/60 mt-0.5">
+        <div className="basis-full text-center font-mono text-[11px] text-muted-foreground/60 mt-0.5">
           {Math.round(userZoom * 100)}%
         </div>
 

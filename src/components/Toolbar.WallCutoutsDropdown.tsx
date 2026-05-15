@@ -114,7 +114,7 @@ export function WallCutoutsDropdown({ anchorRef, onClose, onPick, direction = "d
           key={item.kind}
           data-testid={`wall-cutout-${item.kind}`}
           onClick={() => onPick(item.kind)}
-          className="w-full flex items-center gap-2 px-2 py-1 rounded-smooth-md font-sans text-[11px] text-foreground hover:bg-accent transition-colors"
+          className="w-full flex items-center gap-2 px-2 py-1 rounded-smooth-md font-sans text-[13px] text-foreground hover:bg-accent transition-colors"
         >
           {item.icon === "arch" && (
             <Squircle size={14} /> /* D-15: substitute for material-symbols 'arch' */

@@ -24,7 +24,7 @@ export default function HelpSearch({ query, onQueryChange, onSelect }: Props) {
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
           placeholder="SEARCH HELP..."
-          className="w-full font-sans text-[10px] tracking-wider text-foreground placeholder:text-muted-foreground/60 bg-accent border border-border/60 pl-7 pr-2 py-1.5 rounded-smooth-md focus:outline-none focus:border-accent/50"
+          className="w-full font-sans text-[12px] tracking-wider text-foreground placeholder:text-muted-foreground/60 bg-accent border border-border/60 pl-7 pr-2 py-1.5 rounded-smooth-md focus:outline-none focus:border-accent/50"
         />
         {hasQuery && (
           <button
@@ -40,7 +40,7 @@ export default function HelpSearch({ query, onQueryChange, onSelect }: Props) {
       {hasQuery && (
         <div className="mt-2 max-h-[380px] overflow-y-auto border border-border/50 rounded-smooth-md bg-background">
           {results.length === 0 ? (
-            <div className="px-3 py-4 font-sans text-[10px] text-muted-foreground/60 text-center">
+            <div className="px-3 py-4 font-sans text-[12px] text-muted-foreground/60 text-center">
               NO RESULTS
             </div>
           ) : (
@@ -54,10 +54,10 @@ export default function HelpSearch({ query, onQueryChange, onSelect }: Props) {
                       onClick={() => onSelect(entry)}
                       className="w-full text-left px-3 py-2 hover:bg-accent transition-colors border-b border-border/10 last:border-0"
                     >
-                      <div className="font-sans text-[10px] text-foreground mb-0.5">
+                      <div className="font-sans text-[12px] text-foreground mb-0.5">
                         {renderHighlighted(entry.heading, query)}
                       </div>
-                      <div className="font-sans text-[9px] text-muted-foreground/80 leading-snug">
+                      <div className="font-sans text-[11px] text-muted-foreground/80 leading-snug">
                         {renderHighlighted(entry.body, query)}
                       </div>
                       <div className="font-sans text-[8px] text-muted-foreground/60 tracking-widest mt-1 uppercase">

@@ -267,7 +267,7 @@ export function LabelOverrideInput({
 
   return (
     <div className="flex flex-col gap-1">
-      <label className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">
+      <label className="font-sans text-[13px] text-muted-foreground/60 tracking-wider">
         LABEL_OVERRIDE
       </label>
       <Input
@@ -356,7 +356,7 @@ export function CeilingDimInput({
   return (
     <div className="flex justify-between items-center">
       <label
-        className="font-sans text-[11px] text-muted-foreground/60 tracking-wider"
+        className="font-sans text-[13px] text-muted-foreground/60 tracking-wider"
         htmlFor={`ceiling-dim-${axis}-${ceiling.id}`}
       >
         {label}
@@ -391,8 +391,8 @@ export function CeilingDimInput({
 export function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-center">
-      <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">{label}</span>
-      <span className="font-sans text-[11px] text-foreground">{value}</span>
+      <span className="font-sans text-[13px] text-muted-foreground/60 tracking-wider">{label}</span>
+      <span className="font-sans text-[13px] text-foreground">{value}</span>
     </div>
   );
 }
@@ -446,7 +446,7 @@ export function EditableRow({
   if (editing) {
     return (
       <div className="flex justify-between items-center">
-        <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">{label}</span>
+        <span className="font-sans text-[13px] text-muted-foreground/60 tracking-wider">{label}</span>
         <Input
           autoFocus
           type={parser ? "text" : "number"}
@@ -467,8 +467,8 @@ export function EditableRow({
 
   return (
     <div className="flex justify-between items-center group cursor-pointer" onClick={startEdit}>
-      <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">{label}</span>
-      <span className="font-sans text-[11px] text-foreground group-hover:underline">
+      <span className="font-sans text-[13px] text-muted-foreground/60 tracking-wider">{label}</span>
+      <span className="font-sans text-[13px] text-foreground group-hover:underline">
         {formatFeet(value)} {suffix && <span className="text-muted-foreground/60">{suffix}</span>}
       </span>
     </div>
@@ -518,7 +518,7 @@ export function NumericInputRow({
   const formatted = value.toFixed(2);
   return (
     <div className="flex items-center justify-between gap-2">
-      <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">
+      <span className="font-sans text-[13px] text-muted-foreground/60 tracking-wider">
         {label}
       </span>
       <input

@@ -613,7 +613,7 @@ export default function ThreeViewport({ productLibrary }: Props) {
       </Canvas>
       {showToast && (
         <div
-          className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2 font-mono text-[10px] tracking-widest text-muted-foreground/80 bg-background/80 backdrop-blur-sm border border-border/50 rounded-sm pointer-events-none transition-opacity duration-500"
+          className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2 font-mono text-[12px] tracking-widest text-muted-foreground/80 bg-background/80 backdrop-blur-sm border border-border/50 rounded-sm pointer-events-none transition-opacity duration-500"
           style={{ opacity: showToast ? 1 : 0 }}
         >
           WALK MODE · WASD to move · Mouse to look · ESC to exit
