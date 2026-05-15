@@ -14,7 +14,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { render, fireEvent, act, screen } from "@testing-library/react";
 import { useCADStore, resetCADStoreForTests } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
-import PropertiesPanel from "@/components/PropertiesPanel";
+import RightInspector from "@/components/RightInspector";
 
 const STAIR_ID = "stair_pp_test";
 
@@ -55,7 +55,7 @@ describe("Phase 60 PropertiesPanel — StairSection (D-08, D-15)", () => {
   });
 
   it("C1: renders rise / run / width / stepCount / rotation / label inputs + Save Camera button", () => {
-    render(<PropertiesPanel productLibrary={[]} viewMode={"3d" as never} />);
+    render(<RightInspector productLibrary={[]} viewMode="3d" />);
 
     expect(screen.getByLabelText(/width/i)).toBeTruthy();
     expect(screen.getByLabelText(/rise/i)).toBeTruthy();
@@ -67,7 +67,7 @@ describe("Phase 60 PropertiesPanel — StairSection (D-08, D-15)", () => {
   });
 
   it("C2: rise input dispatches updateStairNoHistory per keystroke; Enter commits via updateStair (single undo)", async () => {
-    render(<PropertiesPanel productLibrary={[]} viewMode={"3d" as never} />);
+    render(<RightInspector productLibrary={[]} viewMode="3d" />);
 
     const input = screen.getByLabelText(/rise/i) as HTMLInputElement;
     expect(input.value).toBe("7");
@@ -93,7 +93,7 @@ describe("Phase 60 PropertiesPanel — StairSection (D-08, D-15)", () => {
   });
 
   it("C3: width edge-handle drag — 3× NoHistory mid-drag + 1 history on release ⇒ single past entry, widthFtOverride === 5.0", () => {
-    render(<PropertiesPanel productLibrary={[]} viewMode={"3d" as never} />);
+    render(<RightInspector productLibrary={[]} viewMode="3d" />);
 
     const beforePast = useCADStore.getState().past.length;
     const cad = useCADStore.getState();
