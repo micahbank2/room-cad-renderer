@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.21
-milestone_name: Sidebar IA & Contextual Surfaces
+milestone: v1.19
+milestone_name: Material Linking & Library Rebuild
 status: completed
-last_updated: "2026-05-14T21:45:00.000Z"
-last_activity: 2026-05-14
+last_updated: "2026-05-15T02:50:35.081Z"
+last_activity: 2026-05-15
 progress:
-  total_phases: 21
-  completed_phases: 14
-  total_plans: 49
-  completed_plans: 46
+  total_phases: 20
+  completed_phases: 13
+  total_plans: 48
+  completed_plans: 45
 ---
 
 # Project State
@@ -28,7 +28,7 @@ Plan: Not started
 Milestone: v1.21 Sidebar IA & Contextual Surfaces — COMPLETE
 Phases: 81 complete; 82 complete; 83 complete; 84 complete
 Status: Phase 84 COMPLETE — Sidebar tool-bound contextual visibility (D-02 gating + D-04 product-library forceOpen). v1.21 final phase shipped.
-Last activity: 2026-05-14
+Last activity: 2026-05-15
 
 ## Decisions
 
