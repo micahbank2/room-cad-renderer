@@ -4,13 +4,13 @@ milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: completed
 stopped_at: Completed 87-01-PLAN.md — theme toggle + Settings popover shipped (standalone polish phase)
-last_updated: "2026-05-15T16:09:00.000Z"
+last_updated: "2026-05-15T16:59:33.845Z"
 last_activity: 2026-05-15
 progress:
-  total_phases: 21
-  completed_phases: 14
-  total_plans: 49
-  completed_plans: 46
+  total_phases: 20
+  completed_phases: 13
+  total_plans: 48
+  completed_plans: 45
 ---
 
 # Project State
@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 
 ## Current Position
 
-Phase: 87 (standalone polish — no active milestone)
-Plan: Complete
+Phase: 999.1
+Plan: Not started
 Milestone: v1.20 Surface Depth & Architectural Expansion — COMPLETE. Phase 87 ships as standalone polish phase per D-01.
 Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86 complete; 87 complete (1 plan)
 Status: Phase 87 Plan 01 COMPLETE — Settings gear button + SettingsPopover (Light/Dark/System SegmentedControl) wired to useTheme(); removed .light force-wrappers from WelcomeScreen + ProjectManager + HelpPage (D-04). 6 unit tests + 3 e2e tests GREEN. 1113 vitest passing (+6 new). All 5 THEME requirements traced. Jessica can flip themes from the gear button; choice persists across reload; HelpPage/Welcome/ProjectManager now inherit the .dark cascade.

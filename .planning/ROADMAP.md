@@ -514,7 +514,7 @@ Standalone phases that ship outside any v1.xx milestone — small, focused, one-
 | 84. Contextual Sidebar Visibility (IA-08) | 1/1 | Complete    | 2026-05-15 |
 | 85. Parametric Product Controls (PARAM-01) | 3/3 | Complete    | 2026-05-15 |
 | 86. Columns & Pillars (COL-01) | 3/3 | Complete    | 2026-05-15 |
-| 87. Theme Toggle + Settings Popover (polish) | 1/1 | Complete   | 2026-05-15 |
+| 87. Theme Toggle + Settings Popover (polish) | 1/1 | Complete    | 2026-05-15 |
 
 ## Backlog
 
