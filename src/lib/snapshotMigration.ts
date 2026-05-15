@@ -23,7 +23,7 @@ export function defaultSnapshot(): CADSnapshot {
     annotations: {},
   };
   return {
-    version: 8,
+    version: 9,
     rooms: { room_main: mainRoom },
     activeRoomId: "room_main",
   };
@@ -59,14 +59,23 @@ function migrateWallsPerSide(rooms: Record<string, RoomDoc> | undefined): void {
 }
 
 export function migrateSnapshot(raw: unknown): CADSnapshot {
-  // Phase 81 IA-03 (D-04): v8 passthrough — already at current.
+  // Phase 85 D-05: v9 passthrough — already at current.
+  if (
+    raw &&
+    typeof raw === "object" &&
+    (raw as { version?: number }).version === 9 &&
+    (raw as CADSnapshot).rooms
+  ) {
+    return raw as CADSnapshot;
+  }
+  // Phase 85 D-05: v8 inputs flow through migrateV8ToV9 (passthrough — heightFtOverride is optional).
   if (
     raw &&
     typeof raw === "object" &&
     (raw as { version?: number }).version === 8 &&
     (raw as CADSnapshot).rooms
   ) {
-    return raw as CADSnapshot;
+    return migrateV8ToV9(raw as CADSnapshot);
   }
   // Phase 81 IA-03 (D-04): v7 inputs flow through migrateV7ToV8 (passthrough — name is optional).
   if (
@@ -560,5 +569,17 @@ export function migrateV6ToV7(snap: CADSnapshot): CADSnapshot {
 export function migrateV7ToV8(snap: CADSnapshot): CADSnapshot {
   if ((snap as { version: number }).version >= 8) return snap;
   (snap as { version: number }).version = 8;
+  return snap;
+}
+
+/* ----------------------------------------------------------------- *
+ * Phase 85 D-05 — v8 → v9. Trivial passthrough: adds optional
+ * heightFtOverride on PlacedProduct + PlacedCustomElement. Absence
+ * means catalog-height rendering (correct legacy behavior). Pure
+ * version bump — matches the Phase 81 v7→v8 + Phase 69 v6→v7 template.
+ * ----------------------------------------------------------------- */
+export function migrateV8ToV9(snap: CADSnapshot): CADSnapshot {
+  if ((snap as { version: number }).version >= 9) return snap;
+  (snap as { version: number }).version = 9;
   return snap;
 }

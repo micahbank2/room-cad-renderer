@@ -473,6 +473,79 @@ export function EditableRow({
   );
 }
 
+/** Phase 85 D-04 — silent clamp helper for inspector numeric inputs.
+ *
+ * Tightens the inspector-layer floor to 0.5 (vs. the store-layer 0.25 floor
+ * preserved for Phase 31 drag-handle UX). Non-finite values (NaN / Infinity)
+ * snap to the min — matches the "silent clamp, no error" UX from D-04.
+ */
+export function clampInspectorValue(v: number, min = 0.5, max = 50): number {
+  if (!Number.isFinite(v)) return min;
+  return Math.max(min, Math.min(max, v));
+}
+
+interface NumericInputRowProps {
+  label: string;
+  value: number;
+  onCommit: (clamped: number) => void;
+  testid: string;
+  min?: number;
+  max?: number;
+  step?: number;
+}
+
+/** Phase 85 D-05 — labeled numeric input row.
+ *
+ * Uncontrolled input keyed by `${testid}-${formatted}` so when the upstream
+ * value changes (drag-resize, undo, redo, store update from another source)
+ * the input re-mounts with the fresh defaultValue rather than retaining a
+ * stale edit. Commits on Enter or blur via `onCommit(clamped)`; Escape
+ * rewinds the buffer to the formatted source-of-truth value and blurs.
+ *
+ * Mixed-case labels per CLAUDE.md D-09.
+ */
+export function NumericInputRow({
+  label,
+  value,
+  onCommit,
+  testid,
+  min = 0.5,
+  max = 50,
+  step = 0.25,
+}: NumericInputRowProps) {
+  const formatted = value.toFixed(2);
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <span className="font-sans text-[11px] text-muted-foreground/60 tracking-wider">
+        {label}
+      </span>
+      <input
+        data-testid={testid}
+        type="number"
+        step={step}
+        min={min}
+        max={max}
+        defaultValue={formatted}
+        key={`${testid}-${formatted}`}
+        className="h-7 w-20 text-xs px-1.5 bg-card border border-border rounded-sm font-mono text-foreground"
+        onBlur={(e) => {
+          const raw = parseFloat(e.target.value);
+          const clamped = clampInspectorValue(raw, min, max);
+          e.target.value = clamped.toFixed(2);
+          onCommit(clamped);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+          if (e.key === "Escape") {
+            (e.target as HTMLInputElement).value = formatted;
+            (e.target as HTMLInputElement).blur();
+          }
+        }}
+      />
+    </div>
+  );
+}
+
 // Phase 33 Plan 08 (GH #87) — test driver for rotation preset chips.
 // Gated by MODE === "test" per Phase 31 driver convention. Exposes click +
 // lookup helpers so RTL specs can exercise the preset block without

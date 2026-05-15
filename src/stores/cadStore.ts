@@ -30,6 +30,7 @@ import {
   migrateV5ToV6,
   migrateV6ToV7,
   migrateV7ToV8,
+  migrateV8ToV9,
 } from "@/lib/snapshotMigration";
 import type { SurfaceTarget } from "@/lib/surfaceMaterial";
 import type { PaintColor } from "@/types/paint";
@@ -66,6 +67,9 @@ interface CADState {
   // Phase 31 — per-axis override mutations (D-01/D-02)
   resizeProductAxis: (id: string, axis: "width" | "depth", valueFt: number) => void;
   resizeProductAxisNoHistory: (id: string, axis: "width" | "depth", valueFt: number) => void;
+  /** Phase 85 D-05: per-placement height override. Mirrors resizeProductAxis pair. */
+  resizeProductHeight: (id: string, valueFt: number) => void;
+  resizeProductHeightNoHistory: (id: string, valueFt: number) => void;
   clearProductOverrides: (id: string) => void;
   setFloorPlanImage: (dataUrl: string | undefined) => void;
   addCeiling: (points: Point[], height: number, material?: string) => string;
@@ -120,6 +124,9 @@ interface CADState {
   updatePlacedCustomElementNoHistory: (id: string, changes: Partial<PlacedCustomElement>) => void;
   resizeCustomElementAxis: (id: string, axis: "width" | "depth", valueFt: number) => void;
   resizeCustomElementAxisNoHistory: (id: string, axis: "width" | "depth", valueFt: number) => void;
+  /** Phase 85 D-05: per-placement height override for custom elements. */
+  resizeCustomElementHeight: (id: string, valueFt: number) => void;
+  resizeCustomElementHeightNoHistory: (id: string, valueFt: number) => void;
   clearCustomElementOverrides: (id: string) => void;
   /** Phase 48 CAM-04 (D-04): NoHistory setter — write savedCameraPos/Target on a wall. */
   setSavedCameraOnWallNoHistory: (
@@ -224,7 +231,7 @@ function snapshot(state: CADState): CADSnapshot {
   const root = state as any;
   const t0 = import.meta.env.DEV ? performance.now() : 0;
   const snap: CADSnapshot = {
-    version: 8,
+    version: 9,
     rooms: structuredClone(toPlain(state.rooms)),
     activeRoomId: state.activeRoomId,
     ...(root.customElements
@@ -646,6 +653,32 @@ export const useCADStore = create<CADState>()((set) => ({
       })
     ),
 
+  // Phase 85 D-05 — height override mutations (D-04: store clamp stays [0.25, 50]; inspector tightens floor to 0.5).
+  resizeProductHeight: (id, valueFt) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const pp = doc.placedProducts[id];
+        if (!pp) return;
+        const v = Math.max(0.25, Math.min(50, valueFt));
+        pushHistory(s);
+        pp.heightFtOverride = v;
+      })
+    ),
+
+  resizeProductHeightNoHistory: (id, valueFt) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc) return;
+        const pp = doc.placedProducts[id];
+        if (!pp) return;
+        const v = Math.max(0.25, Math.min(50, valueFt));
+        pp.heightFtOverride = v;
+      })
+    ),
+
   clearProductOverrides: (id) =>
     set(
       produce((s: CADState) => {
@@ -656,6 +689,8 @@ export const useCADStore = create<CADState>()((set) => ({
         pushHistory(s);
         pp.widthFtOverride = undefined;
         pp.depthFtOverride = undefined;
+        // Phase 85 D-05: also clear height override.
+        pp.heightFtOverride = undefined;
       })
     ),
 
@@ -1143,6 +1178,28 @@ export const useCADStore = create<CADState>()((set) => ({
       })
     ),
 
+  // Phase 85 D-05 — height override mutations for placed custom elements.
+  resizeCustomElementHeight: (id, valueFt) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.placedCustomElements?.[id]) return;
+        const v = Math.max(0.25, Math.min(50, valueFt));
+        pushHistory(s);
+        doc.placedCustomElements[id].heightFtOverride = v;
+      })
+    ),
+
+  resizeCustomElementHeightNoHistory: (id, valueFt) =>
+    set(
+      produce((s: CADState) => {
+        const doc = activeDoc(s);
+        if (!doc?.placedCustomElements?.[id]) return;
+        const v = Math.max(0.25, Math.min(50, valueFt));
+        doc.placedCustomElements[id].heightFtOverride = v;
+      })
+    ),
+
   clearCustomElementOverrides: (id) =>
     set(
       produce((s: CADState) => {
@@ -1151,6 +1208,8 @@ export const useCADStore = create<CADState>()((set) => ({
         pushHistory(s);
         doc.placedCustomElements[id].widthFtOverride = undefined;
         doc.placedCustomElements[id].depthFtOverride = undefined;
+        // Phase 85 D-05: also clear height override.
+        doc.placedCustomElements[id].heightFtOverride = undefined;
       })
     ),
 
@@ -1525,20 +1584,21 @@ export const useCADStore = create<CADState>()((set) => ({
 
   loadSnapshot: async (raw: unknown): Promise<void> => {
     // Phase 51 Pattern A: async pre-pass runs BEFORE produce() (Immer constraint)
-    const shaped = migrateSnapshot(raw);             // sync: v1→v2 (or v3/v4/v5/v6/v7/v8 passthrough)
+    const shaped = migrateSnapshot(raw);             // sync: v1→v2 (or v3/v4/v5/v6/v7/v8/v9 passthrough)
     const migratedV3 = await migrateFloorMaterials(shaped); // async: v2→v3 IDB migration
     const migratedV4 = migrateV3ToV4(migratedV3);    // sync: v3→v4 stair seed (Phase 60)
     const migratedV5 = migrateV4ToV5(migratedV4);    // sync: v4→v5 measure/annotation seed (Phase 62)
     const migrated = await migrateV5ToV6(migratedV5); // async: v5→v6 surface Material migration (Phase 68)
     const migratedV7 = migrateV6ToV7(migrated); // sync: v6→v7 finishMaterialId passthrough (Phase 69)
     const migratedV8 = migrateV7ToV8(migratedV7); // sync: v7→v8 WallSegment.name passthrough (Phase 81)
+    const migratedV9 = migrateV8ToV9(migratedV8); // sync: v8→v9 heightFtOverride passthrough (Phase 85)
     set(
       produce((s: CADState) => {
-        s.rooms = migratedV8.rooms;
-        s.activeRoomId = migratedV8.activeRoomId;
-        (s as any).customElements = (migratedV8 as any).customElements ?? {};
-        (s as any).customPaints = (migratedV8 as any).customPaints ?? [];
-        (s as any).recentPaints = (migratedV8 as any).recentPaints ?? [];
+        s.rooms = migratedV9.rooms;
+        s.activeRoomId = migratedV9.activeRoomId;
+        (s as any).customElements = (migratedV9 as any).customElements ?? {};
+        (s as any).customPaints = (migratedV9 as any).customPaints ?? [];
+        (s as any).recentPaints = (migratedV9 as any).recentPaints ?? [];
         s.past = [];
         s.future = [];
       })

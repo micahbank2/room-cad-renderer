@@ -95,11 +95,11 @@ import type { PlacedProduct, PlacedCustomElement, CustomElement } from "@/types/
  * D-02: effective render dims for a placed product, honoring per-axis overrides.
  *   width  = widthFtOverride  ?? (libraryWidth × sizeScale)
  *   depth  = depthFtOverride  ?? (libraryDepth × sizeScale)
- *   height = libraryHeight    (no override; sizeScale never applied to height per existing contract)
+ *   height = heightFtOverride ?? libraryHeight    (Phase 85 D-05: per-placement override; sizeScale never applied to height per existing contract)
  */
 export function resolveEffectiveDims(
   product: Product | undefined | null,
-  placed: Pick<PlacedProduct, "sizeScale" | "widthFtOverride" | "depthFtOverride">,
+  placed: Pick<PlacedProduct, "sizeScale" | "widthFtOverride" | "depthFtOverride" | "heightFtOverride">,
 ): { width: number; depth: number; height: number; isPlaceholder: boolean } {
   const scale = placed.sizeScale && placed.sizeScale > 0 ? placed.sizeScale : 1;
   const isPlaceholder =
@@ -113,7 +113,7 @@ export function resolveEffectiveDims(
   return {
     width: placed.widthFtOverride ?? baseW * scale,
     depth: placed.depthFtOverride ?? baseD * scale,
-    height: baseH,
+    height: placed.heightFtOverride ?? baseH,
     isPlaceholder,
   };
 }
@@ -121,10 +121,11 @@ export function resolveEffectiveDims(
 /**
  * D-02: effective render dims for a placed custom element, honoring per-axis overrides.
  * Custom elements always have numeric dims when defined, so no isPlaceholder flag.
+ * Phase 85 D-05: honors heightFtOverride.
  */
 export function resolveEffectiveCustomDims(
   el: CustomElement | undefined,
-  placed: Pick<PlacedCustomElement, "sizeScale" | "widthFtOverride" | "depthFtOverride">,
+  placed: Pick<PlacedCustomElement, "sizeScale" | "widthFtOverride" | "depthFtOverride" | "heightFtOverride">,
 ): { width: number; depth: number; height: number } {
   const scale = placed.sizeScale && placed.sizeScale > 0 ? placed.sizeScale : 1;
   if (!el) {
@@ -137,6 +138,6 @@ export function resolveEffectiveCustomDims(
   return {
     width: placed.widthFtOverride ?? el.width * scale,
     depth: placed.depthFtOverride ?? el.depth * scale,
-    height: el.height,
+    height: placed.heightFtOverride ?? el.height,
   };
 }

@@ -611,6 +611,17 @@ export function activateSelectTool(
   };
 
   const onMouseDown = (opt: fabric.TEvent) => {
+    // Phase 85 Pitfall 4: commit any pending inspector numeric input
+    // before drag begins. Without this, a focused W/D/H/X/Y input keeps
+    // its uncommitted value while the drag fires its own pushHistory +
+    // store write — on input blur (which fires after drag-end), the
+    // stale typed value overwrites the just-dragged position/size.
+    // No-op when nothing inspector-side is focused (activeElement is body).
+    const active = document.activeElement;
+    if (active && active instanceof HTMLElement && active !== document.body) {
+      active.blur();
+    }
+
     const pointer = fc.getViewportPoint(opt.e);
     const feet = pxToFeet(pointer, origin, scale);
 
