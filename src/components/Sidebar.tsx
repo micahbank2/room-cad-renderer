@@ -1,6 +1,7 @@
 import { PanelSection } from "@/components/ui";
 import type { Product } from "@/types/product";
 import { useUIStore } from "@/stores/uiStore";
+import { useCADStore } from "@/stores/cadStore";
 import RoomSettings from "./RoomSettings";
 import SidebarProductPicker from "./SidebarProductPicker";
 import CustomElementsPanel from "./CustomElementsPanel";
@@ -15,6 +16,19 @@ interface Props {
 
 export default function Sidebar({ productLibrary }: Props) {
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
+
+  // Phase 84 D-02 (IA-08): contextual visibility gates.
+  // - Custom Elements: visible during select/product workflows.
+  // - Wainscot + Framed Art: wall-surface catalog managers — gated by
+  //   activeTool === "select" AND a wall being selected.
+  // Phase 84 D-04: product-library auto-expands while product tool is active.
+  const activeTool = useUIStore((s) => s.activeTool);
+  const selectedIds = useUIStore((s) => s.selectedIds);
+  const walls = useCADStore((s) => s.rooms[s.activeRoomId ?? ""]?.walls ?? {});
+  const wallSelected = selectedIds.length === 1 && !!walls[selectedIds[0]];
+  const customElementsVisible =
+    activeTool === "select" || activeTool === "product";
+  const wallSurfaceVisible = activeTool === "select" && wallSelected;
 
   return (
     <aside className="w-64 shrink-0 bg-card flex flex-col overflow-hidden">
@@ -47,19 +61,30 @@ export default function Sidebar({ productLibrary }: Props) {
         {/* Phase 80 audit removals: System Stats, Layers (now in toolbar grid toggle).
             Phase 83 D-04: Snap moved to FloatingToolbar Utility group. */}
 
-        <PanelSection id="sidebar-custom-elements" label="Custom elements" defaultOpen={false}>
-          <CustomElementsPanel />
-        </PanelSection>
+        {customElementsVisible && (
+          <PanelSection id="sidebar-custom-elements" label="Custom elements" defaultOpen={false}>
+            <CustomElementsPanel />
+          </PanelSection>
+        )}
 
-        <PanelSection id="sidebar-framed-art" label="Framed art library" defaultOpen={false}>
-          <FramedArtLibrary />
-        </PanelSection>
+        {wallSurfaceVisible && (
+          <PanelSection id="sidebar-framed-art" label="Framed art library" defaultOpen={false}>
+            <FramedArtLibrary />
+          </PanelSection>
+        )}
 
-        <PanelSection id="sidebar-wainscoting" label="Wainscoting library" defaultOpen={false}>
-          <WainscotLibrary />
-        </PanelSection>
+        {wallSurfaceVisible && (
+          <PanelSection id="sidebar-wainscoting" label="Wainscoting library" defaultOpen={false}>
+            <WainscotLibrary />
+          </PanelSection>
+        )}
 
-        <PanelSection id="sidebar-product-library" label="Product library" defaultOpen={false}>
+        <PanelSection
+          id="sidebar-product-library"
+          label="Product library"
+          defaultOpen={false}
+          forceOpen={activeTool === "product"}
+        >
           <SidebarProductPicker />
         </PanelSection>
       </div>
