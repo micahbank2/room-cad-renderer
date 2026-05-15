@@ -180,14 +180,14 @@ interface UIState {
     /** Phase 60 STAIRS-01 adds 'stair'. Phase 61 OPEN-01 (D-11') adds 'opening'
      *  for archway / passthrough / niche / door / window. parentId = wallId
      *  for opening kind. */
-    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "stair" | "opening" | "measureLine" | "annotation";
+    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "stair" | "column" | "opening" | "measureLine" | "annotation";
     nodeId: string | null;
     position: { x: number; y: number };
     /** Phase 61 OPEN-01: when kind === 'opening', the parent wall id. */
     parentId?: string;
   } | null;
   openContextMenu: (
-    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "stair" | "opening" | "measureLine" | "annotation",
+    kind: "wall" | "product" | "ceiling" | "custom" | "empty" | "stair" | "column" | "opening" | "measureLine" | "annotation",
     nodeId: string | null,
     position: { x: number; y: number },
     parentId?: string,

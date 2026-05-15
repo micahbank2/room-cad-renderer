@@ -10,12 +10,13 @@ import {
   useActivePlacedCustomElements,
   useCustomElements,
   useActiveStairs,
+  useActiveColumns,
   getActiveRoomDoc,
 } from "@/stores/cadStore";
 import { useUIStore } from "@/stores/uiStore";
 import { drawGrid } from "./grid";
 import { drawRoomDimensions } from "./dimensions";
-import { renderWalls, renderProducts, renderCeilings, renderCustomElements, renderStairs, renderMeasureLines, renderAnnotations, renderRoomAreaOverlay, renderFloor, setLabelLookupCanvas } from "./fabricSync";
+import { renderWalls, renderProducts, renderCeilings, renderCustomElements, renderStairs, renderColumns, renderMeasureLines, renderAnnotations, renderRoomAreaOverlay, renderFloor, setLabelLookupCanvas } from "./fabricSync";
 import { useMaterials } from "@/hooks/useMaterials";
 import { activateWallTool } from "./tools/wallTool";
 import {
@@ -117,6 +118,8 @@ export default function FabricCanvas({ productLibrary }: Props) {
   const placedCustoms = useActivePlacedCustomElements();
   const customCatalog = useCustomElements();
   const stairs = useActiveStairs();
+  // Phase 86 COL-01: per-room columns subscription for redraw.
+  const columns = useActiveColumns();
   // Phase 62 MEASURE-01 — subscribe to per-room measure/annotation maps so redraw fires.
   const measureLines = activeDoc?.measureLines ?? {};
   const annotations = activeDoc?.annotations ?? {};
@@ -251,6 +254,10 @@ export default function FabricCanvas({ productLibrary }: Props) {
     //    selection outlines layer above. Skips hidden via Phase 46 cascade.
     renderStairs(fc, stairs, scale, origin, selectedIds, hiddenIds, hoveredEntityId);
 
+    // 7b. Columns (Phase 86 COL-01) — render alongside stairs. Note arg order
+    //     matches renderColumns signature (hiddenIds, selectedIds, hoveredId).
+    renderColumns(fc, columns, scale, origin, hiddenIds, selectedIds, hoveredEntityId);
+
     // 8. Phase 62 MEASURE-01 — measure lines + annotations + room-area overlay.
     //    Rendered last so they layer above all geometry.
     renderMeasureLines(fc, measureLines, scale, origin);
@@ -268,7 +275,7 @@ export default function FabricCanvas({ productLibrary }: Props) {
     // Hotfix #2 — record the tool we just activated so the next redraw can
     // tell whether activeTool changed (affects the drag short-circuit above).
     prevActiveToolRef.current = activeTool as ToolType;
-  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog, productImageTick, stairs, hiddenIds, measureLines, annotations, editingAnnotationId, materials, activeDoc, hoveredEntityId]);
+  }, [room, walls, placedProducts, productLibrary, activeTool, selectedIds, showGrid, userZoom, panOffset, floorPlanImage, ceilings, placedCustoms, customCatalog, productImageTick, stairs, columns, hiddenIds, measureLines, annotations, editingAnnotationId, materials, activeDoc, hoveredEntityId]);
 
   // Init canvas
   useEffect(() => {
@@ -594,6 +601,12 @@ export default function FabricCanvas({ productLibrary }: Props) {
           // 6-action menu (Phase 53 D-11 + research Q5).
           if ((obj as fabric.FabricObject).containsPoint(pointer)) {
             hit = { kind: "stair", nodeId: d.stairId as string };
+            break;
+          }
+        } else if (d.type === "column" && d.columnId) {
+          // Phase 86 COL-01: right-click on a column Group opens the context menu.
+          if ((obj as fabric.FabricObject).containsPoint(pointer)) {
+            hit = { kind: "column", nodeId: d.columnId as string };
             break;
           }
         }
