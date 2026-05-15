@@ -24,7 +24,7 @@
 - ✅ **v1.18 Pascal Visual Parity** — Phases 71–76 (shipped 2026-05-08) — chrome-only rewrite to emulate pascalorg/editor
 - 🚧 **v1.19 Material Linking & Library Rebuild** — Phases 69, 70, 77 (in progress) — finish slots on placed products + 3-tab library rebuild
 - 🚧 **v1.20 Surface Depth & Architectural Expansion** — Phases 78, 79 (in progress) — PBR maps + window presets shipped; parametric controls + columns remaining
-- 📋 **v1.21 Sidebar IA & Contextual Surfaces** — Phases 80–84 (planned) — rebuild left + right panels and floating toolbar with Figma/Miro-style contextual visibility; surfaced from Phase 79 Jessica UAT feedback — see [milestones/v1.21-REQUIREMENTS.md](milestones/v1.21-REQUIREMENTS.md)
+- ✅ **v1.21 Sidebar IA & Contextual Surfaces** — Phases 81–84 (shipped 2026-05-14) — rebuilt left + right panels and floating toolbar with Figma/Miro-style contextual visibility; 8/8 IA requirements complete (IA-02 through IA-08); surfaced from Phase 79 Jessica UAT feedback — see [milestones/v1.21-REQUIREMENTS.md](milestones/v1.21-REQUIREMENTS.md)
 
 ---
 
@@ -503,6 +503,7 @@
 | 81. Columns & Pillars | 3/3 | Complete    | 2026-05-13 |
 | 82. Inspector Rebuild (IA-04 + IA-05) | 3/3 | Complete    | 2026-05-14 |
 | 83. Floating Toolbar Redesign (IA-06 + IA-07) | 2/2 | Complete    | 2026-05-15 |
+| 84. Contextual Sidebar Visibility (IA-08) | 1/1 | Complete    | 2026-05-14 |
 
 ## Backlog
 
