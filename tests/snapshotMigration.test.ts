@@ -32,13 +32,16 @@ describe("migrateSnapshot", () => {
     // Phase 69 MAT-LINK-01 bumped to version 7 (adds optional PlacedProduct.finishMaterialId).
     // Phase 81 IA-03 (D-04) bumped to version 8 (adds optional WallSegment.name).
     // Phase 85 D-05 bumped to version 9 (adds optional heightFtOverride on PlacedProduct + PlacedCustomElement).
-    expect(d.version).toBe(9);
+    // Phase 86 COL-01 (D-04) bumped to version 10 (adds Room.columns: Record<string, Column>).
+    expect(d.version).toBe(10);
     expect(Object.keys(d.rooms)).toEqual(["room_main"]);
     expect(d.activeRoomId).toBe("room_main");
     expect(defaultSnapshot().rooms.room_main.room).toEqual({ width: 20, length: 16, wallHeight: 8 });
     // Phase 62 MEASURE-01 (D-02): default RoomDoc seeds gain empty measure/anno maps.
     expect(defaultSnapshot().rooms.room_main.measureLines).toEqual({});
     expect(defaultSnapshot().rooms.room_main.annotations).toEqual({});
+    // Phase 86 COL-01 (D-04): default RoomDoc seeds empty columns map.
+    expect(defaultSnapshot().rooms.room_main.columns).toEqual({});
   });
 
   it("legacy walls and placedProducts carry over into room_main", () => {

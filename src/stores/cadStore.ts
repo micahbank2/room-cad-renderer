@@ -31,6 +31,7 @@ import {
   migrateV6ToV7,
   migrateV7ToV8,
   migrateV8ToV9,
+  migrateV9ToV10,
 } from "@/lib/snapshotMigration";
 import type { SurfaceTarget } from "@/lib/surfaceMaterial";
 import type { PaintColor } from "@/types/paint";
@@ -1592,13 +1593,14 @@ export const useCADStore = create<CADState>()((set) => ({
     const migratedV7 = migrateV6ToV7(migrated); // sync: v6→v7 finishMaterialId passthrough (Phase 69)
     const migratedV8 = migrateV7ToV8(migratedV7); // sync: v7→v8 WallSegment.name passthrough (Phase 81)
     const migratedV9 = migrateV8ToV9(migratedV8); // sync: v8→v9 heightFtOverride passthrough (Phase 85)
+    const migratedV10 = migrateV9ToV10(migratedV9); // sync: v9→v10 columns seed-empty per RoomDoc (Phase 86)
     set(
       produce((s: CADState) => {
-        s.rooms = migratedV9.rooms;
-        s.activeRoomId = migratedV9.activeRoomId;
-        (s as any).customElements = (migratedV9 as any).customElements ?? {};
-        (s as any).customPaints = (migratedV9 as any).customPaints ?? [];
-        (s as any).recentPaints = (migratedV9 as any).recentPaints ?? [];
+        s.rooms = migratedV10.rooms;
+        s.activeRoomId = migratedV10.activeRoomId;
+        (s as any).customElements = (migratedV10 as any).customElements ?? {};
+        (s as any).customPaints = (migratedV10 as any).customPaints ?? [];
+        (s as any).recentPaints = (migratedV10 as any).recentPaints ?? [];
         s.past = [];
         s.future = [];
       })
