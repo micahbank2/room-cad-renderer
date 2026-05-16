@@ -135,4 +135,209 @@ test.describe.parallel("Phase 90 canvas polish", () => {
       expect(canvasBottom).toBeLessThanOrEqual(toolbarTop - 4);
     });
   }
+
+  // ─── Plan 90-02 (Wave 2) — #203 left-click pan + D-06 fit-resets-pan ───
+
+  // Helper: read panOffset via __uiStore test bridge.
+  async function getPanOffset(page: import("@playwright/test").Page) {
+    return await page.evaluate(
+      () =>
+        (window as unknown as {
+          __uiStore?: { getState: () => { panOffset: { x: number; y: number } } };
+        }).__uiStore?.getState().panOffset ?? null,
+    );
+  }
+
+  async function getUserZoom(page: import("@playwright/test").Page) {
+    return await page.evaluate(
+      () =>
+        (window as unknown as {
+          __uiStore?: { getState: () => { userZoom: number } };
+        }).__uiStore?.getState().userZoom ?? null,
+    );
+  }
+
+  async function setActiveTool(
+    page: import("@playwright/test").Page,
+    tool: string,
+  ) {
+    await page.evaluate((t) => {
+      (window as unknown as {
+        __uiStore?: { getState: () => { setTool: (s: string) => void } };
+      }).__uiStore?.getState().setTool(t);
+    }, tool);
+  }
+
+  test("#203 — left-click drag on empty canvas pans the view (Select tool)", async ({
+    page,
+  }) => {
+    await setupPage(page);
+    await seedRoom(page);
+
+    // Ensure Select tool is active.
+    await setActiveTool(page, "select");
+
+    // Record initial pan offset.
+    const initial = await getPanOffset(page);
+    expect(initial).not.toBeNull();
+    if (!initial) return;
+
+    // Find the canvas wrapper bounding box; pick a point well inside the
+    // empty area (the seed room has one wall_1 from (2,2) to (18,2) — we
+    // synthesize the mouse far from that line by clicking near the
+    // center-bottom of the wrapper).
+    const wrapper = page.locator("canvas").first();
+    const box = await wrapper.boundingBox();
+    expect(box).not.toBeNull();
+    if (!box) return;
+
+    // Click in the empty middle of the canvas. Use absolute viewport coords.
+    const startX = Math.round(box.x + box.width / 2);
+    const startY = Math.round(box.y + box.height * 0.75);
+    const endX = startX + 100;
+    const endY = startY + 50;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down({ button: "left" });
+    // Multi-step move to ensure mousemove handlers fire.
+    await page.mouse.move(startX + 50, startY + 25, { steps: 4 });
+    await page.mouse.move(endX, endY, { steps: 4 });
+
+    // While the drag is live, the wrapper cursor should be 'grabbing'.
+    const cursorDuring = await page.evaluate(() => {
+      // Find the wrapper element by walking up from the canvas.
+      const c = document.querySelector("canvas");
+      const w = c?.parentElement;
+      return w?.style.cursor ?? "";
+    });
+    expect(cursorDuring).toBe("grabbing");
+
+    await page.mouse.up({ button: "left" });
+
+    // Poll: pan offset should have shifted by the cursor delta.
+    await expect
+      .poll(async () => await getPanOffset(page), {
+        timeout: 1000,
+        intervals: [16, 32, 50, 100],
+      })
+      .toEqual({ x: initial.x + 100, y: initial.y + 50 });
+
+    // Cursor should no longer be 'grabbing' after mouseup.
+    const cursorAfter = await page.evaluate(() => {
+      const c = document.querySelector("canvas");
+      const w = c?.parentElement;
+      return w?.style.cursor ?? "";
+    });
+    expect(cursorAfter).not.toBe("grabbing");
+  });
+
+  test("#203 — left-click on a wall does NOT pan (hit-clash guard)", async ({
+    page,
+  }) => {
+    await setupPage(page);
+    await seedRoom(page);
+    await setActiveTool(page, "select");
+
+    const initial = await getPanOffset(page);
+    expect(initial).not.toBeNull();
+    if (!initial) return;
+
+    // Compute viewport coordinates of wall_1 (start=(2,2), end=(18,2) in feet).
+    // Read the fc transform from FabricCanvas wrapper bbox + room dims.
+    const wallMid = await page.evaluate(() => {
+      const canvasEl = document.querySelector("canvas") as HTMLCanvasElement | null;
+      if (!canvasEl) return null;
+      const rect = canvasEl.getBoundingClientRect();
+      const cad = (window as unknown as {
+        __cadStore?: {
+          getState: () => {
+            activeRoomId: string;
+            rooms: Record<string, { room: { width: number; length: number } }>;
+          };
+        };
+      }).__cadStore;
+      if (!cad) return null;
+      const st = cad.getState();
+      const room = st.rooms[st.activeRoomId]?.room;
+      if (!room) return null;
+      const padding = 40;
+      const scale = Math.min(
+        (rect.width - padding) / room.width,
+        (rect.height - padding) / room.length,
+      );
+      const originX = (rect.width - room.width * scale) / 2;
+      const originY = (rect.height - room.length * scale) / 2;
+      // Wall midpoint in feet: ((2+18)/2, 2) = (10, 2).
+      // Pan offset applies on top of base fit origin, so include it.
+      const ui = (window as unknown as {
+        __uiStore?: {
+          getState: () => {
+            panOffset: { x: number; y: number };
+            userZoom: number;
+          };
+        };
+      }).__uiStore?.getState();
+      const userZoom = ui?.userZoom ?? 1;
+      const panX = ui?.panOffset.x ?? 0;
+      const panY = ui?.panOffset.y ?? 0;
+      const effScale = scale * userZoom;
+      const xPx = rect.left + originX + panX + 10 * effScale;
+      const yPx = rect.top + originY + panY + 2 * effScale;
+      return { x: xPx, y: yPx };
+    });
+    expect(wallMid).not.toBeNull();
+    if (!wallMid) return;
+
+    await page.mouse.move(wallMid.x, wallMid.y);
+    await page.mouse.down({ button: "left" });
+    await page.mouse.move(wallMid.x + 30, wallMid.y, { steps: 4 });
+    await page.mouse.up({ button: "left" });
+
+    // panOffset must NOT change — the click landed on the wall, so it's
+    // a wall-drag, not a pan.
+    const after = await getPanOffset(page);
+    expect(after).toEqual(initial);
+  });
+
+  test("#203 / D-06 — Fit-to-screen resets pan to {0,0}", async ({ page }) => {
+    await setupPage(page);
+    await seedRoom(page);
+    await setActiveTool(page, "select");
+
+    // First, induce a non-zero pan by dragging on empty canvas (depends on
+    // the #203 fix landing in the same plan).
+    const wrapper = page.locator("canvas").first();
+    const box = await wrapper.boundingBox();
+    expect(box).not.toBeNull();
+    if (!box) return;
+
+    const startX = Math.round(box.x + box.width / 2);
+    const startY = Math.round(box.y + box.height * 0.75);
+    await page.mouse.move(startX, startY);
+    await page.mouse.down({ button: "left" });
+    await page.mouse.move(startX + 75, startY + 30, { steps: 4 });
+    await page.mouse.up({ button: "left" });
+
+    // Wait until pan has shifted off origin.
+    await expect
+      .poll(async () => {
+        const p = await getPanOffset(page);
+        return p ? p.x : 0;
+      })
+      .not.toBe(0);
+
+    // Click Fit-to-screen.
+    await page.locator('[data-testid="toolbar-fit"]').click();
+
+    // panOffset should reset to {0,0} and userZoom to 1.
+    await expect
+      .poll(async () => await getPanOffset(page), {
+        timeout: 1000,
+        intervals: [16, 32, 100],
+      })
+      .toEqual({ x: 0, y: 0 });
+
+    const zoom = await getUserZoom(page);
+    expect(zoom).toBe(1);
+  });
 });
