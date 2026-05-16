@@ -4,13 +4,13 @@ milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: completed
 stopped_at: "Completed 90-02-PLAN.md — #203 left-click pan on empty canvas shipped; Phase 90 COMPLETE"
-last_updated: "2026-05-15T20:50:00.000Z"
-last_activity: 2026-05-15
+last_updated: "2026-05-16T01:02:04.390Z"
+last_activity: 2026-05-16
 progress:
   total_phases: 20
-  completed_phases: 14
+  completed_phases: 13
   total_plans: 48
-  completed_plans: 46
+  completed_plans: 45
 ---
 
 # Project State
@@ -24,12 +24,12 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 
 ## Current Position
 
-Phase: 90-canvas-polish — COMPLETE (both plans shipped)
-Plan: — (no active plan; Phase 90 closed)
+Phase: 999.1
+Plan: Not started
 Milestone: v1.20 Surface Depth & Architectural Expansion — COMPLETE. Phase 87 + Phase 88 + Phase 89 + Phase 90 ship as standalone polish phases per D-01.
 Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86 complete; 87 complete; 88 complete (88-01 + 88-02); 89 complete (89-01); 90 complete (90-01 + 90-02)
 Status: Phase 90 COMPLETE — #201 + #202 + #203 all fixed. PR ready (Closes #201 #202 #203).
-Last activity: 2026-05-15
+Last activity: 2026-05-16
 Stopped at: Completed 90-02-PLAN.md — #203 left-click pan on empty canvas shipped; Phase 90 COMPLETE
 
 ## Decisions
@@ -143,5 +143,6 @@ Stopped at: Completed 90-02-PLAN.md — #203 left-click pan on empty canvas ship
 Phase 90 (canvas polish) COMPLETE — all 3 Phase 89 UAT bugs fixed (#201 theme backdrop flip, #202 toolbar viewport reservation, #203 left-click pan on empty canvas). Ready to open PR (`Closes #201`, `Closes #202`, `Closes #203`). Phase 90 SUMMARY docs at `.planning/phases/90-canvas-polish/90-01-SUMMARY.md` + `90-02-SUMMARY.md`.
 
 Next phase candidates (per ROADMAP):
+
 - New UAT cycle on canvas after Phase 90 ships — Jessica may surface 3D viewport polish gaps.
 - v1.22 scope per PROJECT.md if no canvas regressions surface.
