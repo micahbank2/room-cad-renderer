@@ -205,9 +205,10 @@ test.describe.parallel("Phase 90 canvas polish", () => {
 
     // While the drag is live, the wrapper cursor should be 'grabbing'.
     const cursorDuring = await page.evaluate(() => {
-      // Find the wrapper element by walking up from the canvas.
+      // Climb canvas → .canvas-container → wrapperRef div (the element
+      // FabricCanvas + selectTool write cursor to).
       const c = document.querySelector("canvas");
-      const w = c?.parentElement;
+      const w = c?.parentElement?.parentElement ?? c?.parentElement;
       return w?.style.cursor ?? "";
     });
     expect(cursorDuring).toBe("grabbing");
@@ -225,7 +226,7 @@ test.describe.parallel("Phase 90 canvas polish", () => {
     // Cursor should no longer be 'grabbing' after mouseup.
     const cursorAfter = await page.evaluate(() => {
       const c = document.querySelector("canvas");
-      const w = c?.parentElement;
+      const w = c?.parentElement?.parentElement ?? c?.parentElement;
       return w?.style.cursor ?? "";
     });
     expect(cursorAfter).not.toBe("grabbing");
@@ -260,10 +261,12 @@ test.describe.parallel("Phase 90 canvas polish", () => {
       const st = cad.getState();
       const room = st.rooms[st.activeRoomId]?.room;
       if (!room) return null;
-      const padding = 40;
+      // Mirrors FabricCanvas.getBaseFitScale: padding = 50 on each side
+      // (so effective inset = 100 total).
+      const pad = 50;
       const scale = Math.min(
-        (rect.width - padding) / room.width,
-        (rect.height - padding) / room.length,
+        (rect.width - pad * 2) / room.width,
+        (rect.height - pad * 2) / room.length,
       );
       const originX = (rect.width - room.width * scale) / 2;
       const originY = (rect.height - room.length * scale) / 2;

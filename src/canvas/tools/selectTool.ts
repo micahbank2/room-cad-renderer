@@ -208,6 +208,16 @@ export function isSelectToolDragActive(): boolean {
   return _dragActive;
 }
 
+/** Phase 90 D-05 (#203) — pan-in-progress flag. Set true when left-click
+ *  pan on empty canvas is active (no entity hit). Read by FabricCanvas to
+ *  skip the setPanOffset-triggered redraw → cleanup → re-activate cycle,
+ *  which would otherwise discard the closure-scoped panStart + window
+ *  listeners on the very first pan-move. Mirrors _dragActive semantics. */
+let _panActive = false;
+export function isSelectToolPanActive(): boolean {
+  return _panActive;
+}
+
 /** Hotfix #2 (tool-switch revert). FabricCanvas.redraw() short-circuits on
  *  selectedIds-triggered redraws while a drag is live — but must NOT
  *  short-circuit on activeTool-triggered redraws, because the activeTool
@@ -220,7 +230,9 @@ export function isSelectToolDragActive(): boolean {
 export function shouldSkipRedrawDuringDrag(
   opts: { activeToolChanged: boolean },
 ): boolean {
-  return _dragActive && !opts.activeToolChanged;
+  // Phase 90 D-05 (#203) — same gating for pan: skip setPanOffset-induced
+  // redraws while pan is live so the tool isn't re-activated mid-pan.
+  return (_dragActive || _panActive) && !opts.activeToolChanged;
 }
 
 /** Set to true when a redraw was skipped because `_dragActive` was true.
@@ -342,6 +354,39 @@ export function activateSelectTool(
   // ceilings). Wall-endpoint branch (L765-789) deliberately untouched per
   // D-08b (v1 scope).
   let cachedScene: SceneGeometry | null = null;
+
+  // Phase 90 D-05 (#203) — left-click pan on empty canvas. State + handlers
+  // live in this closure (StrictMode-safe per CLAUDE.md §7) so the activate()
+  // cleanup below clears them on tool switch / unmount. Coexists with the
+  // FabricCanvas-level middle-mouse + Space+left pan handler (which early-
+  // returns for left-click without space, so no double-trigger).
+  let panStart: { startX: number; startY: number; originX: number; originY: number } | null = null;
+  const getWrapperEl = (): HTMLElement | null => {
+    const canvasEl = fc.getElement() as HTMLCanvasElement | undefined;
+    // Fabric wraps <canvas> in a `.canvas-container` div, which itself sits
+    // inside the FabricCanvas wrapperRef div. The pan handler in
+    // FabricCanvas.tsx writes to wrapperRef directly; we mirror that by
+    // climbing two parents up (canvas → canvas-container → wrapperRef).
+    return canvasEl?.parentElement?.parentElement ?? canvasEl?.parentElement ?? null;
+  };
+  const onPanMove = (e: MouseEvent) => {
+    if (!panStart) return;
+    const dx = e.clientX - panStart.startX;
+    const dy = e.clientY - panStart.startY;
+    useUIStore.getState().setPanOffset({
+      x: panStart.originX + dx,
+      y: panStart.originY + dy,
+    });
+  };
+  const onPanUp = () => {
+    if (!panStart) return;
+    panStart = null;
+    _panActive = false;
+    const w = getWrapperEl();
+    if (w) w.style.cursor = "";
+    window.removeEventListener("mousemove", onPanMove);
+    window.removeEventListener("mouseup", onPanUp);
+  };
 
   /**
    * Compute the axis-aligned bbox of the currently dragged object centered at
@@ -1014,6 +1059,32 @@ export function activateSelectTool(
       useUIStore.getState().clearSelection();
       dragging = false;
       dragId = null;
+      // Phase 90 D-05 (#203) — left-click pan on empty canvas. Only fires
+      // for the Select tool's no-hit branch, so it doesn't conflict with
+      // wall/product/etc. drag in the hit branch above. FabricCanvas's
+      // own pan handler (middle-mouse + Space+left) early-returns for
+      // plain left-click, so there's no double-pan.
+      const me = opt.e as MouseEvent;
+      // Defensive: only on primary (left) button, no modifier keys that
+      // would imply a different intent.
+      if (me.button === 0 && !me.metaKey && !me.ctrlKey && !me.shiftKey && !me.altKey) {
+        const { panOffset } = useUIStore.getState();
+        panStart = {
+          startX: me.clientX,
+          startY: me.clientY,
+          originX: panOffset.x,
+          originY: panOffset.y,
+        };
+        // Pan-active flag prevents FabricCanvas.redraw() (triggered by the
+        // setPanOffset() calls below) from running cleanup → re-activate,
+        // which would discard panStart and the window-level listeners.
+        // Mirrors the _dragActive pattern (used by entity drag).
+        _panActive = true;
+        const w = getWrapperEl();
+        if (w) w.style.cursor = "grabbing";
+        window.addEventListener("mousemove", onPanMove);
+        window.addEventListener("mouseup", onPanUp);
+      }
     }
     // Sync module-level drag-active flag so FabricCanvas can skip full
     // redraws triggered by the select()/clearSelection() calls above while
@@ -1024,6 +1095,19 @@ export function activateSelectTool(
   };
 
   const onMouseMove = (opt: fabric.TEvent) => {
+    // Phase 90 D-05 (#203) — hover cursor on empty canvas: grab. During an
+    // active pan-drag the cursor is already `grabbing` (set in onPanUp/Down).
+    // Skip cursor mutation while dragging an entity (drag types own their
+    // own cursors) or while pan is active (already grabbing).
+    if (!dragging && !panStart) {
+      const w = getWrapperEl();
+      if (w) {
+        const pointer = fc.getViewportPoint(opt.e);
+        const feet = pxToFeet(pointer, origin, scale);
+        const hit = hitTestStore(feet, _productLibrary);
+        w.style.cursor = hit ? "" : "grab";
+      }
+    }
     if (!dragging || !dragId) return;
     const pointer = fc.getViewportPoint(opt.e);
     const feet = pxToFeet(pointer, origin, scale);
@@ -1890,6 +1974,22 @@ export function activateSelectTool(
     fc.off("mouse:move", onMouseMove);
     fc.off("mouse:up", onMouseUp);
     document.removeEventListener("keydown", onKeyDown);
+    // Phase 90 D-05 (#203) — clear any in-flight pan-drag listeners + cursor.
+    // StrictMode safety: window-level handlers MUST be removed even if
+    // panStart is null (defensive — removing a not-installed handler is a
+    // no-op), and the wrapper cursor restored.
+    if (panStart) {
+      panStart = null;
+      _panActive = false;
+      window.removeEventListener("mousemove", onPanMove);
+      window.removeEventListener("mouseup", onPanUp);
+      const w = getWrapperEl();
+      if (w) w.style.cursor = "";
+    } else {
+      // Always clear hover-cursor leftover (grab from a recent mouseover).
+      const w = getWrapperEl();
+      if (w && w.style.cursor === "grab") w.style.cursor = "";
+    }
     clearSizeTag();
     // Phase 30 — clear smart-snap guides on tool-switch cleanup (Pitfall 3).
     clearSnapGuides(fc);
