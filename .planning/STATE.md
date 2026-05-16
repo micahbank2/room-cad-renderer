@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: completed
-stopped_at: Completed 91-02-PLAN.md — COL-91-01 shipped; Phase 91 (Object-to-Object Alignment + Collision) COMPLETE; 6/6 e2e + 1153/1153 vitest GREEN; PR-ready
-last_updated: "2026-05-16T02:40:19.791Z"
+stopped_at: "Completed 92-01-PLAN.md — FeedbackDialog + GitHub Issues integration shipped; closes #73; 1159/1159 vitest + 1/1 e2e GREEN"
+last_updated: "2026-05-16T03:07:50.223Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 20
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 Phase: 999.1
 Plan: Not started
 Milestone: v1.20 Surface Depth & Architectural Expansion — COMPLETE. Phase 87 + Phase 88 + Phase 89 + Phase 90 ship as standalone polish phases per D-01.
-Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86 complete; 87 complete; 88 complete (88-01 + 88-02); 89 complete (89-01); 90 complete (90-01 + 90-02)
-Status: Phase 90 COMPLETE — #201 + #202 + #203 all fixed. PR ready (Closes #201 #202 #203).
-Last activity: 2026-05-16
-Stopped at: Completed 91-02-PLAN.md — COL-91-01 shipped; Phase 91 (Object-to-Object Alignment + Collision) COMPLETE; 6/6 e2e + 1153/1153 vitest GREEN; PR-ready
+Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86 complete; 87 complete; 88 complete (88-01 + 88-02); 89 complete (89-01); 90 complete (90-01 + 90-02); 91 complete (91-01 + 91-02); 92 complete (92-01)
+Status: Phase 92 COMPLETE — FeedbackDialog ships; Help → SEND FEEDBACK opens form; submit POSTs to GitHub Issues API; closes #73. 1159/1159 vitest + 1/1 e2e GREEN. PR-ready.
+Last activity: 2026-05-15
+Stopped at: Completed 92-01-PLAN.md — FeedbackDialog + GitHub Issues integration shipped; closes #73; 1159/1159 vitest + 1/1 e2e GREEN
 
 ## Decisions
 
@@ -114,6 +114,7 @@ Stopped at: Completed 91-02-PLAN.md — COL-91-01 shipped; Phase 91 (Object-to-O
 | Phase 90 P02 | 35min | 2 tasks | 3 files |
 | Phase 91 P01 | 18min | 3 tasks | 6 files |
 | Phase 91 P02 | 12min | 2 tasks | 5 files |
+| Phase 92 P01 | 45m | 3 tasks | 7 files |
 
 ## v1.20 Roadmap
 

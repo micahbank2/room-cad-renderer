@@ -471,7 +471,7 @@ Standalone phases that ship outside any v1.xx milestone — small, focused, one-
 
 - 🚧 **Phase 92 — In-App Feedback Dialog → GitHub Issues** (in progress) — branch `gsd/phase-92-feedback-dialog`. Adds a "Send feedback" entry to the Help menu that opens a small dialog (title / description / type) and POSTs to the GitHub Issues REST API in `micahbank2/room-cad-renderer`. Token + repo come from `VITE_FEEDBACK_GITHUB_TOKEN` / `VITE_FEEDBACK_GITHUB_REPO` env vars; missing token falls back to a "not configured" message. Auto-collected context (app version, viewport, view mode, theme, UA) appended to the issue body. 1 plan, 3 atomic tasks. Closes GH #73. See [.planning/phases/92-feedback-dialog/92-CONTEXT.md](phases/92-feedback-dialog/92-CONTEXT.md).
   Plans:
-  - [ ] 92-01-PLAN.md — FeedbackDialog + githubFeedback helper + HelpModal trigger (FB-01..FB-08)
+  - [x] 92-01-PLAN.md — FeedbackDialog + githubFeedback helper + HelpModal trigger (FB-01..FB-08)
 
 ---
 
