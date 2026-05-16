@@ -19,6 +19,7 @@ import { installCeilingDrivers } from "./test-utils/ceilingDrivers";
 import { installTextureDrivers } from "./test-utils/textureDrivers";
 import { installThemeDrivers } from "./test-utils/themeDrivers";
 import { installProductFinishDrivers } from "./test-utils/productFinishDrivers";
+import { installDragDrivers } from "./test-utils/dragDrivers";
 
 // Phase 46: install tree test drivers (gated by MODE==="test", production no-op)
 installTreeDrivers();
@@ -49,6 +50,8 @@ installTextureDrivers();
 installThemeDrivers();
 // Phase 69: install product finish test driver (gated by MODE==="test", production no-op)
 installProductFinishDrivers();
+// Phase 91: install drag drivers for product + column smart-snap e2e (gated by MODE==="test", production no-op)
+installDragDrivers();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

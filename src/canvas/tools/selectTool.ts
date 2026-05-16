@@ -41,6 +41,7 @@ import {
   type BBox,
 } from "@/canvas/snapEngine";
 import { renderSnapGuides, clearSnapGuides } from "@/canvas/snapGuides";
+import { wouldCollide } from "@/canvas/objectCollision";
 
 type DragType =
   | "wall"
@@ -396,11 +397,29 @@ export function activateSelectTool(
    */
   const computeDraggedBBox = (
     id: string,
-    kind: "product" | "ceiling" | "custom-element",
+    kind: "product" | "ceiling" | "custom-element" | "column",
     pos: Point,
   ): BBox => {
     const doc = getActiveRoomDoc();
     if (!doc) return { id, minX: pos.x, maxX: pos.x, minY: pos.y, maxY: pos.y };
+
+    if (kind === "column") {
+      // Phase 91 ALIGN-91-03 — column participates in smart-snap. Use its
+      // rotated AABB at the candidate position so per-frame snap matches the
+      // 2D footprint render.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const col = (doc as any).columns?.[id];
+      if (col) {
+        return axisAlignedBBoxOfRotated(
+          pos,
+          col.widthFt,
+          col.depthFt,
+          col.rotation,
+          id,
+        );
+      }
+      return { id, minX: pos.x, maxX: pos.x, minY: pos.y, maxY: pos.y };
+    }
 
     if (kind === "product") {
       const pp = doc.placedProducts?.[id];
@@ -973,7 +992,13 @@ export function activateSelectTool(
       // products + ceilings (generic-move smart-snap path). Walls use the
       // wall-move branch which is OUT of scope per D-08; wall-endpoint
       // path is untouched per D-08b.
-      if (hit.type === "product" || hit.type === "ceiling") {
+      // Phase 91 ALIGN-91-03 — columns now flow through the smart-snap path
+      // (reverses Phase 86 D-08a stair-precedent skip).
+      if (
+        hit.type === "product" ||
+        hit.type === "ceiling" ||
+        hit.type === "column"
+      ) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const customCatalog = (useCADStore.getState() as any).customElements ?? {};
         cachedScene = buildSceneGeometry(
@@ -1450,16 +1475,23 @@ export function activateSelectTool(
     // Phase 30 smart-snap integration (D-08a). Applies to products + custom
     // elements + ceilings (dragType === "product" | "ceiling"). Walls fall
     // through to the existing grid-only path per D-08.
+    // Phase 91 ALIGN-91-03 — columns now also flow through smart-snap.
     let snapped: Point;
     const isSmartSnapTarget =
-      dragType === "product" || dragType === "ceiling";
+      dragType === "product" ||
+      dragType === "ceiling" ||
+      dragType === "column";
     if (!isSmartSnapTarget || altHeld || !cachedScene) {
       // D-07 Alt disabled OR wall-move OR no cached scene → grid only.
       snapped = gridSnap > 0 ? snapPoint(targetPos, gridSnap) : targetPos;
       if (isSmartSnapTarget) clearSnapGuides(fc);
     } else {
-      const bboxKind: "product" | "ceiling" | "custom-element" =
-        dragType === "ceiling" ? "ceiling" : "product";
+      const bboxKind: "product" | "ceiling" | "custom-element" | "column" =
+        dragType === "ceiling"
+          ? "ceiling"
+          : dragType === "column"
+            ? "column"
+            : "product";
       const draggedBBox = computeDraggedBBox(dragId, bboxKind, targetPos);
       const result = computeSnap({
         candidate: { pos: targetPos, bbox: draggedBBox },
@@ -1470,6 +1502,33 @@ export function activateSelectTool(
       });
       snapped = result.snapped;
       renderSnapGuides(fc, result.guides, scale, origin);
+    }
+
+    // Phase 91 COL-91-01 D-03 — silent-refuse collision check.
+    // Runs AFTER snap (snap-then-collide ordering per CONTEXT) and
+    // INDEPENDENT of altHeld (Alt disables snap only; collision is a
+    // hard constraint — see 91-CONTEXT.md D-07 / D-03).
+    // Reuses cachedScene.objectBBoxes built at drag start in Plan 91-01
+    // (exclude-self already applied at scene-build per D-02b).
+    if (
+      cachedScene &&
+      (dragType === "product" || dragType === "ceiling" || dragType === "column")
+    ) {
+      const bboxKindForCollision: "product" | "ceiling" | "custom-element" | "column" =
+        dragType === "ceiling"
+          ? "ceiling"
+          : dragType === "column"
+            ? "column"
+            : "product";
+      const snappedBBox = computeDraggedBBox(dragId, bboxKindForCollision, snapped);
+      if (wouldCollide(snappedBBox, cachedScene.objectBBoxes)) {
+        // REFUSE: skip this frame entirely. fabricObj + store stay at
+        // their previous valid position. lastDragFeetPos unchanged.
+        // Clear snap guides — showing a guide at an unreachable position
+        // would mislead the user (small UX win on top of D-03 silent-refuse).
+        clearSnapGuides(fc);
+        return;
+      }
     }
 
     if (dragType === "ceiling") {
@@ -1497,8 +1556,9 @@ export function activateSelectTool(
     } else if (dragType === "column") {
       // Phase 86 COL-01 — column move. History entry already pushed at
       // drag start via empty updateColumn(); mid-stroke uses NoHistory.
-      // Snap-engine path skipped for v1.20 (D-08a stair-precedent) — falls
-      // through to the grid-only `snapped` computed above.
+      // Phase 91 ALIGN-91-03 — column now flows through the smart-snap
+      // path above (reverses the D-08a stair-precedent skip from v1.20).
+      // `snapped` already reflects center/edge smart-snap when applicable.
       const cad = useCADStore.getState();
       const roomId = cad.activeRoomId;
       if (roomId) {

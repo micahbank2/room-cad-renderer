@@ -28,7 +28,10 @@ import type {
   Point,
   WallSegment,
   CustomElement,
+  Stair,
+  Column,
 } from "@/types/cad";
+import { DEFAULT_STAIR_WIDTH_FT } from "@/types/cad";
 import type { Product } from "@/types/product";
 import { resolveEffectiveDims, resolveEffectiveCustomDims } from "@/types/product";
 
@@ -75,6 +78,13 @@ export interface SceneGeometry {
   wallMidpoints: Array<{ point: Point; wallId: string; axis: "x" | "y" | "diag" }>;
   /** Bounding boxes of all OTHER placed products, custom elements, ceilings (exclude-self applied). */
   objectBBoxes: BBox[];
+  /**
+   * Phase 91 D-02 — object bbox centers; emit object-center axis targets in
+   * computeSnap (priority 3, between object-edge and midpoint per D-05).
+   * Collected for placedProducts, placedCustomElements, ceilings, columns,
+   * and stairs (D-04 stairs are TARGET-only — no stair-drag in Phase 91).
+   */
+  objectCenters: Point[];
 }
 
 /** What the renderer needs to draw one guide. */
@@ -151,6 +161,10 @@ export function buildSceneGeometry(
       placedProducts: Record<string, { id: string; productId: string; position: Point; rotation: number; sizeScale?: number }>;
       placedCustomElements?: Record<string, { id: string; customElementId: string; position: Point; rotation: number; sizeScale?: number }>;
       ceilings?: Record<string, { id: string; points: Point[] }>;
+      /** Phase 91 D-04 — columns participate as snap source AND target. */
+      columns?: Record<string, Column>;
+      /** Phase 91 D-04 — stairs are snap TARGETS only (no stair-drag in Phase 91). */
+      stairs?: Record<string, Stair>;
     }>;
   },
   excludeId: string,
@@ -158,7 +172,7 @@ export function buildSceneGeometry(
   customCatalog: Record<string, CustomElement>,
 ): SceneGeometry {
   const doc = state.activeRoomId ? state.rooms[state.activeRoomId] : null;
-  if (!doc) return { wallEdges: [], wallMidpoints: [], objectBBoxes: [] };
+  if (!doc) return { wallEdges: [], wallMidpoints: [], objectBBoxes: [], objectCenters: [] };
 
   const allWalls = Object.values(doc.walls);
   const wallEdges: Segment[] = [];
@@ -179,13 +193,24 @@ export function buildSceneGeometry(
   }
 
   const objectBBoxes: BBox[] = [];
+  // Phase 91 D-02 — every object that contributes a bbox also contributes its
+  // bbox center as an object-center axis target.
+  const objectCenters: Point[] = [];
+
+  const pushBBoxAndCenter = (bbox: BBox) => {
+    objectBBoxes.push(bbox);
+    objectCenters.push({
+      x: (bbox.minX + bbox.maxX) / 2,
+      y: (bbox.minY + bbox.maxY) / 2,
+    });
+  };
 
   for (const pp of Object.values(doc.placedProducts)) {
     if (pp.id === excludeId) continue; // D-02b
     const prod = productLibrary.find((p) => p.id === pp.productId);
     // Phase 31: use resolveEffectiveDims so per-axis overrides flow into snap scene.
     const dims = resolveEffectiveDims(prod, pp);
-    objectBBoxes.push(
+    pushBBoxAndCenter(
       axisAlignedBBoxOfRotated(pp.position, dims.width, dims.depth, pp.rotation, pp.id),
     );
   }
@@ -196,7 +221,7 @@ export function buildSceneGeometry(
     if (!el) continue;
     // Phase 31: use resolveEffectiveCustomDims so per-axis overrides flow into snap scene.
     const dims = resolveEffectiveCustomDims(el, pce);
-    objectBBoxes.push(
+    pushBBoxAndCenter(
       axisAlignedBBoxOfRotated(
         pce.position,
         dims.width,
@@ -217,10 +242,46 @@ export function buildSceneGeometry(
       if (p.y < minY) minY = p.y;
       if (p.y > maxY) maxY = p.y;
     }
-    objectBBoxes.push({ id: c.id, minX, maxX, minY, maxY });
+    pushBBoxAndCenter({ id: c.id, minX, maxX, minY, maxY });
   }
 
-  return { wallEdges, wallMidpoints, objectBBoxes };
+  // Phase 91 ALIGN-91-03 — columns participate as snap targets (and as snap
+  // source from selectTool drag handler). position IS bbox center for columns
+  // (Phase 86 D-02: no UP-axis asymmetry, unlike stairs).
+  for (const col of Object.values(doc.columns ?? {})) {
+    if (col.id === excludeId) continue; // D-02b
+    pushBBoxAndCenter(
+      axisAlignedBBoxOfRotated(
+        col.position,
+        col.widthFt,
+        col.depthFt,
+        col.rotation,
+        col.id,
+      ),
+    );
+  }
+
+  // Phase 91 D-04 — stairs are TARGET-only. Stair.position is bottom-step
+  // center, NOT bbox center (cad.ts:160). Compute bbox center by offsetting
+  // along the rotation-implied UP direction. For rotation=0, UP is +Y (matches
+  // Phase 60 stair render convention — stair extends from bottom-step into
+  // +Y in 2D feet). Depth = stepCount × runIn / 12 (runIn is inches).
+  for (const stair of Object.values(doc.stairs ?? {})) {
+    if (stair.id === excludeId) continue; // D-02b (kept for symmetry; stairs not draggable)
+    const widthFt = stair.widthFtOverride ?? DEFAULT_STAIR_WIDTH_FT;
+    const depthFt = (stair.stepCount * stair.runIn) / 12;
+    const theta = (stair.rotation * Math.PI) / 180;
+    // Local +Y in stair frame → world direction: (-sin θ, cos θ).
+    const upX = -Math.sin(theta);
+    const upY = Math.cos(theta);
+    const cx = stair.position.x + upX * (depthFt / 2);
+    const cy = stair.position.y + upY * (depthFt / 2);
+    pushBBoxAndCenter(
+      axisAlignedBBoxOfRotated({ x: cx, y: cy }, widthFt, depthFt, stair.rotation, stair.id),
+    );
+  }
+
+  return { wallEdges, wallMidpoints, objectBBoxes, objectCenters };
 }
 
 // ---------------------------------------------------------------------------
@@ -228,7 +289,7 @@ export function buildSceneGeometry(
 // ---------------------------------------------------------------------------
 
 type SrcKind = "edge" | "center";
-type TargetKind = "wall-face" | "object-edge" | "midpoint";
+type TargetKind = "wall-face" | "object-edge" | "object-center" | "midpoint";
 
 interface AxisTarget {
   value: number;
@@ -244,7 +305,7 @@ interface AxisSrc {
 
 interface AxisWinner {
   dxFt: number;
-  priority: 1 | 2 | 3;
+  priority: 1 | 2 | 3 | 4;
   targetValue: number;
   srcValue: number;
   isMidpoint: boolean;
@@ -252,8 +313,9 @@ interface AxisWinner {
 }
 
 /**
- * Per-axis scan with D-05a priority tiebreak.
- *   priority 3 = midpoint (only matches when source kind === "center")
+ * Per-axis scan with D-05 priority tiebreak (Phase 91 — 4 tiers).
+ *   priority 4 = midpoint (only matches when source kind === "center")
+ *   priority 3 = object-center (NEW Phase 91 — fires on edge OR center sources)
  *   priority 2 = object-edge
  *   priority 1 = wall-face
  * Replace best if strictly closer OR equal-distance + higher priority.
@@ -268,11 +330,22 @@ function scanAxis(
     for (const t of targets) {
       // Midpoint targets only apply to center sources (D-03a).
       if (t.kind === "midpoint" && s.kind !== "center") continue;
+      // Phase 91 D-02 — object-center targets only apply to center sources
+      // (aligning the dragged object's CENTER to another object's center). Edge
+      // sources don't fire on object-center targets — that would behave like
+      // an object-edge-vs-object-center misalignment.
+      if (t.kind === "object-center" && s.kind !== "center") continue;
       const dx = Math.abs(s.value - t.value);
       if (dx > tolFt) continue;
 
-      const priority: 1 | 2 | 3 =
-        t.kind === "midpoint" ? 3 : t.kind === "object-edge" ? 2 : 1;
+      const priority: 1 | 2 | 3 | 4 =
+        t.kind === "midpoint"
+          ? 4
+          : t.kind === "object-center"
+            ? 3
+            : t.kind === "object-edge"
+              ? 2
+              : 1;
 
       if (
         !best ||
@@ -374,6 +447,15 @@ export function computeSnap(input: SnapInput): SnapResult {
     targetXs.push({ value: b.maxX, kind: "object-edge" });
     targetYs.push({ value: b.minY, kind: "object-edge" });
     targetYs.push({ value: b.maxY, kind: "object-edge" });
+  }
+
+  // Phase 91 ALIGN-91-01 / D-02 — object-center axis targets. Each scene
+  // object contributes its bbox center as both an X and a Y target. Priority 3
+  // (between object-edge and midpoint per D-05) so center beats edge when both
+  // are equally close.
+  for (const c of scene.objectCenters ?? []) {
+    targetXs.push({ value: c.x, kind: "object-center" });
+    targetYs.push({ value: c.y, kind: "object-center" });
   }
 
   const xWinner = scanAxis(srcXs, targetXs, tolFt);
