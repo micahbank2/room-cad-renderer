@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: Material Linking & Library Rebuild
 status: completed
-stopped_at: Completed 89-01-PLAN.md — product/custom-element 2D image polish (Cover-fit + clipPath + label backdrops + cache invalidation)
-last_updated: "2026-05-15T23:33:32.691Z"
+stopped_at: "Completed 90-02-PLAN.md — #203 left-click pan on empty canvas shipped; Phase 90 COMPLETE"
+last_updated: "2026-05-15T20:50:00.000Z"
 last_activity: 2026-05-15
 progress:
   total_phases: 20
-  completed_phases: 13
+  completed_phases: 14
   total_plans: 48
-  completed_plans: 45
+  completed_plans: 46
 ---
 
 # Project State
@@ -24,13 +24,13 @@ See: .planning/PROJECT.md (updated 2026-05-08 — v1.19 Material Linking & Libra
 
 ## Current Position
 
-Phase: 999.1
-Plan: Not started
-Milestone: v1.20 Surface Depth & Architectural Expansion — COMPLETE. Phase 87 + Phase 88 + Phase 89 ship as standalone polish phases per D-01.
-Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86 complete; 87 complete; 88 complete (88-01 + 88-02); 89 complete (89-01)
-Status: Phase 89 COMPLETE — 2D image polish (Cover-fit, custom-element images, label backdrops, cache invalidation) ready for Jessica UAT; ready for PR
+Phase: 90-canvas-polish — COMPLETE (both plans shipped)
+Plan: — (no active plan; Phase 90 closed)
+Milestone: v1.20 Surface Depth & Architectural Expansion — COMPLETE. Phase 87 + Phase 88 + Phase 89 + Phase 90 ship as standalone polish phases per D-01.
+Phases: 81 complete; 82 complete; 83 complete; 84 complete; 85 complete; 86 complete; 87 complete; 88 complete (88-01 + 88-02); 89 complete (89-01); 90 complete (90-01 + 90-02)
+Status: Phase 90 COMPLETE — #201 + #202 + #203 all fixed. PR ready (Closes #201 #202 #203).
 Last activity: 2026-05-15
-Stopped at: Completed 89-01-PLAN.md — product/custom-element 2D image polish (Cover-fit + clipPath + label backdrops + cache invalidation)
+Stopped at: Completed 90-02-PLAN.md — #203 left-click pan on empty canvas shipped; Phase 90 COMPLETE
 
 ## Decisions
 
@@ -72,6 +72,8 @@ Stopped at: Completed 89-01-PLAN.md — product/custom-element 2D image polish (
 - [Phase 88]: Plan 88-01 (POLISH-01/02/03): Canvas theme bridge via getCanvasTheme() + setFabricSyncTheme() per-frame ref; FloatingToolbar mount hoisted; --border bumped to oklch(0.85). 1120/1120 vitest pass (1113 baseline + 7 new), 0 regressions. Refs #194, #195, #196.
 - [Phase 88]: Plan 88-02 (POLISH-04 #197): mechanical typography sweep across 36 files, 187 occurrences (text-[9/10/11px] -> text-[11/12/13px]). Single safe-revert commit (c83d36c). 2 DO-NOT-BUMP exceptions preserved at FabricCanvas.tsx:820 (dimension-edit input) + :855 (annotation input). 1120/1131 vitest pass, 0 regressions; 8/8 critical e2e on chromium-dev. 2 pre-existing Wave 1 light-mode-canvas.spec.ts failures logged to deferred-items.md (chromium getComputedStyle oklch literal vs rgb regex — not 88-02 fallout). Phase 88 COMPLETE.
 - [Phase 89]: Phase 89 Plan 01: Cover-fit + clipPath replaces Stretch in renderProducts; renderCustomElements refactored to Group-wrap rect+image+label so rotation propagates; productImageCache shared via UUID namespace (no key collision); imageUrl-trigger invalidation in productStore + cadStore; data-tag-based test queries to survive jsdom probe-div empty CSS var lookups
+- [Phase 90]: Plan 90-01 (#201 #202): MutationObserver on <html>.class drives canvas-bg flip (useTheme local-state was insufficient — per-call useState); 208px canvas height shrink via h-[calc(100%-13rem)] reserves space for FloatingToolbar (pb-* didn't work — Fabric reads padding-inclusive getBoundingClientRect)
+- [Phase 90]: Plan 90-02 (#203 D-06): left-click pan on empty canvas with Select tool — closure-scoped panStart in selectTool no-hit branch + _panActive module flag ORed into shouldSkipRedrawDuringDrag (mirrors _dragActive); FabricCanvas middle-mouse + Space+left pan paths UNTOUCHED. D-06 fit-resets-pan verified — no code change (uiStore.resetView + FloatingToolbar Fit button already correctly wired). Closure-scoped panStart was insufficient on its own: setPanOffset triggers redraw → tool re-activation → discards panStart, so _panActive gating is required. Phase 90 COMPLETE.
 
 ## Performance Metrics
 
@@ -106,6 +108,8 @@ Stopped at: Completed 89-01-PLAN.md — product/custom-element 2D image polish (
 | Phase 88 P01 | 35 | 4 tasks | 12 files |
 | Phase 88 P02 | 8min | 2 tasks | 36 files |
 | Phase 89 P01 | 16min | 4 tasks | 7 files |
+| Phase 90 P01 | 20min | 3 tasks | 3 files |
+| Phase 90 P02 | 35min | 2 tasks | 3 files |
 
 ## v1.20 Roadmap
 
@@ -136,4 +140,8 @@ Stopped at: Completed 89-01-PLAN.md — product/custom-element 2D image polish (
 
 ## Next Step
 
-Phase 87 (theme toggle + Settings popover) COMPLETE as standalone polish phase. Ready to open PR (closes the v1.21 / v1.22 theme-toggle backlog item, no GH issue tracks it directly per CONTEXT.md). Next milestone candidates: visual polish for dark mode on Welcome/Help/ProjectManager surfaces (if UAT surfaces contrast issues), or move to next v1.22 scope.
+Phase 90 (canvas polish) COMPLETE — all 3 Phase 89 UAT bugs fixed (#201 theme backdrop flip, #202 toolbar viewport reservation, #203 left-click pan on empty canvas). Ready to open PR (`Closes #201`, `Closes #202`, `Closes #203`). Phase 90 SUMMARY docs at `.planning/phases/90-canvas-polish/90-01-SUMMARY.md` + `90-02-SUMMARY.md`.
+
+Next phase candidates (per ROADMAP):
+- New UAT cycle on canvas after Phase 90 ships — Jessica may surface 3D viewport polish gaps.
+- v1.22 scope per PROJECT.md if no canvas regressions surface.

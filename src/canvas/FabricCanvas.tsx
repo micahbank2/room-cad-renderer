@@ -142,6 +142,50 @@ export default function FabricCanvas({ productLibrary }: Props) {
   // values pulled via getCanvasTheme().
   const { resolved } = useTheme();
 
+  // Phase 90 D-03 (#201): observe <html class="dark"> attribute mutations
+  // directly. Each useTheme() call has its OWN useState — SettingsPopover's
+  // useTheme drives the class write, but THIS component's `resolved` never
+  // changes when the user toggles theme from elsewhere. MutationObserver on
+  // <html>.class is the single source of truth.
+  //
+  // Inside the observer callback we rAF-defer the canvas write so we run AFTER
+  // the class attribute has flushed and CSS-token resolution returns the new
+  // theme's values. Direct fc.backgroundColor write (NOT a full redraw()) to
+  // avoid interrupting selectTool drag transactions.
+  //
+  // Also seed the initial value on mount (in case the boot bridge wrote .dark
+  // before React mounted but FabricCanvas's initial redraw raced ahead).
+  useEffect(() => {
+    let raf = 0;
+    const applyThemeToCanvas = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const fc = fcRef.current;
+        if (!fc) return;
+        const theme = getCanvasTheme();
+        setFabricSyncTheme(theme);
+        fc.backgroundColor = theme.background;
+        fc.renderAll();
+      });
+    };
+    // Seed once on mount.
+    applyThemeToCanvas();
+    // Observe the <html> class attribute — that's where useTheme writes "dark".
+    const observer = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.type === "attributes" && m.attributeName === "class") {
+          applyThemeToCanvas();
+          break;
+        }
+      }
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
   // Keep select tool's product library reference up to date
   useEffect(() => {
     setSelectToolProductLibrary(productLibrary);
@@ -814,7 +858,20 @@ export default function FabricCanvas({ productLibrary }: Props) {
   }
 
   return (
-    <div ref={wrapperRef} className={`relative w-full h-full overflow-hidden ${cursorClass}`}>
+    // Phase 90 D-04 (#202): h-[calc(100%-13rem)] reserves 208px below the
+    // canvas wrapper for the FloatingToolbar (fixed bottom-6 [24px] + ~180px
+    // actual height after Phase 83 redesign banded the toolbar into labeled
+    // groups + ~4px breathing). The Phase 90 research undercounted at ~80px;
+    // measured live height at h=1600 viewport is ~178px.
+    //
+    // Why height shrink and not pb-* padding: Fabric reads
+    // wrapper.getBoundingClientRect() inside redraw() — padding is INCLUDED in
+    // the rect, so pb-* would NOT actually shrink the canvas surface.
+    //
+    // Bumping toolbar height in src/components/FloatingToolbar.tsx
+    // (the <div data-testid="floating-toolbar"> at ~L161) requires re-tuning
+    // this offset.
+    <div ref={wrapperRef} className={`relative w-full h-[calc(100%-13rem)] overflow-hidden ${cursorClass}`}>
       <canvas ref={canvasElRef} />
       {overlayStyle && (
         <input
