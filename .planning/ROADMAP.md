@@ -456,6 +456,10 @@ Standalone phases that ship outside any v1.xx milestone — small, focused, one-
   Plans:
   - [x] 88-01-PLAN.md — Canvas theme bridge + FloatingToolbar mount + border contrast (POLISH-01/02/03)
   - [x] 88-02-PLAN.md — Typography density sweep (POLISH-04)
+- ✅ **Phase 90 — Canvas Polish** (COMPLETE) — branch `gsd/phase-90-canvas-polish`. Closes 3 GH issues from Phase 89 UAT: #201 theme backdrop flip (MutationObserver on `<html>.class` drives canvas-bg flip — useTheme local state was insufficient), #202 floating toolbar overlap (h-[calc(100%-13rem)] shrinks canvas wrapper by 208px), #203 left-click pan on empty canvas with Select tool (closure-scoped panStart in selectTool no-hit branch + _panActive module flag mirroring _dragActive). 2 plans across 2 waves. PR closes #201 #202 #203. See [.planning/phases/90-canvas-polish/90-CONTEXT.md](phases/90-canvas-polish/90-CONTEXT.md).
+  Plans:
+  - [x] 90-01-PLAN.md — Theme backdrop flip + toolbar viewport reservation (#201/#202)
+  - [x] 90-02-PLAN.md — Left-click pan on empty canvas + Fit-to-screen reset verification (#203/D-06)
 
 ---
 
