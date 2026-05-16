@@ -54,6 +54,36 @@ async function waitForWindowPresetDriver(page: import("@playwright/test").Page) 
   );
 }
 
+/**
+ * Issue #181: Playwright canvas-click placement on Fabric was unreliable —
+ * page.mouse.click at canvas-center lands 6ft from wall_1 (top edge), well
+ * outside WALL_SNAP_THRESHOLD_FT=0.5. Use the __drivePlaceWindow driver
+ * instead — same code path as a real click (uses currentWindowPreset, calls
+ * addOpening + setTool("select")), but with deterministic wall+offset.
+ */
+async function placeWindowAtWallMid(
+  page: import("@playwright/test").Page,
+  wallId: string,
+  offsetFt: number,
+) {
+  await page.waitForFunction(
+    () =>
+      typeof (window as unknown as { __drivePlaceWindow?: unknown })
+        .__drivePlaceWindow === "function",
+    { timeout: 5_000 },
+  );
+  await page.evaluate(
+    ({ wallId, offsetFt }) => {
+      (
+        window as unknown as {
+          __drivePlaceWindow: (w: string, o: number) => string | null;
+        }
+      ).__drivePlaceWindow(wallId, offsetFt);
+    },
+    { wallId, offsetFt },
+  );
+}
+
 test.describe("Phase 79 — Window Presets (WIN-PRESETS-01)", () => {
   test.beforeEach(async ({ page }) => {
     await setupPage(page);
@@ -81,11 +111,9 @@ test.describe("Phase 79 — Window Presets (WIN-PRESETS-01)", () => {
         __driveWindowPreset: (id: string) => void;
       }).__driveWindowPreset("wide");
     });
-    // Place by clicking the canvas — mid-wall hit (wall_1 runs x:2→18 at y=2).
-    const canvas = page.locator("canvas").first();
-    const box = await canvas.boundingBox();
-    if (!box) throw new Error("Canvas not visible");
-    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    // Issue #181: use __drivePlaceWindow driver instead of page.mouse.click
+    // — canvas-center misses wall_1 by 6ft (threshold is 0.5ft).
+    await placeWindowAtWallMid(page, "wall_1", 6);
     await settle(page);
     const op = await page.evaluate(() => {
       const s = (window as unknown as {
@@ -126,10 +154,8 @@ test.describe("Phase 79 — Window Presets (WIN-PRESETS-01)", () => {
         __driveWindowPreset: (id: string) => void;
       }).__driveWindowPreset("wide");
     });
-    const canvas = page.locator("canvas").first();
-    const box = await canvas.boundingBox();
-    if (!box) throw new Error("Canvas not visible");
-    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    // Issue #181: use driver-based placement.
+    await placeWindowAtWallMid(page, "wall_1", 6);
     await settle(page);
     // Select the wall to surface OpeningsSection in the panel.
     await page.evaluate(() => {
@@ -166,10 +192,8 @@ test.describe("Phase 79 — Window Presets (WIN-PRESETS-01)", () => {
         __driveWindowPreset: (id: string) => void;
       }).__driveWindowPreset("standard");
     });
-    const canvas = page.locator("canvas").first();
-    const box = await canvas.boundingBox();
-    if (!box) throw new Error("Canvas not visible");
-    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    // Issue #181: use driver-based placement.
+    await placeWindowAtWallMid(page, "wall_1", 6);
     await settle(page);
     await page.evaluate(() => {
       (window as unknown as {
