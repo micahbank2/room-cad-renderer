@@ -184,6 +184,38 @@ export function activateWindowTool(
       driveHook;
   }
 
+  // Issue #181 — Playwright canvas-click on Fabric was unreliable because the
+  // synthetic page.mouse.click landed at coordinates 6ft from wall_1 (well
+  // outside WALL_SNAP_THRESHOLD_FT=0.5). Adds a deterministic placement
+  // driver mirroring openingDrivers.__drivePlaceArchway / __drivePlaceNiche.
+  // Uses the CURRENT window preset, so __driveWindowPreset() + __drivePlaceWindow()
+  // covers the same code path as a real click-place.
+  let placeHook: ((wallId: string, offsetFt: number) => string | null) | null = null;
+  if (import.meta.env.MODE === "test") {
+    placeHook = (wallId, offsetFt) => {
+      const preset = currentWindowPreset;
+      useCADStore.getState().addOpening(wallId, {
+        type: "window",
+        offset: offsetFt,
+        width: preset.width,
+        height: preset.height,
+        sillHeight: preset.sillHeight,
+      });
+      // Mirror the click-path side effect: auto-revert to Select tool.
+      useUIStore.getState().setTool("select");
+      // Return the new opening id (last in the array post-add).
+      const doc = useCADStore.getState().rooms[useCADStore.getState().activeRoomId];
+      const wall = doc?.walls[wallId];
+      if (!wall || wall.openings.length === 0) return null;
+      return wall.openings[wall.openings.length - 1].id;
+    };
+    (
+      window as unknown as {
+        __drivePlaceWindow?: typeof placeHook;
+      }
+    ).__drivePlaceWindow = placeHook;
+  }
+
   return () => {
     fc.off("mouse:move", onMouseMove);
     fc.off("mouse:down", onMouseDown);
@@ -195,6 +227,12 @@ export function activateWindowTool(
       const w = window as unknown as { __driveWindowPreset?: typeof driveHook };
       if (w.__driveWindowPreset === driveHook) {
         delete w.__driveWindowPreset;
+      }
+    }
+    if (import.meta.env.MODE === "test" && placeHook) {
+      const w = window as unknown as { __drivePlaceWindow?: typeof placeHook };
+      if (w.__drivePlaceWindow === placeHook) {
+        delete w.__drivePlaceWindow;
       }
     }
   };
