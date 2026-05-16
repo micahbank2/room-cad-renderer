@@ -846,7 +846,20 @@ export default function FabricCanvas({ productLibrary }: Props) {
   }
 
   return (
-    <div ref={wrapperRef} className={`relative w-full h-full overflow-hidden ${cursorClass}`}>
+    // Phase 90 D-04 (#202): h-[calc(100%-13rem)] reserves 208px below the
+    // canvas wrapper for the FloatingToolbar (fixed bottom-6 [24px] + ~180px
+    // actual height after Phase 83 redesign banded the toolbar into labeled
+    // groups + ~4px breathing). The Phase 90 research undercounted at ~80px;
+    // measured live height at h=1600 viewport is ~178px.
+    //
+    // Why height shrink and not pb-* padding: Fabric reads
+    // wrapper.getBoundingClientRect() inside redraw() — padding is INCLUDED in
+    // the rect, so pb-* would NOT actually shrink the canvas surface.
+    //
+    // Bumping toolbar height in src/components/FloatingToolbar.tsx
+    // (the <div data-testid="floating-toolbar"> at ~L161) requires re-tuning
+    // this offset.
+    <div ref={wrapperRef} className={`relative w-full h-[calc(100%-13rem)] overflow-hidden ${cursorClass}`}>
       <canvas ref={canvasElRef} />
       {overlayStyle && (
         <input
