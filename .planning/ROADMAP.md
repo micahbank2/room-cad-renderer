@@ -464,6 +464,11 @@ Standalone phases that ship outside any v1.xx milestone — small, focused, one-
   - [x] 90-01-PLAN.md — Theme backdrop flip + toolbar viewport reservation (#201/#202)
   - [x] 90-02-PLAN.md — Left-click pan on empty canvas + Fit-to-screen reset verification (#203/D-06)
 
+- 🚧 **Phase 91 — Object-to-Object Alignment Guides + Collision Detection** (in progress) — branch `gsd/phase-91-alignment-collision`. Extends Phase 30 smart-snap engine with object-center axis targets (closes Phase 85 D-02 deferral) and adds columns + stairs to the snap scene. Reverses the D-08a stair-precedent skip at `selectTool.ts:1500` so columns participate as snap source. Adds silent-refuse AABB collision so dragging a chair into another chair is rejected (Phase 25 single-undo invariant preserved). 2 plans across 2 waves. See [.planning/phases/91-alignment-collision/91-CONTEXT.md](phases/91-alignment-collision/91-CONTEXT.md).
+  Plans:
+  - [ ] 91-01-PLAN.md — Object-center snap targets + columns/stairs in scene + column smart-snap wiring (ALIGN-91-01/02/03)
+  - [ ] 91-02-PLAN.md — Object-vs-object AABB collision; silent refuse (COL-91-01)
+
 ---
 
 ## Progress
