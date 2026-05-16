@@ -34,14 +34,23 @@ const mockedCreateGitHubIssue = vi.mocked(createGitHubIssue);
 const mockedIsFeedbackConfigured = vi.mocked(isFeedbackConfigured);
 
 describe("FeedbackDialog — Phase 92 (FB-02..FB-08)", () => {
-  let alertSpy: ReturnType<typeof vi.spyOn>;
+  let alertSpy: ReturnType<typeof vi.fn>;
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+  let originalAlert: typeof window.alert | undefined;
 
   beforeEach(() => {
     vi.stubEnv("VITE_FEEDBACK_GITHUB_TOKEN", "test-token-stub");
     vi.stubEnv("VITE_FEEDBACK_GITHUB_REPO", "test-owner/test-repo");
 
-    alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
+    // happy-dom does not implement window.alert by default — assign a fresh
+    // mock fn so the component's success path can call window.alert without
+    // throwing. Restore after each test to avoid cross-suite pollution.
+    originalAlert = (window as { alert?: typeof window.alert }).alert;
+    alertSpy = vi.fn();
+    (window as { alert: (msg?: string) => void }).alert = alertSpy as unknown as (
+      msg?: string,
+    ) => void;
+
     consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     Object.defineProperty(window, "innerWidth", {
@@ -61,7 +70,11 @@ describe("FeedbackDialog — Phase 92 (FB-02..FB-08)", () => {
 
   afterEach(() => {
     vi.unstubAllEnvs();
-    alertSpy.mockRestore();
+    if (originalAlert) {
+      (window as { alert: typeof window.alert }).alert = originalAlert;
+    } else {
+      delete (window as { alert?: typeof window.alert }).alert;
+    }
     consoleErrorSpy.mockRestore();
   });
 

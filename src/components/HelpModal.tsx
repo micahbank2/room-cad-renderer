@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { X, RotateCcw, ExternalLink } from "lucide-react";
+import { X, RotateCcw, ExternalLink, MessageSquare } from "lucide-react";
 import { useUIStore } from "@/stores/uiStore";
 import type { HelpSectionId } from "@/stores/uiStore";
 import {
@@ -9,8 +9,16 @@ import {
 import HelpSearch from "@/components/help/HelpSearch";
 import { useOnboardingStore } from "@/stores/onboardingStore";
 import { Dialog, DialogContent } from "@/components/ui";
+import { FeedbackDialog } from "@/components/FeedbackDialog";
 
-export default function HelpModal() {
+interface HelpModalProps {
+  /** Current app view mode — threaded to FeedbackDialog so auto-context can
+   *  include it in the issue body (FB-05). Defaults to "2d" if omitted so
+   *  legacy mounts (and tests) don't break. */
+  viewMode?: "2d" | "3d" | "split" | "library";
+}
+
+export default function HelpModal({ viewMode = "2d" }: HelpModalProps = {}) {
   const showHelp = useUIStore((s) => s.showHelp);
   const activeSection = useUIStore((s) => s.activeHelpSection);
   const closeHelp = useUIStore((s) => s.closeHelp);
@@ -20,6 +28,12 @@ export default function HelpModal() {
   const [pendingAnchor, setPendingAnchor] = useState<string | null>(null);
   const startTour = useOnboardingStore((s) => s.start);
   const resetTour = useOnboardingStore((s) => s.reset);
+
+  // Phase 92 FB-01 — FeedbackDialog open state. Lives in HelpModal so the
+  // "Send feedback" footer button can close Help (uiStore) AND open the
+  // dialog in one click. FeedbackDialog is rendered as a sibling to the
+  // Help <Dialog> below so closing Help does not unmount the feedback form.
+  const [showFeedback, setShowFeedback] = useState(false);
 
   // Scroll content pane to top on section change (unless we have a pending anchor)
   useEffect(() => {
@@ -50,6 +64,7 @@ export default function HelpModal() {
   }, [showHelp]);
 
   return (
+    <>
     <Dialog open={showHelp} onOpenChange={(open) => { if (!open) closeHelp(); }}>
       <DialogContent
         className="p-0 w-[900px] max-w-[95vw] h-[640px] max-h-[90vh] flex flex-col overflow-hidden"
@@ -123,6 +138,16 @@ export default function HelpModal() {
                 REPLAY TOUR
               </button>
               <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    closeHelp();
+                    setShowFeedback(true);
+                  }}
+                  className="font-sans text-[12px] tracking-widest text-muted-foreground/80 hover:text-foreground transition-colors flex items-center gap-1"
+                >
+                  <MessageSquare size={14} />
+                  SEND FEEDBACK
+                </button>
                 <a
                   href="/help-center"
                   target="_blank"
@@ -141,6 +166,13 @@ export default function HelpModal() {
         </div>
       </DialogContent>
     </Dialog>
+    {/* Phase 92 FB-01: rendered as sibling so closing Help doesn't unmount it */}
+    <FeedbackDialog
+      open={showFeedback}
+      onOpenChange={setShowFeedback}
+      viewMode={viewMode}
+    />
+    </>
   );
 }
 
