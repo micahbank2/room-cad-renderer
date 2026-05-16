@@ -41,6 +41,7 @@ import {
   type BBox,
 } from "@/canvas/snapEngine";
 import { renderSnapGuides, clearSnapGuides } from "@/canvas/snapGuides";
+import { wouldCollide } from "@/canvas/objectCollision";
 
 type DragType =
   | "wall"
@@ -1501,6 +1502,33 @@ export function activateSelectTool(
       });
       snapped = result.snapped;
       renderSnapGuides(fc, result.guides, scale, origin);
+    }
+
+    // Phase 91 COL-91-01 D-03 — silent-refuse collision check.
+    // Runs AFTER snap (snap-then-collide ordering per CONTEXT) and
+    // INDEPENDENT of altHeld (Alt disables snap only; collision is a
+    // hard constraint — see 91-CONTEXT.md D-07 / D-03).
+    // Reuses cachedScene.objectBBoxes built at drag start in Plan 91-01
+    // (exclude-self already applied at scene-build per D-02b).
+    if (
+      cachedScene &&
+      (dragType === "product" || dragType === "ceiling" || dragType === "column")
+    ) {
+      const bboxKindForCollision: "product" | "ceiling" | "custom-element" | "column" =
+        dragType === "ceiling"
+          ? "ceiling"
+          : dragType === "column"
+            ? "column"
+            : "product";
+      const snappedBBox = computeDraggedBBox(dragId, bboxKindForCollision, snapped);
+      if (wouldCollide(snappedBBox, cachedScene.objectBBoxes)) {
+        // REFUSE: skip this frame entirely. fabricObj + store stay at
+        // their previous valid position. lastDragFeetPos unchanged.
+        // Clear snap guides — showing a guide at an unreachable position
+        // would mislead the user (small UX win on top of D-03 silent-refuse).
+        clearSnapGuides(fc);
+        return;
+      }
     }
 
     if (dragType === "ceiling") {

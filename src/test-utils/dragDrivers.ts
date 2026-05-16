@@ -21,6 +21,7 @@ import {
   axisAlignedBBoxOfRotated,
   SNAP_TOLERANCE_PX,
 } from "@/canvas/snapEngine";
+import { wouldCollide } from "@/canvas/objectCollision";
 import { resolveEffectiveDims } from "@/types/product";
 
 declare global {
@@ -87,6 +88,25 @@ export function installDragDrivers(): () => void {
       gridSnap: 0,
     });
 
+    // Phase 91 COL-91-01 — silent-refuse collision check. Mirrors selectTool
+    // onMouseMove logic: build dragged bbox at snapped position, scan scene,
+    // refuse (no store write) if any AABB interior-overlap is found.
+    const snappedBBox = axisAlignedBBoxOfRotated(
+      result.snapped,
+      dims.width,
+      dims.depth,
+      pp.rotation,
+      productId,
+    );
+    if (wouldCollide(snappedBBox, scene.objectBBoxes)) {
+      // Refuse: mirror the live mouseup commit (one history entry per drag,
+      // committed to the LAST valid position which equals the start position
+      // when every frame was refused). Position does NOT change; one history
+      // entry is pushed. Matches the live drag-handler invariant.
+      cad.moveProduct(productId, pp.position);
+      return;
+    }
+
     // moveProduct pushes a single history entry, mirroring the drag-handler's
     // single-undo invariant (one entry per drag, mid-stroke uses NoHistory in
     // the live handler — here we just want the final snapped position
@@ -132,6 +152,21 @@ export function installDragDrivers(): () => void {
       scale: DEFAULT_SCALE_PX_PER_FT,
       gridSnap: 0,
     });
+
+    // Phase 91 COL-91-01 — silent-refuse collision check for columns.
+    const snappedBBox = axisAlignedBBoxOfRotated(
+      result.snapped,
+      col.widthFt,
+      col.depthFt,
+      col.rotation,
+      columnId,
+    );
+    if (wouldCollide(snappedBBox, scene.objectBBoxes)) {
+      // Refuse: push exactly one history entry (drag-start empty updateColumn)
+      // matching the live drag-handler invariant. Position does NOT change.
+      cad.updateColumn(roomId, columnId, {});
+      return;
+    }
 
     // Single-undo: push history once via empty updateColumn, then NoHistory move.
     cad.updateColumn(roomId, columnId, {});
