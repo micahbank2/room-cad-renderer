@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { produce } from "immer";
 import { get, set } from "idb-keyval";
 import type { Product } from "@/types/product";
+import { invalidateProduct } from "@/canvas/productImageCache";
 
 const PRODUCTS_KEY = "room-cad-products";
 
@@ -67,6 +68,13 @@ export const useProductStore = create<ProductState>()((setState, getState) => ({
   },
 
   updateProduct: (id, changes) => {
+    // Phase 89 D-05: if imageUrl key is present in changes (including
+    // explicit `undefined` clears), drop the cached HTMLImageElement so the
+    // next 2D redraw re-fetches the fresh URL. "in" check (rather than
+    // !== undefined) is deliberate — an explicit clear should also bust.
+    if ("imageUrl" in changes) {
+      invalidateProduct(id);
+    }
     setState(
       produce((s: ProductState) => {
         const prod = s.products.find((x) => x.id === id);
