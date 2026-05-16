@@ -341,8 +341,8 @@ export default function App() {
         />
       )}
 
-      {/* Help Modal */}
-      <HelpModal />
+      {/* Help Modal — Phase 92: thread viewMode for FeedbackDialog auto-context */}
+      <HelpModal viewMode={viewMode} />
 
       {/* Onboarding tour */}
       <OnboardingOverlay />
