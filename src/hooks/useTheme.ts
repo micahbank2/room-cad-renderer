@@ -16,11 +16,13 @@ export function useTheme(): {
   resolved: ResolvedTheme;
   setTheme: (t: ThemeChoice) => void;
 } {
+  // Default to "light" for new users (no stored choice).
+  // Existing users with a stored preference keep their choice.
   const [theme, setThemeState] = useState<ThemeChoice>(() => {
-    if (typeof window === "undefined") return "system";
+    if (typeof window === "undefined") return "light";
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === "light" || stored === "dark" || stored === "system") return stored;
-    return "system";
+    return "light";
   });
 
   const [systemDark, setSystemDark] = useState<boolean>(() => {
