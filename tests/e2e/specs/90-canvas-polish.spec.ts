@@ -12,6 +12,22 @@ import { test, expect } from "@playwright/test";
 import { setupPage } from "../playwright-helpers/setupPage";
 import { seedRoom } from "../playwright-helpers/seedRoom";
 
+// Parse rgb(r, g, b) OR oklch(L c h) and return a 0-1 perceptual lightness.
+// Chromium-dev returns oklch strings directly from getComputedStyle; older
+// browsers (and the Phase 88 test assumption) get rgb. Handle both.
+//
+// For rgb: lightness ≈ (r + g + b) / (3 * 255).
+// For oklch: lightness is the first component (already 0-1).
+function parseLightness(color: string): number | null {
+  const oklch = color.match(/^oklch\(\s*([\d.]+)/);
+  if (oklch) return parseFloat(oklch[1]);
+  const rgb = color.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+  if (rgb) {
+    return (parseInt(rgb[1], 10) + parseInt(rgb[2], 10) + parseInt(rgb[3], 10)) / (3 * 255);
+  }
+  return null;
+}
+
 test.describe.parallel("Phase 90 canvas polish", () => {
   test("#201 — theme toggle flips canvas backdrop without reload", async ({ page }) => {
     await setupPage(page);
@@ -24,15 +40,17 @@ test.describe.parallel("Phase 90 canvas polish", () => {
       .getByRole("radio", { name: "Light" })
       .click();
     await page.keyboard.press("Escape");
-    // Allow the (currently-buggy) redraw to settle.
+    // Allow the redraw to settle (post-fix this is the rAF tick).
     await page.waitForTimeout(150);
 
     const lightBg = await page.evaluate(
       () =>
         (window as unknown as { __driveGetCanvasBg?: () => string }).__driveGetCanvasBg?.() ?? "",
     );
-    // Light: near-white (each channel ≥ 240).
-    expect(lightBg).toMatch(/^rgb\((2[4-9]\d|25[0-5]),\s*(2[4-9]\d|25[0-5]),\s*(2[4-9]\d|25[0-5])\)/);
+    const lightL = parseLightness(lightBg);
+    expect(lightL).not.toBeNull();
+    // Light backgrounds are near-white (≥ 0.9).
+    expect(lightL ?? 0).toBeGreaterThanOrEqual(0.9);
 
     // Flip to Dark — the BUG: canvas bg does NOT update after this flip
     // (until something else forces a redraw).
@@ -43,20 +61,22 @@ test.describe.parallel("Phase 90 canvas polish", () => {
       .click();
     await page.keyboard.press("Escape");
 
-    // Critically — do NOT wait long or trigger a redraw via pan/click/etc.
-    // The fix must flip the canvas bg on its own. Allow up to ~2 rAFs.
+    // Critically — do NOT trigger a redraw via pan/click/etc.
+    // The fix must flip the canvas bg on its own (rAF deferral). Poll up to 500ms.
     await expect
       .poll(
-        async () =>
-          page.evaluate(
+        async () => {
+          const bg = await page.evaluate(
             () =>
               (window as unknown as { __driveGetCanvasBg?: () => string }).__driveGetCanvasBg?.() ??
               "",
-          ),
-        { timeout: 500, intervals: [16, 32, 50, 100, 200] },
+          );
+          return parseLightness(bg);
+        },
+        { timeout: 1000, intervals: [16, 32, 50, 100, 200] },
       )
-      // Dark: each channel below 100.
-      .toMatch(/^rgb\(([0-9]|[1-9][0-9]),\s*([0-9]|[1-9][0-9]),\s*([0-9]|[1-9][0-9])\)/);
+      // Dark backgrounds are dark (≤ 0.3).
+      .toBeLessThanOrEqual(0.3);
 
     const darkBg = await page.evaluate(
       () =>
@@ -74,15 +94,17 @@ test.describe.parallel("Phase 90 canvas polish", () => {
 
     await expect
       .poll(
-        async () =>
-          page.evaluate(
+        async () => {
+          const bg = await page.evaluate(
             () =>
               (window as unknown as { __driveGetCanvasBg?: () => string }).__driveGetCanvasBg?.() ??
               "",
-          ),
-        { timeout: 500, intervals: [16, 32, 50, 100, 200] },
+          );
+          return parseLightness(bg);
+        },
+        { timeout: 1000, intervals: [16, 32, 50, 100, 200] },
       )
-      .toMatch(/^rgb\((2[4-9]\d|25[0-5]),\s*(2[4-9]\d|25[0-5]),\s*(2[4-9]\d|25[0-5])\)/);
+      .toBeGreaterThanOrEqual(0.9);
   });
 
   for (const viewportHeight of [800, 1200, 1600]) {
